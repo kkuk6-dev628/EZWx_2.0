@@ -31,6 +31,13 @@ export class ViewController {
       );
   }
 
+  @Get('new')
+  public async showNew(@Req() req: Request, @Res() res: Response) {
+    const parsedUrl = parse(req.url, true);
+
+    await this.viewService.getNextServer().render(req, res, parsedUrl.pathname);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   public async showProfile(@Req() req: Request, @Res() res: Response) {
