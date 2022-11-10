@@ -23,6 +23,7 @@
     "next-env.d.ts",
     "next.config.js",
     "app",
+    "components",
     "pages",
     "../server/common"
   ],

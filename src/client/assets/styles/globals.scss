@@ -1,3 +1,7 @@
 @import "./partial/base";
 @import "./partial/typography";
 @import "./partial/variables";
+
+/*------ Layout ------*/
+//Header
+@import "./layout/Header.scss";
