@@ -65,6 +65,22 @@ function HomeHero() {
           </SwiperSlide>
         </Swiper>
       </div>
+      <div className="hero__card__area">
+        <div className="hero__card__area__header">
+          <h1 className="hero__card__area__title"></h1>
+          <h1 className="hero__card__area__text text"></h1>
+        </div>
+        <div className="hero__card__container">
+          <div className="hero__card">
+            <div className="hero__card__top"></div>
+            <div className="hero__card__btm">
+              <div className="hero__card__icon"></div>
+              <h2 className="hero__card__title"></h2>
+              <p className="hero__card__text text"></p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
