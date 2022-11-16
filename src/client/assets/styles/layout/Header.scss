@@ -137,11 +137,17 @@
     font-size: 20px;
     line-height: 24px;
     cursor: pointer;
+    &:hover {
+      background: transparent;
+      color: var(--color-white);
+    }
   }
 
 
   &__rgt__btn--lft {
     font-weight: 300;
+    opacity: .7;
+    
 
   }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { EffectFade, Navigation, Autoplay } from 'swiper';
+import { Navigation, Autoplay } from 'swiper';
 import Image from 'next/image';
 import 'swiper/css/navigation';
 import 'swiper/css/effect-fade';
@@ -14,7 +14,7 @@ function HomeHero() {
           spaceBetween={30}
           effect="fade"
           autoplay={{ delay: 3000, disableOnInteraction: false }}
-          modules={[Navigation, EffectFade, Autoplay]}
+          modules={[Navigation, Autoplay]}
           navigation={true}
           slidesPerView={1}
         >
