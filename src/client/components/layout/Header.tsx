@@ -1,72 +1,87 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
-import { SvgDropDown } from '../utils/SvgIcons';
+import React, { useState } from 'react';
+import { SvgDropDown, SvgMenuBurger, SvgRoundClose } from '../utils/SvgIcons';
+
+const links = [
+  {
+    id: 1,
+    name: 'Home',
+    link: '/home',
+  },
+  {
+    id: 2,
+    name: 'Samples',
+    link: '/samples',
+    children: [
+      {
+        id: 3,
+        name: 'Imagery',
+        link: '/samples/imagery',
+      },
+      {
+        id: 4,
+        name: 'Workshops',
+        link: '/samples/workshops',
+      },
+    ],
+  },
+  {
+    id: 5,
+    name: 'Try EZWxBrief',
+    link: '/try-ezwxbrief',
+  },
+  {
+    id: 6,
+    name: 'Pricing',
+    link: '/pricing',
+  },
+  {
+    id: 7,
+    name: 'Training',
+    link: '/training',
+  },
+  {
+    id: 8,
+    name: 'Blog',
+    link: '/blog',
+  },
+  {
+    id: 9,
+    name: 'About',
+    link: '/about',
+  },
+];
 
 export default function Header() {
-  const links = [
-    {
-      id: 1,
-      name: 'Home',
-      link: '/home',
-    },
-    {
-      id: 2,
-      name: 'Samples',
-      link: '/samples',
-      children: [
-        {
-          id: 3,
-          name: 'Imagery',
-          link: '/samples/imagery',
-        },
-        {
-          id: 4,
-          name: 'Workshops',
-          link: '/samples/workshops',
-        },
-      ],
-    },
-    {
-      id: 5,
-      name: 'Try EZWxBrief',
-      link: '/try-ezwxbrief',
-    },
-    {
-      id: 6,
-      name: 'Pricing',
-      link: '/pricing',
-    },
-    {
-      id: 7,
-      name: 'Training',
-      link: '/training',
-    },
-    {
-      id: 8,
-      name: 'Blog',
-      link: '/blog',
-    },
-    {
-      id: 9,
-      name: 'About',
-      link: '/about',
-    },
-  ];
+  const [activeMenu, setActiveMenu] = useState('');
+  const [activeResponsiveMenu, setActiveResponsiveMenu] = useState(false);
+  const handleActiveMenu = (id) => {
+    console.log(id);
+    setActiveMenu(id);
+  };
   return (
     <div className="header">
       <div className="container">
         <div className="header__wrp">
           <div className="header__lft">
-            <Link href="/home">
-              <Image
-                src="/images/Logo.png"
-                layout="fill"
-                alt="logo"
-                objectFit="contain"
-                className="header__img"
-              />
-            </Link>
+            <div className="header__img__area">
+              <Link href="/home">
+                <Image
+                  src="/images/Logo.png"
+                  layout="fill"
+                  alt="logo"
+                  objectFit="contain"
+                  className="header__img"
+                />
+              </Link>
+            </div>
+            <button
+              onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)}
+              className="header__menu btn"
+            >
+              {activeResponsiveMenu ? <SvgRoundClose /> : <SvgMenuBurger />}
+            </button>
           </div>
           <div className="header__mid">
             <ul className="header__nav">
@@ -119,6 +134,65 @@ export default function Header() {
           </div>
         </div>
       </div>
+      <ResponsiveMenu
+        activeResponsiveMenu={activeResponsiveMenu}
+        activeMenu={activeMenu}
+        handleActiveMenu={handleActiveMenu}
+      />
     </div>
   );
 }
+
+const ResponsiveMenu = ({
+  activeResponsiveMenu,
+  activeMenu,
+  handleActiveMenu,
+}) => {
+  console.log(activeResponsiveMenu);
+  return (
+    <div
+      className={`responsive__menu ${
+        activeResponsiveMenu ? 'responsive__menu__show' : ''
+      }`}
+    >
+      {links.map((link) => (
+        <>
+          <div
+            onClick={() => handleActiveMenu(link.id)}
+            key={link.id}
+            className={`responsive__menu__item ${
+              activeMenu && activeMenu === link.id
+                ? 'responsive__menu__active'
+                : ''
+            }`}
+          >
+            <Link href={link.link}>
+              <span className="responsive__menu__link">{link.name}</span>
+            </Link>
+            {link.children && (
+              <div className="responsive__menu__dropdown">
+                <SvgDropDown />
+              </div>
+            )}
+          </div>
+          {link.children && (
+            <div
+              className={`responsive__menu__dropdown__list ${
+                activeMenu == link.id &&
+                'responsive__menu__dropdown__list-visible'
+              }`}
+            >
+              {link.children.map((child) => (
+                <Link href={child.link}>
+                  <span className="responsive__menu__dropdown__link">
+                    {child.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </>
+      ))}
+    </div>
+  );
+};
