@@ -1,11 +1,15 @@
-.hero{
+.hero {
 
-  &__slider{
+  &__slider {
     position: relative;
     height: 0;
     padding-bottom: 25%;
 
-    &::before{
+    @media (max-width: 1024px) {
+      padding-bottom: 40%;
+    }
+
+    &::before {
       content: '';
       position: absolute;
       top: 0;
@@ -18,29 +22,38 @@
     }
   }
 
-  &__slider__content{
+  &__slider__content {
     position: relative;
     z-index: 2;
     text-align: center;
     transform: translateY(50%);
+
+    @media (max-width: 991px) {
+      transform: translateY(20%);
+    }
   }
 
-  &__title{
+  &__title {
     color: var(--color-white);
     margin-bottom: 30px;
     font-weight: 700;
     text-transform: capitalize;
     font-size: 46px;
+
+    @media (max-width: 991px) {
+      font-weight: 400;
+      font-size: 40px;
+    }
   }
 
-  &__subtitle{
+  &__subtitle {
     font-size: 28px;
     color: var(--color-white);
     margin-bottom: 30px;
 
   }
 
-  &__img{
+  &__img {
     position: absolute;
     height: 100%;
     width: 100%;
@@ -48,25 +61,4 @@
     display: block;
   }
 
-  &__card__area{}
-
-  &__card__area__header{}
-
-  &__card__area__title{}
-
-  &__card__area__text{}
-
-  &__card__container{}
-
-  &__card{}
-
-  &__card__top{}
-
-  &__card__btm{}
-
-  &__card__icon{}
-
-  &__card__title{}
-
-  &__card__text{}
 }

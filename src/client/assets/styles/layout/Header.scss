@@ -14,6 +14,10 @@
     position: relative;
     display: flex;
     align-items: center;
+
+    @media (max-width: 500px) {
+     width: auto;
+    }
   }
 
   &__img__area{
@@ -153,19 +157,22 @@
 
   &__rgt__btns {
     grid-gap: 20px;
+
+    @media (max-width: 500px) {
+      grid-gap: 15px;
+    }
   }
 
-  // &__rgt__btn {
-  //   padding: 0;
-  //   font-family: var(--font-main);
-  //   font-size: 20px;
-  //   line-height: 24px;
-  //   cursor: pointer;
-  //   &:hover {
-  //     background: transparent;
-  //     color: var(--color-white);
-  //   }
-  // }
+  &__rgt__btn {
+    @media (max-width: 500px) {
+      font-size: 12px;
+
+      &:last-child {
+        margin-right: 10px;
+      }
+    }
+    
+  }
 
   &__rgt__btn--lft {
     font-weight: 300;
@@ -180,7 +187,7 @@
 }
 
 .responsive__menu{
-  position: absolute;
+  position: fixed;
   z-index: 9;
   background-color: var(--color-primary);
   left: 80px;
@@ -195,10 +202,18 @@
   visibility: hidden;
   transition: all 0.3s ease;
 
+  @media (max-width: 1024px) {
+    left: 0;
+  }
+
   &__show{
     visibility: visible;
-    height: auto;
+    height: 100vh;
     opacity: 1;
+    overflow: scroll;
+    @media (max-width: 1024px) {
+      left: 0;
+    }
   }
   &__item{
     display: flex;
@@ -210,8 +225,8 @@
 
   &__link{
     font-weight: 400;
-font-size: 16px;
-line-height: 20px;
+    font-size: 16px;
+    line-height: 20px;
   }
 
   &__dropdown{

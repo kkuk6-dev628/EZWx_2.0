@@ -57,7 +57,6 @@ export default function Header() {
   const [activeMenu, setActiveMenu] = useState('');
   const [activeResponsiveMenu, setActiveResponsiveMenu] = useState(false);
   const handleActiveMenu = (id) => {
-    console.log(id);
     setActiveMenu(id);
   };
   return (
@@ -148,7 +147,6 @@ const ResponsiveMenu = ({
   activeMenu,
   handleActiveMenu,
 }) => {
-  console.log(activeResponsiveMenu);
   return (
     <div
       className={`responsive__menu ${
