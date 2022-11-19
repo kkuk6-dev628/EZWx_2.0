@@ -1,0 +1,154 @@
+.about{
+  position: relative;
+  padding: 60px 0;
+  background-image: url('../../../../public/images/mapbg.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  &__bg__img{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    left: 0;
+    z-index: 0;
+  }
+
+  &__overlay{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.92);
+    z-index: 1;
+  }
+
+  &__wrp{
+    position: relative;
+    z-index: 2;
+  }
+
+  &__hdr{
+    text-align: center;
+    grid-gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  &__title__wrp{}
+
+  &__title{
+    font-size: 32px;
+    color: var(--color-dark);
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: 700;
+    position: relative;
+    padding-bottom: 15px;
+  }
+
+  &__sub{
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 26px;
+    color: var(--color-dark);
+  }
+
+  &__cards{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 20px;
+    justify-content: center;
+
+    @media screen and (max-width: 991px){
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media screen and (max-width: 650px){
+      grid-template-columns: repeat(1, 1fr);
+    }
+  }
+  &__card{
+    border-radius:4px;
+    box-shadow: 0px 2px 12px rgb(0 0 0 / 8%);
+    background-color: var(--color-white);
+    cursor: pointer;
+    // max-width: 360px;
+    transition: all 0.3s ease-in-out;
+    &:hover{
+      .about__card__icon{
+        background: var(--color-white);
+        svg{
+          fill: var(--color-primary);
+          path{
+            stroke: var(--color-primary);
+          }
+        }
+      }
+    }
+
+
+  }
+
+  &__card_img__area{
+    position: relative;
+    height: 0;
+    padding-bottom: 60%;
+    border-radius:4px 4px 0 0;
+    overflow: hidden;
+  }
+
+  &__img{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    left: 0;
+  }
+
+  &__card__icon{
+    font-size: 30px;
+    display: inline-flex;
+    justify-content: center;
+    background: var(--color-primary);
+    width: 34px;
+    height: 34px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    margin: auto;
+    border: 8px solid var(--color-white);
+    margin-top: -50px;
+    position: relative;
+    transition: all 0.3s ease;
+    svg{
+      fill: var(--color-white);
+      path{
+
+        stroke: var(--color-white);
+      }
+    }
+  }
+  
+  &__card__content{
+    display: flex;
+    flex-direction: column;
+    grid-gap: 20px;
+    padding: 20px;
+  }
+
+  &__card__title{
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1.3;
+    color: var(--color-dark);
+    text-align: center;
+  }
+  &__card__subtitle{
+    font-size: 14px;
+    line-height: 24px;
+    color: var(--color-dark);
+  }
+}
