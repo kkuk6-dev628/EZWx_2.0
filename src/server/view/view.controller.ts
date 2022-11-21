@@ -31,8 +31,14 @@ export class ViewController {
       );
   }
 
-  @Get('new')
-  public async showNew(@Req() req: Request, @Res() res: Response) {
+  @Get('pricing')
+  public async showPricing(@Req() req: Request, @Res() res: Response) {
+    const parsedUrl = parse(req.url, true);
+
+    await this.viewService.getNextServer().render(req, res, parsedUrl.pathname);
+  }
+  @Get('training')
+  public async showTraining(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);
 
     await this.viewService.getNextServer().render(req, res, parsedUrl.pathname);
