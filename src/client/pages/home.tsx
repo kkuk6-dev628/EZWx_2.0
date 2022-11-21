@@ -1,13 +1,13 @@
 import React from 'react';
 import { NextPage } from 'next';
+import HomeHero from '../components/Home/HomeHero';
+import HomeAbout from '../components/Home/HomeAbout';
 
-const Home: NextPage<{ data: string }> = (props) => {
-  const { data } = props;
-
+const Home: NextPage<{ data: string }> = () => {
   return (
     <div>
-      <h1>Hello from NextJS! - Home</h1>
-      {data}
+      <HomeHero />
+      <HomeAbout />
     </div>
   );
 };
