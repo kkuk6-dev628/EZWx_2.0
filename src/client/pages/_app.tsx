@@ -3,6 +3,7 @@ import { AppProps } from 'next/app';
 import Script from 'next/script';
 import Header from '../components/layout/Header';
 import '../assets/styles/globals.scss';
+import Footer from '../components/layout/Footer';
 
 const App = ({ Component, pageProps }: AppProps) => {
   return (
@@ -22,6 +23,7 @@ const App = ({ Component, pageProps }: AppProps) => {
       </Script>
       <Header />
       <Component {...pageProps} />
+      <Footer />
     </>
   );
 };
