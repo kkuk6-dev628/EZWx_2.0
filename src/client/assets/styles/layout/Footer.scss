@@ -1,0 +1,63 @@
+.ftr{
+  padding: 18px;
+  &__wrp{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-content: space-between;
+    align-items: center;
+    grid-gap: 20px;
+
+    @media (max-width: 650px) {
+      grid-template-columns: 1fr;
+      justify-content: center;
+      text-align: center;
+    }
+  }
+
+  &__rgt{}
+
+  &__rgt__items{
+    display: flex;
+    align-items: center;
+    grid-gap: 18px;
+    justify-content: end;
+
+    @media (max-width: 650px) {
+      justify-content: center;
+    }
+  }
+  &__rgt__item{
+    display: flex;
+    color: var(--color-dark);
+
+    svg{
+      width:25px;
+      height: 25px;
+    }
+  }
+
+  &__fb{
+    svg{
+      fill: #8791D0;
+    }
+  }
+
+  &__tw{
+    svg{
+      fill: #38A1F3;
+      
+    }
+  }
+
+  &__ytb{
+    svg{
+      fill: #DA4D51;
+    }
+  }
+
+  &__insta{
+    svg{
+      fill: #C051DC;
+    }
+  }
+}

@@ -4,7 +4,9 @@ import { Navigation, Autoplay } from 'swiper';
 import Image from 'next/image';
 import 'swiper/css/navigation';
 import 'swiper/css';
+
 const css = { maxWidth: '100%', height: 'auto' };
+
 function HomeHero() {
   return (
     <div className="hero">

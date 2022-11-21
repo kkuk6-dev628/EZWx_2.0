@@ -31,6 +31,14 @@ export class ViewController {
       );
   }
 
+
+  @Get('pricing')
+  public async showPricing(@Req() req: Request, @Res() res: Response) {
+    const parsedUrl = parse(req.url, true);
+
+    await this.viewService.getNextServer().render(req, res, parsedUrl.pathname);
+  }
+  
   @Get('try-ezwxbrief')
   public async tryEZWxBrief(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);
@@ -46,8 +54,8 @@ export class ViewController {
       );
   }
 
-  @Get('new')
-  public async showNew(@Req() req: Request, @Res() res: Response) {
+  @Get('training')
+  public async showTraining(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);
 
     await this.viewService.getNextServer().render(req, res, parsedUrl.pathname);
