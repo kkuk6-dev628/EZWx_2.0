@@ -1,17 +1,12 @@
 import React from 'react';
 import { NextPage } from 'next';
-import HomeHero from '../components/Home/HomeHero';
-import HomeAbout from '../components/Home/HomeAbout';
-
-import FlexiblePricing from '../components/Shared/FlexiblePricing';
+import Map from '../components/map/Map';
 
 const Home: NextPage<{ data: string }> = () => {
   return (
-    <>
-      <HomeHero />
-      <HomeAbout />
-      <FlexiblePricing />
-    </>
+    <div>
+      <Map />
+    </div>
   );
 };
 

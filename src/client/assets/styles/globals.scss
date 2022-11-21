@@ -6,6 +6,7 @@
 //Header
 @import "./layout/Header.scss";
 
+
 //footer
 @import "./layout/Footer.scss";
 
@@ -19,11 +20,9 @@
 @import "./pages/home/HomeHero.scss";
 @import "./pages/home/HomeAbout.scss";
 
+
 //pricing
 @import "./pages/Pricing.scss";
-
-
-
 
 //swiper slider override
 .swiper-button-next:after, .swiper-button-prev:after{

@@ -65,6 +65,7 @@ function SvgRoundClose() {
     </svg>
   );
 }
+
 function SvgBulbDollar() {
   return (
     <svg
@@ -127,3 +128,4 @@ function SvgBulbDollar() {
 }
 
 export { SvgDropDown, SvgMenuBurger, SvgRoundClose, SvgBulbDollar };
+

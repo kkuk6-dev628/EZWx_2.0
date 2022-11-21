@@ -31,12 +31,29 @@ export class ViewController {
       );
   }
 
+
   @Get('pricing')
   public async showPricing(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);
 
     await this.viewService.getNextServer().render(req, res, parsedUrl.pathname);
   }
+  
+  @Get('try-ezwxbrief')
+  public async tryEZWxBrief(@Req() req: Request, @Res() res: Response) {
+    const parsedUrl = parse(req.url, true);
+    const serverSideProps = { dataFromController: '123' };
+
+    await this.viewService
+      .getNextServer()
+      .render(
+        req,
+        res,
+        parsedUrl.pathname,
+        Object.assign(parsedUrl.query, serverSideProps),
+      );
+  }
+
   @Get('training')
   public async showTraining(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);
