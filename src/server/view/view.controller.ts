@@ -31,6 +31,21 @@ export class ViewController {
       );
   }
 
+  @Get('try-ezwxbrief')
+  public async tryEZWxBrief(@Req() req: Request, @Res() res: Response) {
+    const parsedUrl = parse(req.url, true);
+    const serverSideProps = { dataFromController: '123' };
+
+    await this.viewService
+      .getNextServer()
+      .render(
+        req,
+        res,
+        parsedUrl.pathname,
+        Object.assign(parsedUrl.query, serverSideProps),
+      );
+  }
+
   @Get('new')
   public async showNew(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);
