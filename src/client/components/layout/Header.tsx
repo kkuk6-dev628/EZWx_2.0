@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SvgDropDown, SvgMenuBurger, SvgRoundClose } from '../utils/SvgIcons';
 
 const links = [
@@ -59,8 +59,23 @@ export default function Header() {
   const handleActiveMenu = (id) => {
     setActiveMenu(id);
   };
+  // sticky header
+  const [sticky, setSticky] = useState(false);
+  const handleScroll = () => {
+    if (window.scrollY > 0) {
+      setSticky(true);
+    } else {
+      setSticky(false);
+    }
+  };
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
   return (
-    <div className="header">
+    <div className={`header ${sticky && 'header--fixed'}`}>
       <div className="container">
         <div className="header__wrp">
           <div className="header__lft">
