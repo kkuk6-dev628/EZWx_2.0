@@ -1,6 +1,6 @@
 import React from 'react';
 import { NextPage } from 'next';
-import Map from '../components/map/Map';
+import Map from '../components/map/leaflet';
 
 const Home: NextPage<{ data: string }> = () => {
   return (

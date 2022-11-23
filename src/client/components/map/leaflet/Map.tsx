@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import jsonp from 'jsonp';
-import Map from './LeafletMap';
+import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+
+import styles from './Map.module.css';
+import Ellipse from './layers/BoundedWFSLayer';
+import BoundedWFSLayer from './layers/BoundedWFSLayer';
 
 function LeafletMap() {
   const [gairmetData, setGairmetData] = useState(null);
@@ -14,8 +19,12 @@ function LeafletMap() {
         name: 'parseResponse',
       },
       (error, data: any) => {
-        console.log(data);
-        setGairmetData(data);
+        // console.log(data);
+        if (error) {
+          console.error(error);
+        } else {
+          setGairmetData(data);
+        }
       },
     );
   }, []);
@@ -25,7 +34,8 @@ function LeafletMap() {
   };
 
   return (
-    <Map
+    <MapContainer
+      className={styles.map}
       bounds={[
         [55.0, -130.0],
         [20.0, -60.0],
@@ -33,18 +43,16 @@ function LeafletMap() {
       zoomControl={false}
       ref={handleOnMapMounted}
     >
-      {({ TileLayer, GeoJSON, Marker, Popup, ZoomControl }) => (
-        <>
-          <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}" />
-          {gairmetData != null && <GeoJSON data={gairmetData} />}
-          <Marker position={[38.907132, -77.036546]}>
-            <Popup>
-              A pretty CSS3 popup. <br /> Easily customizable.
-            </Popup>
-          </Marker>
-          <ZoomControl
-            position="topright"
-            zoomInText={`<svg
+      <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}" />
+      <BoundedWFSLayer
+        url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
+        maxFeatures={256}
+        typeName="EZWxBrief:gairmet_latest"
+        jsonpCallbackName="parseResponse"
+      ></BoundedWFSLayer>
+      <ZoomControl
+        position="topright"
+        zoomInText={`<svg
             width="24"
             height="24"
             viewBox="0 0 24 24"
@@ -75,7 +83,7 @@ function LeafletMap() {
               strokeLinejoin="round"
             />
           </svg>`}
-            zoomOutText={`<svg
+        zoomOutText={`<svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
             height="24"
@@ -99,10 +107,8 @@ function LeafletMap() {
               strokeLinejoin="round"
             />
           </svg>`}
-          />
-        </>
-      )}
-    </Map>
+      />
+    </MapContainer>
   );
 }
 
