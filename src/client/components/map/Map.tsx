@@ -1,7 +1,37 @@
 import { SvgRoundMinus, SvgRoundPlus } from '../utils/SvgIcons';
+import { useEffect, useState } from 'react';
+import axios from 'axios-jsonp-pro';
 import Map from './LeafletMap';
 
 function LeafletMap() {
+  const [gairmetData, setGairmetData] = useState(null);
+  const [map, setMap] = useState(null);
+  useEffect(() => {
+    axios
+      .jsonp('http://3.95.80.120:8080/geoserver/EZWxBrief/ows', {
+        params: {
+          outputFormat: 'text/javascript',
+          maxFeatures: 250,
+          request: 'GetFeature',
+          service: 'WFS',
+          typeName: 'EZWxBrief:gairmet_latest',
+          version: '1.0.0',
+          format_options: 'callback:__jp0',
+        },
+        timeout: 5000,
+        // name: 'parseResponse',
+      })
+      .then((data) => {
+        console.log(data);
+        setGairmetData(data);
+      })
+      .catch((error) => Promise.reject(error));
+  }, []);
+
+  const handleOnMapMounted = (evt) => {
+    setMap(evt ? evt.leafletElement : null);
+  };
+
   return (
     <Map
       bounds={[
@@ -9,10 +39,12 @@ function LeafletMap() {
         [20.0, -60.0],
       ]}
       zoomControl={false}
+      ref={handleOnMapMounted}
     >
-      {({ TileLayer, Marker, Popup, ZoomControl }) => (
+      {({ TileLayer, GeoJSON, Marker, Popup, ZoomControl }) => (
         <>
           <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}" />
+          {gairmetData != null && <GeoJSON data={gairmetData} />}
           <Marker position={[38.907132, -77.036546]}>
             <Popup>
               A pretty CSS3 popup. <br /> Easily customizable.
