@@ -64,7 +64,7 @@
     "rxjs": "^7.5.7",
     "sass": "^1.56.1",
     "swiper": "^8.4.5",
-    "ts-morph": "^16.0.0",
+    "ts-morph": "^17.0.1",
     "typeorm": "^0.3.10"
   },
   "devDependencies": {
