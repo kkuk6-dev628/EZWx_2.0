@@ -194,8 +194,8 @@ function SvgSave() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="44"
-      height="44"
+      width="23px"
+      height="23px"
       viewBox="0 0 44 44"
       fill="none"
     >
@@ -215,8 +215,8 @@ function SvgWarn() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="46"
-      height="46"
+      width="23px"
+      height="23px"
       viewBox="0 0 46 46"
       fill="none"
     >
@@ -250,8 +250,8 @@ function SvgSetting() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="44"
-      height="44"
+      width="23px"
+      height="23px"
       viewBox="0 0 44 44"
       fill="none"
     >
@@ -278,8 +278,8 @@ function SvgProfile() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="44"
-      height="44"
+      width="23px"
+      height="23px"
       viewBox="0 0 44 44"
       fill="none"
     >

@@ -4,7 +4,7 @@ import Map from './LeafletMap';
 
 function LeafletMap() {
   const [gairmetData, setGairmetData] = useState(null);
-  const [map, setMap] = useState(null);
+  const [, setMap] = useState(null);
   useEffect(() => {
     jsonp(
       'http://3.95.80.120:8080/geoserver/EZWxBrief/ows',

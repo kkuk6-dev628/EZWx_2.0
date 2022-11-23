@@ -2,7 +2,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { SvgDropDown, SvgMenuBurger, SvgRoundClose } from '../utils/SvgIcons';
+import {
+  SvgDropDown,
+  SvgMenuBurger,
+  SvgProfile,
+  SvgRoundClose,
+  SvgSave,
+  SvgSetting,
+  SvgWarn,
+} from '../utils/SvgIcons';
 
 const links = [
   {
@@ -108,8 +116,24 @@ export default function Header() {
   const handleActiveMenu = (id) => {
     setActiveMenu(id);
   };
+
+  // sticky header
+  const [sticky, setSticky] = useState(false);
+  const handleScroll = () => {
+    if (window.scrollY > 0) {
+      setSticky(true);
+    } else {
+      setSticky(false);
+    }
+  };
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
   return (
-    <div className="header">
+    <div className={`header ${sticky && 'header--fixed'}`}>
       <div className="container">
         <div className="header__wrp">
           <div className="header__lft">
@@ -177,15 +201,38 @@ export default function Header() {
           <div className="header__rgt">
             <div className="header__rgt__btns flex flex-align-center">
               <Link href="/login">
-                <button className="header__rgt__btn header__rgt__btn--lft btn">
-                  New to EZWxBrief?
-                </button>
+                {mapMenu ? (
+                  <button className="header__rgt__btn header__rgt__btn--map btn">
+                    BACK TO SITE
+                  </button>
+                ) : (
+                  <button className="header__rgt__btn header__rgt__btn--lft btn">
+                    New to EZWxBrief?
+                  </button>
+                )}
               </Link>
-              <Link href="/signup">
-                <button className="header__rgt__btn header__rgt__btn--rgt btn">
-                  Join Now | Sign in
-                </button>
-              </Link>
+              {mapMenu ? (
+                <div className="header__icon__area">
+                  <button className="header__rgt__btn header__rgt__btn--icon btn">
+                    <SvgWarn />
+                  </button>
+                  <button className="header__rgt__btn header__rgt__btn--icon btn">
+                    <SvgSave />
+                  </button>
+                  <button className="header__rgt__btn header__rgt__btn--icon btn">
+                    <SvgSetting />
+                  </button>
+                  <button className="header__rgt__btn header__rgt__btn--icon btn">
+                    <SvgProfile />
+                  </button>
+                </div>
+              ) : (
+                <Link href="/signup">
+                  <button className="header__rgt__btn header__rgt__btn--rgt btn">
+                    Join Now | Sign in
+                  </button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
