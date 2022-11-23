@@ -1,11 +1,10 @@
-import { SvgRoundMinus, SvgRoundPlus } from '../utils/SvgIcons';
 import { useEffect, useState } from 'react';
 import jsonp from 'jsonp';
 import Map from './LeafletMap';
 
 function LeafletMap() {
   const [gairmetData, setGairmetData] = useState(null);
-  const [map, setMap] = useState(null);
+  const [, setMap] = useState(null);
   useEffect(() => {
     jsonp(
       'http://3.95.80.120:8080/geoserver/EZWxBrief/ows',
@@ -21,7 +20,7 @@ function LeafletMap() {
     );
   }, []);
 
-  const handleOnMapMounted = (evt: { leafletElement: any; }) => {
+  const handleOnMapMounted = (evt: { leafletElement: any }) => {
     setMap(evt ? evt.leafletElement : null);
   };
 

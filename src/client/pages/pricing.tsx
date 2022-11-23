@@ -1,7 +1,7 @@
 import React from 'react';
 import { NextPage } from 'next';
 import Image from 'next/image';
-import FlexiblePricing from '../components/Shared/FlexiblePricing';
+import FlexiblePricing from '../components/shared/FlexiblePricing';
 
 const Pricing: NextPage = () => {
   const data = {
