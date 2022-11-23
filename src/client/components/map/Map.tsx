@@ -1,34 +1,27 @@
 import { SvgRoundMinus, SvgRoundPlus } from '../utils/SvgIcons';
 import { useEffect, useState } from 'react';
-import axios from 'axios-jsonp-pro';
+import jsonp from 'jsonp';
 import Map from './LeafletMap';
 
 function LeafletMap() {
   const [gairmetData, setGairmetData] = useState(null);
   const [map, setMap] = useState(null);
   useEffect(() => {
-    axios
-      .jsonp('http://3.95.80.120:8080/geoserver/EZWxBrief/ows', {
-        params: {
-          outputFormat: 'text/javascript',
-          maxFeatures: 250,
-          request: 'GetFeature',
-          service: 'WFS',
-          typeName: 'EZWxBrief:gairmet_latest',
-          version: '1.0.0',
-          format_options: 'callback:__jp0',
-        },
-        timeout: 5000,
-        // name: 'parseResponse',
-      })
-      .then((data) => {
+    jsonp(
+      'http://3.95.80.120:8080/geoserver/EZWxBrief/ows',
+      {
+        param:
+          'outputFormat=text/javascript&maxFeatures=250&request=GetFeature&service=WFS&typeName=EZWxBrief:gairmet_latest&version=1.0.0',
+        name: 'parseResponse',
+      },
+      (error, data: any) => {
         console.log(data);
         setGairmetData(data);
-      })
-      .catch((error) => Promise.reject(error));
+      },
+    );
   }, []);
 
-  const handleOnMapMounted = (evt) => {
+  const handleOnMapMounted = (evt: { leafletElement: any; }) => {
     setMap(evt ? evt.leafletElement : null);
   };
 
@@ -62,25 +55,25 @@ function LeafletMap() {
             <path
               d="M12 8V16"
               stroke="#3F0C69"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               d="M16 12H8"
               stroke="#3F0C69"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               fill-rule="evenodd"
               clip-rule="evenodd"
               d="M12 21V21C7.029 21 3 16.971 3 12V12C3 7.029 7.029 3 12 3V3C16.971 3 21 7.029 21 12V12C21 16.971 16.971 21 12 21Z"
               stroke="#3F0C69"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>`}
             zoomOutText={`<svg
@@ -93,18 +86,18 @@ function LeafletMap() {
             <path
               d="M16 12H8"
               stroke="#3F0C69"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <path
               fill-rule="evenodd"
               clip-rule="evenodd"
               d="M12 21V21C7.029 21 3 16.971 3 12V12C3 7.029 7.029 3 12 3V3C16.971 3 21 7.029 21 12V12C21 16.971 16.971 21 12 21Z"
               stroke="#3F0C69"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>`}
           />

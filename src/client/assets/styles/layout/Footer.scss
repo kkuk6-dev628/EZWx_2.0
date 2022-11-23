@@ -20,7 +20,7 @@
     display: flex;
     align-items: center;
     grid-gap: 18px;
-    justify-content: end;
+    justify-content: flex-end;
 
     @media (max-width: 650px) {
       justify-content: center;

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { SvgDropDown, SvgMenuBurger, SvgRoundClose } from '../utils/SvgIcons';
 
 const links = [
@@ -59,23 +59,8 @@ export default function Header() {
   const handleActiveMenu = (id) => {
     setActiveMenu(id);
   };
-  // sticky header
-  const [sticky, setSticky] = useState(false);
-  const handleScroll = () => {
-    if (window.scrollY > 0) {
-      setSticky(true);
-    } else {
-      setSticky(false);
-    }
-  };
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
   return (
-    <div className={`header ${sticky && 'header--fixed'}`}>
+    <div className="header">
       <div className="container">
         <div className="header__wrp">
           <div className="header__lft">
@@ -169,7 +154,7 @@ const ResponsiveMenu = ({
       }`}
     >
       {links.map((link) => (
-        <>
+        <div key={link.id}>
           <div
             onClick={() => handleActiveMenu(link.id)}
             key={link.id}
@@ -196,7 +181,7 @@ const ResponsiveMenu = ({
               }`}
             >
               {link.children.map((child) => (
-                <Link href={child.link}>
+                <Link href={child.link} key={child.id}>
                   <span className="responsive__menu__dropdown__link">
                     {child.name}
                   </span>
@@ -204,7 +189,7 @@ const ResponsiveMenu = ({
               ))}
             </div>
           )}
-        </>
+        </div>
       ))}
     </div>
   );

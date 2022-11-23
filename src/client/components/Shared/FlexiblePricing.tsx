@@ -14,11 +14,11 @@ function FlexiblePricing({ content, isShowBtn }) {
           </div>
           <div className="flx__content">
             {content?.map((item, index) => (
-              <>
+              <div key={index}>
                 <p className="flx__txt text" key={index}>
                   {item.text}
                 </p>
-              </>
+              </div>
             ))}
             {!content && (
               <>
