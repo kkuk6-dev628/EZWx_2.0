@@ -1,4 +1,3 @@
-import { SvgRoundMinus, SvgRoundPlus } from '../utils/SvgIcons';
 import { useEffect, useState } from 'react';
 import jsonp from 'jsonp';
 import Map from './LeafletMap';
@@ -21,7 +20,7 @@ function LeafletMap() {
     );
   }, []);
 
-  const handleOnMapMounted = (evt: { leafletElement: any; }) => {
+  const handleOnMapMounted = (evt: { leafletElement: any }) => {
     setMap(evt ? evt.leafletElement : null);
   };
 
