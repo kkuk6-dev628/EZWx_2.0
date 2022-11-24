@@ -21,7 +21,7 @@ const Pricing: NextPage = () => {
         <Image
           className="prc__img"
           src="/images/baner.jpg"
-          layout="fill"
+          layout={'fill'}
           alt={''}
         />
       </div>

@@ -137,23 +137,23 @@ export default function Header() {
       <div className="container">
         <div className="header__wrp">
           <div className="header__lft">
-            <div className="header__img__area">
-              <Link href="/home">
+            <Link href="/home">
+              <div className="header__img__area">
                 <Image
                   src="/images/Logo.png"
-                  layout="fill"
+                  layout={'fill'}
                   alt="logo"
-                  objectFit="contain"
                   className="header__img"
                 />
-              </Link>
-            </div>
+              </div>
+            </Link>
             <button
               onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)}
               className="header__menu btn"
             >
               {activeResponsiveMenu ? <SvgRoundClose /> : <SvgMenuBurger />}
             </button>
+            {mapMenu && <button className="header__tab__text">1040Z</button>}
           </div>
           <div className="header__mid">
             <ul className="header__nav">
