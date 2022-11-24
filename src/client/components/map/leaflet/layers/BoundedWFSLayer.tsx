@@ -16,25 +16,20 @@ interface WFSLayerProps {
   url: string;
   maxFeatures: number;
   typeName: string;
-  jsonpCallbackName: string;
 }
 
-const BoundedWFSLayer = ({
-  url,
-  maxFeatures,
-  typeName,
-  jsonpCallbackName,
-}: WFSLayerProps) => {
+const BoundedWFSLayer = ({ url, maxFeatures, typeName }: WFSLayerProps) => {
   const [geoJSON, setGeoJSON] = useState(null);
 
   const fetchGeoJSON = () => {
+    const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
     jsonp(
       url,
       {
         param: `outputFormat=text/javascript&maxFeatures=${maxFeatures}&request=GetFeature&service=WFS&typeName=${typeName}&version=1.0.0&bbox=${map
           .getBounds()
-          .toBBoxString()}&callback`,
-        name: jsonpCallbackName,
+          .toBBoxString()},EPSG:4326&format_options=callback:${callbackName}&srsName=EPSG:4326&`,
+        name: callbackName,
       },
       (error, data: any) => {
         // console.log(data);
