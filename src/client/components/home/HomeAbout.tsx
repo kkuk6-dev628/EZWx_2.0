@@ -9,7 +9,7 @@ function HomeAbout() {
       {/* <Image
         className="about__bg__img"
         src="/images/mapbg.jpeg"
-        layout="fill"
+        layout={'fill'}
         alt={''}
       /> */}
       <div className="about__overlay"></div>
@@ -37,7 +37,7 @@ function HomeAbout() {
                 <Image
                   className="about__img"
                   src="/images/slider3.jpeg"
-                  layout="fill"
+                  layout={'fill'}
                   alt={''}
                 />
               </div>
@@ -66,7 +66,7 @@ function HomeAbout() {
                 <Image
                   className="about__img"
                   src="/images/slider3.jpeg"
-                  layout="fill"
+                  layout={'fill'}
                   alt={''}
                 />
               </div>
@@ -95,7 +95,7 @@ function HomeAbout() {
                 <Image
                   className="about__img"
                   src="/images/slider3.jpeg"
-                  layout="fill"
+                  layout={'fill'}
                   alt={''}
                 />
               </div>

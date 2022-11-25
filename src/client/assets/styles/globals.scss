@@ -12,6 +12,7 @@
 
 /*------  Shared Components ------*/
 @import "./shared/FlexiblePricing.scss";
+@import "./shared/MapTabs.scss";
 
 
 /*-------------- Pages -------------*/
@@ -46,9 +47,16 @@
 //leaflet override
 .leaflet-touch .leaflet-bar{
   top: 60px;
-  right: 40px!important;
+  right: 50%!important;
   box-shadow: none;
   border: 0!important;
+  @media screen and (max-width: 1024px) {
+    top: 100px;
+  }
+
+  @media screen and (max-width: 768px) {
+    right: 30%!important;
+  }
 }
 
 .leaflet-touch .leaflet-bar a{
@@ -64,4 +72,11 @@
   &:first-child{
     margin-bottom: 2px!important;
   }
+}
+
+.map__container{
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
 }

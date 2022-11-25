@@ -307,8 +307,252 @@ function SvgProfile() {
     </svg>
   );
 }
+function SvgRefresh() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="34"
+      height="34"
+      viewBox="0 0 34 34"
+      fill="none"
+    >
+      <path
+        d="M17 6.32886C11.6194 6.32968 7.08111 10.3362 6.41311 15.6751C5.74511 21.0141 9.15641 26.0153 14.3709 27.3417C19.5855 28.6682 24.9719 25.905 26.9362 20.8958C28.9006 15.8866 26.8283 10.1985 22.1022 7.62673"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M22.1021 11.7286V7.01196H26.8187"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+}
+function SvgLayer() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+    >
+      <path
+        d="M28 22.6399L15.9867 27.9999"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M15.9867 27.9999L4 22.6399"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M28 16L15.9867 21.36"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M15.9867 21.36L4 16"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M4 9.36533L15.9827 14.732L28 9.36533L16.0173 4L4 9.36533Z"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+}
+function SvgRoute() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+    >
+      <path
+        d="M10.5523 6.1143C11.5937 7.1557 11.5937 8.84414 10.5523 9.88554C9.51089 10.9269 7.82245 10.9269 6.78105 9.88554C5.73965 8.84414 5.73965 7.1557 6.78105 6.1143C7.82245 5.0729 9.51089 5.0729 10.5523 6.1143"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M16.312 24H11.5027C9.568 24 8 22.2093 8 20.0013V19.9973C8 17.7893 9.568 15.9987 11.5027 15.9987H20.496C22.4307 15.9987 23.9987 14.208 23.9987 12V12C24 9.788 22.4293 7.99734 20.4933 8L15 8.00667"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M21.7866 26.912L25.6386 24.6333C26.12 24.348 26.12 23.6506 25.6386 23.3666L21.7866 21.088C21.292 20.7946 20.6666 21.152 20.6666 21.7266V26.2733C20.6666 26.848 21.292 27.2053 21.7866 26.912Z"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+}
+function SvgProfileCharge() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="34"
+      height="34"
+      viewBox="0 0 34 34"
+      fill="none"
+    >
+      <path
+        d="M10.9974 19.6678L14.3322 16.1103L17.6669 19.6678L23.0024 14.3323"
+        stroke="#3F0C69"
+        stroke-width="1.41"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <rect
+        x="4.995"
+        y="4.99512"
+        width="24.01"
+        height="24.01"
+        rx="5"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+}
+function SvgMap() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+    >
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M11.1573 5.61478L5.824 7.39212C4.73467 7.75478 4 8.77478 4 9.92278V24.5095C4 25.5001 5.04267 26.1455 5.92933 25.7015L10.8067 23.2628C11.5573 22.8868 12.4413 22.8868 13.192 23.2628L18.8067 26.0708C19.5573 26.4468 20.4413 26.4468 21.192 26.0708L26.5253 23.4041C27.4293 22.9521 28 22.0281 28 21.0188V7.18278C28 6.27212 27.108 5.62945 26.2453 5.91745L20.844 7.71745C20.296 7.90012 19.7053 7.90012 19.1573 7.71745L12.8427 5.61478C12.296 5.43212 11.704 5.43212 11.1573 5.61478V5.61478Z"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M20 12.7068V20.6268"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M12 10.04V17.96"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+}
+function SvgTemperature() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+    >
+      <path
+        d="M7.50671 18.2427V7.25867C7.50671 5.45867 8.96537 4 10.7654 4C12.5654 4 14.024 5.45867 14.024 7.25867V18.2427V18.2453C15.336 19.2373 16.1974 20.7947 16.1974 22.5653C16.1974 25.568 13.7654 28 10.7654 28C7.76537 28 5.33337 25.568 5.33337 22.568C5.33337 20.7973 6.19471 19.2373 7.50671 18.248"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M20 9.33341H26.6667"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M20 5.33341H26.6667"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M20 13.3334H26.6667"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M20 17.3334H26.6667"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M10.6667 24.6667C11.7713 24.6667 12.6667 23.7713 12.6667 22.6667C12.6667 21.5622 11.7713 20.6667 10.6667 20.6667C9.56218 20.6667 8.66675 21.5622 8.66675 22.6667C8.66675 23.7713 9.56218 24.6667 10.6667 24.6667Z"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M10.6667 20.6667V12"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+}
 
 export {
+  SvgTemperature,
+  SvgMap,
+  SvgProfileCharge,
+  SvgLayer,
+  SvgRoute,
+  SvgRefresh,
   SvgProfile,
   SvgSetting,
   SvgSave,

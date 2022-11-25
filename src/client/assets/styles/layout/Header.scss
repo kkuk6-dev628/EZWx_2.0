@@ -16,6 +16,21 @@
     align-items: center;
   }
 
+  &__tab__text{
+    font-weight: 600;
+font-size: 16px;
+line-height: 20px;
+    margin-left: 10px;
+    color: var(--color-white);
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+    display: none;
+    @media screen and (max-width: 1024px) {
+      display: block;
+    }
+  }
+
   &__lft {
     max-width: 151px;
     width: 100%;
@@ -213,6 +228,9 @@
     font-weight: 600;
     font-size: 16px;
 line-height: 24px;
+@media (max-width: 1420px) {
+  display: none;
+}
   }
 }
 

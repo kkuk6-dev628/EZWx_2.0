@@ -20,7 +20,7 @@ function HomeHero() {
             <Image
               className="slider__img"
               src="/images/slide1.jpeg"
-              layout="fill"
+              layout={'fill'}
               alt={''}
             />
             <div className="container hero__slider__content">
@@ -35,7 +35,7 @@ function HomeHero() {
             <Image
               className="slider__img"
               src="/images/slider2.jpeg"
-              layout="fill"
+              layout={'fill'}
               alt={''}
             />
             <div className="container hero__slider__content">
@@ -50,7 +50,7 @@ function HomeHero() {
             <Image
               className="slider__img"
               src="/images/slider3.jpeg"
-              layout="fill"
+              layout={'fill'}
               alt={''}
             />
             <div className="container hero__slider__content">
