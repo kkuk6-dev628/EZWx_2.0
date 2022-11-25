@@ -7,7 +7,7 @@ const GeneralPopup = ({ feature, title }) => {
       {feature.properties &&
         Object.entries(feature.properties).map(([key, value]) => {
           return (
-            <Typography variant="body2" style={{ margin: 3 }}>
+            <Typography variant="body2" style={{ margin: 3 }} key={key}>
               <>
                 {key}: {value}
               </>

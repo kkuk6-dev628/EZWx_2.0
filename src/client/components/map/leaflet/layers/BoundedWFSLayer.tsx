@@ -10,6 +10,7 @@ interface WFSLayerProps {
   url: string;
   maxFeatures: number;
   typeName: string;
+  propertyNames?: string[];
   enableBBoxQuery?: boolean;
 }
 
@@ -17,6 +18,7 @@ const BoundedWFSLayer = ({
   url,
   maxFeatures,
   typeName,
+  propertyNames,
   enableBBoxQuery,
 }: WFSLayerProps) => {
   const [geoJSON, setGeoJSON] = useState(null);
@@ -24,6 +26,9 @@ const BoundedWFSLayer = ({
   const fetchGeoJSON = () => {
     const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
     let queryString = `outputFormat=text/javascript&maxFeatures=${maxFeatures}&request=GetFeature&service=WFS&typeName=${typeName}&version=1.0.0&format_options=callback:${callbackName}&srsName=EPSG:4326&`;
+    if (propertyNames) {
+      queryString += `propertyName=${propertyNames.join(',')}&`;
+    }
     if (enableBBoxQuery) {
       queryString += `bbox=${map.getBounds().toBBoxString()},EPSG:4326&`;
     }
@@ -84,9 +89,7 @@ const BoundedWFSLayer = ({
               fillOpacity: 0.8,
             });
           }}
-        >
-          <h3>{typeName}</h3>
-        </GeoJSON>
+        ></GeoJSON>
       )}
     </>
   );
