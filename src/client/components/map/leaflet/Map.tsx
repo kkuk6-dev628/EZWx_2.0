@@ -6,28 +6,12 @@ import 'leaflet/dist/leaflet.css';
 import styles from './Map.module.css';
 import BoundedWFSLayer from './layers/BoundedWFSLayer';
 import MapTabs from '../../shared/MapTabs';
+import { WFSLayer } from './layers/WFSLayer';
+
 
 function LeafletMap() {
   const [gairmetData, setGairmetData] = useState(null);
   const [, setMap] = useState(null);
-  useEffect(() => {
-    jsonp(
-      'http://3.95.80.120:8080/geoserver/EZWxBrief/ows',
-      {
-        param:
-          'outputFormat=text/javascript&maxFeatures=250&request=GetFeature&service=WFS&typeName=EZWxBrief:gairmet_latest&version=1.0.0',
-        name: 'parseResponse',
-      },
-      (error, data: any) => {
-        // console.log(data);
-        if (error) {
-          console.error(error);
-        } else {
-          setGairmetData(data);
-        }
-      },
-    );
-  }, []);
 
   const handleOnMapMounted = (evt: { leafletElement: any }) => {
     setMap(evt ? evt.leafletElement : null);
@@ -46,10 +30,19 @@ function LeafletMap() {
       >
         <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}" />
         <BoundedWFSLayer
+          url="http://3.95.80.120:8080/geoserver/topp/ows"
+          maxFeatures={256}
+          typeName="topp:states"
+        ></BoundedWFSLayer>{' '}
+        <BoundedWFSLayer
           url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
           maxFeatures={256}
           typeName="EZWxBrief:gairmet_latest"
-          jsonpCallbackName="parseResponse"
+        ></BoundedWFSLayer>{' '}
+        <BoundedWFSLayer
+          url="http://3.95.80.120:8080/geoserver/sf/ows"
+          maxFeatures={256}
+          typeName="sf:bugsites"
         ></BoundedWFSLayer>
         <ZoomControl
           position="topright"
