@@ -3,4 +3,7 @@
   "editor.codeActionsOnSave": {
       "source.fixAll.eslint": true
   },
+  "workbench.tree.indent": 16,
+  "workbench.tree.renderIndentGuides": "always",
+  "editor.tabSize": 2,
 }
