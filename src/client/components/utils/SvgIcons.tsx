@@ -90,8 +90,8 @@ function SvgRoundPlus() {
         strokeLinejoin="round"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M12 21V21C7.029 21 3 16.971 3 12V12C3 7.029 7.029 3 12 3V3C16.971 3 21 7.029 21 12V12C21 16.971 16.971 21 12 21Z"
         stroke="#3F0C69"
         strokeWidth="1.5"
@@ -118,8 +118,8 @@ function SvgRoundMinus() {
         strokeLinejoin="round"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M12 21V21C7.029 21 3 16.971 3 12V12C3 7.029 7.029 3 12 3V3C16.971 3 21 7.029 21 12V12C21 16.971 16.971 21 12 21Z"
         stroke="#3F0C69"
         strokeWidth="1.5"
@@ -200,13 +200,13 @@ function SvgSave() {
       fill="none"
     >
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M14.2084 5.5H29.7917C31.8175 5.5 33.4584 7.14083 33.4584 9.16667V38.5L22 33L10.5417 38.5V9.16667C10.5417 7.15 12.1917 5.5 14.2084 5.5Z"
         stroke="white"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -221,27 +221,27 @@ function SvgWarn() {
       fill="none"
     >
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M30.3364 39.5067H15.6636C10.5997 39.5067 6.49316 35.4001 6.49316 30.3362V15.6634C6.49316 10.5995 10.5997 6.49292 15.6636 6.49292H30.3364C35.4004 6.49292 39.5069 10.5995 39.5069 15.6634V30.3362C39.5069 35.4001 35.4004 39.5067 30.3364 39.5067Z"
         stroke="white"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M22.9982 15.6634C22.7451 15.6634 22.5397 15.8688 22.5415 16.1219C22.5415 16.375 22.747 16.5804 23.0001 16.5804C23.2532 16.5804 23.4586 16.375 23.4586 16.1219C23.4586 15.8688 23.2532 15.6634 22.9982 15.6634"
         stroke="white"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M23.4585 30.6736V21.9617H21.6245"
         stroke="white"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -258,18 +258,18 @@ function SvgSetting() {
       <path
         d="M25.5002 18.4999C27.4333 20.433 27.4333 23.5671 25.5002 25.5002C23.5671 27.4333 20.4329 27.4333 18.4998 25.5002C16.5667 23.5671 16.5667 20.433 18.4998 18.4999C20.4329 16.5668 23.5671 16.5668 25.5002 18.4999"
         stroke="white"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M9.62499 22C9.62499 22.5445 9.67449 23.089 9.74049 23.617L6.82915 25.894C6.18382 26.4 6.00782 27.3038 6.41849 28.0133L9.00715 32.4922C9.41599 33.2017 10.285 33.5005 11.0458 33.1962L13.6528 32.1493C14.168 31.9422 14.7418 32.0247 15.2038 32.3308C15.6072 32.5985 16.0252 32.8442 16.4578 33.0642C16.9528 33.3153 17.3122 33.7645 17.391 34.3145L17.7888 37.0883C17.9043 37.8987 18.5992 38.5 19.4168 38.5H24.5813C25.399 38.5 26.0938 37.8987 26.2093 37.0883L26.6071 34.3163C26.686 33.7663 27.049 33.3135 27.5458 33.0642C27.9766 32.8478 28.3928 32.604 28.7943 32.3382C29.26 32.0302 29.8356 31.9422 30.3526 32.1512L32.9541 33.1962C33.7131 33.5005 34.5821 33.2017 34.9928 32.4922L37.5815 28.0133C37.9922 27.3038 37.8161 26.3982 37.1708 25.894L34.2595 23.617C34.3255 23.089 34.375 22.5445 34.375 22C34.375 21.4555 34.3255 20.911 34.2595 20.383L37.1708 18.106C37.8161 17.6 37.9922 16.6962 37.5815 15.9867L34.9928 11.5078C34.584 10.7983 33.715 10.4995 32.9541 10.8038L30.3526 11.8488C29.8356 12.056 29.26 11.9698 28.7943 11.6618C28.3928 11.396 27.9766 11.1522 27.5458 10.9358C27.049 10.6865 26.686 10.2337 26.6071 9.68367L26.2112 6.91167C26.0957 6.10133 25.4008 5.5 24.5831 5.5H19.4187C18.601 5.5 17.9062 6.10133 17.7907 6.91167L17.391 9.68733C17.3122 10.2355 16.951 10.6865 16.4578 10.9377C16.0252 11.1577 15.6072 11.4052 15.2038 11.671C14.74 11.9753 14.1662 12.0578 13.651 11.8507L11.0458 10.8038C10.285 10.4995 9.41599 10.7983 9.00715 11.5078L6.41849 15.9867C6.00782 16.6962 6.18382 17.6018 6.82915 18.106L9.74049 20.383C9.67449 20.911 9.62499 21.4555 9.62499 22V22Z"
         stroke="white"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -286,23 +286,23 @@ function SvgProfile() {
       <path
         d="M33.6673 10.3327C40.111 16.7764 40.111 27.2236 33.6673 33.6672C27.2237 40.1109 16.7765 40.1109 10.3329 33.6672C3.88921 27.2236 3.88921 16.7764 10.3329 10.3327C16.7765 3.88909 27.2237 3.88909 33.6673 10.3327"
         stroke="white"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M31.7295 35.3044C31.0255 31.9311 26.9592 29.3333 22 29.3333C17.0408 29.3333 12.9745 31.9311 12.2705 35.3044"
         stroke="white"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M25.8891 14.4442C28.037 16.592 28.037 20.0745 25.8891 22.2223C23.7412 24.3702 20.2588 24.3702 18.1109 22.2223C15.963 20.0745 15.963 16.592 18.1109 14.4442C20.2588 12.2963 23.7412 12.2963 25.8891 14.4442"
         stroke="white"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -319,16 +319,16 @@ function SvgRefresh() {
       <path
         d="M17 6.32886C11.6194 6.32968 7.08111 10.3362 6.41311 15.6751C5.74511 21.0141 9.15641 26.0153 14.3709 27.3417C19.5855 28.6682 24.9719 25.905 26.9362 20.8958C28.9006 15.8866 26.8283 10.1985 22.1022 7.62673"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M22.1021 11.7286V7.01196H26.8187"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -345,39 +345,39 @@ function SvgLayer() {
       <path
         d="M28 22.6399L15.9867 27.9999"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M15.9867 27.9999L4 22.6399"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M28 16L15.9867 21.36"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M15.9867 21.36L4 16"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M4 9.36533L15.9827 14.732L28 9.36533L16.0173 4L4 9.36533Z"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -394,25 +394,25 @@ function SvgRoute() {
       <path
         d="M10.5523 6.1143C11.5937 7.1557 11.5937 8.84414 10.5523 9.88554C9.51089 10.9269 7.82245 10.9269 6.78105 9.88554C5.73965 8.84414 5.73965 7.1557 6.78105 6.1143C7.82245 5.0729 9.51089 5.0729 10.5523 6.1143"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M16.312 24H11.5027C9.568 24 8 22.2093 8 20.0013V19.9973C8 17.7893 9.568 15.9987 11.5027 15.9987H20.496C22.4307 15.9987 23.9987 14.208 23.9987 12V12C24 9.788 22.4293 7.99734 20.4933 8L15 8.00667"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M21.7866 26.912L25.6386 24.6333C26.12 24.348 26.12 23.6506 25.6386 23.3666L21.7866 21.088C21.292 20.7946 20.6666 21.152 20.6666 21.7266V26.2733C20.6666 26.848 21.292 27.2053 21.7866 26.912Z"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -429,9 +429,9 @@ function SvgProfileCharge() {
       <path
         d="M10.9974 19.6678L14.3322 16.1103L17.6669 19.6678L23.0024 14.3323"
         stroke="#3F0C69"
-        stroke-width="1.41"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.41"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <rect
         x="4.995"
@@ -440,9 +440,9 @@ function SvgProfileCharge() {
         height="24.01"
         rx="5"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -457,27 +457,27 @@ function SvgMap() {
       fill="none"
     >
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M11.1573 5.61478L5.824 7.39212C4.73467 7.75478 4 8.77478 4 9.92278V24.5095C4 25.5001 5.04267 26.1455 5.92933 25.7015L10.8067 23.2628C11.5573 22.8868 12.4413 22.8868 13.192 23.2628L18.8067 26.0708C19.5573 26.4468 20.4413 26.4468 21.192 26.0708L26.5253 23.4041C27.4293 22.9521 28 22.0281 28 21.0188V7.18278C28 6.27212 27.108 5.62945 26.2453 5.91745L20.844 7.71745C20.296 7.90012 19.7053 7.90012 19.1573 7.71745L12.8427 5.61478C12.296 5.43212 11.704 5.43212 11.1573 5.61478V5.61478Z"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M20 12.7068V20.6268"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M12 10.04V17.96"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -494,59 +494,131 @@ function SvgTemperature() {
       <path
         d="M7.50671 18.2427V7.25867C7.50671 5.45867 8.96537 4 10.7654 4C12.5654 4 14.024 5.45867 14.024 7.25867V18.2427V18.2453C15.336 19.2373 16.1974 20.7947 16.1974 22.5653C16.1974 25.568 13.7654 28 10.7654 28C7.76537 28 5.33337 25.568 5.33337 22.568C5.33337 20.7973 6.19471 19.2373 7.50671 18.248"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M20 9.33341H26.6667"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M20 5.33341H26.6667"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M20 13.3334H26.6667"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M20 17.3334H26.6667"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M10.6667 24.6667C11.7713 24.6667 12.6667 23.7713 12.6667 22.6667C12.6667 21.5622 11.7713 20.6667 10.6667 20.6667C9.56218 20.6667 8.66675 21.5622 8.66675 22.6667C8.66675 23.7713 9.56218 24.6667 10.6667 24.6667Z"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M10.6667 20.6667V12"
         stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+function SvgThreeDot() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="30px"
+      height="30px"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 21V21C7.029 21 3 16.971 3 12V12C3 7.029 7.029 3 12 3V3C16.971 3 21 7.029 21 12V12C21 16.971 16.971 21 12 21Z"
+        stroke="#3F0C69"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M11.999 11.625C11.792 11.625 11.624 11.793 11.626 12C11.626 12.207 11.794 12.375 12.001 12.375C12.208 12.375 12.376 12.207 12.376 12C12.375 11.793 12.207 11.625 11.999 11.625"
+        stroke="#3F0C69"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M15.999 11.625C15.792 11.625 15.624 11.793 15.626 12C15.626 12.207 15.794 12.375 16.001 12.375C16.208 12.375 16.376 12.207 16.376 12C16.375 11.793 16.207 11.625 15.999 11.625"
+        stroke="#3F0C69"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M7.99899 11.625C7.79199 11.625 7.62399 11.793 7.62599 12C7.62599 12.207 7.79399 12.375 8.00099 12.375C8.20799 12.375 8.37599 12.207 8.37599 12C8.37499 11.793 8.20699 11.625 7.99899 11.625"
+        stroke="#3F0C69"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+function SvgAir() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <path
+        d="M3 20H16"
+        stroke="#3F0C69"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M5.636 14.636L3 12L4.553 11.224C4.835 11.083 5.166 11.083 5.447 11.224L7 12L10.192 10.023L6 6.023L9 5L14 8L18.707 5.31C19.858 4.652 21.319 5.276 21.64 6.562V6.562C21.854 7.416 21.483 8.31 20.728 8.763L12.325 13.805C12.11 13.934 11.872 14.022 11.625 14.063L6.507 14.916C6.189 14.968 5.864 14.864 5.636 14.636Z"
+        stroke="#3F0C69"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
 }
 
 export {
+  SvgAir,
+  SvgThreeDot,
   SvgTemperature,
   SvgMap,
   SvgProfileCharge,
