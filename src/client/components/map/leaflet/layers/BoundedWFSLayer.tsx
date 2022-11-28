@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useEffect, useState } from 'react';
+import React, { Ref, useEffect, useRef, useState } from 'react';
 import { useMapEvents, GeoJSON } from 'react-leaflet';
 import jsonp from 'jsonp';
 import * as ReactDOMServer from 'react-dom/server';
@@ -12,6 +12,9 @@ interface WFSLayerProps {
   typeName: string;
   propertyNames?: string[];
   enableBBoxQuery?: boolean;
+  style?: (feature: L.feature) => L.style;
+  featureClicked: (any) => void;
+  resetHighlightRef: any;
 }
 
 const BoundedWFSLayer = ({
@@ -20,9 +23,27 @@ const BoundedWFSLayer = ({
   typeName,
   propertyNames,
   enableBBoxQuery,
+  style,
+  featureClicked,
+  resetHighlightRef,
 }: WFSLayerProps) => {
   const [geoJSON, setGeoJSON] = useState(null);
-  let map;
+  const ref = useRef(null);
+
+  useEffect(() => {
+    fetchGeoJSON();
+    resetHighlightRef.current = resetHighlight;
+  }, []);
+
+  const map = useMapEvents({
+    zoomend: () => {
+      if (enableBBoxQuery) fetchGeoJSON();
+    },
+    moveend: () => {
+      if (enableBBoxQuery) fetchGeoJSON();
+    },
+  });
+
   const fetchGeoJSON = () => {
     const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
     let queryString = `outputFormat=text/javascript&maxFeatures=${maxFeatures}&request=GetFeature&service=WFS&typeName=${typeName}&version=1.0.0&format_options=callback:${callbackName}&srsName=EPSG:4326&`;
@@ -49,20 +70,26 @@ const BoundedWFSLayer = ({
     );
   };
 
-  useEffect(() => {
-    fetchGeoJSON();
-  }, []);
-
-  if (enableBBoxQuery) {
-    map = useMapEvents({
-      zoomend: () => {
-        fetchGeoJSON();
-      },
-      moveend: () => {
-        fetchGeoJSON();
-      },
-    });
+  function clickFeature(e) {
+    // resetHighlight(e.target);
+    featureClicked(e);
+    highlightFeature(e);
   }
+  function highlightFeature(e) {
+    const layer = e.target;
+    layer.setStyle({
+      weight: 5,
+      color: '#ff0',
+      dashArray: '',
+      fillOpacity: 0.2,
+    });
+    layer.bringToFront();
+  }
+  function resetHighlight(e) {
+    const layer = ref.current;
+    layer.resetStyle();
+  }
+
   const onEachFeature = (feature, layer) => {
     if (feature.properties) {
       const popupContent = ReactDOMServer.renderToString(
@@ -70,15 +97,22 @@ const BoundedWFSLayer = ({
       );
       layer.bindPopup(popupContent);
     }
+    layer.on({
+      // mouseover: highlightFeature,
+      // mouseout: resetHighlight,
+      click: clickFeature,
+    });
   };
 
   return (
     <>
       {geoJSON != null && (
         <GeoJSON
+          ref={ref}
           data={geoJSON}
           // @ts-ignore
           onEachFeature={onEachFeature}
+          style={style}
           pointToLayer={(feature, latlng) => {
             return L.circleMarker(latlng, {
               radius: 8,

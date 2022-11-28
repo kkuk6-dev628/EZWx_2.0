@@ -24,6 +24,7 @@ interface IProps {
   children: ReactElement[];
   position: string;
   collapsed: boolean;
+  exclusive: boolean;
 }
 
 interface ILayerObj {
@@ -34,7 +35,7 @@ interface ILayerObj {
   id: number;
 }
 
-const LayerControl = ({ position, collapsed, children }: IProps) => {
+const LayerControl = ({ position, collapsed, children, exclusive }: IProps) => {
   const [layers, setLayers] = useState<ILayerObj[]>([]);
   const positionClass =
     (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright;
@@ -52,19 +53,16 @@ const LayerControl = ({ position, collapsed, children }: IProps) => {
   });
 
   const onLayerClick = (layerObj: ILayerObj) => {
-    if (map?.hasLayer(layerObj.layer)) {
-      map.removeLayer(layerObj.layer);
-      setLayers(
-        layers.map((layer) => {
-          if (layer.id === layerObj.id)
-            return {
-              ...layer,
-              checked: false,
-            };
-          return layer;
-        }),
-      );
+    if (layerObj.checked) {
+      if (!exclusive) hideLayer(layerObj);
     } else {
+      if (exclusive) hideAllLayers();
+      showLayer(layerObj);
+    }
+  };
+
+  const showLayer = (layerObj: ILayerObj) => {
+    if (!map?.hasLayer(layerObj.layer)) {
       map.addLayer(layerObj.layer);
       setLayers(
         layers.map((layer) => {
@@ -79,16 +77,51 @@ const LayerControl = ({ position, collapsed, children }: IProps) => {
     }
   };
 
+  const hideLayer = (layerObj: ILayerObj) => {
+    if (map?.hasLayer(layerObj.layer)) {
+      map.removeLayer(layerObj.layer);
+      setLayers(
+        layers.map((layer) => {
+          if (layer.id === layerObj.id)
+            return {
+              ...layer,
+              checked: false,
+            };
+          return layer;
+        }),
+      );
+    }
+  };
+
+  const hideAllLayers = () => {
+    const layersNew = layers.map((layerObj) => {
+      map.removeLayer(layerObj.layer);
+      layerObj.checked = false;
+      return {
+        ...layerObj,
+        checked: false,
+      };
+    });
+    setLayers(layersNew);
+  };
+
   const onGroupAdd = (layer: Layer, name: string, group: string) => {
     const cLayers = layers;
     cLayers.push({
       layer,
       group,
       name,
-      checked: map?.hasLayer(layer),
+      checked: exclusive ? false : map?.hasLayer(layer),
       id: Util.stamp(layer),
     });
-
+    if (exclusive) {
+      cLayers[0].checked = true;
+      for (let i = 1; i < cLayers.length; i++) {
+        if (map?.hasLayer(cLayers[i].layer)) {
+          map.removeLayer(cLayers[i].layer);
+        }
+      }
+    }
     setLayers(cLayers);
   };
 

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { FormEvent, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -15,8 +15,18 @@ function LeafletMap() {
   const [layerControlCollapsed, setLayerControlCollapsed] = useState(true);
   const [baseMapControlCollapsed, setBaseMapControlCollapsed] = useState(true);
 
+  const resetHighlightGairmet = useRef(null);
+  const resetHighlightToppstate = useRef(null);
+  const resetHighlightBugsite = useRef(null);
+
   const handleOnMapMounted = (evt: { leafletElement: any }) => {
     setMap(evt ? evt.leafletElement : null);
+  };
+
+  const mapClicked = (e) => {
+    resetHighlightGairmet.current();
+    resetHighlightToppstate.current();
+    resetHighlightBugsite.current();
   };
 
   return (
@@ -29,9 +39,14 @@ function LeafletMap() {
         ]}
         // @ts-ignore
         zoomControl={false}
+        attributionControl={false}
         ref={handleOnMapMounted}
       >
-        <LayerControl position="topright" collapsed={baseMapControlCollapsed}>
+        <LayerControl
+          position="topright"
+          collapsed={baseMapControlCollapsed}
+          exclusive={true}
+        >
           <GroupedLayer checked name="ArcGIS Online" group="Base Maps">
             <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}" />
           </GroupedLayer>
@@ -40,21 +55,55 @@ function LeafletMap() {
           </GroupedLayer>
         </LayerControl>
 
-        <LayerControl position="topright" collapsed={layerControlCollapsed}>
+        <LayerControl
+          position="topright"
+          collapsed={layerControlCollapsed}
+          exclusive={false}
+        >
           <GroupedLayer checked name="Sf Bugsites" group="Layers">
             <BoundedWFSLayer
               url="http://3.95.80.120:8080/geoserver/sf/ows"
               maxFeatures={256}
               typeName="sf:bugsites"
+              featureClicked={mapClicked}
+              resetHighlightRef={resetHighlightBugsite}
             ></BoundedWFSLayer>
           </GroupedLayer>
           <GroupedLayer checked name="GAirmet" group="Layers">
             <BoundedWFSLayer
               url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
               maxFeatures={256}
-              typeName="EZWxBrief:gairmet_latest"
-              propertyNames={['wkb_geometry', 'id']}
+              typeName="EZWxBrief:gairmet"
+              propertyNames={['wkb_geometry', 'id', 'forecast']}
+              featureClicked={mapClicked}
               enableBBoxQuery={true}
+              resetHighlightRef={resetHighlightGairmet}
+              style={(feature) => {
+                let color = '#990000';
+                switch (feature.properties.forecast) {
+                  case '3':
+                    color = '#009900';
+                    break;
+                  case '6':
+                    color = '#000099';
+                    break;
+                  case '9':
+                    color = '#009999';
+                    break;
+                  case '12':
+                    color = '#999900';
+                    break;
+                  default:
+                    color = '#990000';
+                    break;
+                }
+                return { color };
+                // const color =
+                //   (feature.properties.forecast / 12.0) * (256 * 256 * 256);
+                // return {
+                //   color: '#' + color.toString(16),
+                // };
+              }}
             ></BoundedWFSLayer>
           </GroupedLayer>
           <GroupedLayer checked name="States" group="Layers">
@@ -62,6 +111,8 @@ function LeafletMap() {
               url="http://3.95.80.120:8080/geoserver/topp/ows"
               maxFeatures={256}
               typeName="topp:states"
+              featureClicked={mapClicked}
+              resetHighlightRef={resetHighlightToppstate}
             ></BoundedWFSLayer>
           </GroupedLayer>
         </LayerControl>
@@ -77,6 +128,7 @@ function LeafletMap() {
       </MapContainer>
       <MapTabs
         layerClick={(): void => {
+          setBaseMapControlCollapsed(true);
           setLayerControlCollapsed(!layerControlCollapsed);
         }}
         routeClick={(_event: FormEvent<Element>): void => {
@@ -86,6 +138,7 @@ function LeafletMap() {
           throw new Error('Function not implemented.');
         }}
         basemapClick={(): void => {
+          setLayerControlCollapsed(true);
           setBaseMapControlCollapsed(!baseMapControlCollapsed);
         }}
       />
