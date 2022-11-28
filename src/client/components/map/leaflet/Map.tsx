@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { FormEvent, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -9,8 +9,11 @@ import MapTabs from '../../shared/MapTabs';
 import { SvgRoundMinus, SvgRoundPlus } from '../../utils/SvgIcons';
 import ReactDOMServer from 'react-dom/server';
 import LayerControl, { GroupedLayer } from './layer-control/LayerControl';
+import { useRouter } from 'next/router';
 
 function LeafletMap() {
+  const { pathname } = useRouter();
+  const [isShowTabs, setIsShowTabs] = useState(false);
   const [, setMap] = useState(null);
   const [layerControlCollapsed, setLayerControlCollapsed] = useState(true);
   const [baseMapControlCollapsed, setBaseMapControlCollapsed] = useState(true);
@@ -28,6 +31,12 @@ function LeafletMap() {
     resetHighlightToppstate.current();
     resetHighlightBugsite.current();
   };
+
+  useEffect(() => {
+    if (pathname === '/try-ezwxbrief') {
+      setIsShowTabs(true);
+    }
+  }, [pathname]);
 
   return (
     <div className="map__container">
@@ -126,22 +135,24 @@ function LeafletMap() {
           )}
         />
       </MapContainer>
-      <MapTabs
-        layerClick={(): void => {
-          setBaseMapControlCollapsed(true);
-          setLayerControlCollapsed(!layerControlCollapsed);
-        }}
-        routeClick={(_event: FormEvent<Element>): void => {
-          throw new Error('Function not implemented.');
-        }}
-        profileClick={(_event: FormEvent<Element>): void => {
-          throw new Error('Function not implemented.');
-        }}
-        basemapClick={(): void => {
-          setLayerControlCollapsed(true);
-          setBaseMapControlCollapsed(!baseMapControlCollapsed);
-        }}
-      />
+      {isShowTabs && (
+        <MapTabs
+          layerClick={(): void => {
+            setBaseMapControlCollapsed(true);
+            setLayerControlCollapsed(!layerControlCollapsed);
+          }}
+          routeClick={(_event: FormEvent<Element>): void => {
+            throw new Error('Function not implemented.');
+          }}
+          profileClick={(_event: FormEvent<Element>): void => {
+            throw new Error('Function not implemented.');
+          }}
+          basemapClick={(): void => {
+            setLayerControlCollapsed(true);
+            setBaseMapControlCollapsed(!baseMapControlCollapsed);
+          }}
+        />
+      )}
     </div>
   );
 }

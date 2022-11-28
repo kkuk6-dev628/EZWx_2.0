@@ -26,7 +26,7 @@ const links = [
       {
         id: 3,
         name: 'Imagery',
-        link: '/samples/imagery',
+        link: '/imagery',
       },
       {
         id: 4,
@@ -102,12 +102,11 @@ const responsiveLink = [
 
 export default function Header() {
   const { pathname } = useRouter();
-  console.log(pathname);
   const [activeMenu, setActiveMenu] = useState('');
   const [mapMenu, setMapMenu] = useState(false);
   const [activeResponsiveMenu, setActiveResponsiveMenu] = useState(false);
   useEffect(() => {
-    if (pathname === '/try-ezwxbrief') {
+    if (pathname === '/try-ezwxbrief' || pathname === '/imagery') {
       setMapMenu(true);
     } else {
       setMapMenu(false);
@@ -136,25 +135,34 @@ export default function Header() {
     <div className={`header ${sticky && 'header--fixed'}`}>
       <div className="container">
         <div className="header__wrp">
-          <div className="header__lft">
-            <Link href="/home">
-              <div className="header__img__area">
-                <Image
-                  src="/images/Logo.png"
-                  layout={'fill'}
-                  alt="logo"
-                  className="header__img"
-                />
-              </div>
-            </Link>
+          {!mapMenu ? (
+            <div className="header__lft">
+              <Link href="/home">
+                <div className="header__img__area">
+                  <Image
+                    src="/images/Logo.png"
+                    layout={'fill'}
+                    alt="logo"
+                    className="header__img"
+                  />
+                </div>
+              </Link>
+              <button
+                onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)}
+                className="header__menu btn"
+              >
+                {activeResponsiveMenu ? <SvgRoundClose /> : <SvgMenuBurger />}
+              </button>
+              {mapMenu && <button className="header__tab__text">1040Z</button>}
+            </div>
+          ) : (
             <button
               onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)}
               className="header__menu btn"
             >
               {activeResponsiveMenu ? <SvgRoundClose /> : <SvgMenuBurger />}
             </button>
-            {mapMenu && <button className="header__tab__text">1040Z</button>}
-          </div>
+          )}
           <div className="header__mid">
             <ul className="header__nav">
               {mapMenu
