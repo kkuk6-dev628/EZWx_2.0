@@ -10,12 +10,101 @@
   &__lft {
     position: relative;
   }
+
   &__mid {
     background-color: var(--color-white);
   }
 
   &__rgt {
     padding: 20px;
+  }
+
+  &__range__slider {
+    .rc-slider-rail {
+      background: #EED8FF;
+      height: 12px;
+    }
+
+    .rc-slider-track {
+      background: var(--color-primary);
+      height: 12px;
+    }
+
+    .rc-slider-handle {
+      width: 24px;
+      height: 24px;
+
+      background: #FFFFFF;
+      opacity: 1;
+      border: 1px solid #3F0C69;
+    }
+
+    .rc-slider-step {
+      display: none;
+    }
+
+    .rc-slider-mark {
+      top: 30px;
+
+      span {
+        font-weight: 400;
+        font-size: 20px;
+        line-height: 24px;
+
+        &:nth-child(2) {
+          transform: translateX(0%) !important;
+          left: 0% !important;
+        }
+
+        &:nth-child(4) {
+          left: 63.77% !important;
+        }
+
+        &:last-child {
+          transform: translateX(0) !important;
+          left: 80.95% !important;
+        }
+      }
+    }
+
+    
+  }
+
+  &__range {
+    background-color: var(--color-white);
+    padding: 58px 0;
+  }
+
+  &__range__wrp {
+    // max-width: 1356px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    grid-gap: 45px;
+    // grid
+  }
+  .rc-slider{
+    padding:0px 0px!important;
+  }
+  &__range__play--icon {
+    font-size: 30px;
+    color: var(--color-primary);
+  }
+
+  &__range__play__btn {
+    background: transparent;
+    display: flex;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  &__range__title{
+    text-align: center;
+    margin-bottom: 26px;
+    font-weight: 600;
+font-size: 20px;
+line-height: 24px;
   }
 }
 
@@ -40,12 +129,14 @@
     display: flex;
     align-items: center;
     transition: all 0.3s ease-in-out;
-    svg{
-      path{
+
+    svg {
+      path {
         fill: var(--color-primary);
       }
     }
   }
+
   &__header__rgt--rotate {
     transform: rotate(180deg);
   }
@@ -159,6 +250,7 @@
 
   &__menu__icon {
     transition: all 0.3s ease-in;
+
     svg {
       width: 30px;
       height: 30px;
@@ -173,7 +265,7 @@
     }
   }
 
-  &__menu__item--cld--show{
+  &__menu__item--cld--show {
     display: flex;
   }
 }

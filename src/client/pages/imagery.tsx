@@ -2,11 +2,29 @@ import React, { useState } from 'react';
 import { IoMdArrowDropdown } from 'react-icons/io';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { GrFormClose } from 'react-icons/gr';
-import { SvgDropDown } from '../components/utils/SvgIcons';
+import { FaPlayCircle } from 'react-icons/fa';
 import MapTabs from '../components/shared/MapTabs';
+import { SvgDropDown } from '../components/utils/SvgIcons';
 import Map from '../components/map/leaflet';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 
 function Imagery() {
+  const marks = {
+    0: '0',
+    25: {
+      label: <p className="igry__range__txt">1200Z Feb 27 - 0000Z Feb 28</p>,
+    },
+    50: {
+      label: <p className="igry__range__txt">1200Z Feb 27 - 0000Z Feb 28</p>,
+    },
+    75: {
+      label: <p className="igry__range__txt">1200Z Feb 27 - 0000Z Feb 28</p>,
+    },
+    100: {
+      label: <p className="igry__range__txt">1200Z Feb 27 - 0000Z Feb 28</p>,
+    },
+  };
   return (
     <div className="igry">
       <div className="igry__wrp">
@@ -31,6 +49,25 @@ function Imagery() {
         </div>
         <div className="igry__rgt igry__blu">
           <ImageryDropDown />
+        </div>
+      </div>
+      <div className="igry__range">
+        <div className="container">
+          <h2 className="igry__range__title">
+            Valid 0000Z Feb 27 to 1200Z Feb 27
+          </h2>
+          <div className="igry__range__wrp container">
+            <button className="igry__range__play__btn">
+              <FaPlayCircle className="igry__range__play--icon" />
+            </button>
+            <Slider
+              min={20}
+              defaultValue={20}
+              marks={marks}
+              step={null}
+              className="igry__range__slider"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -206,11 +243,11 @@ const ImageryDropDown = () => {
                             key={child.id}
                           >
                             <p className="igryDrop__menu__text">{child.name}</p>
-                            {child.grandChildren && (
+                            {/* {child.grandChildren && (
                               <div className="igryDrop__menu__icon">
                                 <SvgDropDown />
                               </div>
-                            )}
+                            )} */}
                           </div>
                         );
                       })}
