@@ -28,7 +28,7 @@
   "dependencies": {
     "@apollo/client": "^3.7.1",
     "@apollo/gateway": "^2.2.1",
-    "@babel/runtime": "^7.20.1",
+    "@babel/runtime": "^7.20.6",
     "@material-ui/core": "^4.12.4",
     "@material-ui/icons": "^4.11.3",
     "@nestjs/apollo": "^10.1.6",
