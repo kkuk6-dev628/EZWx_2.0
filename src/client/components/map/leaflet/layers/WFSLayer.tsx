@@ -14,11 +14,11 @@ interface WFSLayerProps {
   enableBBoxQuery?: boolean;
   interactive?: boolean;
   style?: (feature: L.feature) => L.style;
-  featureClicked: (any) => void;
-  resetHighlightRef: any;
+  highlightStyle?: any;
+  filter?: string;
 }
 
-const BoundedWFSLayer = ({
+const WFSLayer = ({
   url,
   maxFeatures,
   typeName,
@@ -26,15 +26,14 @@ const BoundedWFSLayer = ({
   enableBBoxQuery,
   interactive = true,
   style,
-  featureClicked,
-  resetHighlightRef,
+  highlightStyle,
+  filter,
 }: WFSLayerProps) => {
   const [geoJSON, setGeoJSON] = useState(null);
   const ref = useRef(null);
 
   useEffect(() => {
     fetchGeoJSON();
-    resetHighlightRef.current = resetHighlight;
   }, []);
 
   const map = useMapEvents({
@@ -48,23 +47,44 @@ const BoundedWFSLayer = ({
 
   const fetchGeoJSON = () => {
     const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-    let queryString = `outputFormat=text/javascript&maxFeatures=${maxFeatures}&request=GetFeature&service=WFS&typeName=${typeName}&version=1.0.0&format_options=callback:${callbackName}&srsName=EPSG:4326&`;
+    const params = {
+      outputFormat: 'text/javascript',
+      maxFeatures,
+      request: 'GetFeature',
+      service: 'WFS',
+      typeName,
+      version: '1.0.0',
+      format_options: `callback:${callbackName}`,
+      srsName: 'EPSG:4326',
+    };
     if (propertyNames) {
-      queryString += `propertyName=${propertyNames.join(',')}&`;
+      // @ts-ignore
+      params.propertyName = propertyNames.join(',');
     }
     if (enableBBoxQuery) {
-      queryString += `bbox=${map.getBounds().toBBoxString()},EPSG:4326&`;
+      // @ts-ignore
+      params.bbox = `${map.getBounds().toBBoxString()},EPSG:4326`;
     }
+    if (filter) {
+      // @ts-ignore
+      params.cql_filter = filter;
+    }
+    const paramString = L.Util.getParamString(params);
     jsonp(
       url,
       {
-        param: queryString,
+        param: paramString.slice(1) + '&',
         name: callbackName,
+        timeout: 10000,
       },
       (error, data: any) => {
         // console.log(data);
         if (error) {
           console.error(error);
+          setGeoJSON({
+            type: 'FeatureCollection',
+            features: [],
+          });
         } else {
           setGeoJSON(data);
         }
@@ -73,18 +93,16 @@ const BoundedWFSLayer = ({
   };
 
   function clickFeature(e) {
-    // resetHighlight(e.target);
-    featureClicked(e);
     highlightFeature(e);
+    console.log('Layer clicked', e.target.feature.id);
   }
   function highlightFeature(e) {
     const layer = e.target;
-    layer.setStyle({
-      weight: 5,
-      color: '#ff0',
-      dashArray: '',
-      fillOpacity: 0.2,
-    });
+    layer.setStyle(
+      highlightStyle ?? {
+        weight: 5,
+      },
+    );
     layer.bringToFront();
   }
   function resetHighlight(e) {
@@ -97,7 +115,7 @@ const BoundedWFSLayer = ({
       const popupContent = ReactDOMServer.renderToString(
         <GeneralPopup feature={feature} title={typeName} />,
       );
-      layer.bindPopup(popupContent);
+      // layer.bindPopup(popupContent);
     }
     layer.on({
       // mouseover: highlightFeature,
@@ -127,10 +145,11 @@ const BoundedWFSLayer = ({
               fillOpacity: 0.8,
             });
           }}
+          bubblingMouseEvents={true}
         ></GeoJSON>
       )}
     </>
   );
 };
 
-export default BoundedWFSLayer;
+export default WFSLayer;

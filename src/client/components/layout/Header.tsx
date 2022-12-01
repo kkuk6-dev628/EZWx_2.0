@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { Toaster } from 'react-hot-toast';
 import {
   SvgDropDown,
   SvgMenuBurger,
@@ -134,6 +135,7 @@ export default function Header() {
   return (
     <div className={`header ${sticky && 'header--fixed'}`}>
       <div className="container">
+        <Toaster />
         <div className="header__wrp">
           {!mapMenu ? (
             <div className="header__lft">
