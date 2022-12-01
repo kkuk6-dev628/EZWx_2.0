@@ -12,6 +12,7 @@ interface WFSLayerProps {
   typeName: string;
   propertyNames?: string[];
   enableBBoxQuery?: boolean;
+  interactive?: boolean;
   style?: (feature: L.feature) => L.style;
   featureClicked: (any) => void;
   resetHighlightRef: any;
@@ -23,6 +24,7 @@ const BoundedWFSLayer = ({
   typeName,
   propertyNames,
   enableBBoxQuery,
+  interactive = true,
   style,
   featureClicked,
   resetHighlightRef,
@@ -87,7 +89,7 @@ const BoundedWFSLayer = ({
   }
   function resetHighlight(e) {
     const layer = ref.current;
-    layer.resetStyle();
+    if (layer) layer.resetStyle();
   }
 
   const onEachFeature = (feature, layer) => {
@@ -110,6 +112,8 @@ const BoundedWFSLayer = ({
         <GeoJSON
           ref={ref}
           data={geoJSON}
+          // @ts-ignore
+          interactive={interactive}
           // @ts-ignore
           onEachFeature={onEachFeature}
           style={style}
