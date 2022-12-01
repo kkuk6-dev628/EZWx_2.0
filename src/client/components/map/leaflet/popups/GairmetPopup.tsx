@@ -5,7 +5,7 @@ const GairmetPopup = ({ feature }) => {
   return (
     <BasePopupFrame title={'GAirmet Feature Properties'}>
       <Typography variant="body2" style={{ margin: 3 }}>
-        Level: {feature.properties.level}
+        Valid: {feature.properties.level}
       </Typography>
       <Typography variant="body2" style={{ margin: 3 }}>
         Forecast: {feature.properties.forecast}
