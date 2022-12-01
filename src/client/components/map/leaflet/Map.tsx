@@ -21,7 +21,6 @@ function LeafletMap() {
 
   const resetHighlightGairmet = useRef(null);
   const resetHighlightToppstate = useRef(null);
-  const resetHighlightBugsite = useRef(null);
   const resetHighlightCWA = useRef(null);
   const resetHighlightSigmet = useRef(null);
 
@@ -32,7 +31,6 @@ function LeafletMap() {
   const mapClicked = (e) => {
     resetHighlightGairmet.current();
     resetHighlightToppstate.current();
-    resetHighlightBugsite.current();
     resetHighlightCWA.current();
     resetHighlightSigmet.current();
   };
