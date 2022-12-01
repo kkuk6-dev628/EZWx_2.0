@@ -52,6 +52,14 @@ export class ViewController {
         Object.assign(parsedUrl.query, serverSideProps),
       );
   }
+  @Get('imagery')
+  public async imagery(@Req() req: Request, @Res() res: Response) {
+    const parsedUrl = parse(req.url, true);
+
+    await this.viewService
+      .getNextServer()
+      .render(req, res, parsedUrl.pathname, Object.assign(parsedUrl.query));
+  }
 
   @Get('training')
   public async showTraining(@Req() req: Request, @Res() res: Response) {

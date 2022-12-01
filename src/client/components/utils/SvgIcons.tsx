@@ -615,8 +615,89 @@ function SvgAir() {
     </svg>
   );
 }
+function SvgTabs() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="26px"
+      height="26px"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <path
+        d="M19.0029 5.99752H4.99707"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M6.99792 2.9963H17.0021"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <rect
+        x="2.99622"
+        y="8.99878"
+        width="18.0075"
+        height="12.005"
+        rx="2"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+}
+function SvgZoom() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="26px"
+      height="26px"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <path
+        d="M8 16L16 8"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M12 8H16V12"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M12 16H8V12"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+}
 
 export {
+  SvgZoom,
+  SvgTabs,
   SvgAir,
   SvgThreeDot,
   SvgTemperature,
