@@ -44,6 +44,36 @@ const GairmetLayer = () => {
     return style;
   };
 
+  const getLabel = (feature) => {
+    let label;
+    switch (feature.properties.hazard) {
+      case 'ICE':
+        label = `Icing <br/>${feature.properties.top}<br/>${feature.properties.base}`;
+        break;
+      case 'TURB-HI':
+        label = `TurbHi<br/>${feature.properties.top}<br/>${feature.properties.base}`;
+        break;
+      case 'TURB-LO':
+        label = `TurbLo<br/>${feature.properties.top}<br/>${feature.properties.base}`;
+        break;
+      case 'LLWS':
+        label = `LLWS`;
+        break;
+      case 'SFC_WND':
+        label = `Sfc Wind`;
+        break;
+      case 'IFR':
+        label = `IFR`;
+        break;
+      case 'MT_OBSC':
+        label = 'Mtn Obsc';
+        break;
+      case 'M_FZLVL':
+        break;
+    }
+    return label;
+  };
+
   return (
     <WFSLayer
       url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
@@ -60,6 +90,7 @@ const GairmetLayer = () => {
       ]}
       style={gairmetStyle}
       filter={`forecast IN ('0') AND hazard NOT IN ('M_FZLVL')`}
+      getLabel={getLabel}
     ></WFSLayer>
   );
 };

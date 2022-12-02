@@ -88,3 +88,14 @@ z-index: 400!important;
   position: relative;
   overflow: hidden;
 }
+
+.my-labels{
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-weight: 700 !important;
+  font-family: Roboto;
+  -webkit-text-stroke: medium;
+  line-height: 0.8rem;
+  font-size: 0.9rem;
+}
