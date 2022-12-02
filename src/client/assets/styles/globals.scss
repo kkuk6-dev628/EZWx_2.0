@@ -13,6 +13,7 @@
 /*------  Shared Components ------*/
 @import "./shared/FlexiblePricing.scss";
 @import "./shared/MapTabs.scss";
+@import "./shared/Modal.scss";
 
 
 /*-------------- Pages -------------*/
@@ -87,4 +88,8 @@ z-index: 400!important;
   width: 100%;
   position: relative;
   overflow: hidden;
+}
+
+.Map_map__vPSDC{
+  height: calc(100vh - 75px)!important;
 }

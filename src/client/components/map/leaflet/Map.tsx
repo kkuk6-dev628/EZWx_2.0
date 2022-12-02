@@ -11,6 +11,7 @@ import { SvgRoundMinus, SvgRoundPlus } from '../../utils/SvgIcons';
 import ReactDOMServer from 'react-dom/server';
 import LayerControl, { GroupedLayer } from './layer-control/LayerControl';
 import { useRouter } from 'next/router';
+import Modal from '../../shared/Modal';
 
 function LeafletMap() {
   const { pathname } = useRouter();
@@ -185,6 +186,7 @@ function LeafletMap() {
           }}
         />
       )}
+      <Modal />
     </div>
   );
 }
