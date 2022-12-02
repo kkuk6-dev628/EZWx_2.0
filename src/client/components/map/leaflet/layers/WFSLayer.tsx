@@ -15,6 +15,7 @@ interface WFSLayerProps {
   propertyNames?: string[];
   enableBBoxQuery?: boolean;
   interactive?: boolean;
+  getLabel?: (feature: L.feature) => string;
   style?: (feature: L.feature) => L.style;
   highlightStyle?: any;
   filter?: string;
@@ -27,6 +28,7 @@ const WFSLayer = ({
   propertyNames,
   enableBBoxQuery,
   interactive = true,
+  getLabel,
   style,
   highlightStyle,
   filter,
@@ -109,8 +111,8 @@ const WFSLayer = ({
   };
 
   function clickFeature(e) {
-    highlightFeature(e);
-    console.log('Layer clicked', e.target.feature.id);
+    // highlightFeature(e);
+    // console.log('Layer clicked', e.target.feature.id);
   }
   function highlightFeature(e) {
     const layer = e.target;
@@ -128,9 +130,19 @@ const WFSLayer = ({
 
   const onEachFeature = (feature, layer) => {
     if (feature.properties) {
-      const popupContent = ReactDOMServer.renderToString(
-        <GeneralPopup feature={feature} title={typeName} />,
-      );
+      if (getLabel) {
+        const center = layer.getBounds().getCenter();
+        console.log(center);
+        layer.bindTooltip(getLabel(feature), {
+          permanent: true,
+          direction: 'center',
+          className: 'my-labels',
+          opacity: 1,
+        });
+      }
+      // const popupContent = ReactDOMServer.renderToString(
+      //   <GeneralPopup feature={feature} title={typeName} />,
+      // );
       // layer.bindPopup(popupContent);
     }
     layer.on({

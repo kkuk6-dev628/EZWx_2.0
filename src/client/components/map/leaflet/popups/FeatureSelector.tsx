@@ -76,7 +76,7 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
           );
         } else if (layerName === 'cwa') {
           return (
-            <>
+            <div key={layer.feature.id}>
               <Typography
                 key={layer.feature.id}
                 style={{ margin: 3, cursor: 'pointer', border: '1px' }}
@@ -87,11 +87,11 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
                 {layer.feature.properties.hazard}
               </Typography>
               <Divider />
-            </>
+            </div>
           );
         } else if (layerName === 'conv_outlook') {
           return (
-            <>
+            <div key={layer.feature.id}>
               <Typography
                 key={layer.feature.id}
                 style={{ margin: 3, cursor: 'pointer', border: '1px' }}
@@ -102,7 +102,7 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
                 {layer.feature.properties.hazard}
               </Typography>
               <Divider />
-            </>
+            </div>
           );
         }
       })}
