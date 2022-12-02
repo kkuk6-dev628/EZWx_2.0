@@ -43,29 +43,25 @@ function LeafletMap() {
           collapsed={baseMapControlCollapsed}
           exclusive={true}
         >
-          <GroupedLayer checked name="OpenTopoMap" group="Base Maps">
+          <GroupedLayer checked name="Topo" group="Base Maps">
             <TileLayer url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png" />
           </GroupedLayer>
-          <GroupedLayer checked name="OpenStreetMap" group="Base Maps">
+          <GroupedLayer checked name="Street" group="Base Maps">
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           </GroupedLayer>
-          <GroupedLayer
-            checked
-            name="ArcGIS World Street Map"
-            group="Base Maps"
-          >
-            <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}" />
-          </GroupedLayer>
-          <GroupedLayer checked name="ArcGIS Online" group="Base Maps">
+          <GroupedLayer checked name="Terrain" group="Base Maps">
             <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}" />
           </GroupedLayer>
-          <GroupedLayer checked name="CARTO OpenStreetMap" group="Base Maps">
+          <GroupedLayer checked name="Dark" group="Base Maps">
             <TileLayer
               url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
               // @ts-ignore
               subdomains="abcd"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             />
+          </GroupedLayer>
+          <GroupedLayer checked name="Satellite" group="Base Maps">
+            <TileLayer url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}" />
           </GroupedLayer>
         </LayerControl>
         <MeteoLayers
