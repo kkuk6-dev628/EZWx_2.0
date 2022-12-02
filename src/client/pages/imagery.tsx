@@ -12,9 +12,9 @@ import {
   SvgTabs,
   SvgZoom,
 } from '../components/utils/SvgIcons';
-import Map from '../components/map/leaflet';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
+import Image from 'next/image';
 
 function Imagery() {
   const marks = {
@@ -52,7 +52,14 @@ function Imagery() {
           />
         </div>
         <div className="igry__mid">
-          <Map />
+          <div className="igry__img__area">
+            <Image
+              className="igry__img"
+              src="/images/map__img.png"
+              layout={'fill'}
+              alt={''}
+            />
+          </div>
         </div>
         <div className="igry__rgt igry__blu">
           <ImageryDropDown />
