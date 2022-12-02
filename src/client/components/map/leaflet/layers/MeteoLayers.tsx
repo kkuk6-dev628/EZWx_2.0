@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import LayerControl, { GroupedLayer } from '../layer-control/LayerControl';
 import WFSLayer from './WFSLayer';
 import { useMapEvents } from 'react-leaflet';
@@ -5,13 +6,13 @@ import L from 'leaflet';
 import GairmetLayer from './GairmetLayer';
 import { useRef, useState } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
-import FeatureSelector from '../popups/featureSelector';
+import FeatureSelector from '../popups/FeatureSelector';
 import ReactDOMServer from 'react-dom/server';
+import ReactDOM from 'react-dom';
+import GairmetPopup from '../popups/GairmetPopup';
 
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
-  const [pickedFeatures, setPickedFeatures] = useState([]);
-  const [showPopup, setShowPopup] = useState(false);
 
   const handleFeatureSelect = (feature) => {
     console.log(feature);
@@ -30,19 +31,42 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           }
         });
       });
-      setPickedFeatures(features);
-      setShowPopup(true);
+      if (features.length === 0) {
+        map.closePopup();
+        return;
+      }
       L.popup()
         .setLatLng(e.latlng)
         .setContent(
           ReactDOMServer.renderToString(
             <FeatureSelector
-              features={pickedFeatures}
+              features={features}
               onSelect={handleFeatureSelect}
             ></FeatureSelector>,
           ),
         )
         .openOn(map);
+      const selectorFeatureNodes =
+        document.getElementsByClassName('selector-feature');
+      for (let i = 0; i < selectorFeatureNodes.length; i++) {
+        selectorFeatureNodes[i].addEventListener('click', (ee) => {
+          map.closePopup();
+          // @ts-ignore
+          const featureId = ee.currentTarget.dataset.featureid;
+          features.forEach((layer) => {
+            if (layer.feature.id === featureId) {
+              L.popup()
+                .setLatLng(e.latlng)
+                .setContent(
+                  ReactDOMServer.renderToString(
+                    <GairmetPopup feature={layer.feature}></GairmetPopup>,
+                  ),
+                )
+                .openOn(map);
+            }
+          });
+        });
+      }
     },
   });
 

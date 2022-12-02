@@ -68,7 +68,7 @@ const LayerControl = ({
       });
       return;
     }
-    if (layerObj.checked) {
+    if (map?.hasLayer(layerObj.layer)) {
       if (!exclusive) hideLayer(layerObj);
     } else {
       if (exclusive) hideAllLayers();
@@ -171,7 +171,10 @@ const LayerControl = ({
                       control={
                         <Checkbox
                           checked={layerObj.checked}
-                          onChange={() => onLayerClick(layerObj)}
+                          onChange={(e) => {
+                            console.log(e);
+                            onLayerClick(layerObj);
+                          }}
                           name="checkedB"
                           color="primary"
                         />
