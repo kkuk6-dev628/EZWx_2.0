@@ -5,6 +5,8 @@ import jsonp from 'jsonp';
 import * as ReactDOMServer from 'react-dom/server';
 import L from 'leaflet';
 import GeneralPopup from '../popups/GeneralPopup';
+import { assertValidExecutionArguments } from 'graphql/execution/execute';
+import axios from 'axios';
 
 interface WFSLayerProps {
   url: string;
@@ -69,27 +71,41 @@ const WFSLayer = ({
       // @ts-ignore
       params.cql_filter = filter;
     }
-    const paramString = L.Util.getParamString(params);
-    jsonp(
-      url,
-      {
-        param: paramString.slice(1) + '&',
-        name: callbackName,
-        timeout: 10000,
-      },
-      (error, data: any) => {
-        // console.log(data);
-        if (error) {
-          console.error(error);
-          setGeoJSON({
-            type: 'FeatureCollection',
-            features: [],
-          });
-        } else {
-          setGeoJSON(data);
-        }
-      },
-    );
+    // const paramString = L.Util.getParamString(params);
+    // jsonp(
+    //   url,
+    //   {
+    //     param: paramString.slice(1) + '&',
+    //     name: callbackName,
+    //     timeout: 10000,
+    //   },
+    //   (error, data: any) => {
+    //     // console.log(data);
+    //     if (error) {
+    //       console.error(error);
+    //       setGeoJSON({
+    //         type: 'FeatureCollection',
+    //         features: [],
+    //       });
+    //     } else {
+    //       setGeoJSON(data);
+    //     }
+    //   },
+    // );
+    params.outputFormat = 'application/json';
+    params.format_options = undefined;
+    axios
+      .get(url, { params: params })
+      .then((data) => {
+        setGeoJSON(data.data);
+      })
+      .catch((reason) => {
+        console.log(reason);
+        setGeoJSON({
+          type: 'FeatureCollection',
+          features: [],
+        });
+      });
   };
 
   function clickFeature(e) {
