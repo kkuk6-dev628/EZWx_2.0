@@ -4,7 +4,12 @@ import { BsBookmarkPlus } from 'react-icons/bs';
 import { AiOutlineMinus } from 'react-icons/ai';
 import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
 import Switch from 'react-switch';
-function Modal() {
+//i pass setIsShowModal as a prop to the modal component
+interface Props {
+  setIsShowModal: (isShowModal: boolean) => void;
+}
+
+function Modal({ setIsShowModal }: Props) {
   const [checked, setChecked] = useState(false);
   const handleChange = (nextChecked) => {
     setChecked(nextChecked);
@@ -14,7 +19,11 @@ function Modal() {
       <div className="modal__wrp">
         <div className="modal__top">
           <p className="modal__top__text text">Enter/Edit/Delete route</p>
-          <button className="modal__top__close" type="button">
+          <button
+            onClick={() => setIsShowModal(false)}
+            className="modal__top__close"
+            type="button"
+          >
             <AiOutlineClose className="modal__icon" />
           </button>
         </div>

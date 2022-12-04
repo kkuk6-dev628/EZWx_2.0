@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -7,7 +8,16 @@ import L from 'leaflet';
 import styles from './Map.module.css';
 import BoundedWFSLayer from './layers/BoundedWFSLayer';
 import MapTabs from '../../shared/MapTabs';
-import { SvgRoundMinus, SvgRoundPlus } from '../../utils/SvgIcons';
+import {
+  SvgLayer,
+  SvgMap,
+  SvgProfileCharge,
+  SvgRoundMinus,
+  SvgRoundPlus,
+  SvgRoute,
+  SvgTemperature,
+  SvgThreeDot,
+} from '../../utils/SvgIcons';
 import ReactDOMServer from 'react-dom/server';
 import LayerControl, { GroupedLayer } from './layer-control/LayerControl';
 import { useRouter } from 'next/router';
@@ -17,6 +27,7 @@ function LeafletMap() {
   const { pathname } = useRouter();
   const [isShowTabs, setIsShowTabs] = useState(false);
   const [, setMap] = useState(null);
+  const [isShowModal, setIsShowModal] = useState(false);
   const [layerControlCollapsed, setLayerControlCollapsed] = useState(true);
   const [baseMapControlCollapsed, setBaseMapControlCollapsed] = useState(true);
 
@@ -29,7 +40,7 @@ function LeafletMap() {
     setMap(evt ? evt.leafletElement : null);
   };
 
-  const mapClicked = (e) => {
+  const mapClicked = () => {
     resetHighlightGairmet.current();
     resetHighlightToppstate.current();
     resetHighlightCWA.current();
@@ -41,6 +52,76 @@ function LeafletMap() {
       setIsShowTabs(true);
     }
   }, [pathname]);
+
+  const handler = (id: string) => {
+    switch (id) {
+      case 'layer':
+        setBaseMapControlCollapsed(true);
+        setLayerControlCollapsed(!layerControlCollapsed);
+        break;
+      case 'basemap':
+        setLayerControlCollapsed(true);
+        setBaseMapControlCollapsed(!baseMapControlCollapsed);
+        break;
+      case 'route':
+        setIsShowModal(true);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const tabMenus = [
+    {
+      id: '1040Z',
+      name: '1040Z',
+      handler: handler,
+      svg: null,
+      isHideResponsive: true,
+    },
+    {
+      id: 'layer',
+      name: 'Layer',
+      svg: <SvgLayer />,
+      handler: handler,
+      isHideResponsive: false,
+    },
+    {
+      id: 'route',
+      name: 'Route',
+      svg: <SvgRoute />,
+      handler: handler,
+      isHideResponsive: false,
+    },
+    {
+      id: 'profile',
+      name: 'Profile',
+      svg: <SvgProfileCharge />,
+      handler: handler,
+      isHideResponsive: false,
+    },
+    {
+      id: 'more',
+      name: 'More',
+      svg: <SvgThreeDot />,
+      handler: handler,
+      isHideResponsive: false,
+    },
+    {
+      id: 'basemap',
+      name: 'Base map',
+      svg: <SvgMap />,
+      handler: handler,
+      isHideResponsive: true,
+    },
+    {
+      id: '7days',
+      name: '7 days',
+      svg: <SvgTemperature />,
+      handler: handler,
+      isHideResponsive: true,
+    },
+  ];
 
   return (
     <div className="map__container">
@@ -168,25 +249,8 @@ function LeafletMap() {
           )}
         />
       </MapContainer>
-      {isShowTabs && (
-        <MapTabs
-          layerClick={(): void => {
-            setBaseMapControlCollapsed(true);
-            setLayerControlCollapsed(!layerControlCollapsed);
-          }}
-          routeClick={(_event: FormEvent<Element>): void => {
-            throw new Error('Function not implemented.');
-          }}
-          profileClick={(_event: FormEvent<Element>): void => {
-            throw new Error('Function not implemented.');
-          }}
-          basemapClick={(): void => {
-            setLayerControlCollapsed(true);
-            setBaseMapControlCollapsed(!baseMapControlCollapsed);
-          }}
-        />
-      )}
-      <Modal />
+      {isShowTabs && <MapTabs tabMenus={tabMenus} />}
+      {isShowModal && <Modal setIsShowModal={setIsShowModal} />}
     </div>
   );
 }
