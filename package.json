@@ -69,7 +69,7 @@
     "sass": "^1.56.1",
     "swiper": "^8.4.5",
     "ts-morph": "^17.0.1",
-    "typeorm": "^0.3.10"
+    "typeorm": "^0.3.11"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
