@@ -9,7 +9,7 @@ interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
 }
 
-function Modal({ setIsShowModal }: Props) {
+function Route({ setIsShowModal }: Props) {
   const [checked, setChecked] = useState(false);
   const handleChange = (nextChecked) => {
     setChecked(nextChecked);
@@ -139,4 +139,4 @@ function Modal({ setIsShowModal }: Props) {
   );
 }
 
-export default Modal;
+export default Route;

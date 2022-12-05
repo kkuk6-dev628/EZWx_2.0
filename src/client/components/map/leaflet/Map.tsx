@@ -21,11 +21,14 @@ import {
 import ReactDOMServer from 'react-dom/server';
 import LayerControl, { GroupedLayer } from './layer-control/LayerControl';
 import { useRouter } from 'next/router';
-import Modal from '../../shared/Modal';
+import Route from '../../shared/Route';
+import CollapsibleBar from '../../shared/CollapsibleBar';
+import DateSliderModal from '../../shared/DateSliderModal';
 
 function LeafletMap() {
   const { pathname } = useRouter();
   const [isShowTabs, setIsShowTabs] = useState(false);
+  const [isShowDateModal, setIsShowDateModal] = useState(false);
   const [, setMap] = useState(null);
   const [isShowModal, setIsShowModal] = useState(false);
   const [layerControlCollapsed, setLayerControlCollapsed] = useState(true);
@@ -250,7 +253,11 @@ function LeafletMap() {
         />
       </MapContainer>
       {isShowTabs && <MapTabs tabMenus={tabMenus} />}
-      {isShowModal && <Modal setIsShowModal={setIsShowModal} />}
+      {isShowModal && <Route setIsShowModal={setIsShowModal} />}
+      {isShowDateModal && (
+        <DateSliderModal setIsShowDateModal={setIsShowDateModal} />
+      )}
+      <CollapsibleBar setIsShowDateModal={setIsShowDateModal} />
     </div>
   );
 }
