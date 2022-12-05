@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useRef, useState } from 'react';
 import { useMapEvents, GeoJSON } from 'react-leaflet';
-import jsonp from 'jsonp';
-import * as ReactDOMServer from 'react-dom/server';
 import L from 'leaflet';
-import GeneralPopup from '../popups/GeneralPopup';
-import { assertValidExecutionArguments } from 'graphql/execution/execute';
 import axios from 'axios';
 
 interface WFSLayerProps {
@@ -99,7 +95,15 @@ const WFSLayer = ({
     axios
       .get(url, { params: params })
       .then((data) => {
-        setGeoJSON(data.data);
+        if (typeof data.data === 'string') {
+          console.log(data.data);
+          setGeoJSON({
+            type: 'FeatureCollection',
+            features: [],
+          });
+        } else {
+          setGeoJSON(data.data);
+        }
       })
       .catch((reason) => {
         console.log(reason);
@@ -131,8 +135,7 @@ const WFSLayer = ({
   const onEachFeature = (feature, layer) => {
     if (feature.properties) {
       if (getLabel) {
-        const center = layer.getBounds().getCenter();
-        console.log(center);
+        // const center = layer.getBounds().getCenter();
         layer.bindTooltip(getLabel(feature), {
           permanent: true,
           direction: 'center',

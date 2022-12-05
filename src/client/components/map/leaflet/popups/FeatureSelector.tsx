@@ -33,15 +33,15 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
               icon = <SvgLayer />;
               break;
             case 'TURB-LO':
-              text = `Moderate ice from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+              text = `Low turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
               icon = <SvgLayer />;
               break;
             case 'LLWS':
-              text = `Moderate ice from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+              text = `LLWS G-AIRMET`;
               icon = <SvgLayer />;
               break;
             case 'SFC_WND':
-              text = `Moderate ice from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+              text = `Surface Winds G-AIRMET`;
               icon = <SvgLayer />;
               break;
             case 'IFR':
@@ -53,58 +53,50 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
               icon = <SvgLayer />;
               break;
             case 'M_FZLVL':
-              text = `Moderate ice from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+              text = `Multiple freezing levels`;
               icon = <SvgLayer />;
               break;
           }
-          return (
-            <div key={layer.feature.id}>
-              <span
-                style={{
-                  margin: 3,
-                  cursor: 'pointer',
-                  display: 'flex',
-                }}
-                className="selector-feature"
-                data-featureid={layer.feature.id}
-              >
-                <span style={{ alignSelf: 'center' }}>{icon}</span>
-                <p>{text}</p>
-              </span>
-              <Divider />
-            </div>
-          );
         } else if (layerName === 'cwa') {
-          return (
-            <div key={layer.feature.id}>
-              <Typography
-                key={layer.feature.id}
-                style={{ margin: 3, cursor: 'pointer', border: '1px' }}
-                className="selector-feature"
-                data-featureid={layer.feature.id}
-              >
-                <SvgAir></SvgAir>
-                {layer.feature.properties.hazard}
-              </Typography>
-              <Divider />
-            </div>
-          );
+          text = 'CWA';
         } else if (layerName === 'conv_outlook') {
-          return (
-            <div key={layer.feature.id}>
-              <Typography
-                key={layer.feature.id}
-                style={{ margin: 3, cursor: 'pointer', border: '1px' }}
-                className="selector-feature"
-                data-featureid={layer.feature.id}
-              >
-                <SvgAir></SvgAir>
-                {layer.feature.properties.hazard}
-              </Typography>
-              <Divider />
-            </div>
-          );
+          text = 'Convective outlook';
+        } else if (layerName === 'sigmet') {
+          switch (layer.feature.properties.hazard) {
+            case 'CONVECTIVE':
+              text = `Convective SIGMET`;
+              break;
+            case 'TURB':
+              text = `Turbulence SIGMET `;
+              break;
+            case 'ICING':
+              text = `Icing SIGMET`;
+              break;
+            case 'IFR':
+              text = `IFR SIGMET`;
+              break;
+            case 'ASH':
+              text = `ASH SIGMET`;
+              break;
+          }
         }
+        return (
+          <div key={layer.feature.id}>
+            <span
+              style={{
+                margin: 3,
+                cursor: 'pointer',
+                display: 'flex',
+              }}
+              className="selector-feature"
+              data-featureid={layer.feature.id}
+            >
+              <span style={{ alignSelf: 'center' }}>{icon}</span>
+              <p>{text}</p>
+            </span>
+            <Divider />
+          </div>
+        );
       })}
     </BasePopupFrame>
   );
