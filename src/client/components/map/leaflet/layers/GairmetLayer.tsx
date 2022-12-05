@@ -87,6 +87,7 @@ const GairmetLayer = () => {
         'issuetime',
         'validtime',
         'hazard',
+        'dueto',
       ]}
       style={gairmetStyle}
       filter={`forecast IN ('0') AND hazard NOT IN ('M_FZLVL')`}

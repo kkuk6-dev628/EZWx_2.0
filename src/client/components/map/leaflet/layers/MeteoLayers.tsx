@@ -10,6 +10,7 @@ import FeatureSelector from '../popups/FeatureSelector';
 import ReactDOMServer from 'react-dom/server';
 import GairmetPopup from '../popups/GairmetPopup';
 import GeneralPopup from '../popups/GeneralPopup';
+import SigmetLayer from './SigmetLayer';
 
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
@@ -95,9 +96,6 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           setLayers(lyr);
         }}
       >
-        <GroupedLayer checked name="GAirmet" group="Meteo">
-          <GairmetLayer></GairmetLayer>
-        </GroupedLayer>
         <GroupedLayer checked name="States" group="Admin">
           <WFSLayer
             url="http://3.95.80.120:8080/geoserver/topp/ows"
@@ -112,18 +110,17 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
             }}
           ></WFSLayer>
         </GroupedLayer>
+        <GroupedLayer checked name="GAirmet" group="Meteo">
+          <GairmetLayer></GairmetLayer>
+        </GroupedLayer>
+        <GroupedLayer checked name="SIGMET" group="Meteo">
+          <SigmetLayer></SigmetLayer>
+        </GroupedLayer>
         <GroupedLayer checked name="CWA" group="Meteo">
           <WFSLayer
             url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
             maxFeatures={256}
             typeName="EZWxBrief:cwa"
-          ></WFSLayer>
-        </GroupedLayer>
-        <GroupedLayer checked name="SIGMET" group="Meteo">
-          <WFSLayer
-            url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
-            maxFeatures={256}
-            typeName="EZWxBrief:sigmet"
           ></WFSLayer>
         </GroupedLayer>
         <GroupedLayer checked name="Convetive Outlook" group="Meteo">
