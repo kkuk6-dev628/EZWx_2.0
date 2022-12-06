@@ -68,7 +68,7 @@
     "react-switch": "^7.0.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.5.7",
+    "rxjs": "^7.6.0",
     "sass": "^1.56.1",
     "swiper": "^8.4.5",
     "ts-morph": "^17.0.1",
