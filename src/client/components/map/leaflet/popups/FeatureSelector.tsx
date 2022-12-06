@@ -10,6 +10,7 @@ import {
   ListItemIcon,
 } from '@material-ui/core';
 import { SvgAir, SvgLayer } from '../../../utils/SvgIcons';
+import { translateWeatherClausings } from '../../AreoFunctions';
 
 interface FeatureSelectorProps {
   features: L.Layer[];
@@ -29,19 +30,19 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
               icon = <SvgLayer />;
               break;
             case 'TURB-HI':
-              text = `Severe turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+              text = `Moderate turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
               icon = <SvgLayer />;
               break;
             case 'TURB-LO':
-              text = `Low turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+              text = `Moderate turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
               icon = <SvgLayer />;
               break;
             case 'LLWS':
-              text = `LLWS G-AIRMET`;
+              text = `Nonconvective low level wind shear below 2,000 feet AGL G-AIRMET`;
               icon = <SvgLayer />;
               break;
             case 'SFC_WND':
-              text = `Surface Winds G-AIRMET`;
+              text = `Sustained surface wind > 30 knots G-AIRMET`;
               icon = <SvgLayer />;
               break;
             case 'IFR':
@@ -49,7 +50,9 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
               icon = <SvgLayer />;
               break;
             case 'MT_OBSC':
-              text = `Mountains obscured by precipitation, clouds and mist`;
+              text =
+                `Mountains obscured by ` +
+                translateWeatherClausings(layer.feature.properties.dueto);
               icon = <SvgLayer />;
               break;
             case 'M_FZLVL':
@@ -76,7 +79,7 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
               text = `IFR SIGMET`;
               break;
             case 'ASH':
-              text = `ASH SIGMET`;
+              text = `Volcanic ash SIGMET`;
               break;
           }
         }
