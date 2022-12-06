@@ -7,14 +7,17 @@ import { BsBookmarkPlus, BsShare } from 'react-icons/bs';
 import { MdOutlineSaveAlt } from 'react-icons/md';
 import MapTabs from '../components/shared/MapTabs';
 import {
+  SvgBookmark,
+  SvgDownload,
   SvgDropDown,
   SvgRefresh,
+  SvgShare,
   SvgTabs,
   SvgZoom,
 } from '../components/utils/SvgIcons';
-import Map from '../components/map/leaflet';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
+import Image from 'next/image';
 
 function Imagery() {
   const marks = {
@@ -32,27 +35,75 @@ function Imagery() {
       label: <p className="igry__range__txt">1200Z Feb 27 - 0000Z Feb 28</p>,
     },
   };
+  const handler = (id: string) => {
+    console.log(id);
+  };
+  const tabMenus = [
+    {
+      id: '1040Z',
+      name: '1040Z',
+      handler: handler,
+      svg: null,
+      isHideResponsive: false,
+    },
+    {
+      id: 'saved',
+      name: 'Saved',
+      svg: <SvgBookmark />,
+      handler: handler,
+      isHideResponsive: false,
+    },
+    {
+      id: 'export',
+      name: 'Export',
+      svg: <SvgDownload />,
+      handler: handler,
+      isHideResponsive: false,
+    },
+    {
+      id: 'share',
+      name: 'Share',
+      svg: <SvgShare />,
+      handler: handler,
+      isHideResponsive: false,
+    },
+    {
+      id: 'future',
+      name: 'Future',
+      svg: <SvgTabs />,
+      handler: handler,
+      isHideResponsive: false,
+    },
+    {
+      id: 'expand',
+      name: 'Expand',
+      svg: <SvgZoom />,
+      handler: handler,
+      isHideResponsive: false,
+    },
+    {
+      id: 'refresh',
+      name: 'Refresh',
+      svg: <SvgRefresh />,
+      handler: handler,
+      isHideResponsive: false,
+    },
+  ];
   return (
     <div className="igry">
       <div className="igry__wrp">
         <div className="igry__lft igry__blu">
-          <MapTabs
-            layerClick={function (event: React.FormEvent<Element>): void {
-              throw new Error('Function not implemented.');
-            }}
-            routeClick={function (event: React.FormEvent<Element>): void {
-              throw new Error('Function not implemented.');
-            }}
-            profileClick={function (event: React.FormEvent<Element>): void {
-              throw new Error('Function not implemented.');
-            }}
-            basemapClick={function (event: React.FormEvent<Element>): void {
-              throw new Error('Function not implemented.');
-            }}
-          />
+          <MapTabs tabMenus={tabMenus} />
         </div>
         <div className="igry__mid">
-          <Map />
+          <div className="igry__img__area">
+            <Image
+              className="igry__img"
+              src="/images/map__img.png"
+              layout={'fill'}
+              alt={''}
+            />
+          </div>
         </div>
         <div className="igry__rgt igry__blu">
           <ImageryDropDown />

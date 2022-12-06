@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { Ref, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useMapEvents, GeoJSON } from 'react-leaflet';
 import jsonp from 'jsonp';
 import * as ReactDOMServer from 'react-dom/server';
@@ -87,7 +87,7 @@ const BoundedWFSLayer = ({
     });
     layer.bringToFront();
   }
-  function resetHighlight(e) {
+  function resetHighlight() {
     const layer = ref.current;
     if (layer) layer.resetStyle();
   }
