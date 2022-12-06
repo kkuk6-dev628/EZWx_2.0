@@ -1,11 +1,30 @@
 import { Typography } from '@material-ui/core';
 import BasePopupFrame from './BasePopupFrame';
-import {
-  getAltitudeString,
-  translateWeatherClausings,
-} from '../../AreoFunctions';
+import { WeatherCausings } from '../../AreoConstants';
 
-const GairmetPopup = ({ feature }) => {
+const SigmetPopup = ({ feature }) => {
+  const getAltitudeString = (value: string): string => {
+    if (value === 'SFC') {
+      return 'Surface';
+    } else if (value === 'FZL') {
+      return 'FZL';
+    } else if (!isNaN(parseInt(value))) {
+      return parseInt(value) * 100 + ' ft MSL';
+    }
+  };
+
+  const translateWeatherClausings = (dueto: string): string => {
+    if (!dueto) {
+      return '';
+    }
+    const weatherCausings = dueto.slice(dueto.lastIndexOf(' ') + 1);
+    const splitWeatherCausing = weatherCausings.split('/');
+    const wc = splitWeatherCausing.map((element) => {
+      return WeatherCausings[element];
+    });
+    return wc.join(', ').replace(/,(?=[^,]+$)/, ' and');
+  };
+
   let title = 'G_AIRMET';
   let dueto = 'Moderate.';
   const top = getAltitudeString(feature.properties.top);
@@ -29,12 +48,12 @@ const GairmetPopup = ({ feature }) => {
       break;
     case 'SFC_WND':
       title = `Surface Winds G-AIRMET`;
-      dueto = 'Sustained surface wind > 30 knots';
+      dueto = 'Sustained surface  wind > 30 knots ';
       break;
     case 'IFR':
       title = `IFR G-AIRMET`;
       dueto =
-        'Ceiling below 1,000 feet and/or visibility below 3 statute miles by ' +
+        'Ceiling below 1,000  feet and/or visibility below 3 statute miles by ' +
         translateWeatherClausings(feature.properties.dueto);
       break;
     case 'MT_OBSC':
@@ -71,4 +90,4 @@ const GairmetPopup = ({ feature }) => {
     </BasePopupFrame>
   );
 };
-export default GairmetPopup;
+export default SigmetPopup;

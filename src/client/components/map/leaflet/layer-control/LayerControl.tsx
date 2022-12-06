@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react';
+import React, { MutableRefObject, ReactElement, useState } from 'react';
 import { Typography } from '@material-ui/core';
 import { useMapEvents } from 'react-leaflet';
 import { Layer, Util } from 'leaflet';
@@ -9,6 +9,7 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import lodashGroupBy from 'lodash.groupby';
+import toast from 'react-hot-toast';
 import { LayersControlProvider } from './layerControlContext';
 
 import createControlledLayer from './controlledLayer';
@@ -25,6 +26,7 @@ interface IProps {
   position: string;
   collapsed: boolean;
   exclusive: boolean;
+  onLayersAdd?: (layers: ILayerObj[]) => void;
 }
 
 interface ILayerObj {
@@ -33,9 +35,16 @@ interface ILayerObj {
   name: string;
   checked: boolean;
   id: number;
+  isEmpty: boolean;
 }
 
-const LayerControl = ({ position, collapsed, children, exclusive }: IProps) => {
+const LayerControl = ({
+  position,
+  collapsed,
+  children,
+  exclusive,
+  onLayersAdd,
+}: IProps) => {
   const [layers, setLayers] = useState<ILayerObj[]>([]);
   const positionClass =
     (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright;
@@ -53,7 +62,13 @@ const LayerControl = ({ position, collapsed, children, exclusive }: IProps) => {
   });
 
   const onLayerClick = (layerObj: ILayerObj) => {
-    if (layerObj.checked) {
+    if (layerObj.isEmpty) {
+      toast.error(`No ${layerObj.name}'s data displayed`, {
+        position: 'top-right',
+      });
+      return;
+    }
+    if (map?.hasLayer(layerObj.layer)) {
       if (!exclusive) hideLayer(layerObj);
     } else {
       if (exclusive) hideAllLayers();
@@ -106,13 +121,16 @@ const LayerControl = ({ position, collapsed, children, exclusive }: IProps) => {
   };
 
   const onGroupAdd = (layer: Layer, name: string, group: string) => {
+    const isEmptyLayer =
+      layer._layers !== undefined && Object.keys(layer._layers).length === 0;
     const cLayers = layers;
     cLayers.push({
       layer,
       group,
       name,
-      checked: exclusive ? false : map?.hasLayer(layer),
+      checked: exclusive || isEmptyLayer ? false : map?.hasLayer(layer),
       id: Util.stamp(layer),
+      isEmpty: isEmptyLayer,
     });
     if (exclusive) {
       cLayers[0].checked = true;
@@ -123,6 +141,7 @@ const LayerControl = ({ position, collapsed, children, exclusive }: IProps) => {
       }
     }
     setLayers(cLayers);
+    if (onLayersAdd) onLayersAdd(layers);
   };
 
   const groupedLayers = lodashGroupBy(layers, 'group');
@@ -152,7 +171,10 @@ const LayerControl = ({ position, collapsed, children, exclusive }: IProps) => {
                       control={
                         <Checkbox
                           checked={layerObj.checked}
-                          onChange={() => onLayerClick(layerObj)}
+                          onChange={(e) => {
+                            console.log(e);
+                            onLayerClick(layerObj);
+                          }}
                           name="checkedB"
                           color="primary"
                         />

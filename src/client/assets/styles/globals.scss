@@ -92,6 +92,17 @@ z-index: 400!important;
   overflow: hidden;
 }
 
+.my-labels{
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-weight: 700 !important;
+  font-family: Roboto;
+  -webkit-text-stroke: medium;
+  line-height: 0.8rem;
+  font-size: 0.9rem;
+}
+
 .Map_map__vPSDC{
   height: calc(100vh - 75px)!important;
 }
