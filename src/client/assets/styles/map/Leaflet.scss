@@ -1,0 +1,80 @@
+//leaflet override
+.leaflet-touch .leaflet-bar{
+  top: 60px;
+  right: 50%!important;
+  box-shadow: none;
+  border: 0!important;
+  @media screen and (max-width: 1024px) {
+    top: 100px;
+  }
+
+  @media screen and (max-width: 768px) {
+    right: 30%!important;
+  }
+}
+
+.leaflet-top{
+z-index: 400!important;
+
+}
+
+.leaflet-touch .leaflet-bar a{
+  background-color: var(--color-white)!important;
+  height: 44px!important;
+  width: 44px!important;
+  border-radius: 4px!important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 0!important;
+
+  &:first-child{
+    margin-bottom: 2px!important;
+  }
+}
+
+.map__container{
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+@mixin stroke($color: #000, $size: 1px) {
+  text-shadow:
+    -#{$size} -#{$size} 0 $color,
+     0        -#{$size} 0 $color,
+     #{$size} -#{$size} 0 $color,
+     #{$size}  0        0 $color,
+     #{$size}  #{$size} 0 $color,
+     0         #{$size} 0 $color,
+    -#{$size}  #{$size} 0 $color,
+    -#{$size}  0        0 $color;
+}
+
+.my-labels{
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-weight: 700 !important;
+  font-family: Roboto;
+  line-height: 0.8rem;
+  font-size: 0.9rem;
+  text-align: center;
+  @include stroke(#FFFFFF, 1px);
+}
+
+
+.Map_map__vPSDC{
+  height: calc(100vh - 75px)!important;
+}
+
+.feature-selector-item{
+  margin: 3;
+  cursor: pointer;
+  display: flex;
+
+  &-text{
+    text-align: center;
+  }
+}

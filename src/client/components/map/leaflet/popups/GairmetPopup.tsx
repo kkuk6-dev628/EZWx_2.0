@@ -3,32 +3,41 @@ import BasePopupFrame from './BasePopupFrame';
 import {
   getAltitudeString,
   translateWeatherClausings,
+  convertTimeFormat,
 } from '../../AreoFunctions';
 
 const GairmetPopup = ({ feature }) => {
-  let title = 'G_AIRMET';
-  let dueto = 'Moderate.';
-  const top = getAltitudeString(feature.properties.top);
-  const base = getAltitudeString(feature.properties.base);
+  let title = 'G-AIRMET';
+  let dueto = 'Moderate';
+  const top = getAltitudeString(
+    feature.properties.top,
+    feature.properties.fzlbase,
+    feature.properties.fzltop,
+  );
+  const base = getAltitudeString(
+    feature.properties.base,
+    feature.properties.fzlbase,
+    feature.properties.fzltop,
+  );
   switch (feature.properties.hazard) {
     case 'ICE':
-      title = `Icing G_AIRMET`;
-      dueto = 'Moderate ice.';
+      title = `Icing G-AIRMET`;
+      dueto = 'Moderate ice';
       break;
     case 'TURB-HI':
       title = `High Level Turbulence G-AIRMET`;
-      dueto = 'Moderate turbulence.';
+      dueto = 'Moderate turbulence';
       break;
     case 'TURB-LO':
-      title = `Low Level Turbulence G-AIRMET`;
+      title = `Low-Level Turbulence G-AIRMET`;
       dueto = 'Moderate turbulence';
       break;
     case 'LLWS':
-      title = `LLWS G-AIRMET`;
-      dueto = 'Nonconvective low level wind shear below 2,000 feet AGL';
+      title = `Low-level wind shear G-AIRMET`;
+      dueto = 'Nonconvective low-level wind shear below 2,000 feet AGL';
       break;
     case 'SFC_WND':
-      title = `Surface Winds G-AIRMET`;
+      title = `Surface Wind G-AIRMET`;
       dueto = 'Sustained surface wind > 30 knots';
       break;
     case 'IFR':
@@ -38,7 +47,7 @@ const GairmetPopup = ({ feature }) => {
         translateWeatherClausings(feature.properties.dueto);
       break;
     case 'MT_OBSC':
-      title = 'Mountains obscured G-AIRMET';
+      title = 'Mountains obscuration G-AIRMET';
       dueto =
         'Mountains obscured by ' +
         translateWeatherClausings(feature.properties.dueto);
@@ -50,23 +59,23 @@ const GairmetPopup = ({ feature }) => {
   return (
     <BasePopupFrame title={title}>
       <Typography variant="body2" style={{ margin: 3 }}>
-        Valid: {feature.properties.validtime}
+        <b>Valid:</b> {convertTimeFormat(feature.properties.validtime)}
       </Typography>
       <Typography variant="body2" style={{ margin: 3 }}>
-        Issued: {feature.properties.issuetime}
+        <b>Issued:</b> {convertTimeFormat(feature.properties.issuetime)}
       </Typography>
       {top && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          Top: {top}
+          <b>Top:</b> {top}
         </Typography>
       )}
       {base && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          Base: {base}
+          <b>Base:</b> {base}
         </Typography>
       )}
       <Typography variant="body2" style={{ margin: 3 }}>
-        Due to: {dueto}
+        <b>Due to:</b> {dueto}
       </Typography>
     </BasePopupFrame>
   );

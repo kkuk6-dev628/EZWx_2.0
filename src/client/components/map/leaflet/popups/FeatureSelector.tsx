@@ -1,16 +1,7 @@
 import BasePopupFrame from './BasePopupFrame';
 import L from 'leaflet';
-import {
-  Button,
-  Divider,
-  Typography,
-  MenuItem,
-  MenuList,
-  ListItemText,
-  ListItemIcon,
-} from '@material-ui/core';
+import { Divider } from '@material-ui/core';
 import { SvgAir, SvgLayer } from '../../../utils/SvgIcons';
-import { translateWeatherClausings } from '../../AreoFunctions';
 
 interface FeatureSelectorProps {
   features: L.Layer[];
@@ -38,21 +29,19 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
               icon = <SvgLayer />;
               break;
             case 'LLWS':
-              text = `Nonconvective low level wind shear below 2,000 feet AGL G-AIRMET`;
+              text = `Low-level wind shear`;
               icon = <SvgLayer />;
               break;
             case 'SFC_WND':
-              text = `Sustained surface wind > 30 knots G-AIRMET`;
+              text = `Surface wind`;
               icon = <SvgLayer />;
               break;
             case 'IFR':
-              text = `Center weather advisory for IFR conditions`;
+              text = `IFR G-AIRMET`;
               icon = <SvgLayer />;
               break;
             case 'MT_OBSC':
-              text =
-                `Mountains obscured by ` +
-                translateWeatherClausings(layer.feature.properties.dueto);
+              text = `Mountain obscuration`;
               icon = <SvgLayer />;
               break;
             case 'M_FZLVL':
@@ -86,15 +75,15 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
         return (
           <div key={layer.feature.id}>
             <span
-              style={{
-                margin: 3,
-                cursor: 'pointer',
-                display: 'flex',
-              }}
-              className="selector-feature"
+              className="feature-selector-item"
               data-featureid={layer.feature.id}
             >
-              <span style={{ alignSelf: 'center' }}>{icon}</span>
+              <span
+                style={{ alignSelf: 'center' }}
+                className="feature-selector-item-text"
+              >
+                {icon}
+              </span>
               <p>{text}</p>
             </span>
             <Divider />

@@ -19,6 +19,31 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
     console.log(feature);
   };
 
+  const showPopup = (layer: L.Layer, latlng: any): void => {
+    layer.setStyle({
+      weight: 8,
+    });
+
+    const layerName = layer.feature.id.split('.')[0];
+    let popup;
+    switch (layerName) {
+      case 'gairmet':
+        popup = <GairmetPopup feature={layer.feature}></GairmetPopup>;
+        break;
+      default:
+        popup = (
+          <GeneralPopup
+            feature={layer.feature}
+            title={`${layerName} properties`}
+          ></GeneralPopup>
+        );
+    }
+    L.popup()
+      .setLatLng(latlng)
+      .setContent(ReactDOMServer.renderToString(popup))
+      .openOn(map);
+  };
+
   const map = useMapEvents({
     click: (e: any) => {
       const features = [];
@@ -34,54 +59,38 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         });
       });
       map.closePopup();
+
       if (features.length === 0) {
         return;
-      }
-      L.popup()
-        .setLatLng(e.latlng)
-        .setContent(
-          ReactDOMServer.renderToString(
-            <FeatureSelector
-              features={features}
-              onSelect={handleFeatureSelect}
-            ></FeatureSelector>,
-          ),
-        )
-        .openOn(map);
-      const selectorFeatureNodes =
-        document.getElementsByClassName('selector-feature');
-      for (let i = 0; i < selectorFeatureNodes.length; i++) {
-        selectorFeatureNodes[i].addEventListener('click', (ee) => {
-          map.closePopup();
-          // @ts-ignore
-          const featureId = ee.currentTarget.dataset.featureid;
-          features.forEach((layer) => {
-            if (layer.feature.id === featureId) {
-              layer.setStyle({
-                weight: 8,
-              });
-
-              const layerName = layer.feature.id.split('.')[0];
-              let popup;
-              switch (layerName) {
-                case 'gairmet':
-                  popup = <GairmetPopup feature={layer.feature}></GairmetPopup>;
-                  break;
-                default:
-                  popup = (
-                    <GeneralPopup
-                      feature={layer.feature}
-                      title={`${layerName} properties`}
-                    ></GeneralPopup>
-                  );
+      } else if (features.length === 1) {
+        showPopup(features[0], e.latlng);
+      } else {
+        L.popup()
+          .setLatLng(e.latlng)
+          .setContent(
+            ReactDOMServer.renderToString(
+              <FeatureSelector
+                features={features}
+                onSelect={handleFeatureSelect}
+              ></FeatureSelector>,
+            ),
+          )
+          .openOn(map);
+        const selectorFeatureNodes = document.getElementsByClassName(
+          'feature-selector-item',
+        );
+        for (let i = 0; i < selectorFeatureNodes.length; i++) {
+          selectorFeatureNodes[i].addEventListener('click', (ee) => {
+            map.closePopup();
+            // @ts-ignore
+            const featureId = ee.currentTarget.dataset.featureid;
+            features.forEach((layer) => {
+              if (layer.feature.id === featureId) {
+                showPopup(layer, e.latlng);
               }
-              L.popup()
-                .setLatLng(e.latlng)
-                .setContent(ReactDOMServer.renderToString(popup))
-                .openOn(map);
-            }
+            });
           });
-        });
+        }
       }
     },
   });

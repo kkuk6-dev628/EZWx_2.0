@@ -33,7 +33,7 @@ const GairmetLayer = () => {
         style.dashArray = '60 6';
         break;
       case 'MT_OBSC':
-        style.color = '#88CC46';
+        style.color = '#F653F6';
         style.dashArray = '60 6 6 6';
         break;
       case 'M_FZLVL':
@@ -46,15 +46,19 @@ const GairmetLayer = () => {
 
   const getLabel = (feature) => {
     let label;
+    let base = feature.properties.base;
+    if (base === 'FZL') {
+      base = `${feature.properties.fzlbase}/${feature.properties.fzltop}`;
+    }
     switch (feature.properties.hazard) {
       case 'ICE':
-        label = `Icing <br/>${feature.properties.top}<br/>${feature.properties.base}`;
+        label = `Icing <br/>${feature.properties.top}<br/>${base}`;
         break;
       case 'TURB-HI':
-        label = `TurbHi<br/>${feature.properties.top}<br/>${feature.properties.base}`;
+        label = `TurbHi<br/>${feature.properties.top}<br/>${base}`;
         break;
       case 'TURB-LO':
-        label = `TurbLo<br/>${feature.properties.top}<br/>${feature.properties.base}`;
+        label = `TurbLo<br/>${feature.properties.top}<br/>${base}`;
         break;
       case 'LLWS':
         label = `LLWS`;
@@ -84,6 +88,8 @@ const GairmetLayer = () => {
         'id',
         'top',
         'base',
+        'fzlbase',
+        'fzltop',
         'issuetime',
         'validtime',
         'hazard',

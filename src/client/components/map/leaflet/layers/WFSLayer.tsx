@@ -11,6 +11,7 @@ interface WFSLayerProps {
   propertyNames?: string[];
   enableBBoxQuery?: boolean;
   interactive?: boolean;
+  showLabelZoom?: number;
   getLabel?: (feature: L.feature) => string;
   style?: (feature: L.feature) => L.style;
   highlightStyle?: any;
@@ -24,6 +25,7 @@ const WFSLayer = ({
   propertyNames,
   enableBBoxQuery,
   interactive = true,
+  showLabelZoom = 5,
   getLabel,
   style,
   highlightStyle,
@@ -34,6 +36,7 @@ const WFSLayer = ({
     features: [],
   });
   const ref = useRef(null);
+  let lastZoom;
 
   useEffect(() => {
     fetchGeoJSON();
@@ -41,7 +44,31 @@ const WFSLayer = ({
 
   const map = useMapEvents({
     zoomend: () => {
+      const zoom = map.getZoom();
       if (enableBBoxQuery) fetchGeoJSON();
+      if (zoom < showLabelZoom && (!lastZoom || lastZoom >= showLabelZoom)) {
+        ref.current.eachLayer((l) => {
+          if (l.getTooltip()) {
+            const tooltip = l.getTooltip();
+            l.unbindTooltip().bindTooltip(tooltip, {
+              permanent: false,
+            });
+          }
+        });
+      } else if (
+        zoom >= showLabelZoom &&
+        (!lastZoom || lastZoom < showLabelZoom)
+      ) {
+        ref.current.eachLayer(function (l) {
+          if (l.getTooltip()) {
+            const tooltip = l.getTooltip();
+            l.unbindTooltip().bindTooltip(tooltip, {
+              permanent: true,
+            });
+          }
+        });
+      }
+      lastZoom = zoom;
     },
     moveend: () => {
       if (enableBBoxQuery) fetchGeoJSON();
@@ -133,7 +160,7 @@ const WFSLayer = ({
       if (getLabel) {
         // const center = layer.getBounds().getCenter();
         layer.bindTooltip(getLabel(feature), {
-          permanent: true,
+          permanent: false,
           direction: 'center',
           className: 'my-labels',
           opacity: 1,
