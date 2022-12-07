@@ -1,12 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 
-interface Props {
-  setIsShowDateModal: (isShowModal: boolean) => void;
-}
-
-function CollapsibleBar({ setIsShowDateModal }: Props) {
+function CollapsibleBar() {
   const [isColleps, setIsColleps] = useState(false);
+  const [amountOfData, setAmountOfData] = useState(86);
+  // const [windowSize, setWindowSize] = useState(setWindowSize());
+  useEffect(() => {
+    function handleWindowResize() {
+      if (window.innerWidth < 991) {
+        // TODO document why this block is empty
+        setAmountOfData(43);
+      } else {
+        setAmountOfData(86);
+      }
+    }
+
+    window.addEventListener('resize', handleWindowResize);
+
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, []);
 
   const randomColorData = ['red', 'green', 'yellow'];
   return (
@@ -23,11 +37,10 @@ function CollapsibleBar({ setIsShowDateModal }: Props) {
             </button>
           </div>
           <div className="collps__dot__area">
-            {[...Array(86)].map((_, index) => (
+            {[...Array(amountOfData)].map((_, index) => (
               //get
               <button
                 key={index}
-                onClick={() => setIsShowDateModal(true)}
                 className={`collps__dot__btn ${randomColorData[index % 4]} ${
                   isColleps ? 'collps__dot__btn--full' : ''
                 }`}

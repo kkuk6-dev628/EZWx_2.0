@@ -51,6 +51,9 @@ function LeafletMap() {
       case 'route':
         setIsShowModal(true);
         break;
+      case 'profile':
+        setIsShowDateModal(!isShowDateModal);
+        break;
       default:
         break;
     }
@@ -166,7 +169,7 @@ function LeafletMap() {
       {isShowDateModal && (
         <DateSliderModal setIsShowDateModal={setIsShowDateModal} />
       )}
-      <CollapsibleBar setIsShowDateModal={setIsShowDateModal} />
+      <CollapsibleBar />
     </div>
   );
 }

@@ -1,0 +1,24 @@
+.date{
+
+  &__wrp{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    grid-gap: 10px;
+  }
+
+  &__lft{}
+
+  &__mid{
+    font-weight: 700;
+font-size: 16px;
+line-height: 20px;
+  }
+
+  &__rgt{}
+
+  &__btn{
+    background: transparent;
+    border: none;
+  }
+}
