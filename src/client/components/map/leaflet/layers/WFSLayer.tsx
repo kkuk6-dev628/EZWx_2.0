@@ -29,7 +29,10 @@ const WFSLayer = ({
   highlightStyle,
   filter,
 }: WFSLayerProps) => {
-  const [geoJSON, setGeoJSON] = useState(null);
+  const [geoJSON, setGeoJSON] = useState({
+    type: 'FeatureCollection',
+    features: [],
+  });
   const ref = useRef(null);
 
   useEffect(() => {
@@ -97,20 +100,13 @@ const WFSLayer = ({
       .then((data) => {
         if (typeof data.data === 'string') {
           console.log(data.data);
-          setGeoJSON({
-            type: 'FeatureCollection',
-            features: [],
-          });
         } else {
+          map?.removeLayer(ref.current);
           setGeoJSON(data.data);
         }
       })
       .catch((reason) => {
         console.log(reason);
-        setGeoJSON({
-          type: 'FeatureCollection',
-          features: [],
-        });
       });
   };
 
@@ -159,6 +155,7 @@ const WFSLayer = ({
     <>
       {geoJSON != null && (
         <GeoJSON
+          key={JSON.stringify(geoJSON)}
           ref={ref}
           data={geoJSON}
           // @ts-ignore

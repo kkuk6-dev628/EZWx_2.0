@@ -124,14 +124,26 @@ const LayerControl = ({
     const isEmptyLayer =
       layer._layers !== undefined && Object.keys(layer._layers).length === 0;
     const cLayers = layers;
-    cLayers.push({
-      layer,
-      group,
-      name,
-      checked: exclusive || isEmptyLayer ? false : map?.hasLayer(layer),
-      id: Util.stamp(layer),
-      isEmpty: isEmptyLayer,
-    });
+    const index = cLayers.findIndex((e) => e.name === name);
+    if (index > -1) {
+      cLayers.splice(index, 1, {
+        layer,
+        group,
+        name,
+        checked: exclusive || isEmptyLayer ? false : map?.hasLayer(layer),
+        id: Util.stamp(layer),
+        isEmpty: isEmptyLayer,
+      });
+    } else {
+      cLayers.push({
+        layer,
+        group,
+        name,
+        checked: exclusive || isEmptyLayer ? false : map?.hasLayer(layer),
+        id: Util.stamp(layer),
+        isEmpty: isEmptyLayer,
+      });
+    }
     if (exclusive) {
       cLayers[0].checked = true;
       for (let i = 1; i < cLayers.length; i++) {
