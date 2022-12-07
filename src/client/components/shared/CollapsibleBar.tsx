@@ -1,28 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
+import { DateObject } from 'react-multi-date-picker';
+import TimeSlider from './TimeSlider';
 
 function CollapsibleBar() {
   const [isColleps, setIsColleps] = useState(false);
-  const [amountOfData, setAmountOfData] = useState(86);
+  const [date, _] = useState(new DateObject());
+
   // const [windowSize, setWindowSize] = useState(setWindowSize());
-  useEffect(() => {
-    function handleWindowResize() {
-      if (window.innerWidth < 991) {
-        // TODO document why this block is empty
-        setAmountOfData(43);
-      } else {
-        setAmountOfData(86);
-      }
-    }
 
-    window.addEventListener('resize', handleWindowResize);
-
-    return () => {
-      window.removeEventListener('resize', handleWindowResize);
-    };
-  }, []);
-
-  const randomColorData = ['red', 'green', 'yellow'];
   return (
     <div className="collps">
       <div className="collps__wrp">
@@ -32,26 +18,12 @@ function CollapsibleBar() {
               onClick={() => setIsColleps(!isColleps)}
               className="collps__btn"
             >
-              05Z
+              {date.day > 10 ? `${date.day}Z` : `0${date.day}Z`}
               <FaChevronDown className="collps__icon" />
             </button>
           </div>
           <div className="collps__dot__area">
-            {[...Array(amountOfData)].map((_, index) => (
-              //get
-              <button
-                key={index}
-                className={`collps__dot__btn ${randomColorData[index % 4]} ${
-                  isColleps ? 'collps__dot__btn--full' : ''
-                }`}
-              >
-                {[...Array(12)].map((_, i) => (
-                  <span key={i} className="collps__dot">
-                    &nbsp;
-                  </span>
-                ))}
-              </button>
-            ))}
+            <TimeSlider isColleps={isColleps} />
           </div>
         </div>
         <div className="collps__btm__area">
