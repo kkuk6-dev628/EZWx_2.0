@@ -30,39 +30,25 @@ const SigmetPopup = ({ feature }) => {
   const top = getAltitudeString(feature.properties.top);
   const base = getAltitudeString(feature.properties.base);
   switch (feature.properties.hazard) {
-    case 'ICE':
-      title = `Icing G_AIRMET`;
+    case 'TURB':
+      title = `Icing SIGMET`;
       dueto = 'Moderate ice.';
       break;
-    case 'TURB-HI':
+    case 'CONVECTIVE':
       title = `High Level Turbulence G-AIRMET`;
       dueto = 'Moderate turbulence.';
       break;
-    case 'TURB-LO':
+    case 'ICING':
       title = `Low Level Turbulence G-AIRMET`;
       dueto = 'Moderate turbulence';
       break;
-    case 'LLWS':
+    case 'IFR':
       title = `LLWS G-AIRMET`;
       dueto = 'Nonconvective low level wind shear below 2,000 feet AGL';
       break;
-    case 'SFC_WND':
+    case 'ASH':
       title = `Surface Winds G-AIRMET`;
       dueto = 'Sustained surface  wind > 30 knots ';
-      break;
-    case 'IFR':
-      title = `IFR G-AIRMET`;
-      dueto =
-        'Ceiling below 1,000  feet and/or visibility below 3 statute miles by ' +
-        translateWeatherClausings(feature.properties.dueto);
-      break;
-    case 'MT_OBSC':
-      title = 'Mountains obscured G-AIRMET';
-      dueto =
-        'Mountains obscured by ' +
-        translateWeatherClausings(feature.properties.dueto);
-      break;
-    case 'M_FZLVL':
       break;
   }
 

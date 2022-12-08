@@ -1,4 +1,5 @@
 import { WeatherCausings } from './AreoConstants';
+import geojson2svg, { Renderer } from 'geojson-to-svg';
 
 const getAltitudeString = (
   value: string,
@@ -48,4 +49,19 @@ const convertTimeFormat = (time: string) => {
   })}`;
 };
 
-export { getAltitudeString, translateWeatherClausings, convertTimeFormat };
+const getThumbnail = (feature, style) => {
+  const svgString = geojson2svg()
+    .styles({ Polygon: style })
+    .data(feature)
+    .render();
+  const svg = new DOMParser().parseFromString(svgString, 'image/svg+xml');
+  console.log(svg.documentElement);
+  return svgString;
+};
+
+export {
+  getAltitudeString,
+  translateWeatherClausings,
+  convertTimeFormat,
+  getThumbnail,
+};

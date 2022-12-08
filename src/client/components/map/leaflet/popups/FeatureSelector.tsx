@@ -1,7 +1,9 @@
+/* eslint-disable @next/next/no-img-element */
 import BasePopupFrame from './BasePopupFrame';
 import L from 'leaflet';
 import { Divider } from '@material-ui/core';
 import { SvgAir, SvgLayer } from '../../../utils/SvgIcons';
+import { getThumbnail } from '../../AreoFunctions';
 
 interface FeatureSelectorProps {
   features: L.Layer[];
@@ -13,40 +15,38 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
       {features.map((layer) => {
         const layerName = layer.feature.id.split('.')[0];
         let text = '';
-        let icon = <SvgAir />;
+        // let icon = <SvgAir />;
+        const icon = getThumbnail(layer.feature, {
+          stroke: layer.options.color,
+          weight: 0.2,
+        });
+        const svg = new Blob([icon], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(svg);
         if (layerName === 'gairmet') {
           switch (layer.feature.properties.hazard) {
             case 'ICE':
               text = `Moderate ice from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
-              icon = <SvgLayer />;
               break;
             case 'TURB-HI':
               text = `Moderate turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
-              icon = <SvgLayer />;
               break;
             case 'TURB-LO':
               text = `Moderate turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
-              icon = <SvgLayer />;
               break;
             case 'LLWS':
               text = `Low-level wind shear`;
-              icon = <SvgLayer />;
               break;
             case 'SFC_WND':
               text = `Surface wind`;
-              icon = <SvgLayer />;
               break;
             case 'IFR':
               text = `IFR G-AIRMET`;
-              icon = <SvgLayer />;
               break;
             case 'MT_OBSC':
               text = `Mountain obscuration`;
-              icon = <SvgLayer />;
               break;
             case 'M_FZLVL':
               text = `Multiple freezing levels`;
-              icon = <SvgLayer />;
               break;
           }
         } else if (layerName === 'cwa') {
@@ -56,19 +56,19 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
         } else if (layerName === 'sigmet') {
           switch (layer.feature.properties.hazard) {
             case 'CONVECTIVE':
-              text = `Convective SIGMET`;
+              text = `Convection with tops to ${layer.feature.properties.top}`;
               break;
             case 'TURB':
-              text = `Turbulence SIGMET `;
+              text = `Severe turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
               break;
             case 'ICING':
-              text = `Icing SIGMET`;
+              text = `Severe ice from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
               break;
             case 'IFR':
-              text = `IFR SIGMET`;
+              text = `Dust or sandstorm from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
               break;
             case 'ASH':
-              text = `Volcanic ash SIGMET`;
+              text = `Volcanic ash`;
               break;
           }
         }
@@ -78,12 +78,7 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
               className="feature-selector-item"
               data-featureid={layer.feature.id}
             >
-              <span
-                style={{ alignSelf: 'center' }}
-                className="feature-selector-item-text"
-              >
-                {icon}
-              </span>
+              <img className="feature-selector-item-icon" src={url} />
               <p>{text}</p>
             </span>
             <Divider />

@@ -74,7 +74,10 @@ z-index: 400!important;
   cursor: pointer;
   display: flex;
 
-  &-text{
-    text-align: center;
+  &-icon{
+    width: 48px;
+    height: 48px;
+    transform: scaleY(-1);
+    margin: 0 8px 0 0;
   }
 }
