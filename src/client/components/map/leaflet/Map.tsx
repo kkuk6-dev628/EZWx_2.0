@@ -111,6 +111,10 @@ function LeafletMap() {
     },
   ];
 
+  const handleTime = (e) => {
+    console.log(e);
+  };
+
   return (
     <div className="map__container">
       <MapContainer
@@ -169,7 +173,7 @@ function LeafletMap() {
       {isShowDateModal && (
         <DateSliderModal setIsShowDateModal={setIsShowDateModal} />
       )}
-      <CollapsibleBar />
+      <CollapsibleBar handleTime={handleTime} />
     </div>
   );
 }
