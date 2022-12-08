@@ -1,16 +1,9 @@
+/* eslint-disable @next/next/no-img-element */
 import BasePopupFrame from './BasePopupFrame';
 import L from 'leaflet';
-import {
-  Button,
-  Divider,
-  Typography,
-  MenuItem,
-  MenuList,
-  ListItemText,
-  ListItemIcon,
-} from '@material-ui/core';
+import { Divider } from '@material-ui/core';
 import { SvgAir, SvgLayer } from '../../../utils/SvgIcons';
-import { translateWeatherClausings } from '../../AreoFunctions';
+import { getThumbnail } from '../../AreoFunctions';
 
 interface FeatureSelectorProps {
   features: L.Layer[];
@@ -22,42 +15,38 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
       {features.map((layer) => {
         const layerName = layer.feature.id.split('.')[0];
         let text = '';
-        let icon = <SvgAir />;
+        // let icon = <SvgAir />;
+        const icon = getThumbnail(layer.feature, {
+          stroke: layer.options.color,
+          weight: 0.2,
+        });
+        const svg = new Blob([icon], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(svg);
         if (layerName === 'gairmet') {
           switch (layer.feature.properties.hazard) {
             case 'ICE':
               text = `Moderate ice from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
-              icon = <SvgLayer />;
               break;
             case 'TURB-HI':
               text = `Moderate turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
-              icon = <SvgLayer />;
               break;
             case 'TURB-LO':
               text = `Moderate turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
-              icon = <SvgLayer />;
               break;
             case 'LLWS':
-              text = `Nonconvective low level wind shear below 2,000 feet AGL G-AIRMET`;
-              icon = <SvgLayer />;
+              text = `Low-level wind shear`;
               break;
             case 'SFC_WND':
-              text = `Sustained surface wind > 30 knots G-AIRMET`;
-              icon = <SvgLayer />;
+              text = `Surface wind`;
               break;
             case 'IFR':
-              text = `Center weather advisory for IFR conditions`;
-              icon = <SvgLayer />;
+              text = `IFR G-AIRMET`;
               break;
             case 'MT_OBSC':
-              text =
-                `Mountains obscured by ` +
-                translateWeatherClausings(layer.feature.properties.dueto);
-              icon = <SvgLayer />;
+              text = `Mountain obscuration`;
               break;
             case 'M_FZLVL':
               text = `Multiple freezing levels`;
-              icon = <SvgLayer />;
               break;
           }
         } else if (layerName === 'cwa') {
@@ -67,34 +56,29 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
         } else if (layerName === 'sigmet') {
           switch (layer.feature.properties.hazard) {
             case 'CONVECTIVE':
-              text = `Convective SIGMET`;
+              text = `Convection with tops to ${layer.feature.properties.top}`;
               break;
             case 'TURB':
-              text = `Turbulence SIGMET `;
+              text = `Severe turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
               break;
             case 'ICING':
-              text = `Icing SIGMET`;
+              text = `Severe ice from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
               break;
             case 'IFR':
-              text = `IFR SIGMET`;
+              text = `Dust or sandstorm from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
               break;
             case 'ASH':
-              text = `Volcanic ash SIGMET`;
+              text = `Volcanic ash`;
               break;
           }
         }
         return (
           <div key={layer.feature.id}>
             <span
-              style={{
-                margin: 3,
-                cursor: 'pointer',
-                display: 'flex',
-              }}
-              className="selector-feature"
+              className="feature-selector-item"
               data-featureid={layer.feature.id}
             >
-              <span style={{ alignSelf: 'center' }}>{icon}</span>
+              <img className="feature-selector-item-icon" src={url} />
               <p>{text}</p>
             </span>
             <Divider />
