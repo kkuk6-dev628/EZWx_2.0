@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { FaChevronDown } from 'react-icons/fa';
-import { DateObject } from 'react-multi-date-picker';
 import TimeSlider from './TimeSlider';
 
 interface DateData {
-  month: number;
-  day: string;
+  month: string;
+  weekDay: string;
+  day: number;
   hour: number;
+  minute: string;
 }
 
 function CollapsibleBar({
