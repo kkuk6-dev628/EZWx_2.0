@@ -38,6 +38,7 @@ function TimeSlider({ handleTime }: { handleTime: (time: DateData) => void }) {
     if (key === 'hour' && value < 0) {
       const newDate = new DateObject(date);
       // console.log(newDate);
+      // console.log(value);
       newDate[key] += value;
       const dateData = {
         month: newDate.month.shortName,
@@ -58,8 +59,10 @@ function TimeSlider({ handleTime }: { handleTime: (time: DateData) => void }) {
         hour: newDate.hour,
         minute: handleMinute(childIndex),
       };
+      // console.log(value, '-- ', dateData);
       return dateData;
     }
+    // console.log(dateData, ' ', value);
   };
 
   const handleMinute = (value) => {
@@ -102,7 +105,7 @@ function TimeSlider({ handleTime }: { handleTime: (time: DateData) => void }) {
     newDate.hour += index - limit;
     setDate(newDate);
   };
-  console.log(date);
+  // console.log(date);
 
   return (
     <>
@@ -133,15 +136,15 @@ function TimeSlider({ handleTime }: { handleTime: (time: DateData) => void }) {
                   key={i}
                   content={
                     <span>
-                      {getTime('hour', index, i)?.weekDay +
+                      {getTime('hour', index - 12, i)?.weekDay +
                         ' ' +
-                        getTime('hour', index, i)?.day +
+                        getTime('hour', index - 12, i)?.day +
                         ', ' +
-                        getTime('hour', index, i)?.month +
+                        getTime('hour', index - 12, i)?.month +
                         ' ' +
-                        getTime('hour', index, i)?.hour +
+                        getTime('hour', index - 12, i)?.hour +
                         ':' +
-                        getTime('hour', index, i)?.minute}
+                        getTime('hour', index - 12, i)?.minute}
                     </span>
                   }
                 >
@@ -156,57 +159,61 @@ function TimeSlider({ handleTime }: { handleTime: (time: DateData) => void }) {
               ))}
             </div>
           ))}
-          {[...Array(amountOfData)].map((_, index) => (
-            //get
+          {[...Array(amountOfData)].map(
+            (_, index) =>
+              //get
 
-            <div
-              key={index}
-              className={`collps__dot__btn ${randomColorData[index % 4]} ${
-                isColleps ? 'collps__dot__btn--full' : ''
-              }`}
-            >
-              {[...Array(12)].map((_, i) => (
-                <Tippy
-                  key={i}
-                  content={
-                    <span>
-                      {getTime('hour', index, i)?.weekDay +
-                        ' ' +
-                        getTime('hour', index, i)?.day +
-                        ', ' +
-                        getTime('hour', index, i)?.month +
-                        ' ' +
-                        getTime('hour', index, i)?.hour +
-                        ':' +
-                        getTime('hour', index, i)?.minute}
-                    </span>
-                  }
+              index !== 0 && (
+                <div
+                  key={index}
+                  id={'' + index}
+                  className={`collps__dot__btn ${randomColorData[index % 4]} ${
+                    isColleps ? 'collps__dot__btn--full' : ''
+                  }`}
                 >
-                  <span
-                    key={i}
-                    onClick={() => hnadelSetDate(index, 0, i)}
-                    className="collps__dot"
-                  >
-                    &nbsp;
-                  </span>
-                </Tippy>
-              ))}
-            </div>
-          ))}
+                  {[...Array(12)].map((_, i) => (
+                    <Tippy
+                      key={i}
+                      content={
+                        <span>
+                          {getTime('hour', index, i)?.weekDay +
+                            ' ' +
+                            getTime('hour', index, i)?.day +
+                            ', ' +
+                            getTime('hour', index, i)?.month +
+                            ' ' +
+                            getTime('hour', index, i)?.hour +
+                            ':' +
+                            getTime('hour', index, i)?.minute}
+                        </span>
+                      }
+                    >
+                      <span
+                        key={i}
+                        onClick={() => hnadelSetDate(index, 0, i)}
+                        className="collps__dot"
+                      >
+                        &nbsp;
+                      </span>
+                    </Tippy>
+                  ))}
+                </div>
+              ),
+          )}
         </div>
       </div>
       <div className="collps__btm__area">
         <div className="collps__date__area">
           <p className="collps__date__text">
-            {getTime('hour', -12, 11).weekDay +
+            {getTime('hour', -12, 11)?.weekDay +
               ' ' +
-              getTime('hour', -12, 11).day +
+              getTime('hour', -12, 11)?.day +
               ', ' +
-              getTime('hour', -12, 11).month +
+              getTime('hour', -12, 11)?.month +
               ' ' +
-              getTime('hour', -12, 11).hour +
+              getTime('hour', -12, 11)?.hour +
               ':' +
-              getTime('hour', -12, 11).minute}
+              getTime('hour', -12, 11)?.minute}
           </p>
         </div>
         <div className="collps__date__area">
@@ -216,28 +223,28 @@ function TimeSlider({ handleTime }: { handleTime: (time: DateData) => void }) {
         </div>
         <div className="collps__date__area">
           <p className="collps__date__text">
-            {getTime('hour', 24, 11).weekDay +
+            {getTime('hour', 24, 11)?.weekDay +
               ' ' +
-              getTime('hour', 24, 11).day +
+              getTime('hour', 24, 11)?.day +
               ', ' +
-              getTime('hour', 24, 11).month +
+              getTime('hour', 24, 11)?.month +
               ' ' +
-              getTime('hour', 24, 11).hour +
+              getTime('hour', 24, 11)?.hour +
               ':' +
-              getTime('hour', 24, 11).minute}
+              getTime('hour', 24, 11)?.minute}
           </p>
         </div>
         <div className="collps__date__area">
           <p className="collps__date__text">
-            {getTime('hour', 42, 11).weekDay +
+            {getTime('hour', 42, 10)?.weekDay +
               ' ' +
-              getTime('hour', 42, 11).day +
+              getTime('hour', 42, 11)?.day +
               ', ' +
-              getTime('hour', 42, 11).month +
+              getTime('hour', 42, 11)?.month +
               ' ' +
-              getTime('hour', 42, 11).hour +
+              getTime('hour', 42, 11)?.hour +
               ':' +
-              getTime('hour', 42, 11).minute}
+              getTime('hour', 42, 11)?.minute}
           </p>
         </div>
       </div>
