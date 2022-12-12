@@ -127,11 +127,11 @@ function LeafletMap() {
           collapsed={baseMapControlCollapsed}
           exclusive={true}
         >
-          <GroupedLayer checked name="Topo" group="Base Maps">
-            <TileLayer url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png" />
-          </GroupedLayer>
           <GroupedLayer checked name="Street" group="Base Maps">
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          </GroupedLayer>
+          <GroupedLayer checked name="Topo" group="Base Maps">
+            <TileLayer url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png" />
           </GroupedLayer>
           <GroupedLayer checked name="Terrain" group="Base Maps">
             <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}" />

@@ -1,64 +1,56 @@
-import { Typography } from '@material-ui/core';
+import { Divider, Typography } from '@material-ui/core';
 import BasePopupFrame from './BasePopupFrame';
-import { WeatherCausings } from '../../AreoConstants';
+import { convertTimeFormat, getAltitudeString } from '../../AreoFunctions';
 
 const SigmetPopup = ({ feature }) => {
-  const getAltitudeString = (value: string): string => {
-    if (value === 'SFC') {
-      return 'Surface';
-    } else if (value === 'FZL') {
-      return 'FZL';
-    } else if (!isNaN(parseInt(value))) {
-      return parseInt(value) * 100 + ' ft MSL';
-    }
-  };
-
-  const translateWeatherClausings = (dueto: string): string => {
-    if (!dueto) {
-      return '';
-    }
-    const weatherCausings = dueto.slice(dueto.lastIndexOf(' ') + 1);
-    const splitWeatherCausing = weatherCausings.split('/');
-    const wc = splitWeatherCausing.map((element) => {
-      return WeatherCausings[element];
-    });
-    return wc.join(', ').replace(/,(?=[^,]+$)/, ' and');
-  };
-
   let title = 'G_AIRMET';
-  let dueto = 'Moderate.';
-  const top = getAltitudeString(feature.properties.top);
-  const base = getAltitudeString(feature.properties.base);
+  let base;
+  if (
+    isNaN(parseInt(feature.properties.altitudelow1)) ||
+    feature.properties.altitudelow1 == '0'
+  ) {
+    base = 'Surface';
+  } else {
+    base = getAltitudeString(feature.properties.altitudelow1);
+  }
+  if (feature.properties.hazard === 'CONVECTIVE') {
+    base = undefined;
+  }
+
+  let top = getAltitudeString(feature.properties.altitudehi2);
+  if (feature.properties.altitudehi2 == '600') {
+    top = 'Above 45,000 feet MSL';
+  } else if (
+    isNaN(parseInt(feature.properties.altitudehi1)) &&
+    isNaN(parseInt(feature.properties.altitudehi2))
+  ) {
+    top = undefined;
+  }
   switch (feature.properties.hazard) {
     case 'TURB':
-      title = `Icing SIGMET`;
-      dueto = 'Moderate ice.';
+      title = `SIGMET for Severe Turbulence`;
       break;
     case 'CONVECTIVE':
-      title = `High Level Turbulence G-AIRMET`;
-      dueto = 'Moderate turbulence.';
+      title = `SIGMET for Convection`;
       break;
-    case 'ICING':
-      title = `Low Level Turbulence G-AIRMET`;
-      dueto = 'Moderate turbulence';
+    case 'ICE':
+      title = `SIGMET for Severe Icing`;
       break;
     case 'IFR':
-      title = `LLWS G-AIRMET`;
-      dueto = 'Nonconvective low level wind shear below 2,000 feet AGL';
+      title = `SIGMET for Dust/Sandstorms`;
       break;
     case 'ASH':
-      title = `Surface Winds G-AIRMET`;
-      dueto = 'Sustained surface  wind > 30 knots ';
+      title = `SIGMET for Volcanic Ash`;
       break;
   }
 
   return (
     <BasePopupFrame title={title}>
       <Typography variant="body2" style={{ margin: 3 }}>
-        Valid: {feature.properties.validtime}
+        Valid: {convertTimeFormat(feature.properties.validtimefrom)}
       </Typography>
       <Typography variant="body2" style={{ margin: 3 }}>
-        Issued: {feature.properties.issuetime}
+        Through: {convertTimeFormat(feature.properties.validtimeto)}
       </Typography>
       {top && (
         <Typography variant="body2" style={{ margin: 3 }}>
@@ -70,8 +62,9 @@ const SigmetPopup = ({ feature }) => {
           Base: {base}
         </Typography>
       )}
-      <Typography variant="body2" style={{ margin: 3 }}>
-        Due to: {dueto}
+      <Divider></Divider>
+      <Typography variant="body2" style={{ margin: 3, whiteSpace: 'pre-wrap' }}>
+        {feature.properties.rawairsigmet}
       </Typography>
     </BasePopupFrame>
   );

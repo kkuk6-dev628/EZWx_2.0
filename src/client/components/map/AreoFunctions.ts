@@ -3,10 +3,10 @@ import geojson2svg, { Renderer } from 'geojson-to-svg';
 
 const getAltitudeString = (
   value: string,
-  fzlbase: string,
-  fzltop: string,
+  fzlbase?: string,
+  fzltop?: string,
 ): string => {
-  if (value === 'SFC') {
+  if (value === 'SFC' || value == '0') {
     return 'Surface';
   } else if (value === 'FZL') {
     let fzlstring = '';
@@ -54,8 +54,6 @@ const getThumbnail = (feature, style) => {
     .styles({ Polygon: style })
     .data(feature)
     .render();
-  const svg = new DOMParser().parseFromString(svgString, 'image/svg+xml');
-  console.log(svg.documentElement);
   return svgString;
 };
 

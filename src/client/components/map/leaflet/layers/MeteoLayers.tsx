@@ -11,6 +11,9 @@ import ReactDOMServer from 'react-dom/server';
 import GairmetPopup from '../popups/GairmetPopup';
 import GeneralPopup from '../popups/GeneralPopup';
 import SigmetLayer from './SigmetLayer';
+import CWALayer from './CWALayer';
+import SigmetPopup from '../popups/SigmetPopup';
+import CWAPopup from '../popups/CWAPopup';
 
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
@@ -29,6 +32,12 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
     switch (layerName) {
       case 'gairmet':
         popup = <GairmetPopup feature={layer.feature}></GairmetPopup>;
+        break;
+      case 'sigmet':
+        popup = <SigmetPopup feature={layer.feature}></SigmetPopup>;
+        break;
+      case 'cwa':
+        popup = <CWAPopup feature={layer.feature}></CWAPopup>;
         break;
       default:
         popup = (
@@ -50,6 +59,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
       layers.forEach((layer) => {
         layer.layer.resetStyle();
         if (layer.group !== 'Meteo') return;
+        if (layer.name == 'Pirep') return;
         layer.layer.eachLayer((l) => {
           if (
             booleanPointInPolygon([e.latlng.lng, e.latlng.lat], l.toGeoJSON())
@@ -126,17 +136,21 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           <SigmetLayer></SigmetLayer>
         </GroupedLayer>
         <GroupedLayer checked name="CWA" group="Meteo">
-          <WFSLayer
-            url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
-            maxFeatures={256}
-            typeName="EZWxBrief:cwa"
-          ></WFSLayer>
+          <CWALayer></CWALayer>
         </GroupedLayer>
         <GroupedLayer checked name="Convetive Outlook" group="Meteo">
           <WFSLayer
             url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
             maxFeatures={256}
             typeName="EZWxBrief:conv_outlook"
+          ></WFSLayer>
+        </GroupedLayer>
+        <GroupedLayer checked name="Pirep" group="Meteo">
+          <WFSLayer
+            url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
+            maxFeatures={1024}
+            typeName="EZWxBrief:pirep"
+            enableBBoxQuery={true}
           ></WFSLayer>
         </GroupedLayer>
       </LayerControl>

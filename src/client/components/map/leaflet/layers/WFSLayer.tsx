@@ -75,7 +75,9 @@ const WFSLayer = ({
     },
   });
 
+  let pendingFetch = false;
   const fetchGeoJSON = () => {
+    if (pendingFetch) return;
     const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
     const params = {
       outputFormat: 'text/javascript',
@@ -122,18 +124,22 @@ const WFSLayer = ({
     // );
     params.outputFormat = 'application/json';
     params.format_options = undefined;
+    pendingFetch = true;
     axios
       .get(url, { params: params })
       .then((data) => {
         if (typeof data.data === 'string') {
           console.log(data.data);
         } else {
-          map?.removeLayer(ref.current);
           setGeoJSON(data.data);
+          map?.removeLayer(ref.current);
         }
       })
       .catch((reason) => {
         console.log(reason);
+      })
+      .finally(() => {
+        pendingFetch = false;
       });
   };
 
