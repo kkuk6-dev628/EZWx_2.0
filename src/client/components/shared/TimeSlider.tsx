@@ -12,42 +12,35 @@ interface DateData {
 }
 
 function TimeSlider({ handleTime }: { handleTime: (time: DateData) => void }) {
-  const [amountOfData, setAmountOfData] = useState(74);
   const [selectedDate, setSelectedDate] = useState(null);
   const [date, setDate] = useState(new DateObject());
   const [isColleps, setIsColleps] = useState(false);
   const randomColorData = ['red', 'green', 'yellow'];
-  useEffect(() => {
-    function handleWindowResize() {
-      if (window.innerWidth < 991) {
-        // TODO document why this block is empty
-        setAmountOfData(31);
-      } else {
-        setAmountOfData(74);
-      }
-    }
-
-    window.addEventListener('resize', handleWindowResize);
-
-    return () => {
-      window.removeEventListener('resize', handleWindowResize);
-    };
-  }, []);
 
   const getTime = (key, value, childIndex) => {
     if (key === 'hour' && value < 0) {
       const newDate = new DateObject(date);
-      // console.log(newDate);
-      // console.log(value);
-      newDate[key] += value;
-      const dateData = {
-        month: newDate.month.shortName,
-        weekDay: newDate.weekDay.shortName,
-        day: newDate.day,
-        hour: newDate.hour,
-        minute: handleMinute(childIndex),
-      };
-      return dateData;
+      if (value === 0) {
+        const dateData = {
+          month: newDate.month.shortName,
+          weekDay: newDate.weekDay.shortName,
+          day: newDate.day,
+          hour: newDate.hour,
+          minute: handleMinute(childIndex),
+        };
+        console.log(dateData);
+        return dateData;
+      } else {
+        newDate[key] += value;
+        const dateData = {
+          month: newDate.month.shortName,
+          weekDay: newDate.weekDay.shortName,
+          day: newDate.day,
+          hour: newDate.hour,
+          minute: handleMinute(childIndex),
+        };
+        return dateData;
+      }
     }
     if (key === 'hour' && value > 0) {
       const newDate = new DateObject(date);
@@ -95,17 +88,26 @@ function TimeSlider({ handleTime }: { handleTime: (time: DateData) => void }) {
         return '00';
     }
   };
+  console.log(date);
 
   const hnadelSetDate = (index, limit, childIndex) => {
-    // console.log(index);
-    handleTime(getTime('hour', index - limit, childIndex));
-    setSelectedDate(getTime('hour', index - limit, childIndex));
-    //setdate to selected date
-    const newDate = new DateObject(date);
-    newDate.hour += index - limit;
-    setDate(newDate);
+    //index and limit is 0 then it will be current date
+    if (index === 0 && limit === 0) {
+      const newDate = new DateObject(date);
+      const dateData = {
+        month: newDate.month.shortName,
+        weekDay: newDate.weekDay.shortName,
+        day: newDate.day,
+        hour: newDate.hour,
+        minute: handleMinute(childIndex),
+      };
+      handleTime(dateData);
+      setSelectedDate(dateData);
+    } else {
+      handleTime(getTime('hour', index - limit, childIndex));
+      setSelectedDate(getTime('hour', index - limit, childIndex));
+    }
   };
-  // console.log(date);
 
   return (
     <>
@@ -122,83 +124,373 @@ function TimeSlider({ handleTime }: { handleTime: (time: DateData) => void }) {
           </button>
         </div>
         <div className="collps__dot__area">
-          {[...Array(12)].map((_, index) => (
-            //get
+          {!isColleps && (
+            <>
+              <div className="collps__dot__wrp">
+                {[...Array(24)].map((_, index) => (
+                  //get
 
-            <div
-              key={index}
-              className={`collps__dot__btn ${randomColorData[index % 4]} ${
-                isColleps ? 'collps__dot__btn--full' : ''
-              }`}
-            >
-              {[...Array(12)].map((_, i) => (
-                <Tippy
-                  key={i}
-                  content={
-                    <span>
-                      {getTime('hour', index - 12, i)?.weekDay +
-                        ' ' +
-                        getTime('hour', index - 12, i)?.day +
-                        ', ' +
-                        getTime('hour', index - 12, i)?.month +
-                        ' ' +
-                        getTime('hour', index - 12, i)?.hour +
-                        ':' +
-                        getTime('hour', index - 12, i)?.minute}
-                    </span>
-                  }
-                >
-                  <span
-                    key={i}
-                    onClick={() => hnadelSetDate(index, 12, i)}
-                    className="collps__dot"
+                  <div
+                    key={index}
+                    className={`collps__dot__btn ${
+                      randomColorData[index % 4]
+                    } ${isColleps ? 'collps__dot__btn--full' : ''}`}
                   >
-                    &nbsp;
-                  </span>
-                </Tippy>
-              ))}
-            </div>
-          ))}
-          {[...Array(amountOfData)].map(
-            (_, index) =>
-              //get
-
-              index !== 0 && (
-                <div
-                  key={index}
-                  id={'' + index}
-                  className={`collps__dot__btn ${randomColorData[index % 4]} ${
-                    isColleps ? 'collps__dot__btn--full' : ''
-                  }`}
-                >
-                  {[...Array(12)].map((_, i) => (
-                    <Tippy
-                      key={i}
-                      content={
-                        <span>
-                          {getTime('hour', index, i)?.weekDay +
-                            ' ' +
-                            getTime('hour', index, i)?.day +
-                            ', ' +
-                            getTime('hour', index, i)?.month +
-                            ' ' +
-                            getTime('hour', index, i)?.hour +
-                            ':' +
-                            getTime('hour', index, i)?.minute}
-                        </span>
-                      }
-                    >
-                      <span
+                    {[...Array(1)].map((_, i) => (
+                      <Tippy
                         key={i}
-                        onClick={() => hnadelSetDate(index, 0, i)}
-                        className="collps__dot"
+                        content={
+                          <span>
+                            {getTime('hour', index - 12, 11)?.weekDay +
+                              ' ' +
+                              getTime('hour', index - 12, 11)?.day +
+                              ', ' +
+                              getTime('hour', index - 12, 11)?.month +
+                              ' ' +
+                              getTime('hour', index - 12, 11)?.hour +
+                              ':' +
+                              getTime('hour', index - 12, 11)?.minute}
+                          </span>
+                        }
                       >
-                        &nbsp;
-                      </span>
-                    </Tippy>
-                  ))}
-                </div>
-              ),
+                        <span
+                          key={i}
+                          onClick={() => hnadelSetDate(index, 12, 11)}
+                          className="collps__dot"
+                        >
+                          &nbsp;
+                        </span>
+                      </Tippy>
+                    ))}
+                  </div>
+                ))}
+              </div>
+              <div className="collps__dot__wrp">
+                {[...Array(24)].map((_, index) => (
+                  <div
+                    key={index}
+                    id={'' + index}
+                    className={`collps__dot__btn ${
+                      randomColorData[index % 4]
+                    } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                  >
+                    {[...Array(1)].map((_, i) =>
+                      index === 0 ? (
+                        <Tippy
+                          key={i}
+                          content={
+                            <span>
+                              {date.weekDay.shortName +
+                                ' ' +
+                                date.day +
+                                ', ' +
+                                date.month.shortName +
+                                ' ' +
+                                date.hour +
+                                ':' +
+                                handleMinute(11)}
+                            </span>
+                          }
+                        >
+                          <span
+                            key={i}
+                            onClick={() => hnadelSetDate(index, 0, 11)}
+                            className="collps__dot"
+                          >
+                            &nbsp;
+                          </span>
+                        </Tippy>
+                      ) : (
+                        <Tippy
+                          key={i}
+                          content={
+                            <span>
+                              {getTime('hour', index, 11)?.weekDay +
+                                ' ' +
+                                getTime('hour', index, 11)?.day +
+                                ', ' +
+                                getTime('hour', index, 11)?.month +
+                                ' ' +
+                                getTime('hour', index, 11)?.hour +
+                                ':' +
+                                getTime('hour', index, 11)?.minute}
+                            </span>
+                          }
+                        >
+                          <span
+                            key={i}
+                            onClick={() => hnadelSetDate(index, 0, 11)}
+                            className="collps__dot"
+                          >
+                            &nbsp;
+                          </span>
+                        </Tippy>
+                      ),
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="collps__dot__wrp">
+                {[...Array(24)].map((_, index) => (
+                  <div
+                    key={index}
+                    id={'' + index}
+                    className={`collps__dot__btn ${
+                      randomColorData[index % 4]
+                    } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                  >
+                    {[...Array(12)].map((_, i) => (
+                      <Tippy
+                        key={i}
+                        content={
+                          <span>
+                            {getTime('hour', 24 + index, 11)?.weekDay +
+                              ' ' +
+                              getTime('hour', 24 + index, 11)?.day +
+                              ', ' +
+                              getTime('hour', 24 + index, 11)?.month +
+                              ' ' +
+                              getTime('hour', 24 + index, 11)?.hour +
+                              ':' +
+                              getTime('hour', 24 + index, 11)?.minute}
+                          </span>
+                        }
+                      >
+                        <span
+                          key={i}
+                          onClick={() => hnadelSetDate(index, 0, 11)}
+                          className="collps__dot"
+                        >
+                          &nbsp;
+                        </span>
+                      </Tippy>
+                    ))}
+                  </div>
+                ))}
+              </div>
+              <div className="collps__dot__wrp">
+                {[...Array(24)].map((_, index) => (
+                  <div
+                    key={index}
+                    id={'' + index}
+                    className={`collps__dot__btn ${
+                      randomColorData[index % 4]
+                    } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                  >
+                    {[...Array(1)].map((_, i) => (
+                      <Tippy
+                        key={i}
+                        content={
+                          <span>
+                            {getTime('hour', 48 + index, 11)?.weekDay +
+                              ' ' +
+                              getTime('hour', 48 + index, 11)?.day +
+                              ', ' +
+                              getTime('hour', 48 + index, 11)?.month +
+                              ' ' +
+                              getTime('hour', 48 + index, 11)?.hour +
+                              ':' +
+                              getTime('hour', 48 + index, 11)?.minute}
+                          </span>
+                        }
+                      >
+                        <span
+                          key={i}
+                          onClick={() => hnadelSetDate(index, 0, 11)}
+                          className="collps__dot"
+                        >
+                          &nbsp;
+                        </span>
+                      </Tippy>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+          {isColleps && (
+            <>
+              <div className="collps__dot__wrp">
+                {[...Array(24)].map((_, index) => (
+                  //get
+
+                  <div
+                    key={index}
+                    className={`collps__dot__btn ${
+                      randomColorData[index % 4]
+                    } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                  >
+                    {[...Array(12)].map((_, i) => (
+                      <Tippy
+                        key={i}
+                        content={
+                          <span>
+                            {getTime('hour', index - 12, i)?.weekDay +
+                              ' ' +
+                              getTime('hour', index - 12, i)?.day +
+                              ', ' +
+                              getTime('hour', index - 12, i)?.month +
+                              ' ' +
+                              getTime('hour', index - 12, i)?.hour +
+                              ':' +
+                              getTime('hour', index - 12, i)?.minute}
+                          </span>
+                        }
+                      >
+                        <span
+                          key={i}
+                          onClick={() => hnadelSetDate(index, 12, i)}
+                          className="collps__dot"
+                        >
+                          &nbsp;
+                        </span>
+                      </Tippy>
+                    ))}
+                  </div>
+                ))}
+              </div>
+              <div className="collps__dot__wrp">
+                {[...Array(24)].map((_, index) => (
+                  <div
+                    key={index}
+                    id={'' + index}
+                    className={`collps__dot__btn ${
+                      randomColorData[index % 4]
+                    } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                  >
+                    {[...Array(12)].map((_, i) =>
+                      index === 0 ? (
+                        <Tippy
+                          key={i}
+                          content={
+                            <span>
+                              {date.weekDay.shortName +
+                                ' ' +
+                                date.day +
+                                ', ' +
+                                date.month.shortName +
+                                ' ' +
+                                date.hour +
+                                ':' +
+                                handleMinute(i)}
+                            </span>
+                          }
+                        >
+                          <span
+                            key={i}
+                            onClick={() => hnadelSetDate(index, 0, i)}
+                            className="collps__dot"
+                          >
+                            &nbsp;
+                          </span>
+                        </Tippy>
+                      ) : (
+                        <Tippy
+                          key={i}
+                          content={
+                            <span>
+                              {getTime('hour', index, i)?.weekDay +
+                                ' ' +
+                                getTime('hour', index, i)?.day +
+                                ', ' +
+                                getTime('hour', index, i)?.month +
+                                ' ' +
+                                getTime('hour', index, i)?.hour +
+                                ':' +
+                                getTime('hour', index, i)?.minute}
+                            </span>
+                          }
+                        >
+                          <span
+                            key={i}
+                            onClick={() => hnadelSetDate(index, 0, i)}
+                            className="collps__dot"
+                          >
+                            &nbsp;
+                          </span>
+                        </Tippy>
+                      ),
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="collps__dot__wrp">
+                {[...Array(24)].map((_, index) => (
+                  <div
+                    key={index}
+                    id={'' + index}
+                    className={`collps__dot__btn ${
+                      randomColorData[index % 4]
+                    } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                  >
+                    {[...Array(12)].map((_, i) => (
+                      <Tippy
+                        key={i}
+                        content={
+                          <span>
+                            {getTime('hour', 24 + index, i)?.weekDay +
+                              ' ' +
+                              getTime('hour', 24 + index, i)?.day +
+                              ', ' +
+                              getTime('hour', 24 + index, i)?.month +
+                              ' ' +
+                              getTime('hour', 24 + index, i)?.hour +
+                              ':' +
+                              getTime('hour', 24 + index, i)?.minute}
+                          </span>
+                        }
+                      >
+                        <span
+                          key={i}
+                          onClick={() => hnadelSetDate(index, 0, i)}
+                          className="collps__dot"
+                        >
+                          &nbsp;
+                        </span>
+                      </Tippy>
+                    ))}
+                  </div>
+                ))}
+              </div>
+              <div className="collps__dot__wrp">
+                {[...Array(24)].map((_, index) => (
+                  <div
+                    key={index}
+                    id={'' + index}
+                    className={`collps__dot__btn ${
+                      randomColorData[index % 4]
+                    } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                  >
+                    {[...Array(12)].map((_, i) => (
+                      <Tippy
+                        key={i}
+                        content={
+                          <span>
+                            {getTime('hour', 48 + index, i)?.weekDay +
+                              ' ' +
+                              getTime('hour', 48 + index, i)?.day +
+                              ', ' +
+                              getTime('hour', 48 + index, i)?.month +
+                              ' ' +
+                              getTime('hour', 48 + index, i)?.hour +
+                              ':' +
+                              getTime('hour', 48 + index, i)?.minute}
+                          </span>
+                        }
+                      >
+                        <span
+                          key={i}
+                          onClick={() => hnadelSetDate(index, 0, i)}
+                          className="collps__dot"
+                        >
+                          &nbsp;
+                        </span>
+                      </Tippy>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </div>
