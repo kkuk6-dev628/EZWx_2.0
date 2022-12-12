@@ -141,21 +141,21 @@ function TimeSlider({ handleTime }: { handleTime: (time: DateData) => void }) {
                         key={i}
                         content={
                           <span>
-                            {getTime('hour', index - 12, 11)?.weekDay +
+                            {getTime('hour', index - 24, 11)?.weekDay +
                               ' ' +
-                              getTime('hour', index - 12, 11)?.day +
+                              getTime('hour', index - 24, 11)?.day +
                               ', ' +
-                              getTime('hour', index - 12, 11)?.month +
+                              getTime('hour', index - 24, 11)?.month +
                               ' ' +
-                              getTime('hour', index - 12, 11)?.hour +
+                              getTime('hour', index - 24, 11)?.hour +
                               ':' +
-                              getTime('hour', index - 12, 11)?.minute}
+                              getTime('hour', index - 24, 11)?.minute}
                           </span>
                         }
                       >
                         <span
                           key={i}
-                          onClick={() => hnadelSetDate(index, 12, 11)}
+                          onClick={() => hnadelSetDate(index, 24, 11)}
                           className="collps__dot"
                         >
                           &nbsp;
@@ -325,21 +325,21 @@ function TimeSlider({ handleTime }: { handleTime: (time: DateData) => void }) {
                         key={i}
                         content={
                           <span>
-                            {getTime('hour', index - 12, i)?.weekDay +
+                            {getTime('hour', index - 24, i)?.weekDay +
                               ' ' +
-                              getTime('hour', index - 12, i)?.day +
+                              getTime('hour', index - 24, i)?.day +
                               ', ' +
-                              getTime('hour', index - 12, i)?.month +
+                              getTime('hour', index - 24, i)?.month +
                               ' ' +
-                              getTime('hour', index - 12, i)?.hour +
+                              getTime('hour', index - 24, i)?.hour +
                               ':' +
-                              getTime('hour', index - 12, i)?.minute}
+                              getTime('hour', index - 24, i)?.minute}
                           </span>
                         }
                       >
                         <span
                           key={i}
-                          onClick={() => hnadelSetDate(index, 12, i)}
+                          onClick={() => hnadelSetDate(index, 24, i)}
                           className="collps__dot"
                         >
                           &nbsp;
@@ -497,15 +497,15 @@ function TimeSlider({ handleTime }: { handleTime: (time: DateData) => void }) {
       <div className="collps__btm__area">
         <div className="collps__date__area">
           <p className="collps__date__text">
-            {getTime('hour', -12, 11)?.weekDay +
+            {getTime('hour', -24, 11)?.weekDay +
               ' ' +
-              getTime('hour', -12, 11)?.day +
+              getTime('hour', -24, 11)?.day +
               ', ' +
-              getTime('hour', -12, 11)?.month +
+              getTime('hour', -24, 11)?.month +
               ' ' +
-              getTime('hour', -12, 11)?.hour +
+              getTime('hour', -24, 11)?.hour +
               ':' +
-              getTime('hour', -12, 11)?.minute}
+              getTime('hour', -24, 11)?.minute}
           </p>
         </div>
         <div className="collps__date__area">
