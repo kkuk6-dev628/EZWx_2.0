@@ -5,6 +5,7 @@ import L from 'leaflet';
 import axios from 'axios';
 import Image from 'next/image';
 import ReactDOMServer from 'react-dom/server';
+import ConvectiveOutlookLayer from './ConvectiveOutlookLayer';
 
 interface WFSLayerProps {
   url: string;
@@ -214,7 +215,11 @@ const WFSLayer = ({
                 iconAnchor: [22, 19],
                 //popupAnchor: [0, -18]
               }),
+              // interactive: false,
               // pane: 'leaflet-overlay-pane',
+            });
+            pirepMarker.on('click', (e) => {
+              map.fire('click', e);
             });
             return pirepMarker;
           }}

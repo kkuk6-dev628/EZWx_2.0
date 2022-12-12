@@ -57,9 +57,32 @@ const getThumbnail = (feature, style) => {
   return svgString;
 };
 
+const getBBoxFromPointZoom = (
+  pixelDelta: number,
+  latlng: any,
+  zoom: number,
+): any => {
+  const latlngDelta =
+    (pixelDelta * Math.cos((Math.PI * latlng.lat) / 180)) / Math.pow(2, zoom);
+  return {
+    latMin: latlng.lat - latlngDelta / 2,
+    latMax: latlng.lat + latlngDelta / 2,
+    lngMin: latlng.lng - latlngDelta / 2,
+    lngMax: latlng.lng + latlngDelta / 2,
+  };
+};
+
+const createElementFromHTML = (htmlString) => {
+  const div = document.createElement('div');
+  div.innerHTML = htmlString.trim();
+  return div.firstChild;
+};
+
 export {
   getAltitudeString,
   translateWeatherClausings,
   convertTimeFormat,
   getThumbnail,
+  getBBoxFromPointZoom,
+  createElementFromHTML,
 };

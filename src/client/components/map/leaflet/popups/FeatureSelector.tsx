@@ -2,7 +2,7 @@
 import BasePopupFrame from './BasePopupFrame';
 import L from 'leaflet';
 import { Divider } from '@material-ui/core';
-import { getThumbnail } from '../../AreoFunctions';
+import { createElementFromHTML, getThumbnail } from '../../AreoFunctions';
 
 interface FeatureSelectorProps {
   features: L.Layer[];
@@ -13,14 +13,22 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
     <BasePopupFrame title="Select Object">
       {features.map((layer) => {
         const layerName = layer.feature.id.split('.')[0];
-        let text = '';
-        // let icon = <SvgAir />;
-        const icon = getThumbnail(layer.feature, {
-          stroke: layer.options.color,
-          weight: 0.2,
-        });
-        const svg = new Blob([icon], { type: 'image/svg+xml' });
-        const url = URL.createObjectURL(svg);
+        let text = layerName;
+        let icon, imgSrc, notSvg;
+        if (
+          layer.feature.geometry.type === 'Point' ||
+          layer.feature.geometry.type === 'MultiPoint'
+        ) {
+          icon = createElementFromHTML(layer.options.icon.options.html);
+          imgSrc = icon.src;
+        } else {
+          icon = getThumbnail(layer.feature, {
+            stroke: layer.options.color,
+            weight: 0.2,
+          });
+          const img = new Blob([icon], { type: 'image/svg+xml' });
+          imgSrc = URL.createObjectURL(img);
+        }
         if (layerName === 'gairmet') {
           switch (layer.feature.properties.hazard) {
             case 'ICE':
@@ -105,7 +113,7 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
               className="feature-selector-item"
               data-featureid={layer.feature.id}
             >
-              <img className="feature-selector-item-icon" src={url} />
+              <img className="feature-selector-item-icon" src={imgSrc} />
               <p>{text}</p>
             </span>
             <Divider />

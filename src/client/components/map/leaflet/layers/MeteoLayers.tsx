@@ -14,6 +14,10 @@ import SigmetLayer from './SigmetLayer';
 import CWALayer from './CWALayer';
 import SigmetPopup from '../popups/SigmetPopup';
 import CWAPopup from '../popups/CWAPopup';
+import ConvectiveOutlookLayer from './ConvectiveOutlookLayer';
+import ConvectiveOutlookPopup from '../popups/ConvectiveOutlookPopup';
+import IntSigmetLayer from './IntSigmetLayer';
+import { getBBoxFromPointZoom } from '../../AreoFunctions';
 
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
@@ -23,9 +27,11 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
   };
 
   const showPopup = (layer: L.Layer, latlng: any): void => {
-    layer.setStyle({
-      weight: 8,
-    });
+    if (typeof layer.setStyle === 'function') {
+      layer.setStyle({
+        weight: 8,
+      });
+    }
 
     const layerName = layer.feature.id.split('.')[0];
     let popup;
@@ -38,6 +44,13 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         break;
       case 'cwa':
         popup = <CWAPopup feature={layer.feature}></CWAPopup>;
+        break;
+      case 'conv_outlook':
+        popup = (
+          <ConvectiveOutlookPopup
+            feature={layer.feature}
+          ></ConvectiveOutlookPopup>
+        );
         break;
       default:
         popup = (
@@ -56,12 +69,24 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
   const map = useMapEvents({
     click: (e: any) => {
       const features = [];
+      const clickedBBox = getBBoxFromPointZoom(10, e.latlng, map.getZoom());
       layers.forEach((layer) => {
         layer.layer.resetStyle();
         if (layer.group !== 'Meteo') return;
-        if (layer.name == 'Pirep') return;
         layer.layer.eachLayer((l) => {
           if (
+            l.feature.geometry.type === 'Point' ||
+            l.feature.geometry.type === 'MultiPoint'
+          ) {
+            if (
+              clickedBBox.latMin < l.feature.geometry.coordinates[1] &&
+              l.feature.geometry.coordinates[1] < clickedBBox.latMax &&
+              clickedBBox.lngMin < l.feature.geometry.coordinates[0] &&
+              l.feature.geometry.coordinates[0] < clickedBBox.lngMax
+            ) {
+              features.push(l);
+            }
+          } else if (
             booleanPointInPolygon([e.latlng.lng, e.latlng.lat], l.toGeoJSON())
           ) {
             features.push(l);
@@ -135,21 +160,21 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         <GroupedLayer checked name="SIGMET" group="Meteo">
           <SigmetLayer></SigmetLayer>
         </GroupedLayer>
+        <GroupedLayer checked name="International SIGMET" group="Meteo">
+          <IntSigmetLayer></IntSigmetLayer>
+        </GroupedLayer>
         <GroupedLayer checked name="CWA" group="Meteo">
           <CWALayer></CWALayer>
         </GroupedLayer>
         <GroupedLayer checked name="Convetive Outlook" group="Meteo">
-          <WFSLayer
-            url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
-            maxFeatures={256}
-            typeName="EZWxBrief:conv_outlook"
-          ></WFSLayer>
+          <ConvectiveOutlookLayer></ConvectiveOutlookLayer>
         </GroupedLayer>
         <GroupedLayer checked name="Pirep" group="Meteo">
           <WFSLayer
             url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
             maxFeatures={1024}
             typeName="EZWxBrief:pirep"
+            interactive={false}
             // enableBBoxQuery={true}
           ></WFSLayer>
         </GroupedLayer>
