@@ -150,7 +150,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
             url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
             maxFeatures={1024}
             typeName="EZWxBrief:pirep"
-            enableBBoxQuery={true}
+            // enableBBoxQuery={true}
           ></WFSLayer>
         </GroupedLayer>
       </LayerControl>

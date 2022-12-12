@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-
+import L from 'leaflet';
 import styles from './Map.module.css';
 import MapTabs from '../../shared/MapTabs';
 import {
@@ -119,8 +119,8 @@ function LeafletMap() {
         // @ts-ignore
         zoomControl={false}
         attributionControl={false}
-        preferCanvas={true}
-        // renderer={L.canvas()}
+        // preferCanvas={true}
+        renderer={L.canvas()}
       >
         <LayerControl
           position="topright"

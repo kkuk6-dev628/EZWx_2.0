@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useMapEvents, GeoJSON } from 'react-leaflet';
 import L from 'leaflet';
 import axios from 'axios';
+import Image from 'next/image';
+import ReactDOMServer from 'react-dom/server';
 
 interface WFSLayerProps {
   url: string;
@@ -197,14 +199,24 @@ const WFSLayer = ({
           onEachFeature={onEachFeature}
           style={style}
           pointToLayer={(feature, latlng) => {
-            return L.circleMarker(latlng, {
-              radius: 8,
-              fillColor: '#ff7800',
-              color: '#000',
-              weight: 1,
-              opacity: 1,
-              fillOpacity: 0.8,
+            const pirepMarker = L.marker(latlng, {
+              icon: new L.DivIcon({
+                className: 'my-custom-icons',
+                html: ReactDOMServer.renderToString(
+                  <Image
+                    src="/icons/pirep/light-ice-icon.png"
+                    alt={''}
+                    width={16}
+                    height={16}
+                  />,
+                ),
+                iconSize: [44, 38],
+                iconAnchor: [22, 19],
+                //popupAnchor: [0, -18]
+              }),
+              // pane: 'leaflet-overlay-pane',
             });
+            return pirepMarker;
           }}
           bubblingMouseEvents={true}
         ></GeoJSON>
