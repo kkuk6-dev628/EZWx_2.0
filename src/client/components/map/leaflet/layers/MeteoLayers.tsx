@@ -19,6 +19,7 @@ import ConvectiveOutlookPopup from '../popups/ConvectiveOutlookPopup';
 import IntlSigmetLayer from './IntlSigmetLayer';
 import { getBBoxFromPointZoom } from '../../AreoFunctions';
 import IntlSigmetPopup from '../popups/IntlSigmetPopup';
+import PirepLayer from './PirepLayer';
 
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
@@ -174,13 +175,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           <ConvectiveOutlookLayer></ConvectiveOutlookLayer>
         </GroupedLayer>
         <GroupedLayer checked name="Pirep" group="Meteo">
-          <WFSLayer
-            url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
-            maxFeatures={1024}
-            typeName="EZWxBrief:pirep"
-            interactive={false}
-            // enableBBoxQuery={true}
-          ></WFSLayer>
+          <PirepLayer></PirepLayer>
         </GroupedLayer>
       </LayerControl>
     </>

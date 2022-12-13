@@ -17,6 +17,7 @@ interface WFSLayerProps {
   showLabelZoom?: number;
   getLabel?: (feature: L.feature) => string;
   style?: (feature: L.feature) => L.style;
+  pointToLayer?: (feature: L.feature, latlng: any) => L.style;
   highlightStyle?: any;
   filter?: string;
 }
@@ -31,6 +32,7 @@ const WFSLayer = ({
   showLabelZoom = 5,
   getLabel,
   style,
+  pointToLayer,
   highlightStyle,
   filter,
 }: WFSLayerProps) => {
@@ -199,30 +201,7 @@ const WFSLayer = ({
           // @ts-ignore
           onEachFeature={onEachFeature}
           style={style}
-          pointToLayer={(feature, latlng) => {
-            const pirepMarker = L.marker(latlng, {
-              icon: new L.DivIcon({
-                className: 'my-custom-icons',
-                html: ReactDOMServer.renderToString(
-                  <Image
-                    src="/icons/pirep/light-ice-icon.png"
-                    alt={''}
-                    width={16}
-                    height={16}
-                  />,
-                ),
-                iconSize: [16, 16],
-                iconAnchor: [16, 16],
-                //popupAnchor: [0, -18]
-              }),
-              // interactive: false,
-              // pane: 'leaflet-overlay-pane',
-            });
-            pirepMarker.on('click', (e) => {
-              map.fire('click', e);
-            });
-            return pirepMarker;
-          }}
+          pointToLayer={pointToLayer}
           bubblingMouseEvents={true}
         ></GeoJSON>
       )}
