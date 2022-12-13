@@ -22,9 +22,17 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
           icon = createElementFromHTML(layer.options.icon.options.html);
           imgSrc = icon.src;
         } else {
+          let weight = 0.2;
+          if (
+            layerName === 'gairmet' &&
+            (layer.feature.properties.hazard === 'SFC_WND' ||
+              layer.feature.properties.hazard === 'LLWS')
+          ) {
+            weight = 0.1;
+          }
           icon = getThumbnail(layer.feature, {
             stroke: layer.options.color,
-            weight: 0.2,
+            weight: weight,
           });
           const img = new Blob([icon], { type: 'image/svg+xml' });
           imgSrc = URL.createObjectURL(img);
