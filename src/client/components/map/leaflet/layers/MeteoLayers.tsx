@@ -16,8 +16,9 @@ import SigmetPopup from '../popups/SigmetPopup';
 import CWAPopup from '../popups/CWAPopup';
 import ConvectiveOutlookLayer from './ConvectiveOutlookLayer';
 import ConvectiveOutlookPopup from '../popups/ConvectiveOutlookPopup';
-import IntSigmetLayer from './IntSigmetLayer';
+import IntlSigmetLayer from './IntlSigmetLayer';
 import { getBBoxFromPointZoom } from '../../AreoFunctions';
+import IntlSigmetPopup from '../popups/IntlSigmetPopup';
 
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
@@ -41,6 +42,9 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         break;
       case 'sigmet':
         popup = <SigmetPopup feature={layer.feature}></SigmetPopup>;
+        break;
+      case 'intl_sigmet':
+        popup = <IntlSigmetPopup feature={layer.feature}></IntlSigmetPopup>;
         break;
       case 'cwa':
         popup = <CWAPopup feature={layer.feature}></CWAPopup>;
@@ -161,7 +165,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           <SigmetLayer></SigmetLayer>
         </GroupedLayer>
         <GroupedLayer checked name="International SIGMET" group="Meteo">
-          <IntSigmetLayer></IntSigmetLayer>
+          <IntlSigmetLayer></IntlSigmetLayer>
         </GroupedLayer>
         <GroupedLayer checked name="CWA" group="Meteo">
           <CWALayer></CWALayer>

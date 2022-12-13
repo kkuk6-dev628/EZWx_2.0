@@ -14,7 +14,7 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
       {features.map((layer) => {
         const layerName = layer.feature.id.split('.')[0];
         let text = layerName;
-        let icon, imgSrc, notSvg;
+        let icon, imgSrc, base;
         if (
           layer.feature.geometry.type === 'Point' ||
           layer.feature.geometry.type === 'MultiPoint'
@@ -29,83 +29,120 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
           const img = new Blob([icon], { type: 'image/svg+xml' });
           imgSrc = URL.createObjectURL(img);
         }
-        if (layerName === 'gairmet') {
-          switch (layer.feature.properties.hazard) {
-            case 'ICE':
-              text = `Moderate ice from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
-              break;
-            case 'TURB-HI':
-              text = `Moderate turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
-              break;
-            case 'TURB-LO':
-              text = `Moderate turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
-              break;
-            case 'LLWS':
-              text = `Low-level wind shear`;
-              break;
-            case 'SFC_WND':
-              text = `Surface wind`;
-              break;
-            case 'IFR':
-              text = `IFR G-AIRMET`;
-              break;
-            case 'MT_OBSC':
-              text = `Mountain obscuration`;
-              break;
-            case 'M_FZLVL':
-              text = `Multiple freezing levels`;
-              break;
-          }
-        } else if (layerName === 'cwa') {
-          text = 'CWA';
-          let base = layer.feature.properties.base;
-          if (isNaN(parseInt(base)) || base == '0') {
-            base = 'SUF';
-          }
-          switch (layer.feature.properties.hazard) {
-            case 'CONVECTIVE':
-              text = `CWA: TS TOPS TO ${layer.feature.properties.top}`;
-              break;
-            case 'TURB':
-              text = `CWA: TURB ${base} to ${layer.feature.properties.top}`;
-              break;
-            case 'ICE':
-              text = `CWA: ICING ${base} TO ${layer.feature.properties.top}`;
-              break;
-            case 'IFR':
-              text = `CWA: IFR`;
-              break;
-            case 'PCPN':
-              text = `CWA: PRECIP TOPS TO ${layer.feature.properties.top}`;
-              break;
-            default:
-              text = `CWA: UNKNOWN`;
-              break;
-          }
-        } else if (layerName === 'conv_outlook') {
-          text = 'Convective outlook';
-        } else if (layerName === 'sigmet') {
-          let base = layer.feature.properties.altitudelow1;
-          if (isNaN(parseInt(base)) || base == '0') {
-            base = 'SUF';
-          }
-          switch (layer.feature.properties.hazard) {
-            case 'CONVECTIVE':
-              text = `SIGMET: CONV TO ${layer.feature.properties.altitudehi2}`;
-              break;
-            case 'TURB':
-              text = `SIGMET: SEVERE TURB ${base} to ${layer.feature.properties.altitudehi2}`;
-              break;
-            case 'ICE':
-              text = `SIGMET: SEVERE ICE ${base} TO ${layer.feature.properties.altitudehi2}`;
-              break;
-            case 'IFR':
-              text = `SIGMET: IFR TO ${base} to ${layer.feature.properties.altitudehi2}`;
-              break;
-            case 'ASH':
-              text = `SIGMET: VOLCANIC ASH ${base} to ${layer.feature.properties.altitudehi2}`;
-              break;
-          }
+        switch (layerName) {
+          case 'gairmet':
+            switch (layer.feature.properties.hazard) {
+              case 'ICE':
+                text = `Moderate ice from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+                break;
+              case 'TURB-HI':
+                text = `Moderate turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+                break;
+              case 'TURB-LO':
+                text = `Moderate turbulence from ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+                break;
+              case 'LLWS':
+                text = `Low-level wind shear`;
+                break;
+              case 'SFC_WND':
+                text = `Surface wind`;
+                break;
+              case 'IFR':
+                text = `IFR G-AIRMET`;
+                break;
+              case 'MT_OBSC':
+                text = `Mountain obscuration`;
+                break;
+              case 'M_FZLVL':
+                text = `Multiple freezing levels`;
+                break;
+            }
+            break;
+          case 'cwa':
+            text = 'CWA';
+            base = layer.feature.properties.base;
+            if (isNaN(parseInt(base)) || base == '0') {
+              base = 'SUF';
+            }
+            switch (layer.feature.properties.hazard) {
+              case 'CONVECTIVE':
+                text = `CWA: TS TOPS TO ${layer.feature.properties.top}`;
+                break;
+              case 'TURB':
+                text = `CWA: TURB ${base} to ${layer.feature.properties.top}`;
+                break;
+              case 'ICE':
+                text = `CWA: ICING ${base} TO ${layer.feature.properties.top}`;
+                break;
+              case 'IFR':
+                text = `CWA: IFR`;
+                break;
+              case 'PCPN':
+                text = `CWA: PRECIP TOPS TO ${layer.feature.properties.top}`;
+                break;
+              default:
+                text = `CWA: UNKNOWN`;
+                break;
+            }
+            break;
+          case 'conv_outlook':
+            text = 'Convective outlook';
+            break;
+          case 'sigmet':
+            base = layer.feature.properties.altitudelow1;
+            if (isNaN(parseInt(base)) || base == '0') {
+              base = 'SUF';
+            }
+            switch (layer.feature.properties.hazard) {
+              case 'CONVECTIVE':
+                text = `SIGMET: CONV TO ${layer.feature.properties.altitudehi2}`;
+                break;
+              case 'TURB':
+                text = `SIGMET: SEVERE TURB ${base} to ${layer.feature.properties.altitudehi2}`;
+                break;
+              case 'ICE':
+                text = `SIGMET: SEVERE ICE ${base} TO ${layer.feature.properties.altitudehi2}`;
+                break;
+              case 'IFR':
+                text = `SIGMET: IFR TO ${base} to ${layer.feature.properties.altitudehi2}`;
+                break;
+              case 'ASH':
+                text = `SIGMET: VOLCANIC ASH ${base} to ${layer.feature.properties.altitudehi2}`;
+                break;
+            }
+            break;
+          case 'intl_sigmet':
+            switch (layer.feature.properties.hazard) {
+              case 'ICE':
+                text = `SIGMET: SEVERE ICE ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+                break;
+              case 'TURB':
+                text = `SIGMET: SEVERE TURB ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+                break;
+              case 'TS':
+                text = `SIGMET: THUNDERSTORMS TO ${layer.feature.properties.top}`;
+                break;
+              case 'MTW':
+                text = `SIGMET: MTN WAVE ${layer.feature.properties.base} TO ${layer.feature.properties.top}`;
+                break;
+              case 'IFR':
+                text = `SIGMET: DUST/SANDSTORM ${layer.feature.properties.base} TO ${layer.feature.properties.top}`;
+                break;
+              case 'TC':
+                text = `SIGMET: TROP CYCLONE TO ${layer.feature.properties.top}`;
+                break;
+              case 'ASH':
+                text = `SIGMET: VOLCANIC ASH ${layer.feature.properties.base} TO ${layer.feature.properties.top}`;
+                break;
+              default:
+                text = `SIGMET ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+                break;
+            }
+            break;
+          case '':
+            break;
+          default:
+            break;
         }
         return (
           <div key={layer.feature.id}>
