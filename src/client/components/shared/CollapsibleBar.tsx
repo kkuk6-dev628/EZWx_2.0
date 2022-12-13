@@ -15,12 +15,17 @@ function CollapsibleBar({
   handleTime: (time: DateData) => void;
 }) {
   // const [windowSize, setWindowSize] = useState(setWindowSize());
+  const [minOfTimeSlider, setMinOfTimeSlider] = useState(new Date().getTime());
+  const [maxOfTimeSlider, setMaxOfTimeSlider] = useState(new Date().getTime());
 
   return (
     <div className="collps">
-      <div className="collps__wrp">
-        <TimeSlider handleTime={handleTime} />
-      </div>
+      <TimeSlider
+        handleTime={handleTime}
+        min={minOfTimeSlider}
+        max={maxOfTimeSlider}
+        step={1}
+      />
     </div>
   );
 }
