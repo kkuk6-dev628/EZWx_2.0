@@ -1,6 +1,6 @@
 import WFSLayer from './WFSLayer';
 
-const IntSigmetLayer = () => {
+const IntlSigmetLayer = () => {
   const gairmetStyle = (feature) => {
     const style = {
       color: '#F50000',
@@ -40,4 +40,4 @@ const IntSigmetLayer = () => {
   );
 };
 
-export default IntSigmetLayer;
+export default IntlSigmetLayer;

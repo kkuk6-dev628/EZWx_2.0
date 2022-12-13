@@ -211,8 +211,8 @@ const WFSLayer = ({
                     height={16}
                   />,
                 ),
-                iconSize: [44, 38],
-                iconAnchor: [22, 19],
+                iconSize: [16, 16],
+                iconAnchor: [16, 16],
                 //popupAnchor: [0, -18]
               }),
               // interactive: false,

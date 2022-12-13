@@ -47,19 +47,19 @@ const SigmetPopup = ({ feature }) => {
   return (
     <BasePopupFrame title={title}>
       <Typography variant="body2" style={{ margin: 3 }}>
-        Valid: {convertTimeFormat(feature.properties.validtimefrom)}
+        <b>Valid:</b> {convertTimeFormat(feature.properties.validtimefrom)}
       </Typography>
       <Typography variant="body2" style={{ margin: 3 }}>
-        Through: {convertTimeFormat(feature.properties.validtimeto)}
+        <b>Through:</b> {convertTimeFormat(feature.properties.validtimeto)}
       </Typography>
       {top && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          Top: {top}
+          <b>Top:</b> {top}
         </Typography>
       )}
       {base && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          Base: {base}
+          <b>Base:</b> {base}
         </Typography>
       )}
       <Divider></Divider>
