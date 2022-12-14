@@ -27,6 +27,8 @@ function TimeSlider({
   const [isColleps, setIsColleps] = useState(false);
   const randomColorData = ['red', 'green', 'yellow'];
   console.log(min, ' ', max, ' ', step);
+  const [timeSliderSteps, setTimeSliderSteps] = useState(24 / step);
+  console.log(timeSliderSteps);
 
   const getTime = (key, value, childIndex) => {
     if (key === 'hour' && value < 0) {
@@ -141,10 +143,11 @@ function TimeSlider({
             {!isColleps && (
               <>
                 <div className="collps__dot__wrp">
-                  {[...Array(24)].map((_, index) => (
+                  {[...Array(timeSliderSteps)].map((_, index) => (
                     //get
                     <div
                       key={index}
+                      id={timeSliderSteps.toString()}
                       className={`collps__dot__btn ${
                         randomColorData[index % 4]
                       } ${isColleps ? 'collps__dot__btn--full' : ''}`}
@@ -154,21 +157,21 @@ function TimeSlider({
                           key={i}
                           content={
                             <span>
-                              {getTime('hour', index - 24, 11)?.weekDay +
+                              {getTime('hour', index * step - 24, 11)?.weekDay +
                                 ' ' +
-                                getTime('hour', index - 24, 11)?.day +
+                                getTime('hour', index * step - 24, 11)?.day +
                                 ', ' +
-                                getTime('hour', index - 24, 11)?.month +
+                                getTime('hour', index * step - 24, 11)?.month +
                                 ' ' +
-                                getTime('hour', index - 24, 11)?.hour +
+                                getTime('hour', index * step - 24, 11)?.hour +
                                 ':' +
-                                getTime('hour', index - 24, 11)?.minute}
+                                getTime('hour', index * step - 24, 11)?.minute}
                             </span>
                           }
                         >
                           <span
                             key={i}
-                            onClick={() => hnadelSetDate(index, 24, 11)}
+                            onClick={() => hnadelSetDate(index * step, 24, 11)}
                             className="collps__dot"
                           >
                             &nbsp;
@@ -179,7 +182,7 @@ function TimeSlider({
                   ))}
                 </div>
                 <div className="collps__dot__wrp">
-                  {[...Array(24)].map((_, index) => (
+                  {[...Array(timeSliderSteps)].map((_, index) => (
                     <div
                       key={index}
                       id={'' + index}
@@ -207,7 +210,7 @@ function TimeSlider({
                           >
                             <span
                               key={i}
-                              onClick={() => hnadelSetDate(index, 0, 11)}
+                              onClick={() => hnadelSetDate(index * step, 0, 11)}
                               className="collps__dot"
                             >
                               &nbsp;
@@ -218,21 +221,21 @@ function TimeSlider({
                             key={i}
                             content={
                               <span>
-                                {getTime('hour', index, 11)?.weekDay +
+                                {getTime('hour', index * step, 11)?.weekDay +
                                   ' ' +
-                                  getTime('hour', index, 11)?.day +
+                                  getTime('hour', index * step, 11)?.day +
                                   ', ' +
-                                  getTime('hour', index, 11)?.month +
+                                  getTime('hour', index * step, 11)?.month +
                                   ' ' +
-                                  getTime('hour', index, 11)?.hour +
+                                  getTime('hour', index * step, 11)?.hour +
                                   ':' +
-                                  getTime('hour', index, 11)?.minute}
+                                  getTime('hour', index * step, 11)?.minute}
                               </span>
                             }
                           >
                             <span
                               key={i}
-                              onClick={() => hnadelSetDate(index, 0, 11)}
+                              onClick={() => hnadelSetDate(index * step, 0, 11)}
                               className="collps__dot"
                             >
                               &nbsp;
@@ -244,7 +247,7 @@ function TimeSlider({
                   ))}
                 </div>
                 <div className="collps__dot__wrp">
-                  {[...Array(24)].map((_, index) => (
+                  {[...Array(timeSliderSteps)].map((_, index) => (
                     <div
                       key={index}
                       id={'' + index}
@@ -257,21 +260,21 @@ function TimeSlider({
                           key={i}
                           content={
                             <span>
-                              {getTime('hour', 24 + index, 11)?.weekDay +
+                              {getTime('hour', 24 + index * step, 11)?.weekDay +
                                 ' ' +
-                                getTime('hour', 24 + index, 11)?.day +
+                                getTime('hour', 24 + index * step, 11)?.day +
                                 ', ' +
-                                getTime('hour', 24 + index, 11)?.month +
+                                getTime('hour', 24 + index * step, 11)?.month +
                                 ' ' +
-                                getTime('hour', 24 + index, 11)?.hour +
+                                getTime('hour', 24 + index * step, 11)?.hour +
                                 ':' +
-                                getTime('hour', 24 + index, 11)?.minute}
+                                getTime('hour', 24 + index * step, 11)?.minute}
                             </span>
                           }
                         >
                           <span
                             key={i}
-                            onClick={() => hnadelSetDate(index, 0, 11)}
+                            onClick={() => hnadelSetDate(index * step, -24, 11)}
                             className="collps__dot"
                           >
                             &nbsp;
@@ -282,7 +285,7 @@ function TimeSlider({
                   ))}
                 </div>
                 <div className="collps__dot__wrp">
-                  {[...Array(24)].map((_, index) => (
+                  {[...Array(timeSliderSteps)].map((_, index) => (
                     <div
                       key={index}
                       id={'' + index}
@@ -295,21 +298,21 @@ function TimeSlider({
                           key={i}
                           content={
                             <span>
-                              {getTime('hour', 48 + index, 11)?.weekDay +
+                              {getTime('hour', 48 + index * step, 11)?.weekDay +
                                 ' ' +
-                                getTime('hour', 48 + index, 11)?.day +
+                                getTime('hour', 48 + index * step, 11)?.day +
                                 ', ' +
-                                getTime('hour', 48 + index, 11)?.month +
+                                getTime('hour', 48 + index * step, 11)?.month +
                                 ' ' +
-                                getTime('hour', 48 + index, 11)?.hour +
+                                getTime('hour', 48 + index * step, 11)?.hour +
                                 ':' +
-                                getTime('hour', 48 + index, 11)?.minute}
+                                getTime('hour', 48 + index * step, 11)?.minute}
                             </span>
                           }
                         >
                           <span
                             key={i}
-                            onClick={() => hnadelSetDate(index, 0, 11)}
+                            onClick={() => hnadelSetDate(index * step, -48, 11)}
                             className="collps__dot"
                           >
                             &nbsp;
@@ -324,7 +327,7 @@ function TimeSlider({
             {isColleps && (
               <>
                 <div className="collps__dot__wrp">
-                  {[...Array(24)].map((_, index) => (
+                  {[...Array(timeSliderSteps)].map((_, index) => (
                     //get
                     <div
                       key={index}
@@ -337,21 +340,21 @@ function TimeSlider({
                           key={i}
                           content={
                             <span>
-                              {getTime('hour', index - 24, i)?.weekDay +
+                              {getTime('hour', index * step - 24, i)?.weekDay +
                                 ' ' +
-                                getTime('hour', index - 24, i)?.day +
+                                getTime('hour', index * step - 24, i)?.day +
                                 ', ' +
-                                getTime('hour', index - 24, i)?.month +
+                                getTime('hour', index * step - 24, i)?.month +
                                 ' ' +
-                                getTime('hour', index - 24, i)?.hour +
+                                getTime('hour', index * step - 24, i)?.hour +
                                 ':' +
-                                getTime('hour', index - 24, i)?.minute}
+                                getTime('hour', index * step - 24, i)?.minute}
                             </span>
                           }
                         >
                           <span
                             key={i}
-                            onClick={() => hnadelSetDate(index, 24, i)}
+                            onClick={() => hnadelSetDate(index * step, 24, i)}
                             className="collps__dot"
                           >
                             &nbsp;
@@ -362,7 +365,7 @@ function TimeSlider({
                   ))}
                 </div>
                 <div className="collps__dot__wrp">
-                  {[...Array(24)].map((_, index) => (
+                  {[...Array(timeSliderSteps)].map((_, index) => (
                     <div
                       key={index}
                       id={'' + index}
@@ -390,7 +393,7 @@ function TimeSlider({
                           >
                             <span
                               key={i}
-                              onClick={() => hnadelSetDate(index, 0, i)}
+                              onClick={() => hnadelSetDate(index * step, 0, i)}
                               className="collps__dot"
                             >
                               &nbsp;
@@ -401,21 +404,21 @@ function TimeSlider({
                             key={i}
                             content={
                               <span>
-                                {getTime('hour', index, i)?.weekDay +
+                                {getTime('hour', index * step, i)?.weekDay +
                                   ' ' +
-                                  getTime('hour', index, i)?.day +
+                                  getTime('hour', index * step, i)?.day +
                                   ', ' +
-                                  getTime('hour', index, i)?.month +
+                                  getTime('hour', index * step, i)?.month +
                                   ' ' +
-                                  getTime('hour', index, i)?.hour +
+                                  getTime('hour', index * step, i)?.hour +
                                   ':' +
-                                  getTime('hour', index, i)?.minute}
+                                  getTime('hour', index * step, i)?.minute}
                               </span>
                             }
                           >
                             <span
                               key={i}
-                              onClick={() => hnadelSetDate(index, 0, i)}
+                              onClick={() => hnadelSetDate(index * step, 0, i)}
                               className="collps__dot"
                             >
                               &nbsp;
@@ -427,7 +430,7 @@ function TimeSlider({
                   ))}
                 </div>
                 <div className="collps__dot__wrp">
-                  {[...Array(24)].map((_, index) => (
+                  {[...Array(timeSliderSteps)].map((_, index) => (
                     <div
                       key={index}
                       id={'' + index}
@@ -440,21 +443,21 @@ function TimeSlider({
                           key={i}
                           content={
                             <span>
-                              {getTime('hour', 24 + index, i)?.weekDay +
+                              {getTime('hour', 24 + index * step, i)?.weekDay +
                                 ' ' +
-                                getTime('hour', 24 + index, i)?.day +
+                                getTime('hour', 24 + index * step, i)?.day +
                                 ', ' +
-                                getTime('hour', 24 + index, i)?.month +
+                                getTime('hour', 24 + index * step, i)?.month +
                                 ' ' +
-                                getTime('hour', 24 + index, i)?.hour +
+                                getTime('hour', 24 + index * step, i)?.hour +
                                 ':' +
-                                getTime('hour', 24 + index, i)?.minute}
+                                getTime('hour', 24 + index * step, i)?.minute}
                             </span>
                           }
                         >
                           <span
                             key={i}
-                            onClick={() => hnadelSetDate(index, 0, i)}
+                            onClick={() => hnadelSetDate(index * step, 0, i)}
                             className="collps__dot"
                           >
                             &nbsp;
@@ -465,7 +468,7 @@ function TimeSlider({
                   ))}
                 </div>
                 <div className="collps__dot__wrp">
-                  {[...Array(24)].map((_, index) => (
+                  {[...Array(timeSliderSteps)].map((_, index) => (
                     <div
                       key={index}
                       id={'' + index}
@@ -478,21 +481,21 @@ function TimeSlider({
                           key={i}
                           content={
                             <span>
-                              {getTime('hour', 48 + index, i)?.weekDay +
+                              {getTime('hour', 48 + index * step, i)?.weekDay +
                                 ' ' +
-                                getTime('hour', 48 + index, i)?.day +
+                                getTime('hour', 48 + index * step, i)?.day +
                                 ', ' +
-                                getTime('hour', 48 + index, i)?.month +
+                                getTime('hour', 48 + index * step, i)?.month +
                                 ' ' +
-                                getTime('hour', 48 + index, i)?.hour +
+                                getTime('hour', 48 + index * step, i)?.hour +
                                 ':' +
-                                getTime('hour', 48 + index, i)?.minute}
+                                getTime('hour', 48 + index * step, i)?.minute}
                             </span>
                           }
                         >
                           <span
                             key={i}
-                            onClick={() => hnadelSetDate(index, 0, i)}
+                            onClick={() => hnadelSetDate(index * step, 0, i)}
                             className="collps__dot"
                           >
                             &nbsp;
