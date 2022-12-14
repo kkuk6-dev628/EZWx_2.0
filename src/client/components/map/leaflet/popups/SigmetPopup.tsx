@@ -6,24 +6,21 @@ const SigmetPopup = ({ feature }) => {
   let title = 'G_AIRMET';
   let base;
   if (
-    isNaN(parseInt(feature.properties.altitudelow1)) ||
-    feature.properties.altitudelow1 == '0'
+    isNaN(parseInt(feature.properties.altitudelow)) ||
+    feature.properties.altitudelow == '0'
   ) {
     base = 'Surface';
   } else {
-    base = getAltitudeString(feature.properties.altitudelow1);
+    base = getAltitudeString(feature.properties.altitudelow);
   }
   if (feature.properties.hazard === 'CONVECTIVE') {
     base = undefined;
   }
 
-  let top = getAltitudeString(feature.properties.altitudehi2);
-  if (feature.properties.altitudehi2 == '600') {
+  let top = getAltitudeString(feature.properties.altitudehi);
+  if (feature.properties.altitudehi == '600') {
     top = 'Above 45,000 feet MSL';
-  } else if (
-    isNaN(parseInt(feature.properties.altitudehi1)) &&
-    isNaN(parseInt(feature.properties.altitudehi2))
-  ) {
+  } else if (isNaN(parseInt(feature.properties.altitudehi))) {
     top = undefined;
   }
   switch (feature.properties.hazard) {

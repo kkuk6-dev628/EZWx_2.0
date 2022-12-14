@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @next/next/no-img-element */
 import BasePopupFrame from './BasePopupFrame';
 import L from 'leaflet';
@@ -97,25 +98,30 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
             text = 'Convective outlook';
             break;
           case 'sigmet':
-            base = layer.feature.properties.altitudelow1;
+            base = layer.feature.properties.altitudelow / 100;
             if (isNaN(parseInt(base)) || base == '0') {
               base = 'SUF';
             }
+            let top = layer.feature.properties.altitudehi / 100;
+            if (top == 600) {
+              // @ts-ignore
+              top = 'ABV 450';
+            }
             switch (layer.feature.properties.hazard) {
               case 'CONVECTIVE':
-                text = `SIGMET: CONV TO ${layer.feature.properties.altitudehi2}`;
+                text = `SIGMET: THUNDERSTORMS TO ${top}`;
                 break;
               case 'TURB':
-                text = `SIGMET: SEVERE TURB ${base} to ${layer.feature.properties.altitudehi2}`;
+                text = `SIGMET: SEVERE TURB ${base} TO ${top}`;
                 break;
               case 'ICE':
-                text = `SIGMET: SEVERE ICE ${base} TO ${layer.feature.properties.altitudehi2}`;
+                text = `SIGMET: SEVERE ICE ${base} TO ${top}`;
                 break;
               case 'IFR':
-                text = `SIGMET: IFR TO ${base} to ${layer.feature.properties.altitudehi2}`;
+                text = `SIGMET: DUST/SANDSTORM ${base} TO ${top}`;
                 break;
               case 'ASH':
-                text = `SIGMET: VOLCANIC ASH ${base} to ${layer.feature.properties.altitudehi2}`;
+                text = `SIGMET: VOLCANIC ASH ${base} TO ${top}`;
                 break;
             }
             break;
