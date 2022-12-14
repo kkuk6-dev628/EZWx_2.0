@@ -20,6 +20,7 @@ import IntlSigmetLayer from './IntlSigmetLayer';
 import { getBBoxFromPointZoom } from '../../AreoFunctions';
 import IntlSigmetPopup from '../popups/IntlSigmetPopup';
 import PirepLayer from './PirepLayer';
+import { width } from 'dom7';
 
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
@@ -37,18 +38,23 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
 
     const layerName = layer.feature.id.split('.')[0];
     let popup;
+    let useWidePopup = false;
     switch (layerName) {
       case 'gairmet':
         popup = <GairmetPopup feature={layer.feature}></GairmetPopup>;
+        useWidePopup = false;
         break;
       case 'sigmet':
         popup = <SigmetPopup feature={layer.feature}></SigmetPopup>;
+        useWidePopup = true;
         break;
       case 'intl_sigmet':
         popup = <IntlSigmetPopup feature={layer.feature}></IntlSigmetPopup>;
+        useWidePopup = true;
         break;
       case 'cwa':
         popup = <CWAPopup feature={layer.feature}></CWAPopup>;
+        useWidePopup = true;
         break;
       case 'conv_outlook':
         popup = (
@@ -56,6 +62,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
             feature={layer.feature}
           ></ConvectiveOutlookPopup>
         );
+        useWidePopup = true;
         break;
       default:
         popup = (
@@ -64,10 +71,12 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
             title={`${layerName} properties`}
           ></GeneralPopup>
         );
+        useWidePopup = false;
     }
-    L.popup()
+    const popupContent = ReactDOMServer.renderToString(popup);
+    L.popup({ minWidth: useWidePopup ? 320 : 196 })
       .setLatLng(latlng)
-      .setContent(ReactDOMServer.renderToString(popup))
+      .setContent(popupContent)
       .openOn(map);
   };
 

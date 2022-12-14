@@ -18,7 +18,7 @@ const qualifiersTranslation = {
   OCNL: 'Occasional',
 };
 
-const IntlSigmetPopup = ({ feature }) => {
+const IntlSigmetPopup = ({ feature }: { feature: any }) => {
   let title = hazardTranslation[feature.properties.hazard]
     ? `${qualifiersTranslation[feature.properties.qualifier]} ${
         hazardTranslation[feature.properties.hazard]
@@ -34,15 +34,7 @@ const IntlSigmetPopup = ({ feature }) => {
     base = getAltitudeString(feature.properties.base);
   }
 
-  const top = getAltitudeString(feature.properties.top);
-  // if (feature.properties.altitudehi2 == '600') {
-  //   top = 'Above 45,000 feet MSL';
-  // } else if (
-  //   isNaN(parseInt(feature.properties.altitudehi1)) &&
-  //   isNaN(parseInt(feature.properties.altitudehi2))
-  // ) {
-  //   top = undefined;
-  // }
+  const top = getAltitudeString(feature.properties.top, false);
   switch (feature.properties.hazard) {
     case 'VA':
       title = hazardTranslation.VA;

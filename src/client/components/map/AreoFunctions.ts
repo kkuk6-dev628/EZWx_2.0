@@ -3,6 +3,7 @@ import geojson2svg, { Renderer } from 'geojson-to-svg';
 
 const getAltitudeString = (
   value: string,
+  isHundred = true,
   fzlbase?: string,
   fzltop?: string,
 ): string => {
@@ -13,14 +14,14 @@ const getAltitudeString = (
     if (fzlbase === 'SFC') {
       fzlstring = 'Surface to';
     } else if (!isNaN(parseInt(fzlbase))) {
-      fzlstring = `${parseInt(fzlbase) * 100} to`;
+      fzlstring = `${parseInt(fzlbase) * (isHundred ? 100 : 1)} to`;
     }
     if (!isNaN(parseInt(fzltop))) {
-      fzlstring += ` ${parseInt(fzltop) * 100} ft MSL`;
+      fzlstring += ` ${parseInt(fzltop) * (isHundred ? 100 : 1)} ft MSL`;
     }
     return fzlstring;
   } else if (!isNaN(parseInt(value))) {
-    return parseInt(value) * 100 + ' ft MSL';
+    return parseInt(value) * (isHundred ? 100 : 1) + ' ft MSL';
   }
 };
 

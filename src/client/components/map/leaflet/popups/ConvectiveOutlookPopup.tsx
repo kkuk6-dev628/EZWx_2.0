@@ -2,7 +2,7 @@ import { Divider, Typography } from '@material-ui/core';
 import BasePopupFrame from './BasePopupFrame';
 import { convertTimeFormat, getAltitudeString } from '../../AreoFunctions';
 
-const ConvectiveOutlookPopup = ({ feature }) => {
+const ConvectiveOutlookPopup = ({ feature }: { feature: any }) => {
   return (
     <BasePopupFrame title={'Convective OUTLOOK'}>
       <Typography variant="body2" style={{ margin: 3 }}>

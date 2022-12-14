@@ -11,11 +11,13 @@ const GairmetPopup = ({ feature }) => {
   let dueto = 'Moderate';
   const top = getAltitudeString(
     feature.properties.top,
+    true,
     feature.properties.fzlbase,
     feature.properties.fzltop,
   );
   const base = getAltitudeString(
     feature.properties.base,
+    true,
     feature.properties.fzlbase,
     feature.properties.fzltop,
   );
