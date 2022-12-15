@@ -40,10 +40,8 @@ const SigmetLayer = () => {
       propertyNames={[
         'wkb_geometry',
         'id',
-        'altitudelow1',
-        'altitudelow2',
-        'altitudehi1',
-        'altitudehi2',
+        'altitudelow',
+        'altitudehi',
         'validtimeto',
         'validtimefrom',
         'hazard',

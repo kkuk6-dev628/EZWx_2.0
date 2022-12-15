@@ -32,6 +32,9 @@
 //imagery
 @import "./pages/Imagery.scss";
 
+// map
+@import "./map/Leaflet.scss";
+
 //swiper slider override
 .swiper-button-next:after, .swiper-button-prev:after{
   display: none;

@@ -1,7 +1,13 @@
-import React, { MutableRefObject, ReactElement, useState } from 'react';
+import React, {
+  MutableRefObject,
+  ReactElement,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Typography } from '@material-ui/core';
 import { useMapEvents } from 'react-leaflet';
-import { Layer, Util } from 'leaflet';
+import { Layer, Util, DomEvent } from 'leaflet';
 import Accordion from '@material-ui/core/Accordion';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -13,6 +19,7 @@ import toast from 'react-hot-toast';
 import { LayersControlProvider } from './layerControlContext';
 
 import createControlledLayer from './controlledLayer';
+import { getEventListeners } from 'events';
 
 const POSITION_CLASSES: { [key: string]: string } = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -48,6 +55,8 @@ const LayerControl = ({
   const [layers, setLayers] = useState<ILayerObj[]>([]);
   const positionClass =
     (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright;
+
+  const ref = useRef<HTMLDivElement>();
 
   const map = useMapEvents({
     layerremove: () => {
@@ -124,14 +133,26 @@ const LayerControl = ({
     const isEmptyLayer =
       layer._layers !== undefined && Object.keys(layer._layers).length === 0;
     const cLayers = layers;
-    cLayers.push({
-      layer,
-      group,
-      name,
-      checked: exclusive || isEmptyLayer ? false : map?.hasLayer(layer),
-      id: Util.stamp(layer),
-      isEmpty: isEmptyLayer,
-    });
+    const index = cLayers.findIndex((e) => e.name === name);
+    if (index > -1) {
+      cLayers.splice(index, 1, {
+        layer,
+        group,
+        name,
+        checked: exclusive || isEmptyLayer ? false : map?.hasLayer(layer),
+        id: Util.stamp(layer),
+        isEmpty: isEmptyLayer,
+      });
+    } else {
+      cLayers.push({
+        layer,
+        group,
+        name,
+        checked: exclusive || isEmptyLayer ? false : map?.hasLayer(layer),
+        id: Util.stamp(layer),
+        isEmpty: isEmptyLayer,
+      });
+    }
     if (exclusive) {
       cLayers[0].checked = true;
       for (let i = 1; i < cLayers.length; i++) {
@@ -146,6 +167,11 @@ const LayerControl = ({
 
   const groupedLayers = lodashGroupBy(layers, 'group');
 
+  useEffect(() => {
+    const clickLayerControl = (e) => {
+      DomEvent.stopPropagation(e);
+    };
+  }, []);
   return (
     <LayersControlProvider
       value={{
@@ -154,7 +180,11 @@ const LayerControl = ({
       }}
     >
       <div className={positionClass}>
-        <div className="leaflet-control leaflet-bar">
+        <div
+          id="layer-control"
+          className="leaflet-control leaflet-bar"
+          ref={ref}
+        >
           {!collapsed &&
             Object.keys(groupedLayers).map((section, index) => (
               <Accordion key={`${section} ${index}`} defaultExpanded>
@@ -171,15 +201,18 @@ const LayerControl = ({
                       control={
                         <Checkbox
                           checked={layerObj.checked}
-                          onChange={(e) => {
-                            console.log(e);
-                            onLayerClick(layerObj);
-                          }}
                           name="checkedB"
                           color="primary"
                         />
                       }
                       label={layerObj.name}
+                      onClickCapture={(e) => {
+                        DomEvent.stopPropagation(e);
+                        onLayerClick(layerObj);
+                      }}
+                      onDoubleClickCapture={(e) => {
+                        DomEvent.stopPropagation(e);
+                      }}
                     />
                   </AccordionDetails>
                 ))}

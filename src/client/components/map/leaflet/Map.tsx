@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-
+import L from 'leaflet';
 import styles from './Map.module.css';
 import MapTabs from '../../shared/MapTabs';
 import {
@@ -126,19 +126,19 @@ function LeafletMap() {
         // @ts-ignore
         zoomControl={false}
         attributionControl={false}
-        preferCanvas={true}
-        // renderer={L.canvas()}
+        // preferCanvas={true}
+        renderer={L.canvas()}
       >
         <LayerControl
           position="topright"
           collapsed={baseMapControlCollapsed}
           exclusive={true}
         >
-          <GroupedLayer checked name="Topo" group="Base Maps">
-            <TileLayer url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png" />
-          </GroupedLayer>
           <GroupedLayer checked name="Street" group="Base Maps">
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          </GroupedLayer>
+          <GroupedLayer checked name="Topo" group="Base Maps">
+            <TileLayer url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png" />
           </GroupedLayer>
           <GroupedLayer checked name="Terrain" group="Base Maps">
             <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}" />

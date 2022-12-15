@@ -2,47 +2,37 @@ import { Divider, Typography } from '@material-ui/core';
 import BasePopupFrame from './BasePopupFrame';
 import { convertTimeFormat, getAltitudeString } from '../../AreoFunctions';
 
-const SigmetPopup = ({ feature }) => {
-  let title = 'G_AIRMET';
-  let base;
-  if (
-    isNaN(parseInt(feature.properties.altitudelow)) ||
-    feature.properties.altitudelow == '0'
-  ) {
-    base = 'Surface';
-  } else {
-    base = getAltitudeString(feature.properties.altitudelow);
-  }
-  if (feature.properties.hazard === 'CONVECTIVE') {
-    base = undefined;
-  }
+const CWAPopup = ({ feature }) => {
+  let title = 'CWA';
+  const base = getAltitudeString(feature.properties.base);
+  const top = getAltitudeString(feature.properties.top);
 
-  let top = getAltitudeString(feature.properties.altitudehi);
-  if (feature.properties.altitudehi == '600') {
-    top = 'Above 45,000 feet MSL';
-  } else if (isNaN(parseInt(feature.properties.altitudehi))) {
-    top = undefined;
-  }
   switch (feature.properties.hazard) {
     case 'TURB':
-      title = `SIGMET for Severe Turbulence`;
+      title = `Center Weather Advisory for Turbulence`;
       break;
-    case 'CONVECTIVE':
-      title = `SIGMET for Convection`;
+    case 'TS':
+      title = `Center Weather Advisory for Thunderstorms`;
       break;
     case 'ICE':
-      title = `SIGMET for Severe Icing`;
+      title = `Center Weather Advisory for Icing`;
       break;
     case 'IFR':
-      title = `SIGMET for Dust/Sandstorms`;
+      title = `Center Weather Advisory for IFR Conditions`;
       break;
-    case 'ASH':
-      title = `SIGMET for Volcanic Ash`;
+    case 'PCPN':
+      title = `Center Weather Advisory for Precipitation`;
+      break;
+    case 'UNK':
+      title = `Center Weather Advisory`;
       break;
   }
 
   return (
     <BasePopupFrame title={title}>
+      <Typography variant="body2" style={{ margin: 3 }}>
+        <b>CWSU:</b> {`${feature.properties.cwsu} [${feature.properties.name}]`}
+      </Typography>
       <Typography variant="body2" style={{ margin: 3 }}>
         <b>Valid:</b> {convertTimeFormat(feature.properties.validtimefrom)}
       </Typography>
@@ -61,9 +51,9 @@ const SigmetPopup = ({ feature }) => {
       )}
       <Divider></Divider>
       <Typography variant="body2" style={{ margin: 3, whiteSpace: 'pre-wrap' }}>
-        {feature.properties.rawairsigmet}
+        {feature.properties.cwatext}
       </Typography>
     </BasePopupFrame>
   );
 };
-export default SigmetPopup;
+export default CWAPopup;
