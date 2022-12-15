@@ -24,7 +24,7 @@ function CollapsibleBar({
         handleTime={handleTime}
         min={minOfTimeSlider}
         max={maxOfTimeSlider}
-        step={2}
+        step={1}
       />
     </div>
   );

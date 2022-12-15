@@ -106,4 +106,13 @@ z-index: 400!important;
 
 .Map_map__vPSDC{
   height: calc(100vh - 75px)!important;
+  @media screen and (max-width: 1024px) {
+    height: calc(100vh - 114px)!important;
+    top: 70px;
+  }
+
+  @media screen and (max-width: 500px) {
+    height: calc(100vh - 107px)!important;
+    top: 70px;
+  }
 }
