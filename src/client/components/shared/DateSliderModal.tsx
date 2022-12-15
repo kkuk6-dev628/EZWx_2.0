@@ -1,5 +1,6 @@
 import React from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
+import DateSlider from './DateSlider';
 
 //i pass setIsShowModal and showModal as a prop to the modal component
 interface Props {
@@ -20,6 +21,9 @@ function DateSliderModal({ setIsShowDateModal }: Props) {
           </button>
         </div>
         <div className="dates__content">
+          <div className="dates__date__area">
+            <DateSlider />
+          </div>
           <div className="dates__data__area">
             <div className="dates__circle dates__circle__red">&nbsp;</div>
             <p className="dates__text text">

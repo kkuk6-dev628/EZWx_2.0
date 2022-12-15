@@ -51,6 +51,9 @@ function LeafletMap() {
       case 'route':
         setIsShowModal(true);
         break;
+      case 'profile':
+        setIsShowDateModal(!isShowDateModal);
+        break;
       default:
         break;
     }
@@ -107,6 +110,10 @@ function LeafletMap() {
       isHideResponsive: true,
     },
   ];
+
+  const handleTime = (e) => {
+    console.log(e);
+  };
 
   return (
     <div className="map__container">
@@ -166,7 +173,7 @@ function LeafletMap() {
       {isShowDateModal && (
         <DateSliderModal setIsShowDateModal={setIsShowDateModal} />
       )}
-      <CollapsibleBar setIsShowDateModal={setIsShowDateModal} />
+      <CollapsibleBar handleTime={handleTime} />
     </div>
   );
 }

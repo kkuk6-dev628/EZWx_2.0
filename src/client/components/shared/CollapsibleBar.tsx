@@ -1,61 +1,31 @@
 import React, { useState } from 'react';
-import { FaChevronDown } from 'react-icons/fa';
+import TimeSlider from './TimeSlider';
 
-interface Props {
-  setIsShowDateModal: (isShowModal: boolean) => void;
+interface DateData {
+  month: string;
+  weekDay: string;
+  day: number;
+  hour: number;
+  minute: string;
 }
 
-function CollapsibleBar({ setIsShowDateModal }: Props) {
-  const [isColleps, setIsColleps] = useState(false);
+function CollapsibleBar({
+  handleTime,
+}: {
+  handleTime: (time: DateData) => void;
+}) {
+  // const [windowSize, setWindowSize] = useState(setWindowSize());
+  const [minOfTimeSlider, setMinOfTimeSlider] = useState(new Date().getTime());
+  const [maxOfTimeSlider, setMaxOfTimeSlider] = useState(new Date().getTime());
 
-  const randomColorData = ['red', 'green', 'yellow'];
   return (
     <div className="collps">
-      <div className="collps__wrp">
-        <div className="collps__top__area">
-          <div className="collps__btn__area">
-            <button
-              onClick={() => setIsColleps(!isColleps)}
-              className="collps__btn"
-            >
-              05Z
-              <FaChevronDown className="collps__icon" />
-            </button>
-          </div>
-          <div className="collps__dot__area">
-            {[...Array(86)].map((_, index) => (
-              //get
-              <button
-                key={index}
-                onClick={() => setIsShowDateModal(true)}
-                className={`collps__dot__btn ${randomColorData[index % 4]} ${
-                  isColleps ? 'collps__dot__btn--full' : ''
-                }`}
-              >
-                {[...Array(12)].map((_, i) => (
-                  <span key={i} className="collps__dot">
-                    &nbsp;
-                  </span>
-                ))}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="collps__btm__area">
-          <div className="collps__date__area">
-            <p className="collps__date__text">Fri 11</p>
-          </div>
-          <div className="collps__date__area">
-            <p className="collps__date__text">Sut 12</p>
-          </div>
-          <div className="collps__date__area">
-            <p className="collps__date__text">Sun 13</p>
-          </div>
-          <div className="collps__date__area">
-            <p className="collps__date__text">Mon 14</p>
-          </div>
-        </div>
-      </div>
+      <TimeSlider
+        handleTime={handleTime}
+        min={minOfTimeSlider}
+        max={maxOfTimeSlider}
+        step={1}
+      />
     </div>
   );
 }
