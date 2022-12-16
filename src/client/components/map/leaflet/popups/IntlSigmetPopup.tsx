@@ -16,6 +16,7 @@ const qualifiersTranslation = {
   SEV: 'Severe',
   EMBD: 'Embedded',
   OCNL: 'Occasional',
+  FRQ: 'Frequent',
 };
 
 const IntlSigmetPopup = ({ feature }: { feature: any }) => {
@@ -26,8 +27,9 @@ const IntlSigmetPopup = ({ feature }: { feature: any }) => {
     : 'Other';
   let base;
   if (
-    isNaN(parseInt(feature.properties.base)) ||
-    feature.properties.base == '0'
+    feature.properties.base !== null &&
+    (isNaN(parseInt(feature.properties.base)) ||
+      feature.properties.base === '0')
   ) {
     base = 'Surface';
   } else {

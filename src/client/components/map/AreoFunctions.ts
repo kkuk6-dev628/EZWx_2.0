@@ -32,9 +32,15 @@ const translateWeatherClausings = (dueto: string): string => {
   const weatherCausings = dueto.slice(dueto.lastIndexOf(' ') + 1);
   const splitWeatherCausing = weatherCausings.split('/');
   const wc = splitWeatherCausing.map((element) => {
+    if (!WeatherCausings.hasOwnProperty(element)) {
+      return;
+    }
     return WeatherCausings[element];
   });
-  return wc.join(', ').replace(/,(?=[^,]+$)/, ' and');
+  return wc
+    .filter((n) => n)
+    .join(', ')
+    .replace(/,(?=[^,]+$)/, ' and');
 };
 
 const convertTimeFormat = (time: string) => {
