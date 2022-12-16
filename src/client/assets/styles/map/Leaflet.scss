@@ -87,3 +87,28 @@ z-index: 400!important;
     margin: 0 8px 0 0;
   }
 }
+
+.pirep-icon {
+    // width: 44px !important;
+    // height: 38px !important;
+    -ms-border-radius: 0.2rem;
+    border-radius: 0.2rem;
+    background-color: #ffffff;
+    padding: .05rem;
+    text-align: center;
+}
+
+.pirep-span {
+    font-weight: bold;
+    color: #000000;
+}
+.pirep-unk-span {
+    font-size: xx-small;
+    font-weight: bold;
+    color: #000000;
+}
+.pirep-left-icon {
+    border-right-color: gray;
+    border-right-style: ridge;
+    border-right-width: 1px;
+}

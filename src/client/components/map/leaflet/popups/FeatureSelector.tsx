@@ -4,6 +4,7 @@ import BasePopupFrame from './BasePopupFrame';
 import L from 'leaflet';
 import { Divider } from '@material-ui/core';
 import { createElementFromHTML, getThumbnail } from '../../AreoFunctions';
+import { relative } from 'path';
 
 interface FeatureSelectorProps {
   features: L.Layer[];
@@ -20,8 +21,7 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
           layer.feature.geometry.type === 'Point' ||
           layer.feature.geometry.type === 'MultiPoint'
         ) {
-          icon = createElementFromHTML(layer.options.icon.options.html);
-          imgSrc = icon.src;
+          icon = layer.getIcon().createIcon();
         } else {
           let weight = 0.2;
           if (
@@ -153,7 +153,8 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
                 break;
             }
             break;
-          case '':
+          case 'pirep':
+            text = layer.feature.properties.aireptype;
             break;
           default:
             break;
@@ -164,7 +165,28 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
               className="feature-selector-item"
               data-featureid={layer.feature.id}
             >
-              <img className="feature-selector-item-icon" src={imgSrc} />
+              {layer.feature.geometry.type === 'Point' && (
+                <div
+                  style={{
+                    width: 48,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: icon.style.width,
+                      position: 'relative',
+                    }}
+                    className={icon.className}
+                    dangerouslySetInnerHTML={{ __html: icon.innerHTML }}
+                  />
+                </div>
+              )}
+              {layer.feature.geometry.type !== 'Point' && (
+                <img className="feature-selector-item-icon" src={imgSrc} />
+              )}
               <p>{text}</p>
             </span>
             <Divider />

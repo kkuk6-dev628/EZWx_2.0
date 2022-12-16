@@ -79,6 +79,11 @@ const createElementFromHTML = (htmlString) => {
   return div.firstChild;
 };
 
+const addLeadingZeroes = (str, max) => {
+  str = str.toString();
+  return str.length < max ? addLeadingZeroes('0' + str, max) : str;
+};
+
 export {
   getAltitudeString,
   translateWeatherClausings,
@@ -86,4 +91,5 @@ export {
   getThumbnail,
   getBBoxFromPointZoom,
   createElementFromHTML,
+  addLeadingZeroes,
 };

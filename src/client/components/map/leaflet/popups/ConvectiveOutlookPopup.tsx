@@ -12,7 +12,7 @@ const ConvectiveOutlookPopup = ({ feature }: { feature: any }) => {
         <b>Through:</b> {convertTimeFormat(feature.properties.valid_time_to)}
       </Typography>
       <Divider></Divider>
-      <Typography variant="body2" style={{ margin: 3, whiteSpace: 'pre-wrap' }}>
+      <Typography variant="body2" style={{ margin: 3, whiteSpace: 'pre-line' }}>
         {feature.properties.raw_text}
       </Typography>
     </BasePopupFrame>

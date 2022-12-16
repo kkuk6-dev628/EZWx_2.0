@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Children, useEffect, useRef, useState } from 'react';
 import { useMapEvents, GeoJSON } from 'react-leaflet';
 import L from 'leaflet';
 import axios from 'axios';
 import Image from 'next/image';
 import ReactDOMServer from 'react-dom/server';
 import ConvectiveOutlookLayer from './ConvectiveOutlookLayer';
-
+import MarkerClusterGroup from './MarkerClusterGroup';
 interface WFSLayerProps {
   url: string;
   maxFeatures: number;
@@ -17,9 +17,10 @@ interface WFSLayerProps {
   showLabelZoom?: number;
   getLabel?: (feature: L.feature) => string;
   style?: (feature: L.feature) => L.style;
-  pointToLayer?: (feature: L.feature, latlng: any) => L.style;
+  pointToLayer?: (feature: L.feature, latlng: any) => L.Marker;
   highlightStyle?: any;
   filter?: string;
+  isClusteredMarker?: boolean;
 }
 
 const WFSLayer = ({
@@ -35,17 +36,12 @@ const WFSLayer = ({
   pointToLayer,
   highlightStyle,
   filter,
+  isClusteredMarker = false,
 }: WFSLayerProps) => {
   const [geoJSON, setGeoJSON] = useState({
     type: 'FeatureCollection',
     features: [],
   });
-  const ref = useRef(null);
-  let lastZoom;
-
-  useEffect(() => {
-    fetchGeoJSON();
-  }, []);
 
   const map = useMapEvents({
     zoomend: () => {
@@ -79,6 +75,12 @@ const WFSLayer = ({
       if (enableBBoxQuery) fetchGeoJSON();
     },
   });
+  const ref = useRef(null);
+  useEffect(() => {
+    fetchGeoJSON();
+  }, []);
+
+  let lastZoom: number;
 
   let pendingFetch = false;
   const fetchGeoJSON = () => {
@@ -106,27 +108,6 @@ const WFSLayer = ({
       // @ts-ignore
       params.cql_filter = filter;
     }
-    // const paramString = L.Util.getParamString(params);
-    // jsonp(
-    //   url,
-    //   {
-    //     param: paramString.slice(1) + '&',
-    //     name: callbackName,
-    //     timeout: 10000,
-    //   },
-    //   (error, data: any) => {
-    //     // console.log(data);
-    //     if (error) {
-    //       console.error(error);
-    //       setGeoJSON({
-    //         type: 'FeatureCollection',
-    //         features: [],
-    //       });
-    //     } else {
-    //       setGeoJSON(data);
-    //     }
-    //   },
-    // );
     params.outputFormat = 'application/json';
     params.format_options = undefined;
     pendingFetch = true;
@@ -134,14 +115,14 @@ const WFSLayer = ({
       .get(url, { params: params })
       .then((data) => {
         if (typeof data.data === 'string') {
-          console.log(data.data);
+          console.log(typeName + ': Invalid json data!', data.data);
         } else {
           setGeoJSON(data.data);
           map?.removeLayer(ref.current);
         }
       })
       .catch((reason) => {
-        console.log(reason);
+        console.log(typeName, reason);
       })
       .finally(() => {
         pendingFetch = false;
@@ -191,7 +172,34 @@ const WFSLayer = ({
 
   return (
     <>
-      {geoJSON != null && (
+      {isClusteredMarker && (
+        <MarkerClusterGroup
+          // @ts-ignore
+          iconCreateFunction={(cluster) => {
+            return cluster.getAllChildMarkers()[0].getIcon();
+          }}
+          zoomToBoundsOnClick={false}
+          showCoverageOnHover={false}
+          spiderfyOnMaxZoom={false}
+          maxClusterRadius={40}
+        >
+          {geoJSON != null && (
+            <GeoJSON
+              key={JSON.stringify(geoJSON)}
+              ref={ref}
+              data={geoJSON}
+              // @ts-ignore
+              interactive={interactive}
+              // @ts-ignore
+              onEachFeature={onEachFeature}
+              style={style}
+              pointToLayer={pointToLayer}
+              bubblingMouseEvents={true}
+            ></GeoJSON>
+          )}
+        </MarkerClusterGroup>
+      )}
+      {!isClusteredMarker && geoJSON != null && (
         <GeoJSON
           key={JSON.stringify(geoJSON)}
           ref={ref}

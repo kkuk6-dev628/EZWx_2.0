@@ -11,13 +11,13 @@ const SigmetPopup = ({ feature }) => {
   ) {
     base = 'Surface';
   } else {
-    base = getAltitudeString(feature.properties.altitudelow);
+    base = getAltitudeString(feature.properties.altitudelow, false);
   }
   if (feature.properties.hazard === 'CONVECTIVE') {
     base = undefined;
   }
 
-  let top = getAltitudeString(feature.properties.altitudehi);
+  let top = getAltitudeString(feature.properties.altitudehi, false);
   if (feature.properties.altitudehi == '600') {
     top = 'Above 45,000 feet MSL';
   } else if (isNaN(parseInt(feature.properties.altitudehi))) {
@@ -60,7 +60,7 @@ const SigmetPopup = ({ feature }) => {
         </Typography>
       )}
       <Divider></Divider>
-      <Typography variant="body2" style={{ margin: 3, whiteSpace: 'pre-wrap' }}>
+      <Typography variant="body2" style={{ margin: 3, whiteSpace: 'pre-line' }}>
         {feature.properties.rawairsigmet}
       </Typography>
     </BasePopupFrame>

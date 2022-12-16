@@ -20,7 +20,6 @@ import IntlSigmetLayer from './IntlSigmetLayer';
 import { getBBoxFromPointZoom } from '../../AreoFunctions';
 import IntlSigmetPopup from '../popups/IntlSigmetPopup';
 import PirepLayer from './PirepLayer';
-import { width } from 'dom7';
 
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
@@ -83,9 +82,9 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
   const map = useMapEvents({
     click: (e: any) => {
       const features = [];
-      const clickedBBox = getBBoxFromPointZoom(10, e.latlng, map.getZoom());
+      const clickedBBox = getBBoxFromPointZoom(40, e.latlng, map.getZoom());
       layers.forEach((layer) => {
-        layer.layer.resetStyle();
+        layer.layer.resetStyle && layer.layer.resetStyle();
         if (layer.group !== 'Meteo') return;
         layer.layer.eachLayer((l) => {
           if (

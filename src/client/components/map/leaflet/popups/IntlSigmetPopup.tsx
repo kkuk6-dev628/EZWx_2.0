@@ -31,7 +31,7 @@ const IntlSigmetPopup = ({ feature }: { feature: any }) => {
   ) {
     base = 'Surface';
   } else {
-    base = getAltitudeString(feature.properties.base);
+    base = getAltitudeString(feature.properties.base, false);
   }
 
   const top = getAltitudeString(feature.properties.top, false);
@@ -69,7 +69,7 @@ const IntlSigmetPopup = ({ feature }: { feature: any }) => {
         </Typography>
       )}
       <Divider></Divider>
-      <Typography variant="body2" style={{ margin: 3, whiteSpace: 'pre-wrap' }}>
+      <Typography variant="body2" style={{ margin: 3, whiteSpace: 'pre-line' }}>
         {feature.properties.rawsigmet}
       </Typography>
     </BasePopupFrame>

@@ -50,7 +50,7 @@ const CWAPopup = ({ feature }) => {
         </Typography>
       )}
       <Divider></Divider>
-      <Typography variant="body2" style={{ margin: 3, whiteSpace: 'pre-wrap' }}>
+      <Typography variant="body2" style={{ margin: 3, whiteSpace: 'pre-line' }}>
         {feature.properties.cwatext}
       </Typography>
     </BasePopupFrame>
