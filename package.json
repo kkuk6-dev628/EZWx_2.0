@@ -44,6 +44,8 @@
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "apollo-server-express": "^3.11.1",
     "axios": "^1.2.1",
+    "bcrypt": "^5.1.0",
+    "class-validator": "^0.14.0",
     "commander": "^9.4.1",
     "cookie-parser": "^1.4.6",
     "geojson-to-svg": "^1.1.4",
