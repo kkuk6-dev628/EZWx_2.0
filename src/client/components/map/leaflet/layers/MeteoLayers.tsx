@@ -20,6 +20,7 @@ import IntlSigmetLayer from './IntlSigmetLayer';
 import { getBBoxFromPointZoom } from '../../AreoFunctions';
 import IntlSigmetPopup from '../popups/IntlSigmetPopup';
 import PirepLayer from './PirepLayer';
+import PIREPPopup from '../popups/PIREPPopup';
 
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
@@ -62,6 +63,9 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           ></ConvectiveOutlookPopup>
         );
         useWidePopup = true;
+        break;
+      case 'pirep':
+        popup = <PIREPPopup feature={layer.feature}></PIREPPopup>;
         break;
       default:
         popup = (
