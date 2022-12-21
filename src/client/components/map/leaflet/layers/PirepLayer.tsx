@@ -2,7 +2,7 @@ import WFSLayer from './WFSLayer';
 import L from 'leaflet';
 import Image from 'next/image';
 import ReactDOMServer from 'react-dom/server';
-import { useMap } from 'react-leaflet';
+import { Pane, useMap } from 'react-leaflet';
 import { addLeadingZeroes } from '../../AreoFunctions';
 
 const PirepLayer = () => {
@@ -96,7 +96,7 @@ const PirepLayer = () => {
         iconAnchor: [11, 19],
         //popupAnchor: [0, -10]
       }),
-      // pane: 'pirepsPane',
+      pane: 'pirep',
     });
     return pirepMarker;
   };
@@ -129,7 +129,7 @@ const PirepLayer = () => {
         iconAnchor: [22, 19],
         //popupAnchor: [0, -18]
       }),
-      // pane: 'pirepsPane',
+      pane: 'pirep',
     });
     return pirepMarker;
   };
@@ -176,46 +176,44 @@ const PirepLayer = () => {
     return pirepMarker;
   };
 
-  const getLabel = (feature) => {
-    return feature.properties.hazard;
-  };
-
   return (
-    <WFSLayer
-      url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
-      maxFeatures={256}
-      typeName="EZWxBrief:pirep"
-      propertyNames={[
-        'wkb_geometry',
-        'ogc_fid',
-        'icaoid',
-        'aireptype',
-        'obstime',
-        'actype',
-        'temp',
-        'wdir',
-        'wspd',
-        'cloudcvg1',
-        'cloudbas1',
-        'cloudtop1',
-        'cloudcvg2',
-        'cloudbas2',
-        'cloudtop2',
-        'wxstring',
-        'fltlvl',
-        'fltlvltype',
-        'tbint1',
-        'tbtype1',
-        'tbfreq1',
-        'icgint1',
-        'icgtype1',
-        'brkaction',
-        'rawob',
-      ]}
-      pointToLayer={pointToLayer}
-      getLabel={getLabel}
-      isClusteredMarker={true}
-    ></WFSLayer>
+    <Pane name={'pirep'} style={{ zIndex: 699 }}>
+      <WFSLayer
+        url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
+        maxFeatures={256}
+        typeName="EZWxBrief:pirep"
+        propertyNames={[
+          'wkb_geometry',
+          'ogc_fid',
+          'icaoid',
+          'aireptype',
+          'obstime',
+          'actype',
+          'temp',
+          'wdir',
+          'wspd',
+          'cloudcvg1',
+          'cloudbas1',
+          'cloudtop1',
+          'cloudcvg2',
+          'cloudbas2',
+          'cloudtop2',
+          'wxstring',
+          'fltlvl',
+          'fltlvltype',
+          'tbint1',
+          'tbtype1',
+          'tbfreq1',
+          'icgint1',
+          'icgtype1',
+          'brkaction',
+          'rawob',
+        ]}
+        pointToLayer={pointToLayer}
+        isClusteredMarker={true}
+        markerPane={'pirep'}
+      ></WFSLayer>
+    </Pane>
   );
 };
 

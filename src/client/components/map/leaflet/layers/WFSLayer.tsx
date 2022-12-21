@@ -21,6 +21,7 @@ interface WFSLayerProps {
   highlightStyle?: any;
   filter?: string;
   isClusteredMarker?: boolean;
+  markerPane?: string;
 }
 
 const WFSLayer = ({
@@ -37,6 +38,7 @@ const WFSLayer = ({
   highlightStyle,
   filter,
   isClusteredMarker = false,
+  markerPane,
 }: WFSLayerProps) => {
   const [geoJSON, setGeoJSON] = useState({
     type: 'FeatureCollection',
@@ -181,7 +183,8 @@ const WFSLayer = ({
           zoomToBoundsOnClick={false}
           showCoverageOnHover={false}
           spiderfyOnMaxZoom={false}
-          maxClusterRadius={40}
+          maxClusterRadius={30}
+          clusterPane={markerPane ? markerPane : undefined}
         >
           {geoJSON != null && (
             <GeoJSON

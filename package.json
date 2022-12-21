@@ -51,6 +51,7 @@
     "graphql": "^16.6.0",
     "jsonp": "^0.2.1",
     "leaflet": "^1.9.3",
+    "leaflet-responsive-popup": "^1.0.0",
     "leaflet.markercluster": "^1.5.3",
     "lodash.groupby": "^4.6.0",
     "nestjs-console": "^8.0.0",

@@ -21,6 +21,8 @@ import { getBBoxFromPointZoom } from '../../AreoFunctions';
 import IntlSigmetPopup from '../popups/IntlSigmetPopup';
 import PirepLayer from './PirepLayer';
 import PIREPPopup from '../popups/PIREPPopup';
+import 'leaflet-responsive-popup';
+import 'leaflet-responsive-popup/leaflet.responsive.popup.css';
 
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
@@ -66,6 +68,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         break;
       case 'pirep':
         popup = <PIREPPopup feature={layer.feature}></PIREPPopup>;
+        useWidePopup = true;
         break;
       default:
         popup = (
@@ -77,7 +80,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         useWidePopup = false;
     }
     const popupContent = ReactDOMServer.renderToString(popup);
-    L.popup({ minWidth: useWidePopup ? 320 : 196 })
+    L.responsivePopup({ minWidth: useWidePopup ? 320 : 196, offset: [10, 19] })
       .setLatLng(latlng)
       .setContent(popupContent)
       .openOn(map);
@@ -117,7 +120,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
       } else if (features.length === 1) {
         showPopup(features[0], e.latlng);
       } else {
-        L.popup()
+        L.responsivePopup({ offset: [10, 19] })
           .setLatLng(e.latlng)
           .setContent(
             ReactDOMServer.renderToString(
@@ -171,8 +174,8 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
             }}
           ></WFSLayer>
         </GroupedLayer>
-        <GroupedLayer checked name="GAirmet" group="Meteo">
-          <GairmetLayer></GairmetLayer>
+        <GroupedLayer checked name="Pirep" group="Meteo">
+          <PirepLayer></PirepLayer>
         </GroupedLayer>
         <GroupedLayer checked name="SIGMET" group="Meteo">
           <SigmetLayer></SigmetLayer>
@@ -186,8 +189,15 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         <GroupedLayer checked name="Convetive Outlook" group="Meteo">
           <ConvectiveOutlookLayer></ConvectiveOutlookLayer>
         </GroupedLayer>
-        <GroupedLayer checked name="Pirep" group="Meteo">
-          <PirepLayer></PirepLayer>
+        <GroupedLayer checked name="GAirmet" group="Meteo">
+          <GairmetLayer></GairmetLayer>
+        </GroupedLayer>
+        <GroupedLayer checked name="Metar" group="Meteo">
+          <WFSLayer
+            url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
+            maxFeatures={1024}
+            typeName="EZWxBrief:metar"
+          ></WFSLayer>
         </GroupedLayer>
       </LayerControl>
     </>

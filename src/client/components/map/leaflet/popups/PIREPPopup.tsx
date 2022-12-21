@@ -65,7 +65,9 @@ const PIREPPopup = ({ feature }) => {
       <Typography variant="body2" style={{ margin: 3 }}>
         <b>Time:</b> {convertTimeFormat(feature.properties.obstime)}
       </Typography>
-      {feature.properties.fltlvl && feature.properties.fltlvl !== 'UNK' ? (
+      {feature.properties.fltlvl &&
+      feature.properties.fltlvl !== 'UNK' &&
+      feature.properties.fltlvl !== '000' ? (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Flight level:</b> {feature.properties.fltlvl}
         </Typography>
@@ -117,22 +119,26 @@ const PIREPPopup = ({ feature }) => {
       )}
       {turbulenceIntensityTranslations[feature.properties.tbint1] && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Turbulence intensity:</b> {turbulenceIntensityTranslations[feature.properties.tbint1]}
+          <b>Turbulence intensity:</b>{' '}
+          {turbulenceIntensityTranslations[feature.properties.tbint1]}
         </Typography>
       )}
       {turblenceTypeTranslations[feature.properties.tbtype1] && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Turbulence type:</b> {turblenceTypeTranslations[feature.properties.tbtype1]}
+          <b>Turbulence type:</b>{' '}
+          {turblenceTypeTranslations[feature.properties.tbtype1]}
         </Typography>
       )}
       {turbulenceFrequencyTranslations[feature.properties.tbfreq1] && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Turbulence frequency:</b> {turbulenceFrequencyTranslations[feature.properties.tbfreq1]}
+          <b>Turbulence frequency:</b>{' '}
+          {turbulenceFrequencyTranslations[feature.properties.tbfreq1]}
         </Typography>
       )}
       {cloudCoverageTranslations[feature.properties.cloudcvg1] && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Cloud coverage:</b> {cloudCoverageTranslations[feature.properties.cloudcvg1]}
+          <b>Cloud coverage:</b>{' '}
+          {cloudCoverageTranslations[feature.properties.cloudcvg1]}
         </Typography>
       )}
       {feature.properties.cloudbas1 && (

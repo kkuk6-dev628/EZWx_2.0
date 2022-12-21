@@ -5747,6 +5747,11 @@ lazy-ass@^1.6.0:
   resolved "https://registry.yarnpkg.com/lazy-ass/-/lazy-ass-1.6.0.tgz#7999655e8646c17f089fdd187d150d3324d54513"
   integrity sha512-cc8oEVoctTvsFZ/Oje/kGnHbpWHYBe8IAJe4C0QNc3t8uM/0Y8+erSz/7Y1ALuXTEZTMvxXwO6YbX1ey3ujiZw==
 
+leaflet-responsive-popup@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/leaflet-responsive-popup/-/leaflet-responsive-popup-1.0.0.tgz#5d6011debb46c339b0fe8c8e84da4ebf7229a699"
+  integrity sha512-BEPnq057TyTtBH5I98SMWqH4p/Usi6yirWPUSIYI2EGjXN3/HbyTPjTmEe6Z2RXBTBzEN3nMC8ZkaRWQ0pWfeQ==
+
 leaflet.markercluster@^1.5.3:
   version "1.5.3"
   resolved "https://registry.yarnpkg.com/leaflet.markercluster/-/leaflet.markercluster-1.5.3.tgz#9cdb52a4eab92671832e1ef9899669e80efc4056"
