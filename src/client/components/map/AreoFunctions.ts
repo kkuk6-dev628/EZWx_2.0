@@ -56,6 +56,17 @@ const convertTimeFormat = (time: string) => {
   })}`;
 };
 
+const simpleTimeFormat = (time: Date) => {
+  return `${time.toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'short',
+  })} ${time.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })}`;
+};
+
 const getThumbnail = (feature, style) => {
   const svgString = geojson2svg()
     .styles({ Polygon: style })
@@ -98,4 +109,5 @@ export {
   getBBoxFromPointZoom,
   createElementFromHTML,
   addLeadingZeroes,
+  simpleTimeFormat,
 };

@@ -192,13 +192,13 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         <GroupedLayer checked name="GAirmet" group="Meteo">
           <GairmetLayer></GairmetLayer>
         </GroupedLayer>
-        <GroupedLayer checked name="Metar" group="Meteo">
+        {/* <GroupedLayer checked name="Metar" group="Meteo">
           <WFSLayer
             url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
             maxFeatures={1024}
             typeName="EZWxBrief:metar"
           ></WFSLayer>
-        </GroupedLayer>
+        </GroupedLayer> */}
       </LayerControl>
     </>
   );

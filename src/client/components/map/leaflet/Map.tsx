@@ -111,8 +111,8 @@ function LeafletMap() {
     },
   ];
 
-  const handleTime = (e) => {
-    console.log(e);
+  const handleTime = (time) => {
+    console.log(time);
   };
 
   return (
