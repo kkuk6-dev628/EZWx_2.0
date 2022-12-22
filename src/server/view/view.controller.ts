@@ -31,6 +31,20 @@ export class ViewController {
       );
   }
 
+  @Get('signin')
+  public async showSignIn(@Req() req: Request, @Res() res: Response) {
+    const parsedUrl = parse(req.url, true);
+
+    await this.viewService.getNextServer().render(req, res, parsedUrl.pathname);
+  }
+
+  @Get('signup')
+  public async showSignUp(@Req() req: Request, @Res() res: Response) {
+    const parsedUrl = parse(req.url, true);
+
+    await this.viewService.getNextServer().render(req, res, parsedUrl.pathname);
+  }
+
   @Get('pricing')
   public async showPricing(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);

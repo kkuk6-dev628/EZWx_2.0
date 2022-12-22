@@ -3,6 +3,8 @@ import { FaChevronDown } from 'react-icons/fa';
 import { DateObject } from 'react-multi-date-picker';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { setTimeSliderValue } from '../../features/timeSlider/timeSliderSlice';
 interface DateData {
   month: string;
   weekDay: string;
@@ -22,13 +24,13 @@ function TimeSlider({
   max: number;
   step: number;
 }) {
+  const dispatch = useDispatch();
+  const { timeSlider } = useSelector((state: any) => state);
   const [selectedDate, setSelectedDate] = useState(null);
   const [date, setDate] = useState(new DateObject());
   const [isColleps, setIsColleps] = useState(false);
   const randomColorData = ['red', 'green', 'yellow'];
-  console.log(min, ' ', max, ' ', step);
   const [timeSliderSteps, setTimeSliderSteps] = useState(24 / step);
-  console.log(timeSliderSteps);
 
   const getTime = (key, value, childIndex) => {
     if (key === 'hour' && value < 0) {
@@ -101,7 +103,7 @@ function TimeSlider({
         return '00';
     }
   };
-  console.log(date);
+  // console.log(date);
 
   const hnadelSetDate = (index, limit, childIndex) => {
     //index and limit is 0 then it will be current date
@@ -114,11 +116,23 @@ function TimeSlider({
         hour: newDate.hour,
         minute: handleMinute(childIndex),
       };
+      console.log(dateData);
       handleTime(dateData);
       setSelectedDate(dateData);
+      dispatch(
+        setTimeSliderValue({
+          payload: dateData,
+        }),
+      );
     } else {
-      handleTime(getTime('hour', index - limit, childIndex));
-      setSelectedDate(getTime('hour', index - limit, childIndex));
+      const time = getTime('hour', index - limit, childIndex);
+      handleTime(time);
+      setSelectedDate(time);
+      dispatch(
+        setTimeSliderValue({
+          payload: time,
+        }),
+      );
     }
   };
 

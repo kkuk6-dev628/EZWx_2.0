@@ -17,6 +17,7 @@
 @import "./shared//CollapsibleBar.scss";
 @import "./shared/DateSliderModal.scss";
 @import "./shared/DateSlider.scss";
+@import "./shared/CustomInput.scss";
 
 
 /*-------------- Pages -------------*/
@@ -24,6 +25,9 @@
 //Home
 @import "./pages/home/HomeHero.scss";
 @import "./pages/home/HomeAbout.scss";
+
+//Signin
+@import "./pages/signin.scss";
 
 
 //pricing
