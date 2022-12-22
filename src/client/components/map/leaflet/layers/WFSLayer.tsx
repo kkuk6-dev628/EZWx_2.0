@@ -7,6 +7,7 @@ import Image from 'next/image';
 import ReactDOMServer from 'react-dom/server';
 import ConvectiveOutlookLayer from './ConvectiveOutlookLayer';
 import MarkerClusterGroup from './MarkerClusterGroup';
+import { generateHash } from '../../AreoFunctions';
 interface WFSLayerProps {
   url: string;
   maxFeatures: number;
@@ -19,7 +20,8 @@ interface WFSLayerProps {
   style?: (feature: L.feature) => L.style;
   pointToLayer?: (feature: L.feature, latlng: any) => L.Marker;
   highlightStyle?: any;
-  filter?: string;
+  serverFilter?: string;
+  clientFilter?: (feature: L.feature) => boolean;
   isClusteredMarker?: boolean;
   markerPane?: string;
 }
@@ -36,7 +38,8 @@ const WFSLayer = ({
   style,
   pointToLayer,
   highlightStyle,
-  filter,
+  serverFilter: filter,
+  clientFilter,
   isClusteredMarker = false,
   markerPane,
 }: WFSLayerProps) => {
@@ -44,6 +47,32 @@ const WFSLayer = ({
     type: 'FeatureCollection',
     features: [],
   });
+
+  const [displayedData, setDisplayedData] = useState({
+    type: 'FeatureCollection',
+    features: [],
+  });
+
+  const [geoJsonKey, setGeoJsonKey] = useState(12034512);
+
+  useEffect(() => {
+    const newKey = generateHash(JSON.stringify(displayedData));
+    setGeoJsonKey(newKey);
+  }, [displayedData]);
+
+  useEffect(() => {
+    if (clientFilter && geoJSON.features.length > 0) {
+      const filteredFeatures = geoJSON.features.filter((feature) =>
+        clientFilter(feature),
+      );
+      setDisplayedData({
+        type: 'FeatureCollection',
+        features: filteredFeatures,
+      });
+    } else {
+      setDisplayedData(geoJSON);
+    }
+  }, [geoJSON]);
 
   const map = useMapEvents({
     zoomend: () => {
@@ -131,28 +160,27 @@ const WFSLayer = ({
       });
   };
 
-  function clickFeature(e) {
-    // highlightFeature(e);
-    // console.log('Layer clicked', e.target.feature.id);
-  }
-  function highlightFeature(e) {
-    const layer = e.target;
-    layer.setStyle(
-      highlightStyle ?? {
-        weight: 5,
-      },
-    );
-    layer.bringToFront();
-  }
-  function resetHighlight() {
-    const layer = ref.current;
-    if (layer) layer.resetStyle();
-  }
+  // function clickFeature(e) {
+  //   // highlightFeature(e);
+  //   // console.log('Layer clicked', e.target.feature.id);
+  // }
+  // function highlightFeature(e) {
+  //   const layer = e.target;
+  //   layer.setStyle(
+  //     highlightStyle ?? {
+  //       weight: 5,
+  //     },
+  //   );
+  //   layer.bringToFront();
+  // }
+  // function resetHighlight() {
+  //   const layer = ref.current;
+  //   if (layer) layer.resetStyle();
+  // }
 
   const onEachFeature = (feature, layer) => {
     if (feature.properties) {
       if (getLabel) {
-        // const center = layer.getBounds().getCenter();
         layer.bindTooltip(getLabel(feature), {
           permanent: false,
           direction: 'center',
@@ -160,16 +188,7 @@ const WFSLayer = ({
           opacity: 1,
         });
       }
-      // const popupContent = ReactDOMServer.renderToString(
-      //   <GeneralPopup feature={feature} title={typeName} />,
-      // );
-      // layer.bindPopup(popupContent);
     }
-    layer.on({
-      // mouseover: highlightFeature,
-      // mouseout: resetHighlight,
-      click: clickFeature,
-    });
   };
 
   return (
@@ -188,7 +207,7 @@ const WFSLayer = ({
         >
           {geoJSON != null && (
             <GeoJSON
-              key={JSON.stringify(geoJSON)}
+              key={geoJsonKey}
               ref={ref}
               data={geoJSON}
               // @ts-ignore
@@ -204,7 +223,7 @@ const WFSLayer = ({
       )}
       {!isClusteredMarker && geoJSON != null && (
         <GeoJSON
-          key={JSON.stringify(geoJSON)}
+          key={geoJsonKey}
           ref={ref}
           data={geoJSON}
           // @ts-ignore
