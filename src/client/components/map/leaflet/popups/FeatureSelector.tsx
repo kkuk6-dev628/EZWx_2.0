@@ -4,16 +4,17 @@ import BasePopupFrame from './BasePopupFrame';
 import L from 'leaflet';
 import { Divider } from '@material-ui/core';
 import { getThumbnail } from '../../common/AreoFunctions';
+import { FeatureCollection } from 'geojson';
 
 interface FeatureSelectorProps {
   features: L.Layer[];
-  onSelect: (feature: L.Feature) => void;
+  onSelect: (feature: GeoJSON.Feature) => void;
 }
 const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
   return (
     <BasePopupFrame title="Select Object">
       <div style={{ maxHeight: 320, overflowY: 'auto' }}>
-        {features.map((layer) => {
+        {features.map((layer: any) => {
           const layerName = layer.feature.id.split('.')[0];
           let text = layerName;
           let icon, imgSrc, base;

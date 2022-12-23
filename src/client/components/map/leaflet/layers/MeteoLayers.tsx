@@ -2,7 +2,7 @@
 import LayerControl, { GroupedLayer } from '../layer-control/LayerControl';
 import WFSLayer from './WFSLayer';
 import { useMapEvents } from 'react-leaflet';
-import L from 'leaflet';
+import L, { LatLng } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
 import { useState } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
@@ -17,11 +17,7 @@ import CWAPopup from '../popups/CWAPopup';
 import ConvectiveOutlookLayer from './ConvectiveOutlookLayer';
 import ConvectiveOutlookPopup from '../popups/ConvectiveOutlookPopup';
 import IntlSigmetLayer from './IntlSigmetLayer';
-import {
-  getBBoxFromPointZoom,
-  getQueryTime,
-  getTimeRangeStart,
-} from '../../common/AreoFunctions';
+import { getBBoxFromPointZoom, getQueryTime } from '../../common/AreoFunctions';
 import IntlSigmetPopup from '../popups/IntlSigmetPopup';
 import PirepLayer from './PirepLayer';
 import PIREPPopup from '../popups/PIREPPopup';
@@ -35,13 +31,14 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
     console.log(feature);
   };
 
-  const showPopup = (layer: L.Layer, latlng: any): void => {
+  const showPopup = (layer: L.GeoJSON, latlng: LatLng): void => {
     if (typeof layer.setStyle === 'function') {
       layer.setStyle({
         weight: 8,
       });
     }
 
+    // @ts-ignore
     const layerName = layer.feature.id.split('.')[0];
     let popup;
     let useWidePopup = false;
@@ -204,7 +201,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
             url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
             maxFeatures={10000}
             typeName="EZWxBrief:metar"
-            pointToLayer={(feature, latlng) => {
+            pointToLayer={(feature: GeoJSON.Feature, latlng: LatLng) => {
               return L.circleMarker(latlng, { color: '#990', weight: 1 });
             }}
             serverFilter={`observation_time DURING ${getQueryTime(current)}`}

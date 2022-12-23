@@ -1,15 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { Children, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useMapEvents, GeoJSON } from 'react-leaflet';
-import L from 'leaflet';
+import L, { LatLng, PathOptions } from 'leaflet';
 import axios from 'axios';
-import Image from 'next/image';
-import ReactDOMServer from 'react-dom/server';
-import ConvectiveOutlookLayer from './ConvectiveOutlookLayer';
 import MarkerClusterGroup from './MarkerClusterGroup';
 import { useSelector } from 'react-redux';
 import { selectObsTime } from '../../../../store/ObsTimeSlice';
 import { generateHash } from '../../common/AreoFunctions';
+import { FeatureCollection } from 'geojson';
 
 interface WFSLayerProps {
   url: string;
@@ -19,12 +17,11 @@ interface WFSLayerProps {
   enableBBoxQuery?: boolean;
   interactive?: boolean;
   showLabelZoom?: number;
-  getLabel?: (feature: L.feature) => string;
-  style?: (feature: L.feature) => L.style;
-  pointToLayer?: (feature: L.feature, latlng: any) => L.Marker;
-  highlightStyle?: any;
+  getLabel?: (feature: GeoJSON.Feature) => string;
+  style?: (feature: GeoJSON.Feature) => PathOptions;
+  pointToLayer?: (feature: GeoJSON.Feature, latlng: LatLng) => L.Layer;
   serverFilter?: string;
-  clientFilter?: (feature: L.feature, obsTime: Date) => boolean;
+  clientFilter?: (feature: GeoJSON.Feature, obsTime: Date) => boolean;
   isClusteredMarker?: boolean;
   markerPane?: string;
 }
@@ -40,19 +37,19 @@ const WFSLayer = ({
   getLabel,
   style,
   pointToLayer,
-  highlightStyle,
   serverFilter: filter,
   clientFilter,
   isClusteredMarker = false,
   markerPane,
 }: WFSLayerProps) => {
   const observationTime = useSelector(selectObsTime);
-  const [geoJSON, setGeoJSON] = useState({
+
+  const [geoJSON, setGeoJSON] = useState<FeatureCollection>({
     type: 'FeatureCollection',
     features: [],
   });
 
-  const [displayedData, setDisplayedData] = useState({
+  const [displayedData, setDisplayedData] = useState<FeatureCollection>({
     type: 'FeatureCollection',
     features: [],
   });

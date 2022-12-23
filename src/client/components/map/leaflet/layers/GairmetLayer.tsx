@@ -1,10 +1,11 @@
+import { PathOptions } from 'leaflet';
 import WFSLayer from './WFSLayer';
 
 const GairmetLayer = () => {
-  const gairmetStyle = (feature) => {
+  const gairmetStyle = (feature: GeoJSON.Feature): PathOptions => {
     const style = {
       color: '#333333',
-      weight: '2',
+      weight: 2,
       dashArray: '60 6 6 6',
       opacity: 0.7,
     };

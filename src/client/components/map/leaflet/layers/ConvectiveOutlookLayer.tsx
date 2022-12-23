@@ -1,16 +1,17 @@
+import { PathOptions } from 'leaflet';
 import WFSLayer from './WFSLayer';
 
 const ConvectiveOutlookLayer = () => {
-  const style = (feature) => {
+  const style = (): PathOptions => {
     const style = {
       color: '#F0F000',
-      weight: '2',
+      weight: 2,
       opacity: 0.7,
     };
     return style;
   };
 
-  const getLabel = (feature) => {
+  const getLabel = (): string => {
     const label = 'Conv Outlook';
     // switch (feature.properties.hazard) {
     //   case 'CONVECTIVE':

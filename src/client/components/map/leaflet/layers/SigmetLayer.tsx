@@ -1,16 +1,17 @@
+import { PathOptions } from 'leaflet';
 import WFSLayer from './WFSLayer';
 
 const SigmetLayer = () => {
-  const gairmetStyle = (feature) => {
+  const gairmetStyle = (): PathOptions => {
     const style = {
       color: '#F50000',
-      weight: '2',
+      weight: 2,
       opacity: 0.7,
     };
     return style;
   };
 
-  const getLabel = (feature) => {
+  const getLabel = (feature: GeoJSON.Feature) => {
     let label;
     switch (feature.properties.hazard) {
       case 'CONVECTIVE':
@@ -32,6 +33,18 @@ const SigmetLayer = () => {
     return label;
   };
 
+  const clientFilter = (
+    feature: GeoJSON.Feature,
+    observationTime: Date,
+  ): boolean => {
+    const start = new Date(feature.properties.obstime);
+    const end = new Date(feature.properties.obstime);
+    end.setMinutes(end.getMinutes() + 75);
+    end.setSeconds(0);
+    end.setMilliseconds(0);
+    return start <= observationTime && observationTime < end;
+  };
+
   return (
     <WFSLayer
       url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
@@ -49,6 +62,7 @@ const SigmetLayer = () => {
       ]}
       style={gairmetStyle}
       getLabel={getLabel}
+      clientFilter={clientFilter}
     ></WFSLayer>
   );
 };

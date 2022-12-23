@@ -1,16 +1,17 @@
+import { PathOptions } from 'leaflet';
 import WFSLayer from './WFSLayer';
 
 const CWALayer = () => {
-  const style = (feature) => {
+  const style = (): PathOptions => {
     const style = {
       color: '#3BF5E3',
-      weight: '2',
+      weight: 2,
       opacity: 0.7,
     };
     return style;
   };
 
-  const getLabel = (feature) => {
+  const getLabel = (feature: GeoJSON.Feature): string => {
     const label = feature.properties.hazard;
     // switch (feature.properties.hazard) {
     //   case 'CONVECTIVE':

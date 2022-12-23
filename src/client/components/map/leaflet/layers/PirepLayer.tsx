@@ -1,5 +1,5 @@
 import WFSLayer from './WFSLayer';
-import L from 'leaflet';
+import L, { LatLng } from 'leaflet';
 import Image from 'next/image';
 import ReactDOMServer from 'react-dom/server';
 import { Pane, useMap } from 'react-leaflet';
@@ -137,8 +137,8 @@ const PirepLayer = () => {
     return pirepMarker;
   };
 
-  const pointToLayer = (feature, latlng) => {
-    let pirepMarker;
+  const pointToLayer = (feature: GeoJSON.Feature, latlng: LatLng): L.Layer => {
+    let pirepMarker: L.Layer;
     if (
       feature.properties.tbint1 !== null &&
       feature.properties.icgint1 !== null
@@ -179,6 +179,18 @@ const PirepLayer = () => {
     return pirepMarker;
   };
 
+  const clientFilter = (
+    feature: GeoJSON.Feature,
+    observationTime: Date,
+  ): boolean => {
+    const start = new Date(feature.properties.obstime);
+    const end = new Date(feature.properties.obstime);
+    end.setMinutes(end.getMinutes() + 75);
+    end.setSeconds(0);
+    end.setMilliseconds(0);
+    return start <= observationTime && observationTime < end;
+  };
+
   return (
     <Pane name={'pirep'} style={{ zIndex: 699 }}>
       <WFSLayer
@@ -216,14 +228,7 @@ const PirepLayer = () => {
         isClusteredMarker={true}
         markerPane={'pirep'}
         serverFilter={`obstime AFTER ${getTimeRangeStart().toISOString()}`}
-        clientFilter={(feature: L.feature, observationTime: Date): boolean => {
-          const start = new Date(feature.properties.obstime);
-          const end = new Date(feature.properties.obstime);
-          end.setMinutes(end.getMinutes() + 75);
-          end.setSeconds(0);
-          end.setMilliseconds(0);
-          return start <= observationTime && observationTime < end;
-        }}
+        clientFilter={clientFilter}
       ></WFSLayer>
     </Pane>
   );
