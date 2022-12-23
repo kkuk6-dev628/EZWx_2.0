@@ -46,8 +46,7 @@ const WFSLayer = ({
   isClusteredMarker = false,
   markerPane,
 }: WFSLayerProps) => {
-  const selector = useSelector(selectObsTime);
-  console.log('selector', selector);
+  const observationTime = useSelector(selectObsTime);
   const [geoJSON, setGeoJSON] = useState({
     type: 'FeatureCollection',
     features: [],
@@ -68,7 +67,7 @@ const WFSLayer = ({
   useEffect(() => {
     if (clientFilter && geoJSON.features.length > 0) {
       const filteredFeatures = geoJSON.features.filter((feature) =>
-        clientFilter(feature, new Date()),
+        clientFilter(feature, new Date(observationTime)),
       );
       setDisplayedData({
         type: 'FeatureCollection',
@@ -78,6 +77,18 @@ const WFSLayer = ({
       setDisplayedData(geoJSON);
     }
   }, [geoJSON]);
+
+  useEffect(() => {
+    if (clientFilter && geoJSON.features.length > 0) {
+      const filteredFeatures = geoJSON.features.filter((feature) =>
+        clientFilter(feature, new Date(observationTime)),
+      );
+      setDisplayedData({
+        type: 'FeatureCollection',
+        features: filteredFeatures,
+      });
+    }
+  }, [observationTime]);
 
   const map = useMapEvents({
     zoomend: () => {
@@ -219,7 +230,7 @@ const WFSLayer = ({
             <GeoJSON
               key={geoJsonKey}
               ref={ref}
-              data={geoJSON}
+              data={displayedData}
               // @ts-ignore
               interactive={interactive}
               // @ts-ignore
@@ -235,7 +246,7 @@ const WFSLayer = ({
         <GeoJSON
           key={geoJsonKey}
           ref={ref}
-          data={geoJSON}
+          data={displayedData}
           // @ts-ignore
           interactive={interactive}
           // @ts-ignore

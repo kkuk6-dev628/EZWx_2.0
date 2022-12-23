@@ -53,17 +53,19 @@ const convertTimeFormat = (time: string) => {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
+    timeZoneName: 'short',
   })}`;
 };
 
 const simpleTimeFormat = (time: Date) => {
   return `${time.toLocaleDateString('en-US', {
-    day: 'numeric',
+    day: '2-digit',
     month: 'short',
   })} ${time.toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
+    timeZoneName: 'short',
   })}`;
 };
 
@@ -131,6 +133,11 @@ const getQueryTime = (time: Date): string => {
   return start.toISOString() + '/' + time.toISOString();
 };
 
+const diffMinutes = (date1: Date, date2: Date) => {
+  const diff = (date1.getTime() - date2.getTime()) / (60 * 1000);
+  return Math.abs(Math.round(diff));
+};
+
 export {
   getAltitudeString,
   translateWeatherClausings,
@@ -143,4 +150,5 @@ export {
   simpleTimeFormat,
   getTimeRangeStart,
   getQueryTime,
+  diffMinutes,
 };

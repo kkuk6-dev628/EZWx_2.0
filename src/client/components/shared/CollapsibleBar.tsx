@@ -2,18 +2,28 @@
 import Slider from '@mui/material/Slider';
 import React from 'react';
 import {
+  diffMinutes,
   getTimeRangeStart,
   simpleTimeFormat,
 } from '../map/common/AreoFunctions';
 import { useDispatch } from 'react-redux';
 import { setObsTime } from '../../store/ObsTimeSlice';
+
 function CollapsibleBar() {
   const dispatch = useDispatch();
-  const valueToTime = (value) => {
+
+  const valueToTime = (value: number): Date => {
     const origin = getTimeRangeStart();
     origin.setMinutes(value * 5);
     return origin;
   };
+
+  const timeToValue = (time: Date): number => {
+    const origin = getTimeRangeStart();
+    const diff = diffMinutes(time, origin);
+    return Math.floor(diff / 5);
+  };
+
   const marks = [
     {
       value: 0,
@@ -50,7 +60,7 @@ function CollapsibleBar() {
       <Slider
         style={{ width: '90%' }}
         aria-label="Time Slider"
-        defaultValue={80}
+        defaultValue={timeToValue(new Date())}
         max={84 * 12}
         valueLabelFormat={valuetext}
         step={1}

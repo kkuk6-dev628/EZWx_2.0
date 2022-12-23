@@ -220,7 +220,9 @@ const PirepLayer = () => {
           const start = new Date(feature.properties.obstime);
           const end = new Date(feature.properties.obstime);
           end.setMinutes(end.getMinutes() + 75);
-          return start <= observationTime && observationTime > end;
+          end.setSeconds(0);
+          end.setMilliseconds(0);
+          return start <= observationTime && observationTime < end;
         }}
       ></WFSLayer>
     </Pane>
