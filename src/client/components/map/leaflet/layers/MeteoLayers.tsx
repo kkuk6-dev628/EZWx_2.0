@@ -17,7 +17,11 @@ import CWAPopup from '../popups/CWAPopup';
 import ConvectiveOutlookLayer from './ConvectiveOutlookLayer';
 import ConvectiveOutlookPopup from '../popups/ConvectiveOutlookPopup';
 import IntlSigmetLayer from './IntlSigmetLayer';
-import { getBBoxFromPointZoom } from '../../AreoFunctions';
+import {
+  getBBoxFromPointZoom,
+  getQueryTime,
+  getTimeRangeStart,
+} from '../../common/AreoFunctions';
 import IntlSigmetPopup from '../popups/IntlSigmetPopup';
 import PirepLayer from './PirepLayer';
 import PIREPPopup from '../popups/PIREPPopup';
@@ -150,6 +154,9 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
     },
   });
 
+  const current = new Date();
+  current.setHours(current.getHours() - 48);
+
   return (
     <>
       <LayerControl
@@ -192,13 +199,17 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         <GroupedLayer checked name="GAirmet" group="Meteo">
           <GairmetLayer></GairmetLayer>
         </GroupedLayer>
-        {/* <GroupedLayer checked name="Metar" group="Meteo">
+        <GroupedLayer checked name="Metar" group="Meteo">
           <WFSLayer
             url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
-            maxFeatures={1024}
+            maxFeatures={10000}
             typeName="EZWxBrief:metar"
+            pointToLayer={(feature, latlng) => {
+              return L.circleMarker(latlng, { color: '#990', weight: 1 });
+            }}
+            serverFilter={`observation_time DURING ${getQueryTime(current)}`}
           ></WFSLayer>
-        </GroupedLayer> */}
+        </GroupedLayer>
       </LayerControl>
     </>
   );

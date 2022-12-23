@@ -1,15 +1,16 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import Slider from '@mui/material/Slider';
-import React, { useState } from 'react';
-import { simpleTimeFormat } from '../map/AreoFunctions';
-import TimeSlider from './TimeSlider';
-
-function CollapsibleBar({ handleTime }: { handleTime: (time: Date) => void }) {
-  // const [windowSize, setWindowSize] = useState(setWindowSize());
+import React from 'react';
+import {
+  getTimeRangeStart,
+  simpleTimeFormat,
+} from '../map/common/AreoFunctions';
+import { useDispatch } from 'react-redux';
+import { setObsTime } from '../../store/ObsTimeSlice';
+function CollapsibleBar() {
+  const dispatch = useDispatch();
   const valueToTime = (value) => {
-    const currentDate = new Date();
-    const origin = new Date();
-    origin.setDate(currentDate.getDate() - 1);
-    origin.setHours(12, 0, 0);
+    const origin = getTimeRangeStart();
     origin.setMinutes(value * 5);
     return origin;
   };
@@ -40,6 +41,10 @@ function CollapsibleBar({ handleTime }: { handleTime: (time: Date) => void }) {
     return <div>{simpleTimeFormat(valueToTime(value))}</div>;
   }
 
+  const handleTimeChange = (time: Date) => {
+    dispatch(setObsTime(time.toISOString()));
+  };
+
   return (
     <div className="collps">
       <Slider
@@ -52,10 +57,11 @@ function CollapsibleBar({ handleTime }: { handleTime: (time: Date) => void }) {
         marks={marks}
         valueLabelDisplay="on"
         onChange={(e) => {
-          handleTime(valueToTime(e.target.value));
+          // @ts-ignore
+          handleTimeChange(valueToTime(e.target.value));
         }}
         onChangeCommitted={(e) => {
-          console.log(e);
+          // console.log(e);
         }}
       />
     </div>

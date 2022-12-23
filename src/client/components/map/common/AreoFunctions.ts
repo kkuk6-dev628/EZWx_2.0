@@ -114,6 +114,23 @@ const generateHash = (s: string): number => {
   return hash;
 };
 
+const getTimeRangeStart = () => {
+  const currentDate = new Date();
+  const origin = new Date();
+  origin.setDate(currentDate.getDate() - 1);
+  origin.setHours(12, 0, 0);
+  origin.setMinutes(0);
+  origin.setSeconds(0);
+  origin.setMilliseconds(0);
+  return origin;
+};
+
+const getQueryTime = (time: Date): string => {
+  const start = new Date(time);
+  start.setMinutes(time.getMinutes() - 75);
+  return start.toISOString() + '/' + time.toISOString();
+};
+
 export {
   getAltitudeString,
   translateWeatherClausings,
@@ -124,4 +141,6 @@ export {
   addLeadingZeroes,
   generateHash,
   simpleTimeFormat,
+  getTimeRangeStart,
+  getQueryTime,
 };

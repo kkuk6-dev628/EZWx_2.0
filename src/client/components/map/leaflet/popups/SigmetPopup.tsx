@@ -1,6 +1,9 @@
 import { Divider, Typography } from '@material-ui/core';
 import BasePopupFrame from './BasePopupFrame';
-import { convertTimeFormat, getAltitudeString } from '../../AreoFunctions';
+import {
+  convertTimeFormat,
+  getAltitudeString,
+} from '../../common/AreoFunctions';
 
 const SigmetPopup = ({ feature }) => {
   let title = 'G_AIRMET';

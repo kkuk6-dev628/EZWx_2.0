@@ -4,7 +4,7 @@ import {
   getAltitudeString,
   translateWeatherClausings,
   convertTimeFormat,
-} from '../../AreoFunctions';
+} from '../../common/AreoFunctions';
 
 const GairmetPopup = ({ feature }) => {
   let title = 'G-AIRMET';

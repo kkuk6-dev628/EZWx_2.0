@@ -30,9 +30,10 @@
     "app",
     "components",
     "pages",
+    "store/ObsTimeSlice.tsts",
     "../server/common",
     ".next/types/**/*.ts"
-  ],
+, "store/store.ts", "store/store.ts"  ],
   "exclude": [
     "node_modules"
   ]

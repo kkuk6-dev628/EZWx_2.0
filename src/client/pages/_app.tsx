@@ -5,6 +5,7 @@ import Header from '../components/layout/Header';
 import '../assets/styles/globals.scss';
 import Footer from '../components/layout/Footer';
 import { useRouter } from 'next/router';
+import { wrapper } from '../store/store';
 
 const App = ({ Component, pageProps }: AppProps) => {
   const [showFooter, setShowFooter] = useState(false);
@@ -37,4 +38,4 @@ const App = ({ Component, pageProps }: AppProps) => {
   );
 };
 
-export default App;
+export default wrapper.withRedux(App);

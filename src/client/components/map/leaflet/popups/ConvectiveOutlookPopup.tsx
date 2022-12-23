@@ -1,6 +1,6 @@
 import { Divider, Typography } from '@material-ui/core';
 import BasePopupFrame from './BasePopupFrame';
-import { convertTimeFormat, getAltitudeString } from '../../AreoFunctions';
+import { convertTimeFormat } from '../../common/AreoFunctions';
 
 const ConvectiveOutlookPopup = ({ feature }: { feature: any }) => {
   return (
