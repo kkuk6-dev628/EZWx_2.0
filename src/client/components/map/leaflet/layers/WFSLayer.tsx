@@ -10,6 +10,7 @@ import { generateHash } from '../../common/AreoFunctions';
 import { FeatureCollection } from 'geojson';
 
 import { generateHash } from '../../common/AreoFunctions';
+
 interface WFSLayerProps {
   url: string;
   maxFeatures: number;
