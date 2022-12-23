@@ -6718,6 +6718,11 @@ nestjs-console@^8.0.0:
     commander "^8.1.0"
     ora "5.4.1"
 
+next-redux-wrapper@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/next-redux-wrapper/-/next-redux-wrapper-8.0.0.tgz#588f2d89146c60c77d4a40c0af7e5282acfe4773"
+  integrity sha512-zKRdpvDeqNXQr1j5DUWwsB2fz6XpHR32iy2qJGItTKLsbLB9GvtxDL9b4mFCfhDvnzy5dw97UqMjWDpFY8h0zA==
+
 next@^13.0.7:
   version "13.0.7"
   resolved "https://registry.yarnpkg.com/next/-/next-13.0.7.tgz#f07a0cc3afefdb86fb6668048e910a2193e3c1e2"

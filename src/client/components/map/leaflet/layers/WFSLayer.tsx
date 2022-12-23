@@ -9,6 +9,8 @@ import ConvectiveOutlookLayer from './ConvectiveOutlookLayer';
 import MarkerClusterGroup from './MarkerClusterGroup';
 import { generateHash } from '../../AreoFunctions';
 import { useSelector } from 'react-redux';
+import { selectObsTime } from '../../../../store/ObsTimeSlice';
+
 interface WFSLayerProps {
   url: string;
   maxFeatures: number;
@@ -44,7 +46,7 @@ const WFSLayer = ({
   isClusteredMarker = false,
   markerPane,
 }: WFSLayerProps) => {
-  const selector = useSelector((state) => state);
+  const selector = useSelector(selectObsTime);
   console.log('selector', selector);
   const [geoJSON, setGeoJSON] = useState({
     type: 'FeatureCollection',
