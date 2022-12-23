@@ -120,6 +120,8 @@ const getTimeRangeStart = () => {
   origin.setDate(currentDate.getDate() - 1);
   origin.setHours(12, 0, 0);
   origin.setMinutes(0);
+  origin.setSeconds(0);
+  origin.setMilliseconds(0);
   return origin;
 };
 
