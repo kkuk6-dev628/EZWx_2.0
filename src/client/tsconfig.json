@@ -30,6 +30,7 @@
     "app",
     "components",
     "pages",
+    "features/timeSlider.ts",
     "../server/common",
     ".next/types/**/*.ts"
   ],

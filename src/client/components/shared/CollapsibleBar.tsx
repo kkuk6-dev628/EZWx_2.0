@@ -2,8 +2,12 @@ import Slider from '@mui/material/Slider';
 import React, { useState } from 'react';
 import { simpleTimeFormat } from '../map/AreoFunctions';
 import TimeSlider from './TimeSlider';
-
-function CollapsibleBar({ handleTime }: { handleTime: (time: Date) => void }) {
+import { useDispatch, useSelector } from 'react-redux';
+import { setTimeSliderValue } from '../../features/timeSlider';
+function CollapsibleBar() {
+  const selector = useSelector((state) => state);
+  console.log(selector);
+  const dispatch = useDispatch();
   // const [windowSize, setWindowSize] = useState(setWindowSize());
   const valueToTime = (value) => {
     const currentDate = new Date();
@@ -40,6 +44,15 @@ function CollapsibleBar({ handleTime }: { handleTime: (time: Date) => void }) {
     return <div>{simpleTimeFormat(valueToTime(value))}</div>;
   }
 
+  const handleTimeChange = (time) => {
+    // console.log(time);
+    const convertSerializable = new Date(time);
+    //conver to string
+    const timestamp = convertSerializable.toISOString();
+    // console.log(timestamp);
+    dispatch(setTimeSliderValue(timestamp));
+  };
+
   return (
     <div className="collps">
       <Slider
@@ -52,10 +65,10 @@ function CollapsibleBar({ handleTime }: { handleTime: (time: Date) => void }) {
         marks={marks}
         valueLabelDisplay="on"
         onChange={(e) => {
-          handleTime(valueToTime(e.target.value));
+          handleTimeChange(valueToTime(e.target.value));
         }}
         onChangeCommitted={(e) => {
-          console.log(e);
+          // console.log(e);
         }}
       />
     </div>
