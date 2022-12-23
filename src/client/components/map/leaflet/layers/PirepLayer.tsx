@@ -3,7 +3,10 @@ import L from 'leaflet';
 import Image from 'next/image';
 import ReactDOMServer from 'react-dom/server';
 import { Pane, useMap } from 'react-leaflet';
-import { addLeadingZeroes } from '../../AreoFunctions';
+import {
+  addLeadingZeroes,
+  getTimeRangeStart,
+} from '../../common/AreoFunctions';
 
 const PirepLayer = () => {
   const map = useMap();
@@ -180,7 +183,7 @@ const PirepLayer = () => {
     <Pane name={'pirep'} style={{ zIndex: 699 }}>
       <WFSLayer
         url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
-        maxFeatures={256}
+        maxFeatures={10000}
         typeName="EZWxBrief:pirep"
         propertyNames={[
           'wkb_geometry',
@@ -212,6 +215,13 @@ const PirepLayer = () => {
         pointToLayer={pointToLayer}
         isClusteredMarker={true}
         markerPane={'pirep'}
+        serverFilter={`obstime AFTER ${getTimeRangeStart().toISOString()}`}
+        clientFilter={(feature: L.feature, observationTime: Date): boolean => {
+          const start = new Date(feature.properties.obstime);
+          const end = new Date(feature.properties.obstime);
+          end.setMinutes(end.getMinutes() + 75);
+          return start <= observationTime && observationTime > end;
+        }}
       ></WFSLayer>
     </Pane>
   );

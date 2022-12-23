@@ -3,8 +3,7 @@
 import BasePopupFrame from './BasePopupFrame';
 import L from 'leaflet';
 import { Divider } from '@material-ui/core';
-import { createElementFromHTML, getThumbnail } from '../../AreoFunctions';
-import { relative } from 'path';
+import { getThumbnail } from '../../common/AreoFunctions';
 
 interface FeatureSelectorProps {
   features: L.Layer[];

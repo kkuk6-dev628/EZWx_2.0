@@ -1,18 +1,16 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import Slider from '@mui/material/Slider';
-import React, { useState } from 'react';
-import { simpleTimeFormat } from '../map/AreoFunctions';
-import TimeSlider from './TimeSlider';
+import React from 'react';
+import {
+  getTimeRangeStart,
+  simpleTimeFormat,
+} from '../map/common/AreoFunctions';
 import { useDispatch } from 'react-redux';
 import { setObsTime } from '../../store/ObsTimeSlice';
 function CollapsibleBar() {
   const dispatch = useDispatch();
-  // const [windowSize, setWindowSize] = useState(setWindowSize());
   const valueToTime = (value) => {
-    const currentDate = new Date();
-    const origin = new Date();
-    origin.setDate(currentDate.getDate() - 1);
-    origin.setHours(12, 0, 0);
+    const origin = getTimeRangeStart();
     origin.setMinutes(value * 5);
     return origin;
   };

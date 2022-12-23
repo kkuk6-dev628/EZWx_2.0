@@ -7,10 +7,10 @@ import Image from 'next/image';
 import ReactDOMServer from 'react-dom/server';
 import ConvectiveOutlookLayer from './ConvectiveOutlookLayer';
 import MarkerClusterGroup from './MarkerClusterGroup';
-import { generateHash } from '../../AreoFunctions';
 import { useSelector } from 'react-redux';
 import { selectObsTime } from '../../../../store/ObsTimeSlice';
 
+import { generateHash } from '../../common/AreoFunctions';
 interface WFSLayerProps {
   url: string;
   maxFeatures: number;
@@ -24,7 +24,7 @@ interface WFSLayerProps {
   pointToLayer?: (feature: L.feature, latlng: any) => L.Marker;
   highlightStyle?: any;
   serverFilter?: string;
-  clientFilter?: (feature: L.feature) => boolean;
+  clientFilter?: (feature: L.feature, obsTime: Date) => boolean;
   isClusteredMarker?: boolean;
   markerPane?: string;
 }
@@ -68,7 +68,7 @@ const WFSLayer = ({
   useEffect(() => {
     if (clientFilter && geoJSON.features.length > 0) {
       const filteredFeatures = geoJSON.features.filter((feature) =>
-        clientFilter(feature),
+        clientFilter(feature, new Date()),
       );
       setDisplayedData({
         type: 'FeatureCollection',
@@ -148,7 +148,12 @@ const WFSLayer = ({
     params.format_options = undefined;
     pendingFetch = true;
     axios
-      .get(url, { params: params })
+      .get(url, {
+        params: params,
+        headers: {
+          'Cache-Control': 'public, max-age=31536000',
+        },
+      })
       .then((data) => {
         if (typeof data.data === 'string') {
           console.log(typeName + ': Invalid json data!', data.data);
