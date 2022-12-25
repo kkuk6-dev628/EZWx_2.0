@@ -30,7 +30,7 @@
     "app",
     "components",
     "pages",
-    "store/ObsTimeSlice.tsts",
+    "store/ObsTimeSlice.tst",
     "../server/common",
     ".next/types/**/*.ts"
 , "store/store.ts", "store/store.ts"  ],
