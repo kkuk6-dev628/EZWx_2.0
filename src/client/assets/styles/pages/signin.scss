@@ -1,0 +1,258 @@
+.sign{
+
+  background-color: #504D7F;  
+  height: calc(100vh - 140px);
+
+  @media screen and (max-width: 1024px){
+    height: 100vh;
+  }
+  
+  &__wrp{
+    display: grid;
+    grid-template-columns:1.3fr 2fr;
+    max-width: 1280px ;
+    margin: 0 auto;
+    padding: 80px 0;
+    padding-inline: 2%; 
+
+    @media screen and (max-width: 1024px){
+      grid-template-columns: 1fr;
+    }
+    
+  }
+
+  &__left{
+
+    @media screen and (max-width: 1024px){
+      display: none;
+    }
+  }
+
+  &__lft__hdr{}
+
+  &__title{
+    font-size: 32px;
+    line-height: 36.4px;
+    font-weight: 500;
+    color: #fff;
+  }
+
+  &__txt{
+    font-size: 24px;
+    color: #fff;
+    opacity: .9;
+    letter-spacing: 2px;
+    margin: 24px 0;
+  }
+
+  &__btn__area{
+  margin-bottom: 24px;
+  }
+
+  &__btn{
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    opacity: .9;
+  }
+
+  &__social__area{}
+
+  &__socila__lbl{
+    font-size: 16px;
+    color: #fff;
+    opacity: .9;
+    margin-bottom: 10px;
+  }
+
+  &__social__items{
+    display: flex;
+    grid-gap: 10px;
+  }
+
+  &__ipt__wrp{
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__frm__area{
+    // margin-left: auto;
+    display: flex;
+    justify-content: end;
+  }
+
+  &__frm{
+    max-width: 386px;
+    width: 100%;
+    border-radius: 10px;
+      background-color: #f7f9fa;
+      box-shadow: 0px 0px 13px 0px rgba(74, 53, 107, 0.08);
+      padding: 1.5rem;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+
+      @media screen and (max-width: 1024px){
+        max-width: 100%;
+      
+        
+      }
+  }
+
+  &__sub__btn__area{
+    margin-bottom: 20px;
+  }
+
+  &__sub__btn{
+    background: #3D0D68;
+    width: 100%;
+    border: none;
+    color: #fff;
+    font-size: 22px;
+    text-transform: capitalize;
+    padding: 14px 20px;
+    font-weight: 500;
+    border-radius: 4px;
+
+    box-shadow: 0 2px 6px 0 rgba(136, 106, 181, 0.5); 
+
+
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+
+    &:hover{
+      background-color: #3c1d76;
+    }
+  }
+
+  &__forgt{
+    background-color: transparent;
+    font-size: 16px;
+    border: none;
+    margin: auto;
+    width: 100%;
+    cursor: pointer;
+    color: #886ab5;
+    opacity: .9;
+  }
+
+  &__frm__header{
+    padding: 1rem 1.25rem;
+    margin-bottom: 2rem;
+    border: 1px solid #d6d3da;
+    border-radius: 4px;
+    background-color: #f3f1f5;
+    color: #505050;
+    line-height: 20px;
+  
+}
+}
+
+.csuinp{
+  margin-bottom: 30px;
+
+  &--checkbox{
+    display: flex;
+    align-items: center;
+    grid-gap: 10px;
+
+    &-alg-top{
+      align-items: flex-start;
+    }
+  }
+
+  &__ipt__wrp{
+    display: flex;
+    flex-direction: column;
+    grid-gap: 10px ;
+    position: relative;
+  }
+  
+  &__lbl{
+    font-size: 19px;
+    font-weight: 500;
+    cursor: pointer;
+
+    &--light{
+      font-weight: 400;
+    }
+
+    &--link{
+      color: #886ab5;
+      opacity: .9;
+      font-weight: 500;
+      cursor: pointer;
+    }
+  }
+
+  &__input{
+    display: flex;
+    height: calc(1.47em + 1rem + 2px);
+    width: calc(100% - 34px);
+    padding: 0rem 0.875rem;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.47;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #E5E5E5;
+    border-radius: 4px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+    &--select{
+      width: 100%;
+      .css-1hb7zxy-IndicatorsContainer{
+        display: none!important;
+      }
+    }
+
+    &::placeholder{
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    &:focus{
+      border-color: #886ab5;
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem transparent;
+    }
+
+  }
+
+  input[type="checkbox"]{
+    appearance: none;
+    width: 1.4rem;
+    height: 1.4rem;
+    background-color: #fff;
+    border: #adb5bd solid 3px;
+    border-radius: 2px;
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s;
+
+    &:checked{
+      background-color: #3D0D68;
+      border: #3D0D68 solid 3px;
+    }
+  }
+
+  &__input__rgt{
+    position: absolute;
+    left: 9px;
+    top: 8px;
+    font-size: 13px;
+    color: #fff ;
+
+  }
+
+
+  &__txt{
+    color: #909090;
+    font-size: 16px;
+    margin-top: 6px;
+
+  }
+
+  &__grp{
+    display: flex;
+    grid-gap: 10px;
+  }
+}

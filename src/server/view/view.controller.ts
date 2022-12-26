@@ -38,6 +38,20 @@ export class ViewController {
     await this.viewService.getNextServer().render(req, res, parsedUrl.pathname);
   }
 
+  @Get('signin')
+  public async showSignin(@Req() req: Request, @Res() res: Response) {
+    const parsedUrl = parse(req.url, true);
+
+    await this.viewService.getNextServer().render(req, res, parsedUrl.pathname);
+  }
+
+  @Get('signup')
+  public async showSignup(@Req() req: Request, @Res() res: Response) {
+    const parsedUrl = parse(req.url, true);
+
+    await this.viewService.getNextServer().render(req, res, parsedUrl.pathname);
+  }
+
   @Get('try-ezwxbrief')
   public async tryEZWxBrief(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);
