@@ -3,20 +3,20 @@
 import BasePopupFrame from './BasePopupFrame';
 import L from 'leaflet';
 import { Divider } from '@material-ui/core';
-import { getThumbnail } from '../../common/AreoFunctions';
+import { addLeadingZeroes, getThumbnail } from '../../common/AreoFunctions';
 
 interface FeatureSelectorProps {
   features: L.Layer[];
   onSelect: (feature: GeoJSON.Feature) => void;
 }
-const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
+const FeatureSelector = ({ features }: FeatureSelectorProps) => {
   return (
     <BasePopupFrame title="Select Object">
       <div style={{ maxHeight: 320, overflowY: 'auto' }}>
         {features.map((layer: any) => {
           const layerName = layer.feature.id.split('.')[0];
           let text = layerName;
-          let icon, imgSrc, base;
+          let icon, imgSrc, base, top;
           if (
             layer.feature.geometry.type === 'Point' ||
             layer.feature.geometry.type === 'MultiPoint'
@@ -69,28 +69,34 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
               break;
             case 'cwa':
               text = 'CWA';
-              base = layer.feature.properties.base;
+              base = layer.feature.properties.base / 100;
               if (isNaN(parseInt(base)) || base == '0') {
                 base = 'SUF';
+              } else {
+                base = addLeadingZeroes(base, 3);
+              }
+              top = layer.feature.properties.top / 100;
+              if (!isNaN(parseInt(top))) {
+                top = addLeadingZeroes(top, 3);
               }
               switch (layer.feature.properties.hazard) {
                 case 'CONVECTIVE':
-                  text = `CWA: TS TOPS TO ${layer.feature.properties.top}`;
+                  text = `CWA: TS tops to ${top}`;
                   break;
                 case 'TURB':
-                  text = `CWA: TURB ${base} to ${layer.feature.properties.top}`;
+                  text = `CWA: turbulence ${base} to ${top}`;
                   break;
                 case 'ICE':
-                  text = `CWA: ICING ${base} TO ${layer.feature.properties.top}`;
+                  text = `CWA: Icing ${base} to ${top}`;
                   break;
                 case 'IFR':
-                  text = `CWA: IFR`;
+                  text = `CWA: Ifr`;
                   break;
                 case 'PCPN':
-                  text = `CWA: PRECIP TOPS TO ${layer.feature.properties.top}`;
+                  text = `CWA: Precip tops to ${top}`;
                   break;
                 default:
-                  text = `CWA: UNKNOWN`;
+                  text = `CWA: Unknown`;
                   break;
               }
               break;
@@ -100,61 +106,81 @@ const FeatureSelector = ({ features, onSelect }: FeatureSelectorProps) => {
             case 'sigmet':
               base = layer.feature.properties.altitudelow / 100;
               if (isNaN(parseInt(base)) || base == '0') {
-                base = 'SUF';
+                base = 'SFC';
+              } else {
+                base = addLeadingZeroes(base, 3);
               }
-              let top = layer.feature.properties.altitudehi / 100;
+              top = layer.feature.properties.altitudehi / 100;
               if (top == 600) {
                 // @ts-ignore
                 top = 'ABV 450';
+              } else {
+                top = addLeadingZeroes(top, 3);
               }
               switch (layer.feature.properties.hazard) {
                 case 'CONVECTIVE':
-                  text = `SIGMET: THUNDERSTORMS TO ${top}`;
+                  text = `SIGMET: Thunderstorms to ${top}`;
                   break;
                 case 'TURB':
-                  text = `SIGMET: SEVERE TURB ${base} TO ${top}`;
+                  text = `SIGMET: severe turbulence ${base} to ${top}`;
                   break;
                 case 'ICE':
-                  text = `SIGMET: SEVERE ICE ${base} TO ${top}`;
+                  text = `SIGMET: severe ice ${base} to ${top}`;
                   break;
                 case 'IFR':
-                  text = `SIGMET: DUST/SANDSTORM ${base} TO ${top}`;
+                  text = `SIGMET: dust/sandstorm ${base} to ${top}`;
                   break;
                 case 'ASH':
-                  text = `SIGMET: VOLCANIC ASH ${base} TO ${top}`;
+                  text = `SIGMET: volcanic ash ${base} to ${top}`;
                   break;
               }
               break;
             case 'intl_sigmet':
+              base = layer.feature.properties.base / 100;
+              if (isNaN(parseInt(base)) || base == '0') {
+                base = 'SFC';
+              } else {
+                base = addLeadingZeroes(base, 3);
+              }
+              top = layer.feature.properties.top / 100;
+              if (top == 600) {
+                // @ts-ignore
+                top = 'ABV 450';
+              } else {
+                top = addLeadingZeroes(top, 3);
+              }
               switch (layer.feature.properties.hazard) {
                 case 'ICE':
-                  text = `SIGMET: SEVERE ICE ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+                  text = `SIGMET: Severe ice ${base} to ${top}`;
                   break;
                 case 'TURB':
-                  text = `SIGMET: SEVERE TURB ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+                  text = `SIGMET: Severe Turbulence ${base} to ${top}`;
                   break;
                 case 'TS':
-                  text = `SIGMET: THUNDERSTORMS TO ${layer.feature.properties.top}`;
+                  text = `SIGMET: Thunderstorms to ${top}`;
                   break;
                 case 'MTW':
-                  text = `SIGMET: MTN WAVE ${layer.feature.properties.base} TO ${layer.feature.properties.top}`;
+                  text = `SIGMET: Mountain wave ${base} to ${top}`;
                   break;
                 case 'IFR':
-                  text = `SIGMET: DUST/SANDSTORM ${layer.feature.properties.base} TO ${layer.feature.properties.top}`;
+                  text = `SIGMET: dust/sandstorm ${base} to ${top}`;
                   break;
                 case 'TC':
-                  text = `SIGMET: TROP CYCLONE TO ${layer.feature.properties.top}`;
+                  text = `SIGMET: Tropical cyclone to ${top}`;
                   break;
                 case 'ASH':
-                  text = `SIGMET: VOLCANIC ASH ${layer.feature.properties.base} TO ${layer.feature.properties.top}`;
+                  text = `SIGMET: Volcanic ash ${base} to ${top}`;
                   break;
                 default:
-                  text = `SIGMET ${layer.feature.properties.base} to ${layer.feature.properties.top}`;
+                  text = `SIGMET ${base} to ${top}`;
                   break;
               }
               break;
             case 'pirep':
-              text = layer.feature.properties.aireptype;
+              text =
+                layer.feature.properties.aireptype +
+                ' ' +
+                layer.feature.properties.actype;
               break;
             default:
               break;

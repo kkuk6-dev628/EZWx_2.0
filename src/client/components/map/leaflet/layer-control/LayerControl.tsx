@@ -1,13 +1,7 @@
-import React, {
-  MutableRefObject,
-  ReactElement,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { Typography } from '@material-ui/core';
 import { useMapEvents } from 'react-leaflet';
-import { Layer, Util, DomEvent } from 'leaflet';
+import { Layer, Util, DomEvent, LayerGroup } from 'leaflet';
 import Accordion from '@material-ui/core/Accordion';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -19,7 +13,6 @@ import toast from 'react-hot-toast';
 import { LayersControlProvider } from './layerControlContext';
 
 import createControlledLayer from './controlledLayer';
-import { getEventListeners } from 'events';
 
 const POSITION_CLASSES: { [key: string]: string } = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -70,8 +63,15 @@ const LayerControl = ({
     },
   });
 
+  const checkEmptyLayer = (layer: Layer): boolean => {
+    return (
+      typeof (layer as any).getLayers === 'function' &&
+      (layer as LayerGroup).getLayers().length === 0
+    );
+  };
+
   const onLayerClick = (layerObj: ILayerObj) => {
-    if (layerObj.isEmpty) {
+    if (checkEmptyLayer(layerObj.layer)) {
       toast.error(`No ${layerObj.name}'s data displayed`, {
         position: 'top-right',
       });
@@ -130,8 +130,7 @@ const LayerControl = ({
   };
 
   const onGroupAdd = (layer: Layer, name: string, group: string) => {
-    const isEmptyLayer =
-      layer._layers !== undefined && Object.keys(layer._layers).length === 0;
+    const isEmptyLayer = checkEmptyLayer(layer);
     const cLayers = layers;
     const index = cLayers.findIndex((e) => e.name === name);
     if (index > -1) {
@@ -207,11 +206,11 @@ const LayerControl = ({
                       }
                       label={layerObj.name}
                       onClickCapture={(e) => {
-                        DomEvent.stopPropagation(e);
+                        DomEvent.stopPropagation(e as any);
                         onLayerClick(layerObj);
                       }}
                       onDoubleClickCapture={(e) => {
-                        DomEvent.stopPropagation(e);
+                        DomEvent.stopPropagation(e as any);
                       }}
                     />
                   </AccordionDetails>

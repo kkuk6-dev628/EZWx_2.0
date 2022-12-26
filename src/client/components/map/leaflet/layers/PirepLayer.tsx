@@ -168,7 +168,7 @@ const PirepLayer = () => {
       feature.properties.icgint1 === null
     ) {
       let iconUrl = '/icons/pirep/weather-sky-icon-black.png';
-      if (feature.properties.airepType === 'Urgent PIREP') {
+      if (feature.properties.aireptype === 'Urgent PIREP') {
         iconUrl = '/icons/pirep/weather-sky-icon-red.png';
       }
       pirepMarker = getMarker(latlng, iconUrl, feature.properties.fltlvl);

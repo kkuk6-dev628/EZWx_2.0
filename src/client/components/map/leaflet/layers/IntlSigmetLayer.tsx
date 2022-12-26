@@ -1,10 +1,11 @@
+import { PathOptions } from 'leaflet';
 import WFSLayer from './WFSLayer';
 
 const IntlSigmetLayer = () => {
-  const gairmetStyle = (feature) => {
+  const gairmetStyle = (): PathOptions => {
     const style = {
       color: '#F50000',
-      weight: '2',
+      weight: 2,
       opacity: 0.7,
     };
     return style;

@@ -15,7 +15,7 @@ const SigmetLayer = () => {
     let label;
     switch (feature.properties.hazard) {
       case 'CONVECTIVE':
-        label = `Convective`;
+        label = `TS`;
         break;
       case 'TURB':
         label = `TURB`;
