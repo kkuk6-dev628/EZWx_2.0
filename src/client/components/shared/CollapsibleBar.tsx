@@ -6,11 +6,17 @@ import {
   getTimeRangeStart,
   simpleTimeFormat,
 } from '../map/common/AreoFunctions';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setObsTime } from '../../store/ObsTimeSlice';
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import {
+  selectObsInterval,
+  setObsInterval,
+} from '../../store/ObsIntervalSlice';
 
 function CollapsibleBar() {
   const dispatch = useDispatch();
+  const obsInterval = useSelector(selectObsInterval);
 
   const valueToTime = (value: number): Date => {
     const origin = getTimeRangeStart();
@@ -55,10 +61,13 @@ function CollapsibleBar() {
     dispatch(setObsTime(time.toISOString()));
   };
 
+  const handleIntervalChange = (minutes: number) => {
+    dispatch(setObsInterval(minutes));
+  };
+
   return (
     <div className="collps">
       <Slider
-        style={{ width: '90%' }}
         aria-label="Time Slider"
         defaultValue={timeToValue(new Date())}
         max={84 * 12}
@@ -74,6 +83,23 @@ function CollapsibleBar() {
           // console.log(e);
         }}
       />
+      <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+        <InputLabel id="Select Observation Interval">Interval</InputLabel>
+        <Select
+          labelId="select-observation-interval"
+          id="select-observation-interval"
+          value={obsInterval}
+          label="Select Observation Interval"
+          onChange={(e) => {
+            // @ts-ignore
+            handleIntervalChange(e.target.value);
+          }}
+        >
+          <MenuItem value={50}>50</MenuItem>
+          <MenuItem value={75}>75</MenuItem>
+          <MenuItem value={90}>90</MenuItem>
+        </Select>{' '}
+      </FormControl>
     </div>
   );
 }

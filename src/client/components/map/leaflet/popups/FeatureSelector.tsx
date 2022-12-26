@@ -4,7 +4,6 @@ import BasePopupFrame from './BasePopupFrame';
 import L from 'leaflet';
 import { Divider } from '@material-ui/core';
 import { getThumbnail } from '../../common/AreoFunctions';
-import { FeatureCollection } from 'geojson';
 
 interface FeatureSelectorProps {
   features: L.Layer[];
