@@ -113,7 +113,7 @@ const GairmetLayer = () => {
         'dueto',
       ]}
       style={gairmetStyle}
-      serverFilter={`forecast IN ('0')`}
+      // serverFilter={`forecast IN ('0')`}
       getLabel={getLabel}
       clientFilter={clientFilter}
     ></WFSLayer>
