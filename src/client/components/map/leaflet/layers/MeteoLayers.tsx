@@ -94,6 +94,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
       layers.forEach((layer) => {
         layer.layer.resetStyle && layer.layer.resetStyle();
         if (layer.group !== 'Meteo') return;
+        if (typeof layer.layer.eachLayer !== 'function') return;
         layer.layer.eachLayer((l) => {
           if (
             l.feature.geometry.type === 'Point' ||
