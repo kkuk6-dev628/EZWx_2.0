@@ -38,8 +38,8 @@ const GairmetLayer = () => {
         style.dashArray = '60 6 6 6';
         break;
       case 'M_FZLVL':
-        style.color = '#C87746';
-        style.dashArray = '60 6';
+        style.color = '#7470C4';
+        style.dashArray = '60 10 2 10';
         break;
     }
     return style;
@@ -78,6 +78,21 @@ const GairmetLayer = () => {
     }
     return label;
   };
+  const clientFilter = (
+    feature: GeoJSON.Feature,
+    observationTime: Date,
+  ): boolean => {
+    const start = new Date(feature.properties.validtime);
+    let duration = 3 * 60; // minutes
+    if (feature.properties.forecast == 12) {
+      duration = 1.5 * 60;
+    }
+    const end = new Date(feature.properties.validtime);
+    end.setMinutes(end.getMinutes() + duration);
+    end.setSeconds(0);
+    end.setMilliseconds(0);
+    return start <= observationTime && observationTime < end;
+  };
 
   return (
     <WFSLayer
@@ -93,12 +108,14 @@ const GairmetLayer = () => {
         'fzltop',
         'issuetime',
         'validtime',
+        'forecast',
         'hazard',
         'dueto',
       ]}
       style={gairmetStyle}
       serverFilter={`forecast IN ('0')`}
       getLabel={getLabel}
+      clientFilter={clientFilter}
     ></WFSLayer>
   );
 };

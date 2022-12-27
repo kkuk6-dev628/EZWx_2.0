@@ -71,7 +71,7 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
               text = 'CWA';
               base = layer.feature.properties.base / 100;
               if (isNaN(parseInt(base)) || base == '0') {
-                base = 'SUF';
+                base = 'SFC';
               } else {
                 base = addLeadingZeroes(base, 3);
               }
@@ -81,19 +81,23 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
               }
               switch (layer.feature.properties.hazard) {
                 case 'CONVECTIVE':
-                  text = `CWA: TS tops to ${top}`;
+                  text = `CWA: TS tops` + top === '000' ? '' : ` to ${top}`;
                   break;
                 case 'TURB':
-                  text = `CWA: turbulence ${base} to ${top}`;
+                  text =
+                    `CWA: Turbulence` + top === '000'
+                      ? ''
+                      : ` ${base} to ${top}`;
                   break;
                 case 'ICE':
-                  text = `CWA: Icing ${base} to ${top}`;
+                  text =
+                    `CWA: Icing` + top === '000' ? '' : ` ${base} to ${top}`;
                   break;
                 case 'IFR':
-                  text = `CWA: Ifr`;
+                  text = `CWA: IFR`;
                   break;
                 case 'PCPN':
-                  text = `CWA: Precip tops to ${top}`;
+                  text = `CWA: Precip tops` + top === '000' ? '' : ` to ${top}`;
                   break;
                 default:
                   text = `CWA: Unknown`;
@@ -122,16 +126,16 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
                   text = `SIGMET: Thunderstorms to ${top}`;
                   break;
                 case 'TURB':
-                  text = `SIGMET: severe turbulence ${base} to ${top}`;
+                  text = `SIGMET: Severe turbulence ${base} to ${top}`;
                   break;
                 case 'ICE':
-                  text = `SIGMET: severe ice ${base} to ${top}`;
+                  text = `SIGMET: Severe ice ${base} to ${top}`;
                   break;
                 case 'IFR':
-                  text = `SIGMET: dust/sandstorm ${base} to ${top}`;
+                  text = `SIGMET: Dust/sandstorm ${base} to ${top}`;
                   break;
                 case 'ASH':
-                  text = `SIGMET: volcanic ash ${base} to ${top}`;
+                  text = `SIGMET: Volcanic ash ${base} to ${top}`;
                   break;
               }
               break;
@@ -163,7 +167,7 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
                   text = `SIGMET: Mountain wave ${base} to ${top}`;
                   break;
                 case 'IFR':
-                  text = `SIGMET: dust/sandstorm ${base} to ${top}`;
+                  text = `SIGMET: Dust/sandstorm ${base} to ${top}`;
                   break;
                 case 'TC':
                   text = `SIGMET: Tropical cyclone to ${top}`;

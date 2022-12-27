@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import LayerControl, { GroupedLayer } from '../layer-control/LayerControl';
 import WFSLayer from './WFSLayer';
-import { useMapEvents } from 'react-leaflet';
-import L, { LatLng } from 'leaflet';
+import { ImageOverlay, useMapEvents, WMSTileLayer } from 'react-leaflet';
+import L, { CRS, LatLng } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
 import { useState } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
@@ -164,6 +164,16 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           setLayers(lyr);
         }}
       >
+        <GroupedLayer checked name="temperature" group="Meteo">
+          <WMSTileLayer
+            url="http://3.95.80.120:8080/geoserver/EZWxBrief/wms?"
+            layers="EZWxBrief:2t_NBM"
+            format="image/png"
+            transparent={true}
+            version="1.1.0"
+            crs={CRS.EPSG4326}
+          ></WMSTileLayer>
+        </GroupedLayer>
         <GroupedLayer checked name="States" group="Admin">
           <WFSLayer
             url="http://3.95.80.120:8080/geoserver/topp/ows"

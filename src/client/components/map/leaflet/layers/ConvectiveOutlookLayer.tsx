@@ -12,7 +12,7 @@ const ConvectiveOutlookLayer = () => {
   };
 
   const getLabel = (): string => {
-    const label = 'Conv Outlook';
+    const label = 'Conv<br/>Outlook';
     // switch (feature.properties.hazard) {
     //   case 'CONVECTIVE':
     //     label = `Convective`;
@@ -32,6 +32,14 @@ const ConvectiveOutlookLayer = () => {
     // }
     return label;
   };
+  const clientFilter = (
+    feature: GeoJSON.Feature,
+    observationTime: Date,
+  ): boolean => {
+    const start = new Date(feature.properties.valid_time_from);
+    const end = new Date(feature.properties.valid_time_to);
+    return start <= observationTime && observationTime < end;
+  };
 
   return (
     <WFSLayer
@@ -47,6 +55,7 @@ const ConvectiveOutlookLayer = () => {
       ]}
       style={style}
       getLabel={getLabel}
+      clientFilter={clientFilter}
     ></WFSLayer>
   );
 };

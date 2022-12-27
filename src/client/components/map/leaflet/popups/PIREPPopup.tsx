@@ -26,7 +26,7 @@ const turbulenceIntensityTranslations = {
 const turblenceTypeTranslations = {
   CAT: 'Clear air',
   CHOP: 'Chop',
-  LLWS: 'Low level wind shear',
+  LLWS: 'Low-level wind shear',
   MWAVE: 'Mountain wave',
 };
 const icingTypeTranslations = {

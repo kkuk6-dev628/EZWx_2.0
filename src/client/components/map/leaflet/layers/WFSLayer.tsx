@@ -213,6 +213,7 @@ const WFSLayer = ({
     <>
       {isClusteredMarker && (
         <MarkerClusterGroup
+          key={geoJsonKey}
           // @ts-ignore
           iconCreateFunction={(cluster) => {
             return cluster.getAllChildMarkers()[0].getIcon();
@@ -225,7 +226,6 @@ const WFSLayer = ({
         >
           {geoJSON != null && (
             <GeoJSON
-              key={geoJsonKey}
               ref={ref}
               data={displayedData}
               // @ts-ignore

@@ -75,7 +75,6 @@ const LayerControl = ({
       toast.error(`No ${layerObj.name}'s data displayed`, {
         position: 'top-right',
       });
-      return;
     }
     if (map?.hasLayer(layerObj.layer)) {
       if (!exclusive) hideLayer(layerObj);

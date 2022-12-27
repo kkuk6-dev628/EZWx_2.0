@@ -14,6 +14,14 @@ const IntlSigmetLayer = () => {
   const getLabel = (feature) => {
     return feature.properties.hazard;
   };
+  const clientFilter = (
+    feature: GeoJSON.Feature,
+    observationTime: Date,
+  ): boolean => {
+    const start = new Date(feature.properties.validtimefrom);
+    const end = new Date(feature.properties.validtimeto);
+    return start <= observationTime && observationTime < end;
+  };
 
   return (
     <WFSLayer
@@ -37,6 +45,7 @@ const IntlSigmetLayer = () => {
       ]}
       style={gairmetStyle}
       getLabel={getLabel}
+      clientFilter={clientFilter}
     ></WFSLayer>
   );
 };
