@@ -54,7 +54,7 @@ const PIREPPopup = ({ feature }) => {
   return (
     <>
       <Typography variant="subtitle2">
-        {feature.properties.aireptype ? (
+        {feature.properties.aireptype === 'Urgent PIREP' ? (
           <span style={{ color: 'red' }}>{feature.properties.aireptype}</span>
         ) : (
           feature.properties.aireptype

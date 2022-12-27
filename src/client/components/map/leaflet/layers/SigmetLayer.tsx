@@ -37,11 +37,8 @@ const SigmetLayer = () => {
     feature: GeoJSON.Feature,
     observationTime: Date,
   ): boolean => {
-    const start = new Date(feature.properties.obstime);
-    const end = new Date(feature.properties.obstime);
-    end.setMinutes(end.getMinutes() + 75);
-    end.setSeconds(0);
-    end.setMilliseconds(0);
+    const start = new Date(feature.properties.validtimefrom);
+    const end = new Date(feature.properties.validtimeto);
     return start <= observationTime && observationTime < end;
   };
 

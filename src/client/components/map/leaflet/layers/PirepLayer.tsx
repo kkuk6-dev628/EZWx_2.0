@@ -84,8 +84,8 @@ const PirepLayer = () => {
   };
 
   const getMarker = (latlng, iconUrl, fltlvl) => {
-    const flightLevel = fltlvl === 0 ? 'UNK' : addLeadingZeroes(fltlvl, 3);
-    const spanClass = fltlvl === 0 ? 'pirep-unk-span' : 'pirep-span';
+    const flightLevel = fltlvl == 0 ? 'UNK' : addLeadingZeroes(fltlvl, 3);
+    const spanClass = fltlvl == 0 ? 'pirep-unk-span' : 'pirep-span';
     const pirepMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'pirep-icon',
@@ -104,8 +104,8 @@ const PirepLayer = () => {
     return pirepMarker;
   };
   const getBothMarkers = (latlng, iconUrl1, iconUrl2, fltlvl) => {
-    const flightLevel = fltlvl === 0 ? 'UNK' : addLeadingZeroes(fltlvl, 3);
-    const spanClass = fltlvl === 0 ? 'pirep-unk-span' : 'pirep-span';
+    const flightLevel = fltlvl == 0 ? 'UNK' : addLeadingZeroes(fltlvl, 3);
+    const spanClass = fltlvl == 0 ? 'pirep-unk-span' : 'pirep-span';
     const pirepMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'pirep-icon',
