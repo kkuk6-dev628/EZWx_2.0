@@ -7,7 +7,6 @@ import { addLeadingZeroes, getThumbnail } from '../../common/AreoFunctions';
 
 interface FeatureSelectorProps {
   features: L.Layer[];
-  onSelect: (feature: GeoJSON.Feature) => void;
 }
 const FeatureSelector = ({ features }: FeatureSelectorProps) => {
   return (

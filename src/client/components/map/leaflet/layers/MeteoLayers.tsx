@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import LayerControl, { GroupedLayer } from '../layer-control/LayerControl';
 import WFSLayer from './WFSLayer';
-import { ImageOverlay, useMapEvents, WMSTileLayer } from 'react-leaflet';
-import L, { CRS, LatLng } from 'leaflet';
+import { useMapEvents, WMSTileLayer } from 'react-leaflet';
+import L, { CRS, LatLng, TileLayer } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import FeatureSelector from '../popups/FeatureSelector';
 import ReactDOMServer from 'react-dom/server';
@@ -23,13 +23,11 @@ import PirepLayer from './PirepLayer';
 import PIREPPopup from '../popups/PIREPPopup';
 import 'leaflet-responsive-popup';
 import 'leaflet-responsive-popup/leaflet.responsive.popup.css';
+import WMSLayer from './WMSLayer';
 
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
-
-  const handleFeatureSelect = (feature) => {
-    console.log(feature);
-  };
+  const wmsLayerRef = useRef(null);
 
   const showPopup = (layer: L.GeoJSON, latlng: LatLng): void => {
     if (typeof layer.setStyle === 'function') {
@@ -118,6 +116,17 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
       map.closePopup();
 
       if (features.length === 0) {
+        if (wmsLayerRef.current) {
+          wmsLayerRef.current.getFeatureInfo(
+            map.latLngToContainerPoint(e.latlng),
+            e.latlng,
+            ['EZWxBrief:2t_NBM', 'EZWxBrief:gairmet'],
+            (latlng, result) => {
+              const resultObj = JSON.parse(result);
+              showPopup({ feature: resultObj.features[0] } as any, latlng);
+            },
+          );
+        }
         return;
       } else if (features.length === 1) {
         showPopup(features[0], e.latlng);
@@ -126,10 +135,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           .setLatLng(e.latlng)
           .setContent(
             ReactDOMServer.renderToString(
-              <FeatureSelector
-                features={features}
-                onSelect={handleFeatureSelect}
-              ></FeatureSelector>,
+              <FeatureSelector features={features}></FeatureSelector>,
             ),
           )
           .openOn(map);
@@ -166,14 +172,19 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         }}
       >
         <GroupedLayer checked name="temperature" group="Meteo">
-          <WMSTileLayer
+          <WMSLayer
+            ref={wmsLayerRef}
             url="http://3.95.80.120:8080/geoserver/EZWxBrief/wms?"
-            layers="EZWxBrief:2t_NBM"
-            format="image/png"
-            transparent={true}
-            version="1.1.0"
-            crs={CRS.EPSG4326}
-          ></WMSTileLayer>
+            layers={['EZWxBrief:2t_NBM']}
+            options={{
+              transparent: true,
+              format: 'image/png',
+              crs: CRS.EPSG4326,
+              info_format: 'application/json',
+              identify: false,
+              tiled: true,
+            }}
+          ></WMSLayer>
         </GroupedLayer>
         <GroupedLayer checked name="States" group="Admin">
           <WFSLayer
