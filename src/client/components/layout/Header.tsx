@@ -237,11 +237,10 @@ export default function Header() {
                   </button>
                 </div>
               ) : (
-                <Link href="/signup">
-                  <button className="header__rgt__btn header__rgt__btn--rgt btn">
-                    Join Now | Sign in
-                  </button>
-                </Link>
+                <button className="header__rgt__btn header__rgt__btn--rgt btn">
+                  <Link href="/signup">Join Now</Link>
+                  <Link href="/signin"> | Sign in</Link>
+                </button>
               )}
             </div>
           </div>

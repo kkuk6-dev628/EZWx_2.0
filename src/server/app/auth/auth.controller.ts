@@ -1,9 +1,18 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { AuthSignupDto, AuthSinginDto } from './dto';
 
 @Controller('auth')
 export class AuthController {
-  @Get()
-  async auth(@Res() res) {
-    return res.redirect('/auth/cognito');
+  constructor(private authService: AuthService) {}
+
+  @Post('signup')
+  signup(@Body() dto: AuthSignupDto) {
+    return this.authService.signup(dto);
+  }
+
+  @Post('signin')
+  signin(@Body() dto: AuthSinginDto) {
+    return this.authService.signin(dto);
   }
 }

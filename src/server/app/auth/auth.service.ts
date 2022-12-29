@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { AuthDto, AuthSingingDto } from './dto';
+import { AuthSignupDto, AuthSinginDto } from './dto';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { TypeORMError } from 'typeorm';
@@ -12,14 +12,16 @@ export class AuthService {
     private jwtService: JwtAuthService,
   ) {}
 
-  async signup(dto: AuthDto) {
+  async signup(dto: AuthSignupDto) {
     const hash = await bcrypt.hash(dto.password, 2);
 
+    const { password, confirmPassword, ...newDto } = dto;
+
+    // console.log({ ...newDto, hash });
     try {
       const user = await this.userService.create({
-        username: dto.username,
         hash,
-        email: dto.email,
+        ...newDto,
       });
 
       const accessToken = await this.jwtService.login({
@@ -39,7 +41,7 @@ export class AuthService {
     }
   }
 
-  async signin(dto: AuthSingingDto) {
+  async signin(dto: AuthSinginDto) {
     const user = await this.userService.findOne({
       where: {
         email: dto.email,

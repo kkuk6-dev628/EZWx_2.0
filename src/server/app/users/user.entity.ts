@@ -1,3 +1,4 @@
+import { Certification } from './../certification/certification.entity';
 import {
   Entity,
   Column,
@@ -17,14 +18,25 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
-  username: string;
+  @Column()
+  firstname: string;
 
-  @Column({ nullable: false })
+  @Column()
+  lastname: string;
+
+  @Column()
   email: string;
 
-  @Column({ nullable: false })
+  @Column()
   hash: string;
+
+  @Column()
+  hearAbout: string;
+
+  @OneToMany(() => Certification, (certification) => certification.user, {
+    cascade: true,
+  })
+  certifications: Certification[];
 
   @Column()
   @CreateDateColumn()

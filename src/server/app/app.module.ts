@@ -16,7 +16,9 @@ import { typeOrmConfig } from 'ormconfig';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot(typeOrmConfig),
+    TypeOrmModule.forRootAsync({
+      useFactory: async () => typeOrmConfig,
+    }),
     ConsoleModule,
     AuthModule,
     UsersModule,

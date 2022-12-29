@@ -2,8 +2,20 @@ import React from 'react';
 import { GrFacebook } from 'react-icons/gr';
 import { FaTwitterSquare, FaYoutubeSquare, FaCheck } from 'react-icons/fa';
 import { BsInstagram } from 'react-icons/bs';
-
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { useSigninMutation } from '../store/auth/authApi';
+interface IFormInput {
+  email: string;
+  password: string;
+}
 function signin() {
+  const { handleSubmit, register } = useForm<IFormInput>();
+  const [signin, { data, isLoading, error: responseError }] =
+    useSigninMutation();
+  const onSubmit: SubmitHandler<IFormInput> = (data) => {
+    console.log(data);
+    signin(data);
+  };
   return (
     <div className="sign">
       <div className="sign__wrp">
@@ -43,7 +55,11 @@ function signin() {
           </div>
         </div>
         <div className="sign__frm__area">
-          <form className="sign__frm" action="">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="sign__frm"
+            action=""
+          >
             <div className="csuinp">
               <div className="csuinp__ipt__wrp">
                 <label htmlFor="email" className="csuinp__lbl">
@@ -51,7 +67,7 @@ function signin() {
                 </label>
                 <input
                   type="email"
-                  name="email"
+                  {...register('email', { required: true })}
                   id="email"
                   className="csuinp__input"
                   placeholder="Email for Verification"
@@ -68,7 +84,7 @@ function signin() {
                 </label>
                 <input
                   type="password"
-                  name="password"
+                  {...register('password', { required: true })}
                   id="password"
                   className="csuinp__input"
                   placeholder="The password you specified during registration"
@@ -94,7 +110,9 @@ function signin() {
               </label>
             </div>
             <div className="sign__sub__btn__area">
-              <button className="sign__sub__btn">Secure sign in</button>
+              <button type="submit" className="sign__sub__btn">
+                Secure sign in
+              </button>
             </div>
             <button className="sign__forgt">Forgot your password?</button>
           </form>

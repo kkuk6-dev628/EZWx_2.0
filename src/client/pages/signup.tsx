@@ -1,17 +1,107 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FaCheck } from 'react-icons/fa';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { useSignupMutation } from '../store/auth/authApi';
+
+interface Certification {
+  name: string;
+  description: string;
+}
+interface IFormInput {
+  firstname: string;
+  lastname: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  hearAbout: string;
+  certifications: Certification[];
+  terms: boolean;
+  newsletter: boolean;
+}
 
 const animatedComponents = makeAnimated();
 function signup() {
-  const colourOptions = [
-    { value: 'ocean', label: 'Ocean', color: '#00B8D9', isFixed: true },
-    { value: 'blue', label: 'Blue', color: '#0052CC', isFixed: true },
-    { value: 'purple', label: 'Purple', color: '#5243AA' },
-    { value: 'red', label: 'Red', color: '#FF5630', isDisabled: true },
-    { value: 'orange', label: 'Orange', color: '#FF8B00' },
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IFormInput>({
+    defaultValues: {
+      firstname: '',
+      lastname: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      hearAbout: '',
+      certifications: [],
+      terms: false,
+      newsletter: true,
+    },
+  });
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [signup, { data, isLoading, error: responseError }] =
+    useSignupMutation();
+
+  const onSubmit: SubmitHandler<IFormInput> = (data) => {
+    console.log(data);
+    delete data.terms;
+    delete data.newsletter;
+    signup(data);
+  };
+
+  const certificationOptions = [
+    {
+      name: 'atp',
+      description: 'Private, Commercial or ATP',
+    },
+    {
+      name: 'cfi',
+      description: 'Certified Flight Instructor (CFI)',
+    },
+    { name: 'purple', description: 'Instrument Rated' },
+    {
+      name: 'professional',
+      description: 'Professional Pilot (other than a CFI)',
+    },
+    {
+      name: 'dpe',
+      description: 'Designated Pilot Examiner (DPE)',
+    },
+    { name: 'other', description: 'Other' },
   ];
+
+  const validateEmail = (value: string) => {
+    const emailRegex =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return emailRegex.test(value) ? true : 'Invalid email';
+  };
+
+  const validatePassword = (value: string) => {
+    console.log(value);
+    if (!value && value === '') {
+      return 'Password is required';
+    }
+
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+    return passwordRegex.test(value)
+      ? true
+      : 'Password must be at least 6 characters and contain at least one upper case (A-Z), one lower case (a-z), one number (0-9) and one special character (e.g. !@#$%^&*-,.)';
+  };
+
+  const validateConfirmPassword = (value: string) => {
+    console.log(value, 'hb ', password);
+    if (value !== password) {
+      return 'The password and confirm password do not match.';
+    }
+    return true;
+  };
+
   return (
     <div className="signup">
       <div className="signup__wrp">
@@ -24,7 +114,10 @@ function signup() {
           </p>
         </div>
         <div className="sign__frm__area signup__frm__area">
-          <form action="" className="sign__frm signup__frm">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="sign__frm signup__frm"
+          >
             <div className="sign__frm__header">
               <p>
                 Want to skip the trial and pay for an annual membership to
@@ -38,20 +131,42 @@ function signup() {
                   Your first and last name *
                 </label>
                 <div className="csuinp__grp">
-                  <input
-                    type="text"
-                    name="first_name"
-                    id="first_name"
-                    className="csuinp__input"
-                    placeholder="First Name"
-                  />
-                  <input
-                    type="text"
-                    name="last_name"
-                    id="last_name"
-                    className="csuinp__input"
-                    placeholder="Last Name"
-                  />
+                  <div className="csuinp__wrp__two">
+                    <input
+                      type="text"
+                      {...register('firstname', {
+                        required: 'The First Name field is required.',
+                      })}
+                      id="firstname"
+                      className={`csuinp__input ${
+                        errors.firstname ? 'csuinp__input--error' : ''
+                      }`}
+                      placeholder="First Name"
+                    />
+                    {errors.firstname && (
+                      <p className="csuinp__error__msg">
+                        {errors.firstname.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="csuinp__wrp__two">
+                    <input
+                      type="text"
+                      {...register('lastname', {
+                        required: 'The Last Name field is required.',
+                      })}
+                      id="lastname"
+                      className={`csuinp__input ${
+                        errors.lastname ? 'csuinp__input--error' : ''
+                      }`}
+                      placeholder="Last Name"
+                    />
+                    {errors.lastname && (
+                      <p className="csuinp__error__msg">
+                        {errors.lastname.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -60,13 +175,23 @@ function signup() {
                 <label htmlFor="email" className="csuinp__lbl">
                   Email for login and verification *
                 </label>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  className="csuinp__input"
-                  placeholder="Email for Verification"
-                />
+                <div className="csuinp__wrp__two">
+                  <input
+                    type="email"
+                    {...register('email', {
+                      required: 'Please enter a valid email address.',
+                      validate: validateEmail,
+                    })}
+                    id="email"
+                    className={`csuinp__input ${
+                      errors.email ? 'csuinp__input--error' : ''
+                    }`}
+                    placeholder="Email for Verification"
+                  />
+                  {errors.email && (
+                    <p className="csuinp__error__msg">{errors.email.message}</p>
+                  )}
+                </div>
               </div>
               <p className="csuinp__txt">
                 Your email will also be your username
@@ -77,13 +202,26 @@ function signup() {
                 <label htmlFor="password" className="csuinp__lbl">
                   Please pick a password *
                 </label>
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  className="csuinp__input"
-                  placeholder="Password (minimum 6 characters)"
-                />
+                <div className="csuinp__wrp__two">
+                  <input
+                    type="password"
+                    {...register('password', {
+                      validate: validatePassword,
+                    })}
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={`csuinp__input ${
+                      errors.password ? 'csuinp__input--error' : ''
+                    }`}
+                    placeholder="Password (minimum 6 characters)"
+                  />
+                  {errors.password && (
+                    <p className="csuinp__error__msg">
+                      {errors.password.message}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
             <div className="csuinp">
@@ -91,12 +229,26 @@ function signup() {
                 <label htmlFor="password" className="csuinp__lbl">
                   Please confirm your password *
                 </label>
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  className="csuinp__input"
-                />
+                <div className="">
+                  <input
+                    {...register('confirmPassword', {
+                      required: true,
+                      validate: validateConfirmPassword,
+                    })}
+                    type="password"
+                    id="password"
+                    className={`csuinp__input ${
+                      errors.confirmPassword ? 'csuinp__input--error' : ''
+                    }`}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                  {errors.confirmPassword && (
+                    <p className="csuinp__error__msg">
+                      {errors.confirmPassword.message}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
             <div className="csuinp">
@@ -104,16 +256,36 @@ function signup() {
                 <label htmlFor="password" className="csuinp__lbl">
                   Where did you hear about EZWxBrief? *
                 </label>
-                <select
-                  name=""
-                  id=""
-                  className="csuinp__input csuinp__input--select"
-                >
-                  <option value="">Where did you hear about us?</option>
-                  <option value="">Where did you hear about us?</option>
-                  <option value="">Where did you hear about us?</option>
-                  <option value="">Where did you hear about us?</option>
-                </select>
+                <div className="">
+                  <select
+                    {...register('hearAbout', {
+                      required:
+                        'The Where did you hear about EZWxBrief? field is required.',
+                    })}
+                    id=""
+                    className={`csuinp__input csuinp__input--select ${
+                      errors.hearAbout ? 'csuinp__input--error' : ''
+                    }`}
+                  >
+                    <option value="">Where did you hear about us?</option>
+                    <option value="repeat">Repeat customer</option>
+                    <option value="friend">Friend (first & last name?)</option>
+                    <option value="discussion">
+                      Discussion Forum (Which one?)
+                    </option>
+                    <option value="magazine">Magazine (Which one?)</option>
+                    <option value="Website">Website (Which one?)</option>
+                    <option value="podcast">Podcast (Which one?)</option>
+                    <option value="search">Search Engine (Which one?)</option>
+                    <option value="other">Other (Please specify)</option>
+                    <option value="do-not-remember">Do not remember</option>
+                  </select>
+                  {errors.hearAbout && (
+                    <p className="csuinp__error__msg">
+                      {errors.hearAbout.message}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
             <div className="csuinp">
@@ -121,49 +293,83 @@ function signup() {
                 <label htmlFor="password" className="csuinp__lbl">
                   Pilot certifications (select all that apply) *
                 </label>
-                <Select
-                  styles={{
-                    control: (baseStyles, state) => ({
-                      ...baseStyles,
-                      borderColor: state.isFocused ? '#886ab5' : '#E5E5E5',
-                    }),
-                  }}
-                  className=" csuinp__input--select"
-                  closeMenuOnSelect={false}
-                  components={animatedComponents}
-                  defaultValue={[colourOptions[4], colourOptions[5]]}
-                  isMulti
-                  options={colourOptions}
-                />
+                <div className="">
+                  <Controller
+                    name="certifications"
+                    control={control}
+                    {...register('certifications', {
+                      required:
+                        'The Pilot certifications (select all that apply) field is required.',
+                    })}
+                    render={({ field }) => (
+                      <Select
+                        placeholder="Select your certifications"
+                        isMulti
+                        styles={{
+                          control: (baseStyles, state) => ({
+                            ...baseStyles,
+                            borderColor: errors.certifications
+                              ? '#dc3545'
+                              : state.isFocused
+                              ? '#886ab5'
+                              : '#E5E5E5',
+                          }),
+                        }}
+                        {...field}
+                        closeMenuOnSelect={false}
+                        getOptionLabel={(option: { description: string }) =>
+                          option.description
+                        }
+                        getOptionValue={(option: { name: string }) =>
+                          option.name
+                        }
+                        className=" csuinp__input--select"
+                        options={certificationOptions}
+                        components={animatedComponents}
+                      />
+                    )}
+                  />
+                  {errors.certifications && (
+                    <p className="csuinp__error__msg">
+                      {errors.certifications.message}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="csuinp csuinp--checkbox">
-              <div className="csuinp__ipt__wrp">
-                <input
-                  type="checkbox"
-                  name="checkbox"
-                  id="checkbox"
-                  className="csuinp__input__checkbox"
-                  placeholder="The password you specified during registration"
-                />
-                <FaCheck className="csuinp__input__rgt" />
+            <div className="csuinp">
+              <div className=" csuinp--checkbox">
+                <div className="csuinp__ipt__wrp">
+                  <input
+                    type="checkbox"
+                    {...register('terms', {
+                      required: 'This field is required.',
+                    })}
+                    id="checkbox"
+                    className="csuinp__input__checkbox"
+                    placeholder="The password you specified during registration"
+                  />
+                  <FaCheck className="csuinp__input__rgt" />
+                </div>
+                <label
+                  htmlFor="checkbox"
+                  className="csuinp__lbl csuinp__lbl--light"
+                >
+                  I agree to{' '}
+                  <a className="csuinp__lbl--link" href="#">
+                    Terms of Service
+                  </a>
+                </label>
               </div>
-              <label
-                htmlFor="checkbox"
-                className="csuinp__lbl csuinp__lbl--light"
-              >
-                I agree to{' '}
-                <a className="csuinp__lbl--link" href="#">
-                  Terms of Service
-                </a>
-              </label>
+              {errors.terms && (
+                <p className="csuinp__error__msg">{errors.terms.message}</p>
+              )}
             </div>
             <div className="csuinp csuinp--checkbox csuinp--checkbox-alg-top">
               <div className="csuinp__ipt__wrp">
                 <input
-                  checked={true}
                   type="checkbox"
-                  name="checkbox"
+                  {...register('newsletter')}
                   id="checkbox2"
                   className="csuinp__input__checkbox"
                   placeholder="The password you specified during registration"
@@ -176,9 +382,13 @@ function signup() {
               </label>
             </div>
             <div className="sign__sub__btn__area signup__btn__area">
-              <button className="sign__sub__btn">Purchase Now</button>
+              <button type="submit" className="sign__sub__btn">
+                Purchase Now
+              </button>
               <span>Or</span>
-              <button className="sign__sub__btn">Start 14-Day Trial</button>
+              <button type="submit" className="sign__sub__btn">
+                Start 14-Day Trial
+              </button>
             </div>
           </form>
         </div>

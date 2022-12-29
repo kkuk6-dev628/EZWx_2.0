@@ -30,7 +30,10 @@
     "app",
     "components",
     "pages",
-    "store/ObsTimeSlice.tst",
+    "store/ObsTimeSlice.ts",
+    "store/auth/authSlice.ts",
+    "store/auth/authApi.ts",
+    "store/api/apiSlice.ts",
     "../server/common",
     ".next/types/**/*.ts"
 , "store/store.ts", "store/store.ts"  ],

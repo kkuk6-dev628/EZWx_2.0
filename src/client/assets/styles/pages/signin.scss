@@ -79,7 +79,7 @@
   &__frm__area{
     // margin-left: auto;
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
   }
 
   &__frm{
@@ -112,10 +112,7 @@
     padding: 14px 20px;
     font-weight: 500;
     border-radius: 4px;
-
     box-shadow: 0 2px 6px 0 rgba(136, 106, 181, 0.5); 
-
-
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 
@@ -123,6 +120,8 @@
       background-color: #3c1d76;
     }
   }
+
+  
 
   &__forgt{
     background-color: transparent;
@@ -186,7 +185,7 @@
 
   &__input{
     display: flex;
-    height: calc(1.47em + 1rem + 2px);
+    height: calc(1.47em + 1rem );
     width: calc(100% - 34px);
     padding: 0rem 0.875rem;
     font-size: 18px;
@@ -197,13 +196,18 @@
     background-clip: padding-box;
     border: 1px solid #E5E5E5;
     border-radius: 4px;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    transition: all 0.15s ease-in-out;
 
     &--select{
       width: 100%;
+      z-index: 4;
       .css-1hb7zxy-IndicatorsContainer{
         display: none!important;
       }
+    }
+
+    &--error{
+      border: 1px solid #dc3545;
     }
 
     &::placeholder{
@@ -214,23 +218,32 @@
     &:focus{
       border-color: #886ab5;
       outline: 0;
-      box-shadow: 0 0 0 0.2rem transparent;
+      // box-shadow: 0 0 0 0.2rem transparent;
     }
 
+  }
+
+  &__error__msg{
+    color: #dc3545;
+    margin-top: 5px;
   }
 
   input[type="checkbox"]{
     appearance: none;
     width: 1.4rem;
     height: 1.4rem;
-    background-color: #fff;
-    border: #adb5bd solid 3px;
     border-radius: 2px;
-    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s;
-
+    border: #adb5bd solid 3px;
+    background: #fff;
+    position: relative;
+    z-index: 1;
+    
     &:checked{
-      background-color: #3D0D68;
+        background-color: #3D0D68;
       border: #3D0D68 solid 3px;
+      z-index: 0;
+      
+      
     }
   }
 
