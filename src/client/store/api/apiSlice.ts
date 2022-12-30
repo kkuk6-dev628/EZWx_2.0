@@ -12,7 +12,7 @@ export const apiSlice = createApi({
   baseQuery: async (args, api, extraOptions) => {
     const result = await baseQuery(args, api, extraOptions);
     if (result.error) {
-      // do something with the error
+      console.log('Error ', result.error);
     }
     return result;
   },

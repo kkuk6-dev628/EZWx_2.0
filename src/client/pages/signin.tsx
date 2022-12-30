@@ -9,7 +9,11 @@ interface IFormInput {
   password: string;
 }
 function signin() {
-  const { handleSubmit, register } = useForm<IFormInput>();
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<IFormInput>();
   const [signin, { data, isLoading, error: responseError }] =
     useSigninMutation();
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
@@ -65,13 +69,20 @@ function signin() {
                 <label htmlFor="email" className="csuinp__lbl">
                   Username
                 </label>
-                <input
-                  type="email"
-                  {...register('email', { required: true })}
-                  id="email"
-                  className="csuinp__input"
-                  placeholder="Email for Verification"
-                />
+                <div className="csuinp__wrp__two">
+                  <input
+                    type="email"
+                    {...register('email', {
+                      required: 'Please enter a valid email address.',
+                    })}
+                    id="email"
+                    className="csuinp__input"
+                    placeholder="Email for Verification"
+                  />
+                  {errors.email && (
+                    <p className="csuinp__error__msg">{errors.email.message}</p>
+                  )}
+                </div>
               </div>
               <p className="csuinp__txt">
                 The email address you registered with
