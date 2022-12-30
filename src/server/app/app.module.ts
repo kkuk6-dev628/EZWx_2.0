@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { User } from './users/user.entity';
 import { typeOrmConfig } from 'ormconfig';
+import { ApiModule } from './api/api.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,6 +21,7 @@ import { typeOrmConfig } from 'ormconfig';
     ConsoleModule,
     AuthModule,
     UsersModule,
+    ApiModule,
   ],
   providers: [AppService],
   controllers: [AppController],

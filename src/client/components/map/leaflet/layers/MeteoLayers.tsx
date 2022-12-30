@@ -24,6 +24,7 @@ import PIREPPopup from '../popups/PIREPPopup';
 import 'leaflet-responsive-popup';
 import 'leaflet-responsive-popup/leaflet.responsive.popup.css';
 import WMSLayer from './WMSLayer';
+import axios from 'axios';
 
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
@@ -117,15 +118,26 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
 
       if (features.length === 0) {
         if (wmsLayerRef.current) {
-          wmsLayerRef.current.getFeatureInfo(
-            map.latLngToContainerPoint(e.latlng),
-            e.latlng,
-            ['EZWxBrief:2t_NBM', 'EZWxBrief:gairmet'],
-            (latlng, result) => {
-              const resultObj = JSON.parse(result);
-              showPopup({ feature: resultObj.features[0] } as any, latlng);
-            },
-          );
+          // wmsLayerRef.current.getFeatureInfo(
+          //   map.latLngToContainerPoint(e.latlng),
+          //   e.latlng,
+          //   ['EZWxBrief:2t_NBM', 'EZWxBrief:gairmet'],
+          //   (latlng, result) => {
+          //     const resultObj = JSON.parse(result);
+          //     showPopup({ feature: resultObj.features[0] } as any, latlng);
+          //   },
+          // );
+          axios
+            .post('/api/asd', e.latlng)
+            .then((data) => {
+              showPopup(
+                { feature: { properties: data.data[0], id: 'temp' } } as any,
+                e.latlng,
+              );
+            })
+            .catch((reason) => {
+              console.log(reason);
+            });
         }
         return;
       } else if (features.length === 1) {
