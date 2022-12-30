@@ -9,7 +9,7 @@ export class ApiService {
       'geotiff',
       module,
     )) as typeof import('geotiff');
-    const file = await geotiff.fromFile('D:\\EZWx\\2t_NBM.tif');
+    const file = await geotiff.fromFile('/home/tuan/model_data/NBM/2t_NBM.tif');
     const image = await file.getImage();
     const bbox = image.getBoundingBox();
     const pixelWidth = image.getWidth();
