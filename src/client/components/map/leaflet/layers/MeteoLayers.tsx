@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import LayerControl, { GroupedLayer } from '../layer-control/LayerControl';
 import WFSLayer from './WFSLayer';
-import { useMapEvents, WMSTileLayer } from 'react-leaflet';
+import { LayerGroup, useMapEvents, WMSTileLayer } from 'react-leaflet';
 import L, { CRS, LatLng, TileLayer } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
 import { useRef, useState } from 'react';
@@ -29,6 +29,7 @@ import axios from 'axios';
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
   const wmsLayerRef = useRef(null);
+  const debugLayerGroupRef = useRef(null);
 
   const showPopup = (layer: L.GeoJSON, latlng: LatLng): void => {
     if (typeof layer.setStyle === 'function') {
@@ -90,6 +91,9 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
     click: (e: any) => {
       const features = [];
       const clickedBBox = getBBoxFromPointZoom(40, e.latlng, map.getZoom());
+      if (debugLayerGroupRef.current) {
+        debugLayerGroupRef.current.clearLayers();
+      }
       layers.forEach((layer) => {
         layer.layer.resetStyle && layer.layer.resetStyle();
         if (layer.group !== 'Meteo') return;
@@ -129,9 +133,23 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           // );
           axios
             .post('/api/asd', e.latlng)
-            .then((data) => {
+            .then((result) => {
+              Object.entries(result.data).map((entry) => {
+                const lnglat = entry[0].split(',');
+                if (
+                  debugLayerGroupRef.current &&
+                  debugLayerGroupRef.current.addLayer
+                ) {
+                  const circleMarker = new L.CircleMarker(
+                    [lnglat[1] as any, lnglat[0] as any],
+                    { radius: 2 },
+                  );
+                  circleMarker.bindTooltip(`<h>${entry[1]}</h>`);
+                  debugLayerGroupRef.current.addLayer(circleMarker);
+                }
+              });
               showPopup(
-                { feature: { properties: data.data[0], id: 'temp' } } as any,
+                { feature: { properties: result.data, id: 'temp' } } as any,
                 e.latlng,
               );
             })
@@ -241,6 +259,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
             serverFilter={`observation_time DURING ${getQueryTime(current)}`}
           ></WFSLayer>
         </GroupedLayer>
+        <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
       </LayerControl>
     </>
   );
