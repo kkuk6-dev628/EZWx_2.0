@@ -26,6 +26,8 @@ import 'leaflet-responsive-popup/leaflet.responsive.popup.css';
 import WMSLayer from './WMSLayer';
 import axios from 'axios';
 
+const maxLayers = 6;
+
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
   const wmsLayerRef = useRef(null);
@@ -96,9 +98,15 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
       }
       layers.forEach((layer) => {
         layer.layer.resetStyle && layer.layer.resetStyle();
+        if (features.length >= maxLayers) {
+          return;
+        }
         if (layer.group !== 'Meteo') return;
         if (typeof layer.layer.eachLayer !== 'function') return;
         layer.layer.eachLayer((l) => {
+          if (features.length >= maxLayers) {
+            return;
+          }
           if (
             l.feature.geometry.type === 'Point' ||
             l.feature.geometry.type === 'MultiPoint'

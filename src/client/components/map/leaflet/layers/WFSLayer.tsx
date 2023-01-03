@@ -216,7 +216,11 @@ const WFSLayer = ({
           key={geoJsonKey}
           // @ts-ignore
           iconCreateFunction={(cluster) => {
-            return cluster.getAllChildMarkers()[0].getIcon();
+            const children = cluster.getAllChildMarkers();
+            const marker = children.sort((a: any, b: any) => {
+              return a._leaflet_id > b._leaflet_id ? 1 : -1;
+            })[0];
+            return marker.getIcon();
           }}
           zoomToBoundsOnClick={false}
           showCoverageOnHover={false}
