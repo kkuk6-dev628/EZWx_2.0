@@ -1,17 +1,30 @@
 import { IsEmail, IsNotEmpty } from 'class-validator';
 
-export class AuthDto {
+export class AuthSignupDto {
   @IsNotEmpty()
-  username: string;
+  firstname: string;
+
+  @IsNotEmpty()
+  lastname: string;
+
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 
   @IsNotEmpty()
   password: string;
 
   @IsNotEmpty()
-  @IsEmail()
-  email: string;
+  confirmPassword: string;
+
+  @IsNotEmpty()
+  hearAbout: string;
+
+  @IsNotEmpty()
+  certifications: { name: string; description: string }[];
 }
-export class AuthSingingDto {
+
+export class AuthSinginDto {
   @IsNotEmpty()
   password: string;
 

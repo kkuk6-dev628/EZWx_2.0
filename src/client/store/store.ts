@@ -2,14 +2,20 @@ import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import ObsTimeSlice from './ObsTimeSlice';
 import ObsIntervalSlice from './ObsIntervalSlice';
 import { createWrapper } from 'next-redux-wrapper';
+import authSlice from './auth/authSlice';
+import { apiSlice } from './api/apiSlice';
 
 const makeStore = () =>
   configureStore({
     reducer: {
       [ObsIntervalSlice.name]: ObsIntervalSlice.reducer,
       [ObsTimeSlice.name]: ObsTimeSlice.reducer,
+      [apiSlice.reducerPath]: apiSlice.reducer,
+      [authSlice.name]: authSlice.reducer,
     },
     devTools: process.env.NODE_ENV !== 'production',
+    middleware: (getDefaultMiddlewares) =>
+      getDefaultMiddlewares().concat(apiSlice.middleware),
   });
 
 export type AppStore = ReturnType<typeof makeStore>;

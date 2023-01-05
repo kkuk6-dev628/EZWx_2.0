@@ -1,25 +1,30 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { AuthDto, AuthSingingDto } from './dto';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+import { AuthSignupDto, AuthSinginDto } from './dto';
 import * as bcrypt from 'bcrypt';
-import { UsersService } from '../users/users.service';
+import { UserService } from '../user/user.service';
 import { TypeORMError } from 'typeorm';
 import { JwtAuthService } from './jwt/jwt-auth.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UsersService,
+    private userService: UserService,
     private jwtService: JwtAuthService,
   ) {}
 
-  async signup(dto: AuthDto) {
+  async signup(dto: AuthSignupDto) {
     const hash = await bcrypt.hash(dto.password, 2);
+
+    const { password, confirmPassword, ...newDto } = dto;
 
     try {
       const user = await this.userService.create({
-        username: dto.username,
         hash,
-        email: dto.email,
+        ...newDto,
       });
 
       const accessToken = await this.jwtService.login({
@@ -33,13 +38,13 @@ export class AuthService {
     } catch (err) {
       if (err instanceof TypeORMError) {
         if (/(duplicate key)[\s\S]/.test(err.message)) {
-          throw new ForbiddenException('email is already exists..');
+          throw new BadRequestException('email is already exists');
         }
       }
     }
   }
 
-  async signin(dto: AuthSingingDto) {
+  async signin(dto: AuthSinginDto) {
     const user = await this.userService.findOne({
       where: {
         email: dto.email,
