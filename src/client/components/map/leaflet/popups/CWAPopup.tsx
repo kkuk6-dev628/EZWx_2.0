@@ -7,8 +7,8 @@ import {
 
 const CWAPopup = ({ feature }) => {
   let title = 'CWA';
-  const base = getAltitudeString(feature.properties.base);
-  const top = getAltitudeString(feature.properties.top);
+  const base = getAltitudeString(feature.properties.base, false);
+  const top = getAltitudeString(feature.properties.top, false);
 
   switch (feature.properties.hazard) {
     case 'TURB':

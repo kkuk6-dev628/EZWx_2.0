@@ -21,7 +21,7 @@ const SigmetPopup = ({ feature }) => {
   }
 
   let top = getAltitudeString(feature.properties.altitudehi, false);
-  if (feature.properties.altitudehi == '600') {
+  if (feature.properties.altitudehi == '60000') {
     top = 'Above 45,000 feet MSL';
   } else if (isNaN(parseInt(feature.properties.altitudehi))) {
     top = undefined;

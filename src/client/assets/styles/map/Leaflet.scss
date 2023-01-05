@@ -112,3 +112,11 @@ z-index: 400!important;
     border-right-style: ridge;
     border-right-width: 1px;
 }
+.MuiTypography-body2{
+  @media screen and (max-width: 1024px){
+    font-size: 0.75rem !important;
+  }
+  @media screen and (max-width: 650px){
+    font-size: 0.65rem !important;
+  }
+}

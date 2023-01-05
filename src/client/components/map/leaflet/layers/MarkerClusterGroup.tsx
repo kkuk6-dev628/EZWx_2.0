@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { createPathComponent } from '@react-leaflet/core';
 import L from 'leaflet';
 import { useMap } from 'react-leaflet';
@@ -17,6 +18,7 @@ const MarkerClusterGroup = createPathComponent(
     );
 
     // Creating markerClusterGroup Leaflet element
+    // @ts-ignore
     const markerClusterGroup = new L.markerClusterGroup(clusterProps);
 
     const map = useMap();

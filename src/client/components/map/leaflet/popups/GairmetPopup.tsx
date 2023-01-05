@@ -55,6 +55,7 @@ const GairmetPopup = ({ feature }) => {
         translateWeatherClausings(feature.properties.dueto);
       break;
     case 'M_FZLVL':
+      title = 'Multiple Freezing Level G_AIRMET';
       break;
   }
 
@@ -66,6 +67,9 @@ const GairmetPopup = ({ feature }) => {
       <Typography variant="body2" style={{ margin: 3 }}>
         <b>Issued:</b> {convertTimeFormat(feature.properties.issuetime)}
       </Typography>
+      <Typography variant="body2" style={{ margin: 3 }}>
+        <b>Forecast:</b> {feature.properties.forecast}
+      </Typography>{' '}
       {top && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Top:</b> {top}
@@ -76,9 +80,11 @@ const GairmetPopup = ({ feature }) => {
           <b>Base:</b> {base}
         </Typography>
       )}
-      <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Due to:</b> {dueto}
-      </Typography>
+      {feature.properties.hazard !== 'M_FZLVL' && (
+        <Typography variant="body2" style={{ margin: 3 }}>
+          <b>Due to:</b> {dueto}
+        </Typography>
+      )}
     </BasePopupFrame>
   );
 };

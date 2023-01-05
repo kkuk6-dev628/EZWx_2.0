@@ -84,8 +84,8 @@ const PirepLayer = () => {
   };
 
   const getMarker = (latlng, iconUrl, fltlvl) => {
-    const flightLevel = fltlvl === 0 ? 'UNK' : addLeadingZeroes(fltlvl, 3);
-    const spanClass = fltlvl === 0 ? 'pirep-unk-span' : 'pirep-span';
+    const flightLevel = fltlvl == 0 ? 'UNK' : addLeadingZeroes(fltlvl, 3);
+    const spanClass = fltlvl == 0 ? 'pirep-unk-span' : 'pirep-span';
     const pirepMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'pirep-icon',
@@ -104,8 +104,8 @@ const PirepLayer = () => {
     return pirepMarker;
   };
   const getBothMarkers = (latlng, iconUrl1, iconUrl2, fltlvl) => {
-    const flightLevel = fltlvl === 0 ? 'UNK' : addLeadingZeroes(fltlvl, 3);
-    const spanClass = fltlvl === 0 ? 'pirep-unk-span' : 'pirep-span';
+    const flightLevel = fltlvl == 0 ? 'UNK' : addLeadingZeroes(fltlvl, 3);
+    const spanClass = fltlvl == 0 ? 'pirep-unk-span' : 'pirep-span';
     const pirepMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'pirep-icon',
@@ -168,7 +168,7 @@ const PirepLayer = () => {
       feature.properties.icgint1 === null
     ) {
       let iconUrl = '/icons/pirep/weather-sky-icon-black.png';
-      if (feature.properties.airepType === 'Urgent PIREP') {
+      if (feature.properties.aireptype === 'Urgent PIREP') {
         iconUrl = '/icons/pirep/weather-sky-icon-red.png';
       }
       pirepMarker = getMarker(latlng, iconUrl, feature.properties.fltlvl);
@@ -180,15 +180,18 @@ const PirepLayer = () => {
   };
 
   const clientFilter = (
-    feature: GeoJSON.Feature,
+    features: GeoJSON.Feature[],
     observationTime: Date,
-  ): boolean => {
-    const start = new Date(feature.properties.obstime);
-    const end = new Date(feature.properties.obstime);
-    end.setMinutes(end.getMinutes() + 75);
-    end.setSeconds(0);
-    end.setMilliseconds(0);
-    return start <= observationTime && observationTime < end;
+  ): GeoJSON.Feature[] => {
+    const results = features.filter((feature) => {
+      const start = new Date(feature.properties.obstime);
+      const end = new Date(feature.properties.obstime);
+      end.setMinutes(end.getMinutes() + 75);
+      end.setSeconds(0);
+      end.setMilliseconds(0);
+      return start <= observationTime && observationTime < end;
+    });
+    return results;
   };
 
   return (

@@ -32,6 +32,17 @@ const CWALayer = () => {
     // }
     return label;
   };
+  const clientFilter = (
+    features: GeoJSON.Feature[],
+    observationTime: Date,
+  ): GeoJSON.Feature[] => {
+    const results = features.filter((feature) => {
+      const start = new Date(feature.properties.validtimefrom);
+      const end = new Date(feature.properties.validtimeto);
+      return start <= observationTime && observationTime < end;
+    });
+    return results;
+  };
 
   return (
     <WFSLayer
@@ -53,6 +64,7 @@ const CWALayer = () => {
       ]}
       style={style}
       getLabel={getLabel}
+      clientFilter={clientFilter}
     ></WFSLayer>
   );
 };

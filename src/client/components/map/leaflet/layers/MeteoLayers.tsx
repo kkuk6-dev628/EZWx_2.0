@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import LayerControl, { GroupedLayer } from '../layer-control/LayerControl';
 import WFSLayer from './WFSLayer';
-import { useMapEvents } from 'react-leaflet';
-import L, { LatLng } from 'leaflet';
+import { LayerGroup, useMapEvents, WMSTileLayer } from 'react-leaflet';
+import L, { CRS, LatLng, TileLayer } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import FeatureSelector from '../popups/FeatureSelector';
 import ReactDOMServer from 'react-dom/server';
@@ -23,13 +23,16 @@ import PirepLayer from './PirepLayer';
 import PIREPPopup from '../popups/PIREPPopup';
 import 'leaflet-responsive-popup';
 import 'leaflet-responsive-popup/leaflet.responsive.popup.css';
+import WMSLayer from './WMSLayer';
+import axios from 'axios';
+import MetarsLayer from './MetarsLayer';
+
+const maxLayers = 6;
 
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
-
-  const handleFeatureSelect = (feature) => {
-    console.log(feature);
-  };
+  const wmsLayerRef = useRef(null);
+  const debugLayerGroupRef = useRef(null);
 
   const showPopup = (layer: L.GeoJSON, latlng: LatLng): void => {
     if (typeof layer.setStyle === 'function') {
@@ -91,10 +94,20 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
     click: (e: any) => {
       const features = [];
       const clickedBBox = getBBoxFromPointZoom(40, e.latlng, map.getZoom());
+      if (debugLayerGroupRef.current) {
+        debugLayerGroupRef.current.clearLayers();
+      }
       layers.forEach((layer) => {
         layer.layer.resetStyle && layer.layer.resetStyle();
+        if (features.length >= maxLayers) {
+          return;
+        }
         if (layer.group !== 'Meteo') return;
+        if (typeof layer.layer.eachLayer !== 'function') return;
         layer.layer.eachLayer((l) => {
+          if (features.length >= maxLayers) {
+            return;
+          }
           if (
             l.feature.geometry.type === 'Point' ||
             l.feature.geometry.type === 'MultiPoint'
@@ -117,6 +130,42 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
       map.closePopup();
 
       if (features.length === 0) {
+        if (wmsLayerRef.current) {
+          // wmsLayerRef.current.getFeatureInfo(
+          //   map.latLngToContainerPoint(e.latlng),
+          //   e.latlng,
+          //   ['EZWxBrief:2t_NBM', 'EZWxBrief:gairmet'],
+          //   (latlng, result) => {
+          //     const resultObj = JSON.parse(result);
+          //     showPopup({ feature: resultObj.features[0] } as any, latlng);
+          //   },
+          // );
+          axios
+            .post('/api/asd', e.latlng)
+            .then((result) => {
+              Object.entries(result.data).map((entry) => {
+                const lnglat = entry[0].split(',');
+                if (
+                  debugLayerGroupRef.current &&
+                  debugLayerGroupRef.current.addLayer
+                ) {
+                  const circleMarker = new L.CircleMarker(
+                    [lnglat[1] as any, lnglat[0] as any],
+                    { radius: 2 },
+                  );
+                  circleMarker.bindTooltip(`<h>${entry[1]}</h>`);
+                  debugLayerGroupRef.current.addLayer(circleMarker);
+                }
+              });
+              showPopup(
+                { feature: { properties: result.data, id: 'temp' } } as any,
+                e.latlng,
+              );
+            })
+            .catch((reason) => {
+              console.log(reason);
+            });
+        }
         return;
       } else if (features.length === 1) {
         showPopup(features[0], e.latlng);
@@ -125,10 +174,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           .setLatLng(e.latlng)
           .setContent(
             ReactDOMServer.renderToString(
-              <FeatureSelector
-                features={features}
-                onSelect={handleFeatureSelect}
-              ></FeatureSelector>,
+              <FeatureSelector features={features}></FeatureSelector>,
             ),
           )
           .openOn(map);
@@ -152,7 +198,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
   });
 
   const current = new Date();
-  current.setHours(current.getHours() - 48);
+  // current.setHours(current.getHours() - 48);
 
   return (
     <>
@@ -164,6 +210,21 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           setLayers(lyr);
         }}
       >
+        <GroupedLayer checked name="temperature" group="Meteo">
+          <WMSLayer
+            ref={wmsLayerRef}
+            url="http://3.95.80.120:8080/geoserver/EZWxBrief/wms?"
+            layers={['EZWxBrief:2t_NBM']}
+            options={{
+              transparent: true,
+              format: 'image/png',
+              crs: CRS.EPSG4326,
+              info_format: 'application/json',
+              identify: false,
+              tiled: true,
+            }}
+          ></WMSLayer>
+        </GroupedLayer>
         <GroupedLayer checked name="States" group="Admin">
           <WFSLayer
             url="http://3.95.80.120:8080/geoserver/topp/ows"
@@ -197,16 +258,9 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           <GairmetLayer></GairmetLayer>
         </GroupedLayer>
         <GroupedLayer checked name="Metar" group="Meteo">
-          <WFSLayer
-            url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
-            maxFeatures={10000}
-            typeName="EZWxBrief:metar"
-            pointToLayer={(feature: GeoJSON.Feature, latlng: LatLng) => {
-              return L.circleMarker(latlng, { color: '#990', weight: 1 });
-            }}
-            serverFilter={`observation_time DURING ${getQueryTime(current)}`}
-          ></WFSLayer>
+          <MetarsLayer></MetarsLayer>
         </GroupedLayer>
+        <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
       </LayerControl>
     </>
   );

@@ -1,5 +1,4 @@
 import { Divider, Typography } from '@material-ui/core';
-import BasePopupFrame from './BasePopupFrame';
 import { convertTimeFormat } from '../../common/AreoFunctions';
 
 const icingIntensityTranslations = {
@@ -27,7 +26,7 @@ const turbulenceIntensityTranslations = {
 const turblenceTypeTranslations = {
   CAT: 'Clear air',
   CHOP: 'Chop',
-  LLWS: 'Low level wind shear',
+  LLWS: 'Low-level wind shear',
   MWAVE: 'Mountain wave',
 };
 const icingTypeTranslations = {
@@ -49,31 +48,39 @@ const turbulenceFrequencyTranslations = {
 };
 
 const PIREPPopup = ({ feature }) => {
-  let title = feature.properties.aireptype
-    ? feature.properties.aireptype
-    : 'PIREP';
-  if (feature.properties.actype === 'NMRS') {
-    title += ' Numerous Aircraft';
-  } else {
-    title += ' ' + feature.properties.actype;
-  }
   const useCelsus = true;
   const useKnote = true;
 
   return (
-    <BasePopupFrame title={title}>
+    <>
+      <Typography variant="subtitle2">
+        {feature.properties.aireptype === 'Urgent PIREP' ? (
+          <span style={{ color: 'red' }}>{feature.properties.aireptype}</span>
+        ) : (
+          feature.properties.aireptype
+        )}{' '}
+        {feature.properties.actype === 'NMRS'
+          ? 'Numerous Aircraft'
+          : feature.properties.actype}
+      </Typography>
+      <Divider />
       <Typography variant="body2" style={{ margin: 3 }}>
         <b>Time:</b> {convertTimeFormat(feature.properties.obstime)}
       </Typography>
-      {feature.properties.fltlvl &&
-      feature.properties.fltlvl !== 'UNK' &&
-      feature.properties.fltlvl !== '000' ? (
+      {feature.properties.fltlvl && feature.properties.fltlvl !== '000' ? (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Flight level:</b> {feature.properties.fltlvl}
         </Typography>
       ) : (
         <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Flight level:</b> Unknown
+          <b>Flight level: </b>
+          {feature.properties.fltlvltype === 'UNKN'
+            ? 'Unknown'
+            : feature.properties.fltlvltype === 'DURC'
+            ? 'During climb'
+            : feature.properties.fltlvltype === 'DURD'
+            ? 'During descent'
+            : 'Unknown'}
         </Typography>
       )}
       {feature.properties.temp && (
@@ -163,7 +170,7 @@ const PIREPPopup = ({ feature }) => {
         </b>{' '}
         {feature.properties.rawob}
       </Typography>
-    </BasePopupFrame>
+    </>
   );
 };
 export default PIREPPopup;

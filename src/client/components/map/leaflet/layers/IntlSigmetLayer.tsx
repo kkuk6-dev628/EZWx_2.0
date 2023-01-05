@@ -1,10 +1,11 @@
+import { PathOptions } from 'leaflet';
 import WFSLayer from './WFSLayer';
 
 const IntlSigmetLayer = () => {
-  const gairmetStyle = (feature) => {
+  const gairmetStyle = (): PathOptions => {
     const style = {
       color: '#F50000',
-      weight: '2',
+      weight: 2,
       opacity: 0.7,
     };
     return style;
@@ -12,6 +13,17 @@ const IntlSigmetLayer = () => {
 
   const getLabel = (feature) => {
     return feature.properties.hazard;
+  };
+  const clientFilter = (
+    features: GeoJSON.Feature[],
+    observationTime: Date,
+  ): GeoJSON.Feature[] => {
+    const results = features.filter((feature) => {
+      const start = new Date(feature.properties.validtimefrom);
+      const end = new Date(feature.properties.validtimeto);
+      return start <= observationTime && observationTime < end;
+    });
+    return results;
   };
 
   return (
@@ -36,6 +48,7 @@ const IntlSigmetLayer = () => {
       ]}
       style={gairmetStyle}
       getLabel={getLabel}
+      clientFilter={clientFilter}
     ></WFSLayer>
   );
 };
