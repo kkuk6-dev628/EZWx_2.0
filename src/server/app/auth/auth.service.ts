@@ -1,14 +1,18 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { AuthSignupDto, AuthSinginDto } from './dto';
 import * as bcrypt from 'bcrypt';
-import { UsersService } from '../users/users.service';
+import { UserService } from '../user/user.service';
 import { TypeORMError } from 'typeorm';
 import { JwtAuthService } from './jwt/jwt-auth.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UsersService,
+    private userService: UserService,
     private jwtService: JwtAuthService,
   ) {}
 
@@ -17,7 +21,6 @@ export class AuthService {
 
     const { password, confirmPassword, ...newDto } = dto;
 
-    // console.log({ ...newDto, hash });
     try {
       const user = await this.userService.create({
         hash,
@@ -35,7 +38,7 @@ export class AuthService {
     } catch (err) {
       if (err instanceof TypeORMError) {
         if (/(duplicate key)[\s\S]/.test(err.message)) {
-          throw new ForbiddenException('email is already exists..');
+          throw new BadRequestException('email is already exists');
         }
       }
     }

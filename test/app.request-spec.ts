@@ -6,8 +6,8 @@ import { DataSource } from 'typeorm';
 import * as cookieParser from 'cookie-parser';
 
 import { usersFactory, ordersFactory, thingsFactory } from 'test/factories';
-import { UsersService } from 'src/server/app/users/users.service';
-import { User } from 'src/server/app/users/user.entity';
+import { UserService } from 'src/server/app/user/user.service';
+import { User } from 'src/server/app/user/user.entity';
 import { Order } from 'src/server/app/orders/order.entity';
 import { OrdersService } from 'src/server/app/orders/orders.service';
 import { JwtAuthService } from 'src/server/app/auth/jwt/jwt-auth.service';
@@ -17,7 +17,7 @@ import { login } from './utils';
 describe('Application', () => {
   let app: INestApplication;
   let authService: JwtAuthService;
-  let usersService: UsersService;
+  let userService: UserService;
   let ordersService: OrdersService;
   let thingsService: ThingsService;
   let dataSource: DataSource;
@@ -31,7 +31,7 @@ describe('Application', () => {
     app.use(cookieParser());
     await app.init();
 
-    usersService = app.get(UsersService);
+    userService = app.get(UserService);
     ordersService = app.get(OrdersService);
     authService = app.get(JwtAuthService);
     thingsService = app.get(ThingsService);
@@ -55,7 +55,7 @@ describe('Application', () => {
       let user: User;
 
       beforeEach(async () => {
-        user = await usersService.create(usersFactory.build());
+        user = await userService.create(usersFactory.build());
       });
 
       it('returns users', () => {
@@ -87,7 +87,7 @@ describe('Application', () => {
 
       describe('when authorized', () => {
         beforeEach(async () => {
-          user = await usersService.create(usersFactory.build());
+          user = await userService.create(usersFactory.build());
           const thing = await thingsService.create(thingsFactory.build());
           order = await ordersService.create(
             ordersFactory.build(

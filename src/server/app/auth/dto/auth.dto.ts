@@ -23,6 +23,7 @@ export class AuthSignupDto {
   @IsNotEmpty()
   certifications: { name: string; description: string }[];
 }
+
 export class AuthSinginDto {
   @IsNotEmpty()
   password: string;

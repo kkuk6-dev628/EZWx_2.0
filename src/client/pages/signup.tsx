@@ -4,8 +4,10 @@ import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { useSignupMutation } from '../store/auth/authApi';
+import { useRouter } from 'next/router';
+// import { error } from 'console';
 
-interface Certification {
+interface certifications {
   name: string;
   description: string;
 }
@@ -16,13 +18,14 @@ interface IFormInput {
   password: string;
   confirmPassword: string;
   hearAbout: string;
-  certifications: Certification[];
+  certifications: certifications[];
   terms: boolean;
   newsletter: boolean;
 }
 
 const animatedComponents = makeAnimated();
 function signup() {
+  const router = useRouter();
   const {
     control,
     register,
@@ -54,7 +57,7 @@ function signup() {
     signup(data);
   };
 
-  const certificationOptions = [
+  const certificationsOptions = [
     {
       name: 'atp',
       description: 'Private, Commercial or ATP',
@@ -101,6 +104,17 @@ function signup() {
     }
     return true;
   };
+
+  // render logic
+  // let content = null;
+
+  if (isLoading) {
+    console.log('loading');
+  } else if (!isLoading && responseError) {
+    console.log(responseError);
+  } else if (!isLoading && !responseError && data) {
+    router.push('/try-ezwxbrief');
+  }
 
   return (
     <div className="signup">
@@ -291,19 +305,19 @@ function signup() {
             <div className="csuinp">
               <div className="csuinp__ipt__wrp">
                 <label htmlFor="password" className="csuinp__lbl">
-                  Pilot certifications (select all that apply) *
+                  Pilot certificationss (select all that apply) *
                 </label>
                 <div className="">
                   <Controller
-                    name="certifications"
+                    name="certificationss"
                     control={control}
                     {...register('certifications', {
                       required:
-                        'The Pilot certifications (select all that apply) field is required.',
+                        'The Pilot certificationss (select all that apply) field is required.',
                     })}
                     render={({ field }) => (
                       <Select
-                        placeholder="Select your certifications"
+                        placeholder="Select your certificationss"
                         isMulti
                         styles={{
                           control: (baseStyles, state) => ({
@@ -324,7 +338,7 @@ function signup() {
                           option.name
                         }
                         className=" csuinp__input--select"
-                        options={certificationOptions}
+                        options={certificationsOptions}
                         components={animatedComponents}
                       />
                     )}

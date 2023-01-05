@@ -1,5 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from '../users/user.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Certification {
@@ -11,7 +10,4 @@ export class Certification {
 
   @Column()
   description: string;
-
-  @ManyToOne(() => User, (user) => user.certifications, { onDelete: 'CASCADE' })
-  user: User;
 }
