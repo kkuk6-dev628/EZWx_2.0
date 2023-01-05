@@ -67,6 +67,7 @@ function signup() {
       description: 'Certified Flight Instructor (CFI)',
     },
     { name: 'purple', description: 'Instrument Rated' },
+
     {
       name: 'professional',
       description: 'Professional Pilot (other than a CFI)',
