@@ -79,19 +79,22 @@ const GairmetLayer = () => {
     return label;
   };
   const clientFilter = (
-    feature: GeoJSON.Feature,
+    features: GeoJSON.Feature[],
     observationTime: Date,
-  ): boolean => {
-    const start = new Date(feature.properties.validtime);
-    let duration = 3 * 60; // minutes
-    if (feature.properties.forecast == 12) {
-      duration = 1.5 * 60;
-    }
-    const end = new Date(feature.properties.validtime);
-    end.setMinutes(end.getMinutes() + duration);
-    end.setSeconds(0);
-    end.setMilliseconds(0);
-    return start <= observationTime && observationTime < end;
+  ): GeoJSON.Feature[] => {
+    const results = features.filter((feature) => {
+      const start = new Date(feature.properties.validtime);
+      let duration = 3 * 60; // minutes
+      if (feature.properties.forecast == 12) {
+        duration = 1.5 * 60;
+      }
+      const end = new Date(feature.properties.validtime);
+      end.setMinutes(end.getMinutes() + duration);
+      end.setSeconds(0);
+      end.setMilliseconds(0);
+      return start <= observationTime && observationTime < end;
+    });
+    return results;
   };
 
   return (

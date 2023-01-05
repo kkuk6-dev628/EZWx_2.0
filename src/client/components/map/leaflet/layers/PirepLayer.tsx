@@ -180,15 +180,18 @@ const PirepLayer = () => {
   };
 
   const clientFilter = (
-    feature: GeoJSON.Feature,
+    features: GeoJSON.Feature[],
     observationTime: Date,
-  ): boolean => {
-    const start = new Date(feature.properties.obstime);
-    const end = new Date(feature.properties.obstime);
-    end.setMinutes(end.getMinutes() + 75);
-    end.setSeconds(0);
-    end.setMilliseconds(0);
-    return start <= observationTime && observationTime < end;
+  ): GeoJSON.Feature[] => {
+    const results = features.filter((feature) => {
+      const start = new Date(feature.properties.obstime);
+      const end = new Date(feature.properties.obstime);
+      end.setMinutes(end.getMinutes() + 75);
+      end.setSeconds(0);
+      end.setMilliseconds(0);
+      return start <= observationTime && observationTime < end;
+    });
+    return results;
   };
 
   return (

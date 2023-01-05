@@ -25,6 +25,7 @@ import 'leaflet-responsive-popup';
 import 'leaflet-responsive-popup/leaflet.responsive.popup.css';
 import WMSLayer from './WMSLayer';
 import axios from 'axios';
+import MetarsLayer from './MetarsLayer';
 
 const maxLayers = 6;
 
@@ -197,7 +198,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
   });
 
   const current = new Date();
-  current.setHours(current.getHours() - 48);
+  // current.setHours(current.getHours() - 48);
 
   return (
     <>
@@ -257,15 +258,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           <GairmetLayer></GairmetLayer>
         </GroupedLayer>
         <GroupedLayer checked name="Metar" group="Meteo">
-          <WFSLayer
-            url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
-            maxFeatures={10000}
-            typeName="EZWxBrief:metar"
-            pointToLayer={(feature: GeoJSON.Feature, latlng: LatLng) => {
-              return L.circleMarker(latlng, { color: '#990', weight: 1 });
-            }}
-            serverFilter={`observation_time DURING ${getQueryTime(current)}`}
-          ></WFSLayer>
+          <MetarsLayer></MetarsLayer>
         </GroupedLayer>
         <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
       </LayerControl>

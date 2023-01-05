@@ -34,12 +34,15 @@ const SigmetLayer = () => {
   };
 
   const clientFilter = (
-    feature: GeoJSON.Feature,
+    features: GeoJSON.Feature[],
     observationTime: Date,
-  ): boolean => {
-    const start = new Date(feature.properties.validtimefrom);
-    const end = new Date(feature.properties.validtimeto);
-    return start <= observationTime && observationTime < end;
+  ): GeoJSON.Feature[] => {
+    const results = features.filter((feature) => {
+      const start = new Date(feature.properties.validtimefrom);
+      const end = new Date(feature.properties.validtimeto);
+      return start <= observationTime && observationTime < end;
+    });
+    return results;
   };
 
   return (

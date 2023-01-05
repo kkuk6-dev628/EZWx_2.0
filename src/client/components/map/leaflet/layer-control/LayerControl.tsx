@@ -1,5 +1,11 @@
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
-import { Typography } from '@material-ui/core';
+import {
+  FormControl,
+  Radio,
+  RadioGroup,
+  Slider,
+  Typography,
+} from '@material-ui/core';
 import { useMapEvents } from 'react-leaflet';
 import { Layer, Util, DomEvent, LayerGroup } from 'leaflet';
 import Accordion from '@material-ui/core/Accordion';
@@ -13,6 +19,7 @@ import toast from 'react-hot-toast';
 import { LayersControlProvider } from './layerControlContext';
 
 import createControlledLayer from './controlledLayer';
+import { GlobalStyles } from '@mui/styled-engine';
 
 const POSITION_CLASSES: { [key: string]: string } = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -186,6 +193,14 @@ const LayerControl = ({
           {!collapsed &&
             Object.keys(groupedLayers).map((section, index) => (
               <Accordion key={`${section} ${index}`} defaultExpanded>
+                <GlobalStyles
+                  styles={{
+                    '.MuiAccordionDetails-root': {
+                      paddingTop: 4,
+                      paddingBottom: 4,
+                    },
+                  }}
+                ></GlobalStyles>
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel1a-content"
@@ -193,27 +208,91 @@ const LayerControl = ({
                 >
                   <Typography>{section}</Typography>
                 </AccordionSummary>
-                {groupedLayers[section]?.map((layerObj, index) => (
-                  <AccordionDetails key={`accDetails_${index}`}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={layerObj.checked}
-                          name="checkedB"
-                          color="primary"
-                        />
-                      }
-                      label={layerObj.name}
-                      onClickCapture={(e) => {
-                        DomEvent.stopPropagation(e as any);
-                        onLayerClick(layerObj);
-                      }}
-                      onDoubleClickCapture={(e) => {
-                        DomEvent.stopPropagation(e as any);
-                      }}
-                    />
-                  </AccordionDetails>
-                ))}
+                {groupedLayers[section]?.map((layerObj, index) => {
+                  switch (layerObj.name) {
+                    case 'Metar':
+                      return (
+                        <Accordion
+                          key={`${layerObj.name} ${index}`}
+                          defaultExpanded
+                          style={{ marginTop: 0 }}
+                        >
+                          <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            aria-controls="panel1a-content"
+                            id="panel1a-header"
+                            style={{ height: 48, minHeight: 48 }}
+                          >
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={layerObj.checked}
+                                  name="checkedB"
+                                  color="primary"
+                                />
+                              }
+                              label={layerObj.name}
+                              onClickCapture={(e) => {
+                                DomEvent.stopPropagation(e as any);
+                                onLayerClick(layerObj);
+                              }}
+                              onDoubleClickCapture={(e) => {
+                                DomEvent.stopPropagation(e as any);
+                              }}
+                            />
+                          </AccordionSummary>
+                          <AccordionDetails style={{ paddingBottom: 4 }}>
+                            <Slider style={{ marginLeft: 26 }}></Slider>
+                          </AccordionDetails>
+                          <AccordionDetails>
+                            <RadioGroup
+                              defaultValue="female"
+                              name="radio-buttons-group-metar"
+                              style={{ paddingLeft: 26 }}
+                            >
+                              <FormControlLabel
+                                value="female"
+                                control={<Radio color="primary" />}
+                                label="Female"
+                              />
+                              <FormControlLabel
+                                value="male"
+                                control={<Radio color="primary" />}
+                                label="Male"
+                              />
+                              <FormControlLabel
+                                value="other"
+                                control={<Radio color="primary" />}
+                                label="Other"
+                              />
+                            </RadioGroup>
+                          </AccordionDetails>
+                        </Accordion>
+                      );
+                    default:
+                      return (
+                        <AccordionDetails key={`accDetails_${index}`}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={layerObj.checked}
+                                name="checkedB"
+                                color="primary"
+                              />
+                            }
+                            label={layerObj.name}
+                            onClickCapture={(e) => {
+                              DomEvent.stopPropagation(e as any);
+                              onLayerClick(layerObj);
+                            }}
+                            onDoubleClickCapture={(e) => {
+                              DomEvent.stopPropagation(e as any);
+                            }}
+                          />
+                        </AccordionDetails>
+                      );
+                  }
+                })}
               </Accordion>
             ))}
         </div>

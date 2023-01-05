@@ -33,12 +33,15 @@ const ConvectiveOutlookLayer = () => {
     return label;
   };
   const clientFilter = (
-    feature: GeoJSON.Feature,
+    features: GeoJSON.Feature[],
     observationTime: Date,
-  ): boolean => {
-    const start = new Date(feature.properties.valid_time_from);
-    const end = new Date(feature.properties.valid_time_to);
-    return start <= observationTime && observationTime < end;
+  ): GeoJSON.Feature[] => {
+    const results = features.filter((feature) => {
+      const start = new Date(feature.properties.valid_time_from);
+      const end = new Date(feature.properties.valid_time_to);
+      return start <= observationTime && observationTime < end;
+    });
+    return results;
   };
 
   return (

@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useRef, useState } from 'react';
-import { useMapEvents, GeoJSON } from 'react-leaflet';
+import { useMapEvents, GeoJSON as GeoJSONLayer } from 'react-leaflet';
 import L, { LatLng, PathOptions } from 'leaflet';
-import axios from 'axios';
+import axios, { GenericAbortSignal } from 'axios';
 import MarkerClusterGroup from './MarkerClusterGroup';
 import { useSelector } from 'react-redux';
 import { selectObsTime } from '../../../../store/ObsTimeSlice';
 import { generateHash } from '../../common/AreoFunctions';
-import { FeatureCollection } from 'geojson';
+import GeoJSON, { FeatureCollection } from 'geojson';
 
 interface WFSLayerProps {
   url: string;
@@ -21,7 +21,10 @@ interface WFSLayerProps {
   style?: (feature: GeoJSON.Feature) => PathOptions;
   pointToLayer?: (feature: GeoJSON.Feature, latlng: LatLng) => L.Layer;
   serverFilter?: string;
-  clientFilter?: (feature: GeoJSON.Feature, obsTime: Date) => boolean;
+  clientFilter?: (
+    features: GeoJSON.Feature[],
+    obsTime: Date,
+  ) => GeoJSON.Feature[];
   isClusteredMarker?: boolean;
   markerPane?: string;
 }
@@ -43,15 +46,16 @@ const WFSLayer = ({
   markerPane,
 }: WFSLayerProps) => {
   const observationTime = useSelector(selectObsTime);
+  const [abortController, setAbortController] = useState<any>();
 
   const [geoJSON, setGeoJSON] = useState<FeatureCollection>({
     type: 'FeatureCollection',
-    features: [],
+    features: new Array<GeoJSON.Feature>(),
   });
 
   const [displayedData, setDisplayedData] = useState<FeatureCollection>({
     type: 'FeatureCollection',
-    features: [],
+    features: new Array<GeoJSON.Feature>(),
   });
 
   const [geoJsonKey, setGeoJsonKey] = useState(12034512);
@@ -63,8 +67,9 @@ const WFSLayer = ({
 
   useEffect(() => {
     if (clientFilter && geoJSON.features.length > 0) {
-      const filteredFeatures = geoJSON.features.filter((feature) =>
-        clientFilter(feature, new Date(observationTime)),
+      const filteredFeatures = clientFilter(
+        geoJSON.features,
+        new Date(observationTime),
       );
       setDisplayedData({
         type: 'FeatureCollection',
@@ -77,8 +82,9 @@ const WFSLayer = ({
 
   useEffect(() => {
     if (clientFilter && geoJSON.features.length > 0) {
-      const filteredFeatures = geoJSON.features.filter((feature) =>
-        clientFilter(feature, new Date(observationTime)),
+      const filteredFeatures = clientFilter(
+        geoJSON.features,
+        new Date(observationTime),
       );
       setDisplayedData({
         type: 'FeatureCollection',
@@ -90,7 +96,6 @@ const WFSLayer = ({
   const map = useMapEvents({
     zoomend: () => {
       const zoom = map.getZoom();
-      if (enableBBoxQuery) fetchGeoJSON();
       if (zoom < showLabelZoom && (!lastZoom || lastZoom >= showLabelZoom)) {
         ref.current.eachLayer((l) => {
           if (l.getTooltip()) {
@@ -139,28 +144,35 @@ const WFSLayer = ({
       version: '1.0.0',
       format_options: `callback:${callbackName}`,
       srsName: 'EPSG:4326',
-    };
+    } as any;
     if (propertyNames) {
-      // @ts-ignore
       params.propertyName = propertyNames.join(',');
     }
-    if (enableBBoxQuery) {
-      // @ts-ignore
-      params.bbox = `${map.getBounds().toBBoxString()},EPSG:4326`;
-    }
     if (filter) {
-      // @ts-ignore
       params.cql_filter = filter;
+    }
+    if (enableBBoxQuery) {
+      if (params.cql_filter) {
+        params.cql_filter += ` AND BBOX(wkb_geometry, ${map
+          .getBounds()
+          .toBBoxString()})`;
+      } else {
+        params.cql_filter = `BBOX(wkb_geometry, ${map
+          .getBounds()
+          .toBBoxString()})`;
+      }
     }
     params.outputFormat = 'application/json';
     params.format_options = undefined;
     pendingFetch = true;
+    // if (abortController) {
+    //   abortController.abort();
+    // }
+    // setAbortController(new AbortController());
     axios
       .get(url, {
         params: params,
-        headers: {
-          'Cache-Control': 'public, max-age=31536000',
-        },
+        // signal: abortController ? abortController.signal : null,
       })
       .then((data) => {
         if (typeof data.data === 'string') {
@@ -175,26 +187,9 @@ const WFSLayer = ({
       })
       .finally(() => {
         pendingFetch = false;
+        // setAbortController(null);
       });
   };
-
-  // function clickFeature(e) {
-  //   // highlightFeature(e);
-  //   // console.log('Layer clicked', e.target.feature.id);
-  // }
-  // function highlightFeature(e) {
-  //   const layer = e.target;
-  //   layer.setStyle(
-  //     highlightStyle ?? {
-  //       weight: 5,
-  //     },
-  //   );
-  //   layer.bringToFront();
-  // }
-  // function resetHighlight() {
-  //   const layer = ref.current;
-  //   if (layer) layer.resetStyle();
-  // }
 
   const onEachFeature = (feature, layer) => {
     if (feature.properties) {
@@ -229,7 +224,7 @@ const WFSLayer = ({
           clusterPane={markerPane ? markerPane : undefined}
         >
           {geoJSON != null && (
-            <GeoJSON
+            <GeoJSONLayer
               ref={ref}
               data={displayedData}
               // @ts-ignore
@@ -239,12 +234,12 @@ const WFSLayer = ({
               style={style}
               pointToLayer={pointToLayer}
               bubblingMouseEvents={true}
-            ></GeoJSON>
+            ></GeoJSONLayer>
           )}
         </MarkerClusterGroup>
       )}
       {!isClusteredMarker && geoJSON != null && (
-        <GeoJSON
+        <GeoJSONLayer
           key={geoJsonKey}
           ref={ref}
           data={displayedData}
@@ -255,7 +250,7 @@ const WFSLayer = ({
           style={style}
           pointToLayer={pointToLayer}
           bubblingMouseEvents={true}
-        ></GeoJSON>
+        ></GeoJSONLayer>
       )}
     </>
   );
