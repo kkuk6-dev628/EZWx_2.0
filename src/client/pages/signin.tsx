@@ -4,6 +4,7 @@ import { FaTwitterSquare, FaYoutubeSquare, FaCheck } from 'react-icons/fa';
 import { BsInstagram } from 'react-icons/bs';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useSigninMutation } from '../store/auth/authApi';
+import { useRouter } from 'next/router';
 interface IFormInput {
   email: string;
   password: string;
@@ -14,12 +15,21 @@ function signin() {
     register,
     formState: { errors },
   } = useForm<IFormInput>();
+  const router = useRouter();
   const [signin, { data, isLoading, error: responseError }] =
     useSigninMutation();
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
     console.log(data);
     signin(data);
   };
+
+  if (isLoading) {
+    console.log('loading');
+  } else if (!isLoading && responseError) {
+    console.log(responseError);
+  } else if (!isLoading && !responseError && data) {
+    router.push('/try-ezwxbrief');
+  }
   return (
     <div className="sign">
       <div className="sign__wrp">
