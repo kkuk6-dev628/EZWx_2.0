@@ -1,11 +1,19 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React from 'react';
-import { useMap } from 'react-leaflet';
+import {
+  type PathProps,
+  createElementObject,
+  createPathComponent,
+  updateGridLayer,
+  extendContext,
+} from '@react-leaflet/core';
+import React, { Component } from 'react';
+import { LayerGroupProps, useMap, WMSTileLayer } from 'react-leaflet';
 // @ts-ignore
-import * as WMS from 'leaflet.wms';
+import WMS, { WMSOptions } from 'leaflet.wms';
 import { CRS } from 'leaflet';
+import L from 'leaflet';
 
-interface WMSLayerProps {
+interface WMSLayerProps extends WMSOptions, LayerGroupProps, PathProps {
   url: string;
   options: {
     transparent: boolean;
@@ -14,22 +22,33 @@ interface WMSLayerProps {
     info_format: string;
     identify: boolean;
     tiled: boolean;
+    layers: Array<any>;
   };
-  layers: string[];
+  layer: string;
 }
-const WMSLayer = React.forwardRef(
-  ({ url, options, layers }: WMSLayerProps, ref) => {
+
+const WMSLayer = createPathComponent<WMS, WMSLayerProps>(
+  function createWMSLayer({ url, options, layer }, ctx) {
     const map = useMap();
-
-    // Add WMS source/layers
     const source = WMS.source(url, options);
-
-    for (const name of layers) {
-      source.getLayer(name).addTo(map);
+    const layers = [];
+    for (const name of options.layers) {
+      layers.push(source.getLayer(name));
     }
+    const layerGroup = L.layerGroup(layers);
     // @ts-ignore
-    ref.current = source;
-    return null;
+    layerGroup.source = source;
+    return createElementObject(
+      layerGroup,
+      extendContext(ctx, { overlayContainer: layerGroup }),
+    );
+  },
+  function updateWMSLayer(layer, props, prevProps) {
+    updateGridLayer(layer, props, prevProps);
+
+    // if (props.options != null && props.options !== prevProps.options) {
+    //   layer.setParams(props.options);
+    // }
   },
 );
 

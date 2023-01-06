@@ -23,6 +23,7 @@ import Route from '../../shared/Route';
 import CollapsibleBar from '../../shared/CollapsibleBar';
 import DateSliderModal from '../../shared/DateSliderModal';
 import MeteoLayers from './layers/MeteoLayers';
+import './layers/CacheTileLayer';
 
 function LeafletMap() {
   const { pathname } = useRouter();
@@ -124,12 +125,21 @@ function LeafletMap() {
         attributionControl={false}
         // preferCanvas={true}
         renderer={L.canvas()}
+        timeDimension={true}
+        timeDimensionOptions={{
+          timeInterval: '2023-01-05T03:00:00Z/2023-01-05T22:00:00Z',
+          period: 'PT1H',
+        }}
+        timeDimensionControl={true}
       >
         <LayerControl
           position="topright"
           collapsed={baseMapControlCollapsed}
           exclusive={true}
         >
+          {/* <GroupedLayer checked name="Test" group="Base Maps">
+            <MapCacheLayer></MapCacheLayer>
+          </GroupedLayer> */}
           <GroupedLayer checked name="Street" group="Base Maps">
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           </GroupedLayer>

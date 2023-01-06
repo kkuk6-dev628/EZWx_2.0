@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import LayerControl, { GroupedLayer } from '../layer-control/LayerControl';
 import WFSLayer from './WFSLayer';
-import { LayerGroup, useMapEvents, WMSTileLayer } from 'react-leaflet';
-import L, { CRS, LatLng, TileLayer } from 'leaflet';
+import { LayerGroup, useMapEvents } from 'react-leaflet';
+import L, { CRS, LatLng } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
 import { useRef, useState } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
@@ -17,7 +17,7 @@ import CWAPopup from '../popups/CWAPopup';
 import ConvectiveOutlookLayer from './ConvectiveOutlookLayer';
 import ConvectiveOutlookPopup from '../popups/ConvectiveOutlookPopup';
 import IntlSigmetLayer from './IntlSigmetLayer';
-import { getBBoxFromPointZoom, getQueryTime } from '../../common/AreoFunctions';
+import { getBBoxFromPointZoom } from '../../common/AreoFunctions';
 import IntlSigmetPopup from '../popups/IntlSigmetPopup';
 import PirepLayer from './PirepLayer';
 import PIREPPopup from '../popups/PIREPPopup';
@@ -26,6 +26,7 @@ import 'leaflet-responsive-popup/leaflet.responsive.popup.css';
 import WMSLayer from './WMSLayer';
 import axios from 'axios';
 import MetarsLayer from './MetarsLayer';
+import TimeDimensionLayer from './TimeDimensionLayer';
 
 const maxLayers = 6;
 
@@ -103,8 +104,8 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           return;
         }
         if (layer.group !== 'Meteo') return;
-        if (typeof layer.layer.eachLayer !== 'function') return;
-        layer.layer.eachLayer((l) => {
+        if (layer.layer instanceof L.GeoJSON === false) return;
+        layer.layer.eachLayer((l: any) => {
           if (features.length >= maxLayers) {
             return;
           }
@@ -130,42 +131,47 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
       map.closePopup();
 
       if (features.length === 0) {
-        if (wmsLayerRef.current) {
-          // wmsLayerRef.current.getFeatureInfo(
-          //   map.latLngToContainerPoint(e.latlng),
-          //   e.latlng,
-          //   ['EZWxBrief:2t_NBM', 'EZWxBrief:gairmet'],
-          //   (latlng, result) => {
-          //     const resultObj = JSON.parse(result);
-          //     showPopup({ feature: resultObj.features[0] } as any, latlng);
-          //   },
-          // );
-          axios
-            .post('/api/asd', e.latlng)
-            .then((result) => {
-              Object.entries(result.data).map((entry) => {
-                const lnglat = entry[0].split(',');
-                if (
-                  debugLayerGroupRef.current &&
-                  debugLayerGroupRef.current.addLayer
-                ) {
-                  const circleMarker = new L.CircleMarker(
-                    [lnglat[1] as any, lnglat[0] as any],
-                    { radius: 2 },
-                  );
-                  circleMarker.bindTooltip(`<h>${entry[1]}</h>`);
-                  debugLayerGroupRef.current.addLayer(circleMarker);
-                }
-              });
-              showPopup(
-                { feature: { properties: result.data, id: 'temp' } } as any,
-                e.latlng,
-              );
-            })
-            .catch((reason) => {
-              console.log(reason);
-            });
-        }
+        // if (wmsLayerRef.current) {
+        //   wmsLayerRef.current.source.getFeatureInfo(
+        //     map.latLngToContainerPoint(e.latlng),
+        //     e.latlng,
+        //     ['EZWxBrief:2t_NBM', 'EZWxBrief:2t_test'],
+        //     (latlng: L.LatLng, result: string) => {
+        //       try {
+        //         const resultObj = JSON.parse(result);
+        //         resultObj.features.length > 0 &&
+        //           showPopup({ feature: resultObj.features[0] } as any, latlng);
+        //       } catch (e) {
+        //         console.error(result);
+        //       }
+        //     },
+        //   );
+        //   axios
+        //     .post('/api/asd', e.latlng)
+        //     .then((result) => {
+        //       Object.entries(result.data).map((entry) => {
+        //         const lnglat = entry[0].split(',');
+        //         if (
+        //           debugLayerGroupRef.current &&
+        //           debugLayerGroupRef.current.addLayer
+        //         ) {
+        //           const circleMarker = new L.CircleMarker(
+        //             [lnglat[1] as any, lnglat[0] as any],
+        //             { radius: 2 },
+        //           );
+        //           circleMarker.bindTooltip(`<h>${entry[1]}</h>`);
+        //           debugLayerGroupRef.current.addLayer(circleMarker);
+        //         }
+        //       });
+        //       showPopup(
+        //         { feature: { properties: result.data, id: 'temp' } } as any,
+        //         e.latlng,
+        //       );
+        //     })
+        //     .catch((reason) => {
+        //       console.log(reason);
+        //     });
+        // }
         return;
       } else if (features.length === 1) {
         showPopup(features[0], e.latlng);
@@ -197,9 +203,6 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
     },
   });
 
-  const current = new Date();
-  // current.setHours(current.getHours() - 48);
-
   return (
     <>
       <LayerControl
@@ -211,10 +214,10 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         }}
       >
         <GroupedLayer checked name="temperature" group="Meteo">
-          <WMSLayer
+          <TimeDimensionLayer
             ref={wmsLayerRef}
             url="http://3.95.80.120:8080/geoserver/EZWxBrief/wms?"
-            layers={['EZWxBrief:2t_NBM']}
+            layer={'EZWxBrief:2t_test'}
             options={{
               transparent: true,
               format: 'image/png',
@@ -222,8 +225,11 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
               info_format: 'application/json',
               identify: false,
               tiled: true,
+              layers: 'EZWxBrief:2t_test',
+              useCache: true,
+              // crossOrigin: true,
             }}
-          ></WMSLayer>
+          ></TimeDimensionLayer>
         </GroupedLayer>
         <GroupedLayer checked name="States" group="Admin">
           <WFSLayer

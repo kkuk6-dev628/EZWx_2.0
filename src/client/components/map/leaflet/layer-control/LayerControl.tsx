@@ -193,14 +193,6 @@ const LayerControl = ({
           {!collapsed &&
             Object.keys(groupedLayers).map((section, index) => (
               <Accordion key={`${section} ${index}`} defaultExpanded>
-                <GlobalStyles
-                  styles={{
-                    '.MuiAccordionDetails-root': {
-                      paddingTop: 4,
-                      paddingBottom: 4,
-                    },
-                  }}
-                ></GlobalStyles>
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel1a-content"
@@ -210,11 +202,76 @@ const LayerControl = ({
                 </AccordionSummary>
                 {groupedLayers[section]?.map((layerObj, index) => {
                   switch (layerObj.name) {
+                    case 'temperature':
+                      const groupLayer = layerObj.layer as L.LayerGroup;
+                      const subLayers = groupLayer.getLayers() as any;
+                      return (
+                        <Accordion
+                          key={`${layerObj.name} ${index}`}
+                          defaultExpanded={false}
+                          style={{ marginTop: 0 }}
+                        >
+                          <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            aria-controls="panel1a-content"
+                            id="panel1a-header"
+                            style={{ height: 48, minHeight: 48 }}
+                          >
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={layerObj.checked}
+                                  name="checkedB"
+                                  color="primary"
+                                />
+                              }
+                              label={layerObj.name}
+                              onClickCapture={(e) => {
+                                DomEvent.stopPropagation(e as any);
+                                onLayerClick(layerObj);
+                              }}
+                              onDoubleClickCapture={(e) => {
+                                DomEvent.stopPropagation(e as any);
+                              }}
+                            />
+                          </AccordionSummary>
+                          <AccordionDetails style={{ paddingBottom: 4 }}>
+                            <Slider style={{ marginLeft: 26 }}></Slider>
+                          </AccordionDetails>
+                          <AccordionDetails>
+                            {}
+                            <RadioGroup
+                              defaultValue={
+                                subLayers[subLayers.length - 1]._name
+                              }
+                              name="radio-buttons-group-metar"
+                              style={{ paddingLeft: 26 }}
+                              onChangeCapture={(e) => {
+                                subLayers.map((sublayer) => {
+                                  if (sublayer._name === e.target.value) {
+                                    map.addLayer(sublayer);
+                                  } else {
+                                    map.removeLayer(sublayer);
+                                  }
+                                });
+                              }}
+                            >
+                              {subLayers.map((sublayer: any) => (
+                                <FormControlLabel
+                                  value={sublayer._name}
+                                  control={<Radio color="primary" />}
+                                  label={sublayer._name}
+                                />
+                              ))}
+                            </RadioGroup>
+                          </AccordionDetails>
+                        </Accordion>
+                      );
                     case 'Metar':
                       return (
                         <Accordion
                           key={`${layerObj.name} ${index}`}
-                          defaultExpanded
+                          defaultExpanded={false}
                           style={{ marginTop: 0 }}
                         >
                           <AccordionSummary
@@ -259,11 +316,6 @@ const LayerControl = ({
                                 value="male"
                                 control={<Radio color="primary" />}
                                 label="Male"
-                              />
-                              <FormControlLabel
-                                value="other"
-                                control={<Radio color="primary" />}
-                                label="Other"
                               />
                             </RadioGroup>
                           </AccordionDetails>
