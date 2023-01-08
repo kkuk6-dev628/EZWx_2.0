@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaCheck } from 'react-icons/fa';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { useSignupMutation } from '../store/auth/authApi';
 import { useRouter } from 'next/router';
+import { api } from '../utils';
 // import { error } from 'console';
 
 interface certifications {
@@ -44,11 +45,25 @@ function signup() {
       newsletter: true,
     },
   });
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [certificationsOptions, setCertificationsOptions] = useState([]);
 
   const [signup, { data, isLoading, error: responseError }] =
     useSignupMutation();
+
+  useEffect(() => {
+    api({
+      method: 'get',
+      url: 'certification/findAll',
+    })
+      .then((res) => {
+        console.log('certification data ', res.data);
+        setCertificationsOptions(res.data);
+      })
+      .catch((err) => console.log(err.message));
+  }, []);
 
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
     console.log(data);
@@ -56,28 +71,6 @@ function signup() {
     delete data.newsletter;
     signup(data);
   };
-
-  const certificationsOptions = [
-    {
-      name: 'atp',
-      description: 'Private, Commercial or ATP',
-    },
-    {
-      name: 'cfi',
-      description: 'Certified Flight Instructor (CFI)',
-    },
-    { name: 'purple', description: 'Instrument Rated' },
-
-    {
-      name: 'professional',
-      description: 'Professional Pilot (other than a CFI)',
-    },
-    {
-      name: 'dpe',
-      description: 'Designated Pilot Examiner (DPE)',
-    },
-    { name: 'other', description: 'Other' },
-  ];
 
   const validateEmail = (value: string) => {
     const emailRegex =
@@ -333,13 +326,16 @@ function signup() {
                         {...field}
                         closeMenuOnSelect={false}
                         getOptionLabel={(option: { description: string }) =>
-                          option.description
+                          option?.description
                         }
                         getOptionValue={(option: { name: string }) =>
-                          option.name
+                          option?.name
                         }
                         className=" csuinp__input--select"
-                        options={certificationsOptions}
+                        options={
+                          certificationsOptions.length > 0 &&
+                          certificationsOptions
+                        }
                         components={animatedComponents}
                       />
                     )}

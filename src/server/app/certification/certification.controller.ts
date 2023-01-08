@@ -11,6 +11,8 @@ export class CertificationController {
     return this.certificationService.create(dto);
   }
 
-  // @Get('findall')
-  // findAll() {}
+  @Get('findAll')
+  findAll() {
+    return this.certificationService.findAll({});
+  }
 }

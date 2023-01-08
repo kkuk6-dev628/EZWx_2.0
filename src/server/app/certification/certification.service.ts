@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Certification } from './certification.entity';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateCertificationDto } from './dto/create-certification.dto';
 
@@ -24,5 +24,10 @@ export class CertificationService {
     } catch (err: any) {
       console.log(err.message);
     }
+  }
+
+  async findAll(params: FindManyOptions<Certification> = {}) {
+    const certifications = await this.certificationRepository.find(params);
+    return certifications;
   }
 }
