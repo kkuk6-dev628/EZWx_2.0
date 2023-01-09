@@ -189,6 +189,10 @@ L.TileLayer.include({
       return;
     }
 
+    if (tile.complete && tile.naturalHeight !== this.options.tileSize) {
+      console.log('error tile', tile.naturalHeight, this.options.tileSize);
+      return;
+    }
     const canvas = document.createElement('canvas');
     canvas.width = tile.naturalWidth || tile.width;
     canvas.height = tile.naturalHeight || tile.height;

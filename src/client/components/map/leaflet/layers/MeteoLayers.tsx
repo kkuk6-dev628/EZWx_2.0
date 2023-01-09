@@ -4,7 +4,7 @@ import WFSLayer from './WFSLayer';
 import { LayerGroup, useMapEvents } from 'react-leaflet';
 import L, { CRS, LatLng } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import FeatureSelector from '../popups/FeatureSelector';
 import ReactDOMServer from 'react-dom/server';
@@ -27,6 +27,7 @@ import WMSLayer from './WMSLayer';
 import axios from 'axios';
 import MetarsLayer from './MetarsLayer';
 import TimeDimensionLayer from './TimeDimensionLayer';
+import MarkerClusterGroup from './MarkerClusterGroup';
 
 const maxLayers = 6;
 
@@ -104,7 +105,9 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           return;
         }
         if (layer.group !== 'Meteo') return;
-        if (layer.layer instanceof L.GeoJSON === false) return;
+        if (layer.pickable === false) {
+          return;
+        }
         layer.layer.eachLayer((l: any) => {
           if (features.length >= maxLayers) {
             return;
@@ -203,6 +206,25 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
     },
   });
 
+  // useEffect(() => {
+  //   L.GridLayer.GridDebug = L.GridLayer.extend({
+  //     createTile: function (coords) {
+  //       const tile = document.createElement('div');
+  //       tile.style.outline = '1px solid green';
+  //       tile.style.fontWeight = 'bold';
+  //       tile.style.fontSize = '14pt';
+  //       tile.innerHTML = [coords.z, coords.x, coords.y].join('/');
+  //       return tile;
+  //     },
+  //   });
+
+  //   L.gridLayer.gridDebug = function (opts) {
+  //     return new L.GridLayer.GridDebug(opts);
+  //   };
+
+  //   map.addLayer(L.gridLayer.gridDebug());
+  // }, [map]);
+
   return (
     <>
       <LayerControl
@@ -213,11 +235,10 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           setLayers(lyr);
         }}
       >
-        <GroupedLayer checked name="temperature" group="Meteo">
+        <GroupedLayer checked name="temperature" group="Meteo" pickable={false}>
           <TimeDimensionLayer
             ref={wmsLayerRef}
-            url="http://3.95.80.120:8080/geoserver/EZWxBrief/wms?"
-            layer={'EZWxBrief:2t_test'}
+            url="https://{s}.ezwxbrief.com/geoserver/EZWxBrief/wms?"
             options={{
               transparent: true,
               format: 'image/png',
@@ -225,15 +246,17 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
               info_format: 'application/json',
               identify: false,
               tiled: true,
-              layers: 'EZWxBrief:2t_test',
+              subdomains: ['eztile1', 'eztile2', 'eztile3', 'eztile4'],
+              layers: 'EZWxBrief:nbm_t2m_test',
+              // @ts-ignore
               useCache: true,
               // crossOrigin: true,
             }}
           ></TimeDimensionLayer>
         </GroupedLayer>
-        <GroupedLayer checked name="States" group="Admin">
+        <GroupedLayer checked name="States" group="Admin" pickable={false}>
           <WFSLayer
-            url="http://3.95.80.120:8080/geoserver/topp/ows"
+            url="https://eztile1.ezwxbrief.com/geoserver/topp/ows"
             maxFeatures={256}
             typeName="topp:states"
             interactive={false}

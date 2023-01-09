@@ -43,6 +43,7 @@ interface ILayerObj {
   checked: boolean;
   id: number;
   isEmpty: boolean;
+  pickable: boolean;
 }
 
 const LayerControl = ({
@@ -135,7 +136,12 @@ const LayerControl = ({
     setLayers(layersNew);
   };
 
-  const onGroupAdd = (layer: Layer, name: string, group: string) => {
+  const onGroupAdd = (
+    layer: Layer,
+    name: string,
+    group: string,
+    pickable: boolean,
+  ) => {
     const isEmptyLayer = checkEmptyLayer(layer);
     const cLayers = layers;
     const index = cLayers.findIndex((e) => e.name === name);
@@ -147,6 +153,7 @@ const LayerControl = ({
         checked: exclusive || isEmptyLayer ? false : map?.hasLayer(layer),
         id: Util.stamp(layer),
         isEmpty: isEmptyLayer,
+        pickable,
       });
     } else {
       cLayers.push({
@@ -156,6 +163,7 @@ const LayerControl = ({
         checked: exclusive || isEmptyLayer ? false : map?.hasLayer(layer),
         id: Util.stamp(layer),
         isEmpty: isEmptyLayer,
+        pickable,
       });
     }
     if (exclusive) {
@@ -202,71 +210,71 @@ const LayerControl = ({
                 </AccordionSummary>
                 {groupedLayers[section]?.map((layerObj, index) => {
                   switch (layerObj.name) {
-                    case 'temperature':
-                      const groupLayer = layerObj.layer as L.LayerGroup;
-                      const subLayers = groupLayer.getLayers() as any;
-                      return (
-                        <Accordion
-                          key={`${layerObj.name} ${index}`}
-                          defaultExpanded={false}
-                          style={{ marginTop: 0 }}
-                        >
-                          <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls="panel1a-content"
-                            id="panel1a-header"
-                            style={{ height: 48, minHeight: 48 }}
-                          >
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={layerObj.checked}
-                                  name="checkedB"
-                                  color="primary"
-                                />
-                              }
-                              label={layerObj.name}
-                              onClickCapture={(e) => {
-                                DomEvent.stopPropagation(e as any);
-                                onLayerClick(layerObj);
-                              }}
-                              onDoubleClickCapture={(e) => {
-                                DomEvent.stopPropagation(e as any);
-                              }}
-                            />
-                          </AccordionSummary>
-                          <AccordionDetails style={{ paddingBottom: 4 }}>
-                            <Slider style={{ marginLeft: 26 }}></Slider>
-                          </AccordionDetails>
-                          <AccordionDetails>
-                            {}
-                            <RadioGroup
-                              defaultValue={
-                                subLayers[subLayers.length - 1]._name
-                              }
-                              name="radio-buttons-group-metar"
-                              style={{ paddingLeft: 26 }}
-                              onChangeCapture={(e) => {
-                                subLayers.map((sublayer) => {
-                                  if (sublayer._name === e.target.value) {
-                                    map.addLayer(sublayer);
-                                  } else {
-                                    map.removeLayer(sublayer);
-                                  }
-                                });
-                              }}
-                            >
-                              {subLayers.map((sublayer: any) => (
-                                <FormControlLabel
-                                  value={sublayer._name}
-                                  control={<Radio color="primary" />}
-                                  label={sublayer._name}
-                                />
-                              ))}
-                            </RadioGroup>
-                          </AccordionDetails>
-                        </Accordion>
-                      );
+                    // case 'temperature':
+                    //   const groupLayer = layerObj.layer as L.LayerGroup;
+                    //   const subLayers = groupLayer.getLayers() as any;
+                    //   return (
+                    //     <Accordion
+                    //       key={`${layerObj.name} ${index}`}
+                    //       defaultExpanded={false}
+                    //       style={{ marginTop: 0 }}
+                    //     >
+                    //       <AccordionSummary
+                    //         expandIcon={<ExpandMoreIcon />}
+                    //         aria-controls="panel1a-content"
+                    //         id="panel1a-header"
+                    //         style={{ height: 48, minHeight: 48 }}
+                    //       >
+                    //         <FormControlLabel
+                    //           control={
+                    //             <Checkbox
+                    //               checked={layerObj.checked}
+                    //               name="checkedB"
+                    //               color="primary"
+                    //             />
+                    //           }
+                    //           label={layerObj.name}
+                    //           onClickCapture={(e) => {
+                    //             DomEvent.stopPropagation(e as any);
+                    //             onLayerClick(layerObj);
+                    //           }}
+                    //           onDoubleClickCapture={(e) => {
+                    //             DomEvent.stopPropagation(e as any);
+                    //           }}
+                    //         />
+                    //       </AccordionSummary>
+                    //       <AccordionDetails style={{ paddingBottom: 4 }}>
+                    //         <Slider style={{ marginLeft: 26 }}></Slider>
+                    //       </AccordionDetails>
+                    //       <AccordionDetails>
+                    //         {}
+                    //         <RadioGroup
+                    //           defaultValue={
+                    //             subLayers[subLayers.length - 1]._name
+                    //           }
+                    //           name="radio-buttons-group-metar"
+                    //           style={{ paddingLeft: 26 }}
+                    //           onChangeCapture={(e) => {
+                    //             subLayers.map((sublayer) => {
+                    //               if (sublayer._name === e.target.value) {
+                    //                 map.addLayer(sublayer);
+                    //               } else {
+                    //                 map.removeLayer(sublayer);
+                    //               }
+                    //             });
+                    //           }}
+                    //         >
+                    //           {subLayers.map((sublayer: any) => (
+                    //             <FormControlLabel
+                    //               value={sublayer._name}
+                    //               control={<Radio color="primary" />}
+                    //               label={sublayer._name}
+                    //             />
+                    //           ))}
+                    //         </RadioGroup>
+                    //       </AccordionDetails>
+                    //     </Accordion>
+                    //   );
                     case 'Metar':
                       return (
                         <Accordion
@@ -355,8 +363,8 @@ const LayerControl = ({
 };
 
 const GroupedLayer = createControlledLayer(
-  (layersControl, layer, name, group) => {
-    layersControl.addGroup(layer, name, group);
+  (layersControl, layer, name, group, pickable) => {
+    layersControl.addGroup(layer, name, group, pickable);
   },
 );
 

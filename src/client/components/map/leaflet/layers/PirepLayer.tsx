@@ -197,7 +197,7 @@ const PirepLayer = () => {
   return (
     <Pane name={'pirep'} style={{ zIndex: 699 }}>
       <WFSLayer
-        url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
+        url="https://eztile1.ezwxbrief.com/geoserver/EZWxBrief/ows"
         maxFeatures={10000}
         typeName="EZWxBrief:pirep"
         propertyNames={[

@@ -15,6 +15,7 @@ interface IProps {
   checked?: boolean;
   name: string;
   group: string;
+  pickable?: boolean;
   children: ReactNode[] | ReactNode;
 }
 
@@ -24,6 +25,7 @@ const createControlledLayer = (
     layer: Layer,
     name: string,
     group: string,
+    pickable: boolean,
   ) => any,
 ) => {
   const ControlledLayer = (props: IProps) => {
@@ -45,6 +47,9 @@ const createControlledLayer = (
           layerToAdd,
           propsRef.current.name,
           propsRef.current.group,
+          propsRef.current.pickable !== undefined
+            ? propsRef.current.pickable
+            : true,
         );
         setLayer(layerToAdd);
       },

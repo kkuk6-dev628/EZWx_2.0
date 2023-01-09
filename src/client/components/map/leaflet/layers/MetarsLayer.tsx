@@ -222,7 +222,7 @@ const MetarsLayer = () => {
   return (
     <Pane name={'metar'} style={{ zIndex: 698 }}>
       <WFSLayer
-        url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
+        url="https://eztile2.ezwxbrief.com/geoserver/EZWxBrief/ows"
         maxFeatures={164096}
         typeName="EZWxBrief:metar"
         propertyNames={[
