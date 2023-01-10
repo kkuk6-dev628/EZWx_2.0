@@ -30,13 +30,11 @@
     "app",
     "components",
     "pages",
-    "store/ObsTimeSlice.ts",
-    "store/auth/authSlice.ts",
-    "store/auth/authApi.ts",
-    "store/api/apiSlice.ts",
+    "store/**/*.ts",
     "../server/common",
-    ".next/types/**/*.ts"
-, "store/store.ts", "store/store.ts"  ],
+    ".next/types/**/*.ts",
+    "store/store.ts"
+  ],
   "exclude": [
     "node_modules"
   ]

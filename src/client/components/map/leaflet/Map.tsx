@@ -24,6 +24,7 @@ import CollapsibleBar from '../../shared/CollapsibleBar';
 import DateSliderModal from '../../shared/DateSliderModal';
 import MeteoLayers from './layers/MeteoLayers';
 import './layers/CacheTileLayer';
+import WFSLayer from './layers/WFSLayer';
 
 function LeafletMap() {
   const { pathname } = useRouter();
@@ -136,29 +137,66 @@ function LeafletMap() {
           position="topright"
           collapsed={baseMapControlCollapsed}
           exclusive={true}
+          defaultLayer="Street"
+          exclusiveSkipLayers={['U.S. States']}
         >
-          {/* <GroupedLayer checked name="Test" group="Base Maps">
-            <MapCacheLayer></MapCacheLayer>
-          </GroupedLayer> */}
-          <GroupedLayer checked name="Street" group="Base Maps">
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <GroupedLayer
+            checked
+            name="U.S. States"
+            group="Base Admin"
+            pickable={false}
+            order={0}
+          >
+            <WFSLayer
+              url="http://3.95.80.120:8080/geoserver/topp/ows"
+              maxFeatures={256}
+              typeName="topp:states"
+              interactive={false}
+              style={() => {
+                return {
+                  fillOpacity: 0,
+                  weight: 1,
+                };
+              }}
+            ></WFSLayer>
           </GroupedLayer>
-          <GroupedLayer checked name="Topo" group="Base Maps">
-            <TileLayer url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png" />
+          <GroupedLayer checked name="Street" group="Base Maps" order={2}>
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              // @ts-ignore
+              useCache={true}
+            />
           </GroupedLayer>
-          <GroupedLayer checked name="Terrain" group="Base Maps">
-            <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}" />
+          <GroupedLayer checked name="Topo" group="Base Maps" order={3}>
+            <TileLayer
+              url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+              // @ts-ignore
+              useCache={true}
+            />
           </GroupedLayer>
-          <GroupedLayer checked name="Dark" group="Base Maps">
+          <GroupedLayer checked name="Terrain" group="Base Maps" order={4}>
+            <TileLayer
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+              // @ts-ignore
+              useCache={true}
+            />
+          </GroupedLayer>
+          <GroupedLayer checked name="Dark" group="Base Maps" order={5}>
             <TileLayer
               url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
               // @ts-ignore
               subdomains="abcd"
+              // @ts-ignore
+              useCache={true}
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             />
           </GroupedLayer>
-          <GroupedLayer checked name="Satellite" group="Base Maps">
-            <TileLayer url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}" />
+          <GroupedLayer checked name="Satellite" group="Base Maps" order={6}>
+            <TileLayer
+              url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+              // @ts-ignore
+              useCache={true}
+            />
           </GroupedLayer>
         </LayerControl>
         <MeteoLayers

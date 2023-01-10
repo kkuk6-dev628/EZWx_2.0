@@ -5,6 +5,7 @@ import ReactDOMServer from 'react-dom/server';
 import { Pane, useMap } from 'react-leaflet';
 import {
   addLeadingZeroes,
+  getQueryTime,
   getTimeRangeStart,
 } from '../../common/AreoFunctions';
 
@@ -222,7 +223,7 @@ const MetarsLayer = () => {
   return (
     <Pane name={'metar'} style={{ zIndex: 698 }}>
       <WFSLayer
-        url="https://eztile2.ezwxbrief.com/geoserver/EZWxBrief/ows"
+        url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
         maxFeatures={164096}
         typeName="EZWxBrief:metar"
         propertyNames={[
@@ -263,7 +264,7 @@ const MetarsLayer = () => {
         pointToLayer={pointToLayer}
         isClusteredMarker={true}
         markerPane={'metar'}
-        serverFilter={`sky_cover_1 IS NOT NULL`}
+        serverFilter={`observation_time DURING ${getQueryTime(new Date())}`}
         clientFilter={clientFilter}
       ></WFSLayer>
     </Pane>

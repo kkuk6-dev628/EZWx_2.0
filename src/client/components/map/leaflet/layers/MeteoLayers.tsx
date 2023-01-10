@@ -235,10 +235,44 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           setLayers(lyr);
         }}
       >
-        <GroupedLayer checked name="temperature" group="Meteo" pickable={false}>
+        <GroupedLayer checked name="Pirep" group="Meteo" order={0}>
+          <PirepLayer></PirepLayer>
+        </GroupedLayer>
+        <GroupedLayer checked name="Metar" group="Meteo" order={1}>
+          <MetarsLayer></MetarsLayer>
+        </GroupedLayer>
+        <GroupedLayer checked name="SIGMET" group="Meteo" order={2}>
+          <SigmetLayer></SigmetLayer>
+        </GroupedLayer>
+        <GroupedLayer
+          checked
+          name="International SIGMET"
+          group="Meteo"
+          order={3}
+        >
+          <IntlSigmetLayer></IntlSigmetLayer>
+        </GroupedLayer>
+        <GroupedLayer checked name="CWA" group="Meteo" order={4}>
+          <CWALayer></CWALayer>
+        </GroupedLayer>
+        <GroupedLayer checked name="Convetive Outlook" group="Meteo" order={5}>
+          <ConvectiveOutlookLayer></ConvectiveOutlookLayer>
+        </GroupedLayer>
+        <GroupedLayer checked name="GAirmet" group="Meteo" order={6}>
+          <GairmetLayer></GairmetLayer>
+        </GroupedLayer>
+        <GroupedLayer
+          checked
+          name="temperature"
+          group="Meteo"
+          pickable={false}
+          order={7}
+        >
           <TimeDimensionLayer
             ref={wmsLayerRef}
+            // url="https://eztile1.ezwxbrief.com/geoserver/EZWxBrief/wms?"
             url="https://{s}.ezwxbrief.com/geoserver/EZWxBrief/wms?"
+            // url="http://3.95.80.120:8080/geoserver/EZWxBrief/wms?"
             options={{
               transparent: true,
               format: 'image/png',
@@ -253,41 +287,6 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
               // crossOrigin: true,
             }}
           ></TimeDimensionLayer>
-        </GroupedLayer>
-        <GroupedLayer checked name="States" group="Admin" pickable={false}>
-          <WFSLayer
-            url="https://eztile1.ezwxbrief.com/geoserver/topp/ows"
-            maxFeatures={256}
-            typeName="topp:states"
-            interactive={false}
-            style={() => {
-              return {
-                fillOpacity: 0,
-                weight: 1,
-              };
-            }}
-          ></WFSLayer>
-        </GroupedLayer>
-        <GroupedLayer checked name="Pirep" group="Meteo">
-          <PirepLayer></PirepLayer>
-        </GroupedLayer>
-        <GroupedLayer checked name="SIGMET" group="Meteo">
-          <SigmetLayer></SigmetLayer>
-        </GroupedLayer>
-        <GroupedLayer checked name="International SIGMET" group="Meteo">
-          <IntlSigmetLayer></IntlSigmetLayer>
-        </GroupedLayer>
-        <GroupedLayer checked name="CWA" group="Meteo">
-          <CWALayer></CWALayer>
-        </GroupedLayer>
-        <GroupedLayer checked name="Convetive Outlook" group="Meteo">
-          <ConvectiveOutlookLayer></ConvectiveOutlookLayer>
-        </GroupedLayer>
-        <GroupedLayer checked name="GAirmet" group="Meteo">
-          <GairmetLayer></GairmetLayer>
-        </GroupedLayer>
-        <GroupedLayer checked name="Metar" group="Meteo">
-          <MetarsLayer></MetarsLayer>
         </GroupedLayer>
         <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
       </LayerControl>

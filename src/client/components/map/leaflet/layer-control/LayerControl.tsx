@@ -1,11 +1,5 @@
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
-import {
-  FormControl,
-  Radio,
-  RadioGroup,
-  Slider,
-  Typography,
-} from '@material-ui/core';
+import { Radio, RadioGroup, Slider, Typography } from '@material-ui/core';
 import { useMapEvents } from 'react-leaflet';
 import { Layer, Util, DomEvent, LayerGroup } from 'leaflet';
 import Accordion from '@material-ui/core/Accordion';
@@ -18,8 +12,7 @@ import lodashGroupBy from 'lodash.groupby';
 import toast from 'react-hot-toast';
 import { LayersControlProvider } from './layerControlContext';
 
-import createControlledLayer from './controlledLayer';
-import { GlobalStyles } from '@mui/styled-engine';
+import createControlledLayer, { OrderedLayerProps } from './controlledLayer';
 
 const POSITION_CLASSES: { [key: string]: string } = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -33,6 +26,8 @@ interface IProps {
   position: string;
   collapsed: boolean;
   exclusive: boolean;
+  defaultLayer?: string;
+  exclusiveSkipLayers?: string[];
   onLayersAdd?: (layers: ILayerObj[]) => void;
 }
 
@@ -44,6 +39,7 @@ interface ILayerObj {
   id: number;
   isEmpty: boolean;
   pickable: boolean;
+  order: number;
 }
 
 const LayerControl = ({
@@ -51,6 +47,8 @@ const LayerControl = ({
   collapsed,
   children,
   exclusive,
+  defaultLayer,
+  exclusiveSkipLayers,
   onLayersAdd,
 }: IProps) => {
   const [layers, setLayers] = useState<ILayerObj[]>([]);
@@ -126,6 +124,12 @@ const LayerControl = ({
 
   const hideAllLayers = () => {
     const layersNew = layers.map((layerObj) => {
+      if (
+        exclusiveSkipLayers.length > 0 &&
+        exclusiveSkipLayers.includes(layerObj.name)
+      ) {
+        return;
+      }
       map.removeLayer(layerObj.layer);
       layerObj.checked = false;
       return {
@@ -136,12 +140,8 @@ const LayerControl = ({
     setLayers(layersNew);
   };
 
-  const onGroupAdd = (
-    layer: Layer,
-    name: string,
-    group: string,
-    pickable: boolean,
-  ) => {
+  const onGroupAdd = (layer: Layer, options: OrderedLayerProps) => {
+    const { group, name, pickable, order } = options;
     const isEmptyLayer = checkEmptyLayer(layer);
     const cLayers = layers;
     const index = cLayers.findIndex((e) => e.name === name);
@@ -150,6 +150,7 @@ const LayerControl = ({
         layer,
         group,
         name,
+        order,
         checked: exclusive || isEmptyLayer ? false : map?.hasLayer(layer),
         id: Util.stamp(layer),
         isEmpty: isEmptyLayer,
@@ -160,6 +161,7 @@ const LayerControl = ({
         layer,
         group,
         name,
+        order,
         checked: exclusive || isEmptyLayer ? false : map?.hasLayer(layer),
         id: Util.stamp(layer),
         isEmpty: isEmptyLayer,
@@ -167,23 +169,29 @@ const LayerControl = ({
       });
     }
     if (exclusive) {
-      cLayers[0].checked = true;
-      for (let i = 1; i < cLayers.length; i++) {
+      for (let i = 0; i < cLayers.length; i++) {
+        if (
+          cLayers[i].name === defaultLayer ||
+          exclusiveSkipLayers.includes(cLayers[i].name)
+        ) {
+          cLayers[i].checked = true;
+          continue;
+        }
         if (map?.hasLayer(cLayers[i].layer)) {
           map.removeLayer(cLayers[i].layer);
         }
       }
     }
-    setLayers(cLayers);
+    setLayers(cLayers.sort((a, b) => (a.order > b.order ? 1 : -1)));
     if (onLayersAdd) onLayersAdd(layers);
   };
 
   const groupedLayers = lodashGroupBy(layers, 'group');
 
   useEffect(() => {
-    const clickLayerControl = (e) => {
-      DomEvent.stopPropagation(e);
-    };
+    if (ref?.current) {
+      DomEvent.disableClickPropagation(ref.current);
+    }
   }, []);
   return (
     <LayersControlProvider
@@ -311,19 +319,54 @@ const LayerControl = ({
                           </AccordionDetails>
                           <AccordionDetails>
                             <RadioGroup
-                              defaultValue="female"
+                              defaultValue="flightCategory"
                               name="radio-buttons-group-metar"
                               style={{ paddingLeft: 26 }}
                             >
                               <FormControlLabel
-                                value="female"
+                                value="flightCategory"
                                 control={<Radio color="primary" />}
-                                label="Female"
+                                label="Flight Category"
                               />
                               <FormControlLabel
-                                value="male"
+                                value="ceilingHeight"
                                 control={<Radio color="primary" />}
-                                label="Male"
+                                label="Ceiling Height"
+                              />
+                              <FormControlLabel
+                                value="surfaceVisibility"
+                                control={<Radio color="primary" />}
+                                label="Surface Visibility"
+                              />
+                              <FormControlLabel
+                                value="surfaceWindSpeed"
+                                control={<Radio color="primary" />}
+                                label="Surface Wind Speed"
+                              />
+                              <FormControlLabel
+                                value="surfaceWindGust"
+                                control={<Radio color="primary" />}
+                                label="Surface Wind Gust"
+                              />
+                              <FormControlLabel
+                                value="surfaceTemperature"
+                                control={<Radio color="primary" />}
+                                label="Surface Temperature"
+                              />
+                              <FormControlLabel
+                                value="surfaceDewpoint"
+                                control={<Radio color="primary" />}
+                                label="Surface Dewpoint"
+                              />
+                              <FormControlLabel
+                                value="dewpointDepression"
+                                control={<Radio color="primary" />}
+                                label="Dewpoint Depression"
+                              />
+                              <FormControlLabel
+                                value="weather"
+                                control={<Radio color="primary" />}
+                                label="Weather"
                               />
                             </RadioGroup>
                           </AccordionDetails>
@@ -363,8 +406,8 @@ const LayerControl = ({
 };
 
 const GroupedLayer = createControlledLayer(
-  (layersControl, layer, name, group, pickable) => {
-    layersControl.addGroup(layer, name, group, pickable);
+  (layersControl, layer, options: OrderedLayerProps): any => {
+    layersControl.addGroup(layer, options);
   },
 );
 

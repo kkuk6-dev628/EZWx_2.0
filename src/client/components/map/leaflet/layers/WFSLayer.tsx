@@ -5,7 +5,7 @@ import L, { LatLng, PathOptions } from 'leaflet';
 import axios, { GenericAbortSignal } from 'axios';
 import MarkerClusterGroup from './MarkerClusterGroup';
 import { useSelector } from 'react-redux';
-import { selectObsTime } from '../../../../store/ObsTimeSlice';
+import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { generateHash } from '../../common/AreoFunctions';
 import GeoJSON, { FeatureCollection } from 'geojson';
 

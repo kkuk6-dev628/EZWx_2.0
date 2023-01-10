@@ -28,7 +28,7 @@ const IntlSigmetLayer = () => {
 
   return (
     <WFSLayer
-      url="https://eztile1.ezwxbrief.com/geoserver/EZWxBrief/ows"
+      url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
       maxFeatures={256}
       typeName="EZWxBrief:intl_sigmet"
       propertyNames={[

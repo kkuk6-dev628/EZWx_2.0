@@ -1,6 +1,7 @@
+import { LayerControlSlice } from './layers/LayerControl';
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
-import ObsTimeSlice from './ObsTimeSlice';
-import ObsIntervalSlice from './ObsIntervalSlice';
+import ObsTimeSlice from './time-slider/ObsTimeSlice';
+import ObsIntervalSlice from './time-slider/ObsIntervalSlice';
 import { createWrapper } from 'next-redux-wrapper';
 import authSlice from './auth/authSlice';
 import { apiSlice } from './api/apiSlice';
@@ -12,6 +13,7 @@ const makeStore = () =>
       [ObsTimeSlice.name]: ObsTimeSlice.reducer,
       [apiSlice.reducerPath]: apiSlice.reducer,
       [authSlice.name]: authSlice.reducer,
+      [LayerControlSlice.name]: LayerControlSlice.reducer,
     },
     devTools: process.env.NODE_ENV !== 'production',
     middleware: (getDefaultMiddlewares) =>

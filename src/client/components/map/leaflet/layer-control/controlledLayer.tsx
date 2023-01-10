@@ -11,11 +11,12 @@ import { ReactNode } from 'react';
 import { useLayerControlContext } from './layerControlContext';
 import { useMap } from 'react-leaflet';
 
-interface IProps {
+export interface OrderedLayerProps {
   checked?: boolean;
   name: string;
   group: string;
   pickable?: boolean;
+  order: number;
   children: ReactNode[] | ReactNode;
 }
 
@@ -23,12 +24,10 @@ const createControlledLayer = (
   addLayerToControl: (
     layerContext: any,
     layer: Layer,
-    name: string,
-    group: string,
-    pickable: boolean,
+    options: OrderedLayerProps,
   ) => any,
 ) => {
-  const ControlledLayer = (props: IProps) => {
+  const ControlledLayer = (props: OrderedLayerProps) => {
     const context = useLeafletContext();
     const layerContext = useLayerControlContext();
     const propsRef = useRef(props);
@@ -42,15 +41,7 @@ const createControlledLayer = (
           parentMap.addLayer(layerToAdd);
         }
 
-        addLayerToControl(
-          layerContext,
-          layerToAdd,
-          propsRef.current.name,
-          propsRef.current.group,
-          propsRef.current.pickable !== undefined
-            ? propsRef.current.pickable
-            : true,
-        );
+        addLayerToControl(layerContext, layerToAdd, propsRef.current);
         setLayer(layerToAdd);
       },
       [context],
