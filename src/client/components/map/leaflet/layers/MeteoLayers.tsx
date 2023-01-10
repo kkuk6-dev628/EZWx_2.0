@@ -279,9 +279,9 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
               crs: CRS.EPSG4326,
               info_format: 'application/json',
               identify: false,
-              tiled: true,
+              tiled: false,
               subdomains: ['eztile1', 'eztile2', 'eztile3', 'eztile4'],
-              layers: 'EZWxBrief:nbm_t2m_test',
+              layers: 'EZWxBrief:nbm_t2m',
               // @ts-ignore
               useCache: true,
               // crossOrigin: true,
