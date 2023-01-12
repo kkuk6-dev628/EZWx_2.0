@@ -1344,10 +1344,10 @@
     lodash.omit "4.5.0"
     tslib "2.4.1"
 
-"@nestjs/cli@^9.1.5":
-  version "9.1.7"
-  resolved "https://registry.yarnpkg.com/@nestjs/cli/-/cli-9.1.7.tgz#9998025031784769b5ceaee4723b1d2144973f49"
-  integrity sha512-l0+vWXr571JcQ2LnQU3otxsvF5KUXqcAWCjnjMZH7ALVxcYi7BTif8q9YX0QHUETd9xPbH2YWkqV8SvlwgqEVg==
+"@nestjs/cli@^9.1.8":
+  version "9.1.8"
+  resolved "https://registry.yarnpkg.com/@nestjs/cli/-/cli-9.1.8.tgz#e4cb06c0cb628bf08ae143c2c6278a7beb38044b"
+  integrity sha512-53laCMoPLAkjyz3405FlMSrHnbr3DGeoaQjY963bEroezLlm/qfQhwj6oGJwtgA28eNFgx68mvQV2f1VZNUJtw==
   dependencies:
     "@angular-devkit/core" "15.0.4"
     "@angular-devkit/schematics" "15.0.4"
@@ -3500,10 +3500,10 @@ commander@^8.1.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-8.3.0.tgz#4837ea1b2da67b9c616a67afbb0fafee567bca66"
   integrity sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==
 
-commander@^9.4.1:
-  version "9.4.1"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-9.4.1.tgz#d1dd8f2ce6faf93147295c0df13c7c21141cfbdd"
-  integrity sha512-5EEkTNyHNGFPD2H+c/dXXfQZYa/scCKasxWcXJaWnNJ99pnQN9Vnmqow+p+PlFPE63Q6mThaZws1T+HxfpgtPw==
+commander@^9.5.0:
+  version "9.5.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-9.5.0.tgz#bc08d1eb5cedf7ccb797a96199d41c7bc3e60d30"
+  integrity sha512-KRs7WVDKg86PWiuAqhDrAQnTXZKraVcCc6vFdL14qrZ/DcWwuRo7VoiYXalXO7S5GKpqYiVEwCbgFDfxNHKJBQ==
 
 common-tags@^1.8.0:
   version "1.8.2"
@@ -3688,10 +3688,10 @@ csstype@^3.0.2, csstype@^3.1.1:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.1.1.tgz#841b532c45c758ee546a11d5bd7b7b473c8c30b9"
   integrity sha512-DJR/VvkAvSZW9bTouZue2sSxDwdTN92uHjqeKVm+0dAqdfNykRzQ95tay8aXMBAAPpUiq4Qcug2L7neoRh2Egw==
 
-cypress@^12.2.0:
-  version "12.2.0"
-  resolved "https://registry.yarnpkg.com/cypress/-/cypress-12.2.0.tgz#86ddc1ecfffadf57a8689e211cfb4437735f4e92"
-  integrity sha512-kvl95ri95KK8mAy++tEU/wUgzAOMiIciZSL97LQvnOinb532m7dGvwN0mDSIGbOd71RREtmT9o4h088RjK5pKw==
+cypress@^12.3.0:
+  version "12.3.0"
+  resolved "https://registry.yarnpkg.com/cypress/-/cypress-12.3.0.tgz#ae3fb0540aef4b5eab1ef2bcd0760caf2992b8bf"
+  integrity sha512-ZQNebibi6NBt51TRxRMYKeFvIiQZ01t50HSy7z/JMgRVqBUey3cdjog5MYEbzG6Ktti5ckDt1tfcC47lmFwXkw==
   dependencies:
     "@cypress/request" "^2.88.10"
     "@cypress/xvfb" "^1.2.4"
@@ -4149,10 +4149,10 @@ escape-string-regexp@^4.0.0:
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-4.0.0.tgz#14ba83a5d373e3d311e5afca29cf5bfad965bf34"
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
 
-eslint-config-prettier@^8.5.0:
-  version "8.5.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.5.0.tgz#5a81680ec934beca02c7b1a61cf8ca34b66feab1"
-  integrity sha512-obmWKLUNCnhtQRKc+tmnYuQl0pFU1ibYJQ5BGhTVB08bHe9wC8qUeG7c08dj9XX+AuPj1YSGSQIHl1pnDHZR0Q==
+eslint-config-prettier@^8.6.0:
+  version "8.6.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.6.0.tgz#dec1d29ab728f4fa63061774e1672ac4e363d207"
+  integrity sha512-bAF0eLpLVqP5oEVUFKpMA+NnRFICwn9X8B5jrR9FcqnYBuPbqWEjTEspPWMj5ye6czoSLDweCzSo3Ko7gGrZaA==
 
 eslint-plugin-prettier@^4.2.1:
   version "4.2.1"
@@ -5035,10 +5035,10 @@ graphql-zeus-jsonschema@*:
     graphql-js-tree "^0.1.9"
     json-schema "^0.3.0"
 
-graphql-zeus@^5.2.3:
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/graphql-zeus/-/graphql-zeus-5.2.3.tgz#7efe3b729f8a7999e32dce42a30b2f361af2f0ab"
-  integrity sha512-qHgAT2Z2wMttRPpNjjLp20H4cjsrhKAExXbHjBcYXCbXNnvNgaqPYZbOJVNsrdC8yJDRWZZ2d8PdKwFDgplMjA==
+graphql-zeus@^5.2.4:
+  version "5.2.4"
+  resolved "https://registry.yarnpkg.com/graphql-zeus/-/graphql-zeus-5.2.4.tgz#9eb3528443bee134519872d0066d05cddca10736"
+  integrity sha512-Jq7T8mUQUIV51CzVPGKTp3UcGpjztHknLkprWXfKXJU9g9QGjkZt3ItZKW+wNePckA4o9DaoG+V/HUiJrSIv0g==
   dependencies:
     cross-fetch "^3.0.4"
     graphql-zeus-core "*"
@@ -7627,10 +7627,10 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@^2.8.1:
-  version "2.8.1"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.1.tgz#4e1fd11c34e2421bc1da9aea9bd8127cd0a35efc"
-  integrity sha512-lqGoSJBQNJidqCHE80vqZJHWHRFoNYsSpP9AjFhlhi9ODCJA541svILes/+/1GM3VaL/abZi7cpFzOpdR9UPKg==
+prettier@^2.8.2:
+  version "2.8.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.2.tgz#c4ea1b5b454d7c4b59966db2e06ed7eec5dfd160"
+  integrity sha512-BtRV9BcncDyI2tsuS19zzhzoxD8Dh8LiCx7j7tHzrkz8GFXAexeWFdi22mjE1d16dftH2qNaytVxqiRTGlMfpw==
 
 pretty-bytes@^4.0.2:
   version "4.0.2"
@@ -7830,10 +7830,10 @@ react-element-popper@^2.1.6:
   resolved "https://registry.yarnpkg.com/react-element-popper/-/react-element-popper-2.1.6.tgz#4afb912287d57de5d442fb85e76f4d7b94fde879"
   integrity sha512-8va7mUmrKIkUnaM2t5Dyctd8cjgVgVcrv5vVD0FRay0sN6EPBCKa0bDi1/KmVDAjfgSIn7zQnjtc4VojcGrkgQ==
 
-react-hook-form@^7.41.2:
-  version "7.41.2"
-  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.41.2.tgz#db37b0bfd844b96d7b30d26ed3c55366e3c2c7cd"
-  integrity sha512-Uz5kNlfkEZve0sr5y2LsxPDGN3eNDjjKb1XJgand1E5Ay0S3zWo8YcJQNGu88/Zs6JaFnrJqTXbSr6B2q7wllA==
+react-hook-form@^7.41.5:
+  version "7.41.5"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.41.5.tgz#dcd0e7438c15044eadc99df6deb889da5858a03b"
+  integrity sha512-DAKjSJ7X9f16oQrP3TW2/eD9N6HOgrmIahP4LOdFphEWVfGZ2LulFd6f6AQ/YS/0cx/5oc4j8a1PXxuaurWp/Q==
 
 react-hot-toast@^2.4.0:
   version "2.4.0"
