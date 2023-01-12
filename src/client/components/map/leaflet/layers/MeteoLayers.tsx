@@ -281,7 +281,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
               identify: false,
               tiled: false,
               subdomains: ['eztile1', 'eztile2', 'eztile3', 'eztile4'],
-              layers: 'EZWxBrief:nbm_t2m',
+              layers: 'EZWxBrief:nbm_t2m_0.1deg',
               // @ts-ignore
               useCache: true,
               // crossOrigin: true,

@@ -7,6 +7,9 @@ import {
   addLeadingZeroes,
   getTimeRangeStart,
 } from '../../common/AreoFunctions';
+import { useSelector } from 'react-redux';
+import { selectPirep } from '../../../../store/layers/LayerControl';
+import { useEffect } from 'react';
 
 const PirepLayer = () => {
   const map = useMap();
@@ -17,6 +20,8 @@ const PirepLayer = () => {
       Turbulence: true,
     },
   };
+
+  const layerStatus = useSelector(selectPirep);
 
   const getTbIconUrl = (intensity) => {
     let iconUrl = '/icons/pirep/negative-turb-icon.png';
@@ -193,6 +198,10 @@ const PirepLayer = () => {
     });
     return results;
   };
+
+  useEffect(() => {
+    console.log(layerStatus);
+  }, []);
 
   return (
     <Pane name={'pirep'} style={{ zIndex: 699 }}>

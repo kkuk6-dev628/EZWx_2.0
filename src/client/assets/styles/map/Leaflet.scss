@@ -127,3 +127,89 @@ z-index: 400!important;
 .MuiAccordionDetails-root{
   padding: 2px 16px 2px 16px !important;
 }
+
+.metar-ceiling-icon {
+    width: 50px !important;
+    height: 20px !important;
+    -ms-border-radius: 1.1rem;
+    border-radius: 1.1rem;
+    background-color: #808080;
+    text-align: center;
+}
+
+.metar-temperature-icon {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 2rem;
+    text-align: center;
+    color: white;
+    font-size: 15px;
+    padding: 0.2rem;
+    font-weight: bold;
+    line-height: 26px;
+}
+
+.metar-wind-icon {
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: .5rem;
+    text-align: center;
+    color: white;
+    font-size: 14px;
+    padding: 0.2rem;
+    font-weight:bold;
+    line-height: 26px;
+}
+.black {
+    background-color: #000000;
+}
+
+.c10000 {
+    background-color: #c10000;
+}
+
+.cc0000 {
+    background-color: #cc0000;
+}
+
+.fe0000 {
+    background-color: #fe0000;
+}
+
+.f79749 {
+    background-color: #f79749;
+}
+.FEBE00 {
+    background-color: #FEBE00;
+}
+.ffbf00 {
+    background-color: #ffbf00;
+}
+
+.lightGreen {
+    background-color: #92d14f;
+}
+
+.darkerGreen {
+    background-color: #00af4f;
+}
+
+.lightBlue {
+    background-color: #0098fe;
+}
+
+.darkerBlue {
+    background-color: #3532ff;
+}
+
+.purple {
+    background-color: #7130a2;
+}
+
+.magenta {
+    background-color: #990299;
+}
+
+.cc0199 {
+    background-color: #cc0199;
+}

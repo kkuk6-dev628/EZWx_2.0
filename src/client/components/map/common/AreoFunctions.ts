@@ -130,6 +130,8 @@ const getTimeRangeStart = () => {
 const getQueryTime = (time: Date): string => {
   const start = new Date(time);
   start.setMinutes(time.getMinutes() - 75);
+  start.setSeconds(0);
+  start.setMilliseconds(0);
   return start.toISOString() + '/' + time.toISOString();
 };
 

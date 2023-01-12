@@ -1,4 +1,10 @@
-import React, { ReactElement, useEffect, useRef, useState } from 'react';
+import React, {
+  ChangeEvent,
+  ReactElement,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Radio, RadioGroup, Slider, Typography } from '@material-ui/core';
 import { useMapEvents } from 'react-leaflet';
 import { Layer, Util, DomEvent, LayerGroup } from 'leaflet';
@@ -13,6 +19,10 @@ import toast from 'react-hot-toast';
 import { LayersControlProvider } from './layerControlContext';
 
 import createControlledLayer, { OrderedLayerProps } from './controlledLayer';
+import { selectMetar, setMetar } from '../../../../store/layers/LayerControl';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { MarkerTypes } from '../layers/MetarsLayer';
 
 const POSITION_CLASSES: { [key: string]: string } = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -56,6 +66,8 @@ const LayerControl = ({
     (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright;
 
   const ref = useRef<HTMLDivElement>();
+  const dispatch = useDispatch();
+  const layerStatus = useSelector(selectMetar);
 
   const map = useMapEvents({
     layerremove: () => {
@@ -306,11 +318,7 @@ const LayerControl = ({
                               }
                               label={layerObj.name}
                               onClickCapture={(e) => {
-                                DomEvent.stopPropagation(e as any);
                                 onLayerClick(layerObj);
-                              }}
-                              onDoubleClickCapture={(e) => {
-                                DomEvent.stopPropagation(e as any);
                               }}
                             />
                           </AccordionSummary>
@@ -319,54 +327,64 @@ const LayerControl = ({
                           </AccordionDetails>
                           <AccordionDetails>
                             <RadioGroup
-                              defaultValue="flightCategory"
+                              defaultValue={layerStatus.markerType}
                               name="radio-buttons-group-metar"
                               style={{ paddingLeft: 26 }}
+                              onChangeCapture={(
+                                e: ChangeEvent<HTMLInputElement>,
+                              ) => {
+                                dispatch(
+                                  setMetar({
+                                    ...layerStatus,
+                                    markerType: e.target.value,
+                                  }),
+                                );
+                              }}
                             >
                               <FormControlLabel
-                                value="flightCategory"
+                                value={MarkerTypes.flightCategory.value}
                                 control={<Radio color="primary" />}
-                                label="Flight Category"
+                                label={MarkerTypes.flightCategory.text}
                               />
                               <FormControlLabel
-                                value="ceilingHeight"
+                                value={MarkerTypes.ceilingHeight.value}
                                 control={<Radio color="primary" />}
-                                label="Ceiling Height"
+                                label={MarkerTypes.ceilingHeight.text}
                               />
                               <FormControlLabel
-                                value="surfaceVisibility"
+                                value={MarkerTypes.surfaceVisibility.value}
                                 control={<Radio color="primary" />}
-                                label="Surface Visibility"
+                                label={MarkerTypes.surfaceVisibility.text}
                               />
                               <FormControlLabel
-                                value="surfaceWindSpeed"
+                                value={MarkerTypes.surfaceWindSpeed.value}
                                 control={<Radio color="primary" />}
-                                label="Surface Wind Speed"
+                                label={MarkerTypes.surfaceWindSpeed.text}
                               />
                               <FormControlLabel
-                                value="surfaceWindGust"
+                                value={MarkerTypes.surfaceWindGust.value}
                                 control={<Radio color="primary" />}
-                                label="Surface Wind Gust"
+                                label={MarkerTypes.surfaceWindGust.text}
                               />
                               <FormControlLabel
-                                value="surfaceTemperature"
+                                value={MarkerTypes.surfaceTemperature.value}
                                 control={<Radio color="primary" />}
-                                label="Surface Temperature"
+                                label={MarkerTypes.surfaceTemperature.text}
                               />
                               <FormControlLabel
-                                value="surfaceDewpoint"
+                                value={MarkerTypes.surfaceDewpoint.value}
                                 control={<Radio color="primary" />}
-                                label="Surface Dewpoint"
+                                label={MarkerTypes.surfaceDewpoint.text}
                               />
                               <FormControlLabel
-                                value="dewpointDepression"
+                                value={MarkerTypes.dewpointDepression.value}
                                 control={<Radio color="primary" />}
-                                label="Dewpoint Depression"
+                                label={MarkerTypes.dewpointDepression.text}
                               />
                               <FormControlLabel
-                                value="weather"
+                                value={MarkerTypes.weather.value}
                                 control={<Radio color="primary" />}
-                                label="Weather"
+                                label={MarkerTypes.weather.text}
                               />
                             </RadioGroup>
                           </AccordionDetails>
