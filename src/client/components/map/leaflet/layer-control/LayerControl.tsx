@@ -362,6 +362,11 @@ const LayerControl = ({
                                 label={MarkerTypes.surfaceWindSpeed.text}
                               />
                               <FormControlLabel
+                                value={MarkerTypes.surfaceWindBarbs.value}
+                                control={<Radio color="primary" />}
+                                label={MarkerTypes.surfaceWindBarbs.text}
+                              />
+                              <FormControlLabel
                                 value={MarkerTypes.surfaceWindGust.value}
                                 control={<Radio color="primary" />}
                                 label={MarkerTypes.surfaceWindGust.text}

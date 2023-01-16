@@ -29,6 +29,10 @@ export const MarkerTypes = {
     value: 'surfaceWindSpeed',
     text: 'Surface Wind Speed',
   },
+  surfaceWindBarbs: {
+    value: 'surfaceWindBarbs',
+    text: 'Surface Wind Barbs',
+  },
   surfaceWindGust: {
     value: 'surfaceWindGust',
     text: 'Surface Wind Gust',
@@ -477,6 +481,69 @@ const MetarsLayer = () => {
     return metarMarker;
   };
 
+  const getDewpointDepressionMarker = (
+    feature: GeoJSON.Feature,
+    latlng: LatLng,
+  ) => {
+    const temperature = parseFloat(feature.properties.temp_c);
+    const dewpointTemperature = parseFloat(feature.properties.dewpoint_c);
+    // const useCelcius =
+    //   $('#hdnUserTemperatureSetting').val().trim() === 'celsius' ? true : false;
+    let dewpointDepression = temperature - dewpointTemperature;
+    // const temperatureInCelcius = Math.round((temperature - 32) * (5 / 9));
+    let dewpointDepressionInCelcius = Math.round(dewpointDepression);
+    // const dewpointTemperatureInCelcius = Math.round(
+    //   (dewpointTemperature - 32) * (5 / 9),
+    // );
+    // let dewpointDepressionInCelcius = Math.round(
+    //   temperatureInCelcius - dewpointTemperatureInCelcius,
+    // );
+    if (dewpointDepressionInCelcius < 0) {
+      dewpointDepressionInCelcius = 0;
+    }
+    dewpointDepression = Math.round(dewpointDepression);
+    if (dewpointDepression < 0) {
+      dewpointDepression = 0;
+    }
+    let colorCode = 'black';
+    if (dewpointDepressionInCelcius > 7) {
+      colorCode = 'darkerGreen';
+    } else if (
+      dewpointDepressionInCelcius > 4 &&
+      dewpointDepressionInCelcius <= 7
+    ) {
+      colorCode = 'lightBlue';
+    } else if (
+      dewpointDepressionInCelcius > 2 &&
+      dewpointDepressionInCelcius <= 4
+    ) {
+      colorCode = 'darkerBlue';
+    } else if (
+      dewpointDepressionInCelcius > 1 &&
+      dewpointDepressionInCelcius <= 2
+    ) {
+      colorCode = 'purple';
+    } else if (dewpointDepressionInCelcius <= 1) {
+      colorCode = 'magenta';
+    }
+
+    // if (useCelcius) {
+    //   dewpointDepression = dewpointDepressionInCelcius;
+    // }
+
+    const metarMarker = L.marker(latlng, {
+      icon: new L.DivIcon({
+        className: 'metar-temperature-icon ' + colorCode,
+        html: dewpointDepressionInCelcius.toString(),
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+        //popupAnchor: [0, -13]
+      }),
+      pane: 'metar',
+    });
+    return metarMarker;
+  };
+
   const pointToLayer = (feature: GeoJSON.Feature, latlng: LatLng): L.Layer => {
     switch (layerStatus.markerType) {
       case MarkerTypes.flightCategory.value:
@@ -501,6 +568,7 @@ const MetarsLayer = () => {
         return getSurfaceDewpointMarker(feature, latlng);
         break;
       case MarkerTypes.dewpointDepression.value:
+        return getDewpointDepressionMarker(feature, latlng);
         break;
       case MarkerTypes.weather.value:
         break;
@@ -552,14 +620,14 @@ const MetarsLayer = () => {
     <Pane name={'metar'} style={{ zIndex: 698 }} key={layerStatus.markerType}>
       <WFSLayer
         ref={wfsRef}
-        url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
+        url="https://eztile4.ezwxbrief.com/geoserver/EZWxBrief/ows"
         maxFeatures={164096}
         typeName="EZWxBrief:metar"
         propertyNames={[
           'wkb_geometry',
           'ogc_fid',
           'station_id',
-          'elevation_ft',
+          // 'elevation_ft',
           'temp_c',
           'dewpoint_c',
           'wind_dir_degrees',
@@ -567,7 +635,7 @@ const MetarsLayer = () => {
           'wind_speed_kt',
           'wind_gust_kt',
           'flight_category',
-          'raw_text',
+          // 'raw_text',
           'visibility_statute_mi',
           'cloud_base_ft_agl_1',
           'sky_cover_1',
@@ -581,13 +649,13 @@ const MetarsLayer = () => {
           'sky_cover_5',
           'cloud_base_ft_agl_6',
           'sky_cover_6',
-          'altim_in_hg',
-          'sea_level_pressure_mb',
-          'wx_string',
-          'vert_vis_ft',
+          // 'altim_in_hg',
+          // 'sea_level_pressure_mb',
+          // 'wx_string',
+          // 'vert_vis_ft',
           // 'dewpointdepression',
-          'relativehumiditypercent',
-          'densityaltitudefeet',
+          // 'relativehumiditypercent',
+          // 'densityaltitudefeet',
         ]}
         enableBBoxQuery={true}
         pointToLayer={pointToLayer}
