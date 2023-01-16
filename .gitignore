@@ -404,3 +404,4 @@ notes.md
 cypress/videos
 cypress/screenshots
 src/schema.gql
+.yarn/**/*
