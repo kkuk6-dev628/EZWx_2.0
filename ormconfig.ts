@@ -7,7 +7,7 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   url: process.env.DATABASE_URL,
   entities: [__dirname + '/src/server/app/**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/src/server/migration/*.{ts,js}'],
-  // synchronize: true,
+  // synchronize: false,
 };
 
 const source = new DataSource({

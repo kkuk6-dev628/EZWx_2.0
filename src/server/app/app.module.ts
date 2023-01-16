@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { typeOrmConfig } from 'ormconfig';
+import { CertificationModule } from './certification/certification.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -19,6 +20,7 @@ import { typeOrmConfig } from 'ormconfig';
     ConsoleModule,
     AuthModule,
     UserModule,
+    CertificationModule,
   ],
   providers: [AppService],
   controllers: [AppController],

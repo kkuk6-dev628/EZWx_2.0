@@ -1,0 +1,67 @@
+.prom{
+  width: 17.5rem;
+  border-radius: 8px;
+  position: absolute;
+  z-index: 9999;
+  right: 0;
+  top: 75px ;
+  overflow: hidden;
+
+  &__header{
+    display: flex;
+    align-items: center;
+    grid-gap: 10px;
+    padding:24px;
+    background: linear-gradient(250deg, #3e93d6, #8a75aa);
+  }
+
+  &__lft{
+    img{
+      border-radius: 50%;
+    }
+  }
+
+  &__lft__img{}
+
+  &__rgt{
+    color: var(--color-white);
+  }
+
+  &__name{
+    color: var(--color-white);
+  }
+
+  &__email{
+    color: var(--color-white);
+  }
+
+  &__btm{
+    background-color: white;
+  }
+
+  &__btm__itm{
+    border: none;
+    width: 100%;
+    display: flex;
+    grid-gap: 10px;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    &:hover{
+      background-color: #f8f9fa;
+      span{
+        color: #886ab5 
+      }
+    }
+    span{
+      font-size: 20px;
+      color: var(--color-primary);
+      // font-weight: 500;
+    }
+  }
+
+  &__icon{
+    font-size: 20px;
+    color: var(--color-primary);
+  }
+}

@@ -33,7 +33,8 @@
     "store/**/*.ts",
     "../server/common",
     ".next/types/**/*.ts",
-    "store/store.ts"
+    "store/store.ts",
+    "utils/**/*.ts"
   ],
   "exclude": [
     "node_modules"

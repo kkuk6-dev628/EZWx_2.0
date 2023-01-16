@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
+import ProfileModal from '../shared/ProfileModal';
 import {
   SvgDropDown,
   SvgMenuBurger,
@@ -105,6 +106,7 @@ export default function Header() {
   const { pathname } = useRouter();
   const [activeMenu, setActiveMenu] = useState('');
   const [mapMenu, setMapMenu] = useState(false);
+  const [isShowProfileModal, setIsShowProfileModal] = useState(false);
   const [activeResponsiveMenu, setActiveResponsiveMenu] = useState(false);
   useEffect(() => {
     if (pathname === '/try-ezwxbrief' || pathname === '/imagery') {
@@ -232,7 +234,10 @@ export default function Header() {
                   <button className="header__rgt__btn header__rgt__btn--icon btn">
                     <SvgSetting />
                   </button>
-                  <button className="header__rgt__btn header__rgt__btn--icon btn">
+                  <button
+                    onClick={() => setIsShowProfileModal(!isShowProfileModal)}
+                    className="header__rgt__btn header__rgt__btn--icon btn"
+                  >
                     <SvgProfile />
                   </button>
                 </div>
@@ -245,6 +250,7 @@ export default function Header() {
             </div>
           </div>
         </div>
+        {isShowProfileModal && <ProfileModal />}
       </div>
       <ResponsiveMenu
         activeResponsiveMenu={activeResponsiveMenu}
