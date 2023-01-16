@@ -544,6 +544,110 @@ const MetarsLayer = () => {
     return metarMarker;
   };
 
+  const getSurfaceWindBarbsMarker = (
+    feature: GeoJSON.Feature,
+    latlng: LatLng,
+  ) => {
+    let windSpeed = feature.properties.wind_speed_kt;
+    let windDirection = feature.properties.wind_dir_degrees;
+    let iconUrl = '/icons/barbs/0-kt.png';
+    let transformAngle = 'rotate(0deg)';
+    if (isNaN(windSpeed)) {
+      windSpeed = 0;
+    }
+    if (isNaN(windDirection)) {
+      windDirection = 0;
+    }
+    let anchor = [16, 27];
+    if (windSpeed <= 2) {
+      anchor = [15, 15];
+    }
+    if (windSpeed >= 3 && windSpeed <= 7) {
+      iconUrl = '/icons/barbs/5-kt.png';
+    } else if (windSpeed >= 8 && windSpeed <= 12) {
+      iconUrl = '/icons/barbs/10-kt.png';
+    } else if (windSpeed >= 13 && windSpeed <= 17) {
+      iconUrl = '/icons/barbs/15-kt.png';
+    } else if (windSpeed >= 18 && windSpeed <= 22) {
+      iconUrl = '/icons/barbs/20-kt.png';
+    } else if (windSpeed >= 23 && windSpeed <= 27) {
+      iconUrl = '/icons/barbs/25-kt.png';
+    } else if (windSpeed >= 28 && windSpeed <= 32) {
+      iconUrl = '/icons/barbs/30-kt.png';
+    } else if (windSpeed >= 33 && windSpeed <= 37) {
+      iconUrl = '/icons/barbs/35-kt.png';
+    } else if (windSpeed >= 38 && windSpeed <= 42) {
+      iconUrl = '/icons/barbs/40-kt.png';
+    } else if (windSpeed >= 43 && windSpeed <= 47) {
+      iconUrl = '/icons/barbs/45-kt.png';
+    } else if (windSpeed >= 48 && windSpeed <= 52) {
+      iconUrl = '/icons/barbs/50-kt.png';
+    } else if (windSpeed >= 53 && windSpeed <= 57) {
+      iconUrl = '/icons/barbs/55-kt.png';
+    } else if (windSpeed >= 58 && windSpeed <= 62) {
+      iconUrl = '/icons/barbs/60-kt.png';
+    } else if (windSpeed >= 63 && windSpeed <= 67) {
+      iconUrl = '/icons/barbs/65-kt.png';
+    } else if (windSpeed >= 68 && windSpeed <= 72) {
+      iconUrl = '/icons/barbs/70-kt.png';
+    } else if (windSpeed >= 73 && windSpeed <= 77) {
+      iconUrl = '/icons/barbs/75-kt.png';
+    } else if (windSpeed >= 78 && windSpeed <= 82) {
+      iconUrl = '/icons/barbs/80-kt.png';
+    } else if (windSpeed >= 83 && windSpeed <= 87) {
+      iconUrl = '/icons/barbs/85-kt.png';
+    } else if (windSpeed >= 88 && windSpeed <= 92) {
+      iconUrl = '/icons/barbs/90-kt.png';
+    } else if (windSpeed >= 93 && windSpeed <= 97) {
+      iconUrl = '/icons/barbs/95-kt.png';
+    } else if (windSpeed >= 98 && windSpeed <= 102) {
+      iconUrl = '/icons/barbs/100-kt.png';
+    } else if (windSpeed >= 103 && windSpeed <= 107) {
+      iconUrl = '/icons/barbs/105-kt.png';
+    } else if (windSpeed >= 108 && windSpeed <= 112) {
+      iconUrl = '/icons/barbs/110-kt.png';
+    } else if (windSpeed >= 113 && windSpeed <= 117) {
+      iconUrl = '/icons/barbs/115-kt.png';
+    } else if (windSpeed >= 118 && windSpeed <= 122) {
+      iconUrl = '/icons/barbs/120-kt.png';
+    } else if (windSpeed >= 123 && windSpeed <= 140) {
+      iconUrl = '/icons/barbs/125-kt.png';
+    } else if (windSpeed >= 141 && windSpeed <= 175) {
+      iconUrl = '/icons/barbs/150-kt.png';
+    } else if (windSpeed > 175) {
+      iconUrl = '/icons/barbs/200-kt.png';
+    }
+
+    if (windSpeed > 2) {
+      transformAngle = 'rotate(' + windDirection + 'deg)';
+    }
+
+    const metarMarker = L.marker(latlng, {
+      icon: new L.DivIcon({
+        className: '',
+        html: ReactDOMServer.renderToString(
+          <>
+            <Image
+              src={iconUrl}
+              style={{
+                transform: transformAngle,
+                transformOrigin: '16px 26px',
+              }}
+              alt={''}
+              width={30}
+              height={30}
+            />
+          </>,
+        ),
+        iconSize: [30, 30],
+        iconAnchor: anchor as any,
+        //popupAnchor: [0, 0]
+      }),
+      pane: 'metar',
+    });
+    return metarMarker;
+  };
+
   const pointToLayer = (feature: GeoJSON.Feature, latlng: LatLng): L.Layer => {
     switch (layerStatus.markerType) {
       case MarkerTypes.flightCategory.value:
@@ -557,6 +661,9 @@ const MetarsLayer = () => {
         break;
       case MarkerTypes.surfaceWindSpeed.value:
         return getSurfaceWindSpeedMarker(feature, latlng);
+        break;
+      case MarkerTypes.surfaceWindBarbs.value:
+        return getSurfaceWindBarbsMarker(feature, latlng);
         break;
       case MarkerTypes.surfaceWindGust.value:
         return getSurfaceWindGustMarker(feature, latlng);
@@ -651,7 +758,7 @@ const MetarsLayer = () => {
           'sky_cover_6',
           // 'altim_in_hg',
           // 'sea_level_pressure_mb',
-          // 'wx_string',
+          'wx_string',
           // 'vert_vis_ft',
           // 'dewpointdepression',
           // 'relativehumiditypercent',
