@@ -11,6 +11,14 @@
     ],
     "axe/text-alternatives": "off",
     "no-inline-styles": "off",
-    "typescript-config/strict": "off"
+    "typescript-config/strict": "off",
+    "compat-api/css": [
+      "default",
+      {
+        "ignore": [
+          "-ms-filter"
+        ]
+      }
+    ]
   }
 }

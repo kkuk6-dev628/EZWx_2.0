@@ -1,13 +1,10 @@
 import WFSLayer from './WFSLayer';
-import L, { LatLng, marker } from 'leaflet';
+import L, { LatLng } from 'leaflet';
 import Image from 'next/image';
 import ReactDOMServer from 'react-dom/server';
 import { Pane, useMap } from 'react-leaflet';
-import {
-  addLeadingZeroes,
-  getQueryTime,
-  getTimeRangeStart,
-} from '../../common/AreoFunctions';
+import { addLeadingZeroes, getQueryTime } from '../../common/AreoFunctions';
+import SunCalc from 'suncalc';
 import { selectMetar } from '../../../../store/layers/LayerControl';
 import { useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
@@ -173,9 +170,6 @@ const MetarsLayer = () => {
       }),
       pane: 'metar',
     });
-    metarMarker.on('click', (e) => {
-      map.fire('click', e);
-    });
     return metarMarker;
   };
 
@@ -237,9 +231,6 @@ const MetarsLayer = () => {
       }),
       pane: 'metar',
     });
-    metarMarker.on('click', (e) => {
-      map.fire('click', e);
-    });
     return metarMarker;
   };
 
@@ -286,9 +277,6 @@ const MetarsLayer = () => {
         iconAnchor: [25, 10],
       }),
       pane: 'metar',
-    });
-    metarMarker.on('click', (e) => {
-      map.fire('click', e);
     });
     return metarMarker;
   };
@@ -648,38 +636,320 @@ const MetarsLayer = () => {
     return metarMarker;
   };
 
+  const getWeatherMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
+    let isDayTime = true;
+    const sunsetSunriseTime = SunCalc.getTimes(
+      new Date(),
+      latlng.lat,
+      latlng.lng,
+    );
+    if (
+      Date.parse(sunsetSunriseTime.sunrise) &&
+      Date.parse(sunsetSunriseTime.sunset)
+    ) {
+      const obsTime = new Date(feature.properties.observation_time).getTime();
+      isDayTime =
+        obsTime >= sunsetSunriseTime.sunrise.getTime() &&
+        obsTime <= sunsetSunriseTime.sunset.getTime();
+    }
+    let condition = '';
+    let worstSkyConditionFetched = false;
+
+    let weatherIconClass = 'fas fa-question-square';
+    let iconColor = 'lightslategrey';
+    if (feature.properties.flight_category) {
+      switch (feature.properties.flight_category) {
+        case 'VFR':
+          iconColor = '#008000';
+          break;
+        case 'MVFR':
+          iconColor = '#0000FF';
+          break;
+        case 'IFR':
+          iconColor = '#FF0000';
+          break;
+        case 'LIFR':
+          iconColor = '#FF00C0';
+          break;
+      }
+    }
+
+    if (!feature.properties.wx_string) {
+      //if wxString is not set, then get marker's icon from wind speed
+      if (
+        (feature.properties.wind_speed_kt &&
+          feature.properties.wind_speed_kt > 15) ||
+        (feature.properties.wind_gust_kt &&
+          feature.properties.wind_gust_kt > 20)
+      ) {
+        weatherIconClass = 'fas fa-wind';
+      } else {
+        //get icon from worst sky condition
+        [condition] = getSkyCeilingValues(
+          feature,
+          MarkerTypes.ceilingHeight.value,
+        );
+
+        worstSkyConditionFetched = true;
+        switch (condition) {
+          case 'SKC':
+          case 'CLR':
+          case 'CAVOK':
+            weatherIconClass = isDayTime ? 'fas fa-sun' : 'fas fa-moon';
+            break;
+          case 'FEW':
+            weatherIconClass = isDayTime
+              ? 'fas fa-sun-cloud'
+              : 'fas fa-moon-cloud';
+            break;
+          case 'SCT':
+            weatherIconClass = isDayTime
+              ? 'fas fa-cloud-sun'
+              : 'fas fa-cloud-moon';
+            break;
+          case 'BKN':
+            weatherIconClass = isDayTime
+              ? 'fas fa-clouds-sun'
+              : 'fas fa-clouds-moon';
+            break;
+          case 'OVC':
+          case 'OVX':
+            weatherIconClass = 'fas fa-cloud';
+        }
+      }
+    } else {
+      const weatherString = feature.properties.wx_string
+        .replace('-', '')
+        .replace('+', '');
+      switch (weatherString) {
+        case 'SN':
+        case 'SHSN':
+        case 'SN FZFG':
+        case 'SN BR':
+        case 'SN FG':
+        case 'SN FZFG DRSN':
+        case 'SHSN DRSN':
+        case 'SN DRSN':
+        case 'SG DRSN':
+        case 'SG':
+          weatherIconClass = 'fas fa-cloud-snow';
+          break;
+        case 'RASN':
+        case 'SNRA':
+        case 'SN RA':
+        case 'SNPL':
+        case 'PLSN':
+        case 'PL BR':
+        case 'PL FG':
+        case 'PL HZ':
+        case 'RA SN BR':
+        case 'SN RA BR':
+          weatherIconClass = 'fas fa-cloud-sleet';
+          break;
+        case 'RAPL':
+        case 'PLRA':
+        case 'PL':
+          weatherIconClass = 'fas fa-cloud-hail-mixed';
+          break;
+        case 'FZRA':
+        case 'FZRASN':
+        case 'FZRA FZFG':
+        case 'FZDZ BR':
+        case 'FZRA BR':
+        case 'FZRA FG':
+        case 'FZRA HZ':
+        case 'FZDZ':
+          weatherIconClass = 'fas fa-icicles';
+          break;
+        case 'RA':
+        case 'RA BR':
+        case 'RA HZ':
+        case 'RA FG':
+        case 'RA BCFG':
+          weatherIconClass = 'fas fa-cloud-rain';
+          break;
+        case 'DZ':
+        case 'DZ BR':
+          weatherIconClass = 'fas fa-cloud-drizzle';
+          break;
+        case 'SHRA':
+        case 'VCSH':
+        case 'DRSN VCSH':
+          weatherIconClass = 'fas fa-cloud-showers-heavy';
+          break;
+        case 'TS':
+        case 'TS BR':
+        case 'TSRA':
+        case 'TSRA FG':
+        case 'TSSN':
+        case 'VCTSRA':
+        case 'VCTS':
+        case 'VCTS RA':
+        case 'VCTS R':
+        case 'VCTS RA BR':
+        case 'RA BR VCTS':
+        case 'VCTS BR':
+        case 'VCTS HZ':
+        case 'TS FZRA BR':
+        case 'TS FZRA FG':
+        case 'TS FZRA HZ':
+          if (!worstSkyConditionFetched) {
+            [condition] = getSkyCeilingValues(
+              feature,
+              MarkerTypes.ceilingHeight.value,
+            );
+          }
+          if (condition === 'SCT' || condition === 'FEW') {
+            weatherIconClass = isDayTime
+              ? 'fas fa-thunderstorm-sun'
+              : 'fas fa-thunderstorm-moon';
+          } else {
+            weatherIconClass = 'fas fa-thunderstorm';
+          }
+          break;
+        case 'TSRA BR':
+          weatherIconClass = 'fas fa-thunderstorm';
+          break;
+        case 'SS':
+        case 'DU':
+        case 'BLSA':
+        case 'BLDU':
+        case 'HZ DS SQ':
+        case 'HZ DS':
+          weatherIconClass = 'fas fa-sun-dust';
+          break;
+        case 'BLSN':
+        case 'DRSN':
+        case 'SN BLSN':
+          weatherIconClass = 'fas fa-snow-blowing';
+          break;
+        case 'FC':
+          weatherIconClass = 'fas fa-tornado';
+          break;
+        case 'GR':
+          weatherIconClass = 'fas fa-cloud-hail';
+          break;
+        case 'FG':
+        case 'FZFG':
+        case 'VCFG':
+        case 'MIFG':
+        case 'PRFG':
+        case 'BCFG':
+        case 'BR BCFG':
+        case 'BCFG BR':
+        case 'BCFG HZ':
+        case 'MIFG BR':
+          weatherIconClass = 'fas fa-fog';
+          break;
+        case 'FU':
+        case 'HZ FU':
+        case 'BR FU':
+        case 'FU HZ':
+          weatherIconClass = 'fas fa-fire-smoke';
+          break;
+        case 'UP':
+        case 'BR UP':
+        case 'HZ UP':
+        case 'BR':
+        case 'HZ':
+          if (
+            (feature.properties.wind_speed_kt &&
+              feature.properties.wind_speed_kt > 15) ||
+            (feature.properties.wind_gust_kt &&
+              feature.properties.wind_gust_kt > 20)
+          ) {
+            weatherIconClass = 'fas fa-wind';
+          } else {
+            //get icon from worst sky condition
+            if (!worstSkyConditionFetched) {
+              [condition] = getSkyCeilingValues(
+                feature,
+                MarkerTypes.ceilingHeight.value,
+              );
+            }
+            switch (condition) {
+              case 'SKC':
+              case 'CLR':
+                weatherIconClass = isDayTime ? 'fas fa-sun' : 'fas fa-moon';
+                break;
+              case 'FEW':
+                weatherIconClass = isDayTime
+                  ? 'fas fa-sun-cloud'
+                  : 'fas fa-moon-cloud';
+                break;
+              case 'SCT':
+                weatherIconClass = isDayTime
+                  ? 'fas fa-cloud-sun'
+                  : 'fas fa-cloud-moon';
+                break;
+              case 'BKN':
+                weatherIconClass = isDayTime
+                  ? 'fas fa-clouds-sun'
+                  : 'fas fa-clouds-moon';
+                break;
+              case 'OVC':
+              case 'OVX':
+                weatherIconClass = 'fas fa-cloud';
+            }
+          }
+          break;
+      }
+    }
+    const metarMarker = L.marker(latlng, {
+      icon: new L.DivIcon({
+        className: 'metar-weather-icon',
+        html:
+          "<i style='color:" +
+          iconColor +
+          "' class='" +
+          weatherIconClass +
+          " fa-2x'></i>",
+        iconSize: [32, 26],
+        iconAnchor: [16, 13],
+        //popupAnchor: [0, -13]
+      }),
+      pane: 'metar',
+    });
+    return metarMarker;
+  };
   const pointToLayer = (feature: GeoJSON.Feature, latlng: LatLng): L.Layer => {
+    let marker = null;
     switch (layerStatus.markerType) {
       case MarkerTypes.flightCategory.value:
-        return getFlightCatMarker(feature, latlng);
+        marker = getFlightCatMarker(feature, latlng);
         break;
       case MarkerTypes.ceilingHeight.value:
-        return getCeilingHeightMarker(feature, latlng);
+        marker = getCeilingHeightMarker(feature, latlng);
         break;
       case MarkerTypes.surfaceVisibility.value:
-        return getSurfaceVisibilityMarker(feature, latlng);
+        marker = getSurfaceVisibilityMarker(feature, latlng);
         break;
       case MarkerTypes.surfaceWindSpeed.value:
-        return getSurfaceWindSpeedMarker(feature, latlng);
+        marker = getSurfaceWindSpeedMarker(feature, latlng);
         break;
       case MarkerTypes.surfaceWindBarbs.value:
-        return getSurfaceWindBarbsMarker(feature, latlng);
+        marker = getSurfaceWindBarbsMarker(feature, latlng);
         break;
       case MarkerTypes.surfaceWindGust.value:
-        return getSurfaceWindGustMarker(feature, latlng);
+        marker = getSurfaceWindGustMarker(feature, latlng);
         break;
       case MarkerTypes.surfaceTemperature.value:
-        return getSurfaceTemperatureMarker(feature, latlng);
+        marker = getSurfaceTemperatureMarker(feature, latlng);
         break;
       case MarkerTypes.surfaceDewpoint.value:
-        return getSurfaceDewpointMarker(feature, latlng);
+        marker = getSurfaceDewpointMarker(feature, latlng);
         break;
       case MarkerTypes.dewpointDepression.value:
-        return getDewpointDepressionMarker(feature, latlng);
+        marker = getDewpointDepressionMarker(feature, latlng);
         break;
       case MarkerTypes.weather.value:
+        marker = getWeatherMarker(feature, latlng);
         break;
     }
+    marker?.on('click', (e) => {
+      map.fire('click', e);
+    });
+    return marker;
   };
 
   const clientFilter = (
