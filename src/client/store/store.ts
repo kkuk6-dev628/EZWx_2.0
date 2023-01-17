@@ -1,3 +1,4 @@
+import UserSettingsSlice from './user/UserSettings';
 import { LayerControlSlice } from './layers/LayerControl';
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import ObsTimeSlice from './time-slider/ObsTimeSlice';
@@ -14,6 +15,7 @@ const makeStore = () =>
       [apiSlice.reducerPath]: apiSlice.reducer,
       [authSlice.name]: authSlice.reducer,
       [LayerControlSlice.name]: LayerControlSlice.reducer,
+      [UserSettingsSlice.name]: UserSettingsSlice.reducer,
     },
     devTools: process.env.NODE_ENV !== 'production',
     middleware: (getDefaultMiddlewares) =>

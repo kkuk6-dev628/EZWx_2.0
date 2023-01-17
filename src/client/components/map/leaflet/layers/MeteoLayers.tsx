@@ -28,6 +28,10 @@ import axios from 'axios';
 import MetarsLayer from './MetarsLayer';
 import TimeDimensionLayer from './TimeDimensionLayer';
 import MarkerClusterGroup from './MarkerClusterGroup';
+import MetarsPopup from '../popups/MetarsPopup';
+import { useSelector } from 'react-redux';
+import { selectMetar } from '../../../../store/layers/LayerControl';
+import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
 
 const maxLayers = 6;
 
@@ -35,6 +39,8 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
   const [layers, setLayers] = useState([]);
   const wmsLayerRef = useRef(null);
   const debugLayerGroupRef = useRef(null);
+  const metarLayerStatus = useSelector(selectMetar);
+  const personalMinimums = useSelector(selectPersonalMinimums);
 
   const showPopup = (layer: L.GeoJSON, latlng: LatLng): void => {
     if (typeof layer.setStyle === 'function') {
@@ -74,6 +80,16 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         break;
       case 'pirep':
         popup = <PIREPPopup feature={layer.feature}></PIREPPopup>;
+        useWidePopup = true;
+        break;
+      case 'metar':
+        popup = (
+          <MetarsPopup
+            layer={layer as any}
+            markerType={metarLayerStatus.markerType}
+            personalMinimums={personalMinimums}
+          ></MetarsPopup>
+        );
         useWidePopup = true;
         break;
       default:

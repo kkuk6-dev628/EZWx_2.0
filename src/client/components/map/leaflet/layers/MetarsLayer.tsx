@@ -3,155 +3,101 @@ import L, { LatLng } from 'leaflet';
 import Image from 'next/image';
 import ReactDOMServer from 'react-dom/server';
 import { Pane, useMap } from 'react-leaflet';
-import { addLeadingZeroes, getQueryTime } from '../../common/AreoFunctions';
+import {
+  addLeadingZeroes,
+  getMetarCeilingCategory,
+  getQueryTime,
+  getSkyCeilingValues,
+} from '../../common/AreoFunctions';
 import SunCalc from 'suncalc';
 import { selectMetar } from '../../../../store/layers/LayerControl';
 import { useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
-
-export const MarkerTypes = {
-  flightCategory: {
-    value: 'flightCategory',
-    text: 'Flight Category',
-  },
-  ceilingHeight: {
-    value: 'ceilingHeight',
-    text: 'Ceiling Height',
-  },
-  surfaceVisibility: {
-    value: 'surfaceVisibility',
-    text: 'Surface Visibility',
-  },
-  surfaceWindSpeed: {
-    value: 'surfaceWindSpeed',
-    text: 'Surface Wind Speed',
-  },
-  surfaceWindBarbs: {
-    value: 'surfaceWindBarbs',
-    text: 'Surface Wind Barbs',
-  },
-  surfaceWindGust: {
-    value: 'surfaceWindGust',
-    text: 'Surface Wind Gust',
-  },
-  surfaceTemperature: {
-    value: 'surfaceTemperature',
-    text: 'Surface Temperature',
-  },
-  surfaceDewpoint: {
-    value: 'surfaceDewpoint',
-    text: 'Surface Dewpoint',
-  },
-  dewpointDepression: {
-    value: 'dewpointDepression',
-    text: 'Dewpoint Depression',
-  },
-  weather: {
-    value: 'weather',
-    text: 'Weather',
-  },
-};
+import {
+  PersonalMinimumItem,
+  PersonalMinimums,
+  selectPersonalMinimums,
+} from '../../../../store/user/UserSettings';
+import { MetarMarkerTypes } from '../../common/AreoConstants';
 
 const defaultServerFilter = `observation_time DURING ${getQueryTime(
   new Date(),
 )}`;
 
+export const getCategory = (
+  ceiling: number,
+  visibility: number,
+  personalMinimums: PersonalMinimums,
+  markerTyle,
+): string[] => {
+  let cat: string, color: string, visibilityMinimum: number;
+  const visibilityMinimumsValues = Object.values(personalMinimums).map(
+    (val: PersonalMinimumItem) => val.visibility,
+  );
+  const ceilingMinimumsValues = Object.values(personalMinimums).map(
+    (val: PersonalMinimumItem) => val.ceiling,
+  );
+
+  switch (markerTyle) {
+    case MetarMarkerTypes.flightCategory.value:
+      let ceilingMinimum = 0;
+      for (let i = 0; i < ceilingMinimumsValues.length; i++) {
+        if (ceilingMinimumsValues[i] < ceiling) {
+          ceilingMinimum = i;
+        }
+      }
+      visibilityMinimum = 0;
+      for (let i = 0; i < visibilityMinimumsValues.length; i++) {
+        if (visibilityMinimumsValues[i] < visibility) {
+          visibilityMinimum = i;
+        }
+      }
+      const combined =
+        ceiling && ceilingMinimum < visibilityMinimum
+          ? ceilingMinimum
+          : visibilityMinimum;
+      cat = Object.keys(personalMinimums)[combined];
+      color = personalMinimums[cat].color;
+      break;
+    case MetarMarkerTypes.surfaceVisibility.value:
+      visibilityMinimum = 0;
+      for (let i = 0; i < visibilityMinimumsValues.length; i++) {
+        if (visibilityMinimumsValues[i] < visibility) {
+          visibilityMinimum = i;
+        }
+      }
+      cat = Object.keys(personalMinimums)[visibilityMinimum];
+      color = personalMinimums[cat].color;
+      break;
+    default:
+      break;
+  }
+  return [cat, color];
+};
+
 const MetarsLayer = () => {
   const map = useMap();
-  const skyValuesToString = {
-    CLR: 'Clear below 12,000 feet',
-    SKC: 'Sky clear',
-    CAVOK: 'use the same CLR icon.',
-    FEW: 'Few',
-    SCT: 'Scattered',
-    BKN: 'Broken',
-    OVC: 'Overcast',
-    OVX: 'Indefinite ceiling',
-  };
-
-  const ceilingMinimums = {
-    LIFR: 0,
-    IFR: 500,
-    MVFR: 1000,
-    VFR: 3000,
-  };
-
-  const visibilityMinimums = {
-    LIFR: 0,
-    IFR: 1,
-    MVFR: 3,
-    VFR: 3,
-  };
 
   const layerStatus = useSelector(selectMetar);
+  const personalMinimums = useSelector(selectPersonalMinimums);
   const [serverFilter, setServerFilter] = useState(defaultServerFilter);
   const wfsRef = useRef(null);
   const [filteredData, setFilteredData] = useState();
-
-  const getSkyCeilingValues = (
-    feature: GeoJSON.Feature,
-    markerType = MarkerTypes.flightCategory.value,
-  ): any[] => {
-    let skyMin = 0;
-    const skyValues = Object.keys(skyValuesToString);
-    const ceilingValues: number[] = [];
-    switch (markerType) {
-      case MarkerTypes.ceilingHeight.value:
-        for (let i = 1; i <= 6; i++) {
-          const sky = feature.properties[`sky_cover_${i}`];
-          const index = skyValues.indexOf(sky);
-
-          // consider only BKN, OVC and OVX
-          if (index < 5) continue;
-
-          // get ceiling height values
-          ceilingValues.push(feature.properties[`cloud_base_ft_agl_${i}`]);
-          if (index > -1 && index > skyMin) {
-            skyMin = index;
-          }
-        }
-        break;
-      default:
-        for (let i = 1; i <= 6; i++) {
-          const sky = feature.properties[`sky_cover_${i}`];
-          ceilingValues.push(feature.properties[`cloud_base_ft_agl_${i}`]);
-          const index = skyValues.indexOf(sky);
-          if (index > -1 && index > skyMin) {
-            skyMin = index;
-          }
-        }
-        break;
-    }
-    const sky = skyValues[skyMin];
-    const ceiling = Math.min(...ceilingValues);
-    return [sky, ceiling, skyMin];
-  };
 
   const getFlightCatMarker = (
     feature: GeoJSON.Feature,
     latlng: LatLng,
   ): L.Marker => {
-    const [sky, ceiling] = getSkyCeilingValues(feature);
-    const ceilingMinimumsValues = Object.values(ceilingMinimums);
-    let ceilingMinimum = 0;
-    for (let i = 0; i < ceilingMinimumsValues.length; i++) {
-      if (ceilingMinimumsValues[i] < ceiling) {
-        ceilingMinimum = i;
-      }
-    }
-    const visibility = feature.properties.visibility_statute_mi;
-    const visibilityMinimumsValues = Object.values(visibilityMinimums);
-    let visibilityMinimum = 0;
-    for (let i = 0; i < visibilityMinimumsValues.length; i++) {
-      if (visibilityMinimumsValues[i] < visibility) {
-        visibilityMinimum = i;
-      }
-    }
-    const combined =
-      ceiling && ceilingMinimum < visibilityMinimum
-        ? ceilingMinimum
-        : visibilityMinimum;
-    const colorName = Object.keys(ceilingMinimums)[combined];
+    const [sky, ceiling] = getSkyCeilingValues(
+      feature,
+      MetarMarkerTypes.flightCategory.value,
+    );
+    const [category, _] = getCategory(
+      ceiling,
+      feature.properties.visibility_statute_mi,
+      personalMinimums,
+      MetarMarkerTypes.flightCategory.value,
+    );
 
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
@@ -159,7 +105,7 @@ const MetarsLayer = () => {
         html: ReactDOMServer.renderToString(
           <>
             <Image
-              src={`/icons/metar/${colorName}-${sky}.png`}
+              src={`/icons/metar/${category}-${sky}.png`}
               alt={''}
               width={16}
               height={16}
@@ -176,30 +122,11 @@ const MetarsLayer = () => {
   const getCeilingHeightMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
     const [sky, ceiling] = getSkyCeilingValues(
       feature,
-      MarkerTypes.ceilingHeight.value,
+      MetarMarkerTypes.ceilingHeight.value,
     );
-    if (!isFinite(ceiling)) return;
-    const ceilingMinimumsValues = Object.values(ceilingMinimums);
+    if (ceiling == undefined || !isFinite(ceiling)) return;
     const ceilingAmount = addLeadingZeroes(ceiling / 100, 3);
-    let ceilingMinimum = 0;
-    for (let i = 0; i < ceilingMinimumsValues.length; i++) {
-      if (ceilingMinimumsValues[i] < ceiling) {
-        ceilingMinimum = i;
-      }
-    }
-    const visibility = feature.properties.visibility_statute_mi;
-    const visibilityMinimumsValues = Object.values(visibilityMinimums);
-    let visibilityMinimum = 0;
-    for (let i = 0; i < visibilityMinimumsValues.length; i++) {
-      if (visibilityMinimumsValues[i] < visibility) {
-        visibilityMinimum = i;
-      }
-    }
-    const combined =
-      ceiling && ceilingMinimum < visibilityMinimum
-        ? ceilingMinimum
-        : visibilityMinimum;
-    const colorName = Object.keys(ceilingMinimums)[combined];
+    const [category, _] = getMetarCeilingCategory(ceiling, personalMinimums);
 
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
@@ -208,7 +135,7 @@ const MetarsLayer = () => {
           <>
             <div style={{ display: 'inline', verticalAlign: -7 }}>
               <Image
-                src={`/icons/metar/${colorName}-${sky}.png`}
+                src={`/icons/metar/${category}-${sky}.png`}
                 alt={''}
                 width={20}
                 height={20}
@@ -240,14 +167,13 @@ const MetarsLayer = () => {
   ) => {
     const visibility = feature.properties.visibility_statute_mi;
     if (!visibility) return;
-    const visibilityMinimumsValues = Object.values(visibilityMinimums);
-    let visibilityMinimum = 0;
-    for (let i = 0; i < visibilityMinimumsValues.length; i++) {
-      if (visibilityMinimumsValues[i] < visibility) {
-        visibilityMinimum = i;
-      }
-    }
-    const colorName = Object.keys(visibilityMinimums)[visibilityMinimum];
+    const [category, _] = getCategory(
+      0,
+      visibility,
+      personalMinimums,
+      MetarMarkerTypes.surfaceVisibility.value,
+    );
+
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-ceiling-icon',
@@ -255,7 +181,7 @@ const MetarsLayer = () => {
           <>
             <div style={{ display: 'inline', verticalAlign: -7 }}>
               <Image
-                src={`/icons/metar/${colorName}-OVC.png`}
+                src={`/icons/metar/${category}-OVC.png`}
                 alt={''}
                 width={20}
                 height={20}
@@ -687,7 +613,7 @@ const MetarsLayer = () => {
         //get icon from worst sky condition
         [condition] = getSkyCeilingValues(
           feature,
-          MarkerTypes.ceilingHeight.value,
+          MetarMarkerTypes.ceilingHeight.value,
         );
 
         worstSkyConditionFetched = true;
@@ -796,7 +722,7 @@ const MetarsLayer = () => {
           if (!worstSkyConditionFetched) {
             [condition] = getSkyCeilingValues(
               feature,
-              MarkerTypes.ceilingHeight.value,
+              MetarMarkerTypes.ceilingHeight.value,
             );
           }
           if (condition === 'SCT' || condition === 'FEW') {
@@ -864,7 +790,7 @@ const MetarsLayer = () => {
             if (!worstSkyConditionFetched) {
               [condition] = getSkyCeilingValues(
                 feature,
-                MarkerTypes.ceilingHeight.value,
+                MetarMarkerTypes.ceilingHeight.value,
               );
             }
             switch (condition) {
@@ -915,34 +841,34 @@ const MetarsLayer = () => {
   const pointToLayer = (feature: GeoJSON.Feature, latlng: LatLng): L.Layer => {
     let marker = null;
     switch (layerStatus.markerType) {
-      case MarkerTypes.flightCategory.value:
+      case MetarMarkerTypes.flightCategory.value:
         marker = getFlightCatMarker(feature, latlng);
         break;
-      case MarkerTypes.ceilingHeight.value:
+      case MetarMarkerTypes.ceilingHeight.value:
         marker = getCeilingHeightMarker(feature, latlng);
         break;
-      case MarkerTypes.surfaceVisibility.value:
+      case MetarMarkerTypes.surfaceVisibility.value:
         marker = getSurfaceVisibilityMarker(feature, latlng);
         break;
-      case MarkerTypes.surfaceWindSpeed.value:
+      case MetarMarkerTypes.surfaceWindSpeed.value:
         marker = getSurfaceWindSpeedMarker(feature, latlng);
         break;
-      case MarkerTypes.surfaceWindBarbs.value:
+      case MetarMarkerTypes.surfaceWindBarbs.value:
         marker = getSurfaceWindBarbsMarker(feature, latlng);
         break;
-      case MarkerTypes.surfaceWindGust.value:
+      case MetarMarkerTypes.surfaceWindGust.value:
         marker = getSurfaceWindGustMarker(feature, latlng);
         break;
-      case MarkerTypes.surfaceTemperature.value:
+      case MetarMarkerTypes.surfaceTemperature.value:
         marker = getSurfaceTemperatureMarker(feature, latlng);
         break;
-      case MarkerTypes.surfaceDewpoint.value:
+      case MetarMarkerTypes.surfaceDewpoint.value:
         marker = getSurfaceDewpointMarker(feature, latlng);
         break;
-      case MarkerTypes.dewpointDepression.value:
+      case MetarMarkerTypes.dewpointDepression.value:
         marker = getDewpointDepressionMarker(feature, latlng);
         break;
-      case MarkerTypes.weather.value:
+      case MetarMarkerTypes.weather.value:
         marker = getWeatherMarker(feature, latlng);
         break;
     }
@@ -986,7 +912,7 @@ const MetarsLayer = () => {
   useEffect(() => {
     console.log(layerStatus);
     switch (layerStatus.markerType) {
-      case MarkerTypes.surfaceVisibility.value:
+      case MetarMarkerTypes.surfaceVisibility.value:
         setServerFilter(
           defaultServerFilter + ` AND visibility_statute_mi IS NOT NULL`,
         );
@@ -1012,7 +938,7 @@ const MetarsLayer = () => {
           'wind_speed_kt',
           'wind_gust_kt',
           'flight_category',
-          // 'raw_text',
+          'raw_text',
           'visibility_statute_mi',
           'cloud_base_ft_agl_1',
           'sky_cover_1',
@@ -1026,13 +952,13 @@ const MetarsLayer = () => {
           'sky_cover_5',
           'cloud_base_ft_agl_6',
           'sky_cover_6',
-          // 'altim_in_hg',
+          'altim_in_hg',
           // 'sea_level_pressure_mb',
           'wx_string',
-          // 'vert_vis_ft',
+          'vert_vis_ft',
           // 'dewpointdepression',
-          // 'relativehumiditypercent',
-          // 'densityaltitudefeet',
+          'relativehumiditypercent',
+          'densityaltitudefeet',
         ]}
         enableBBoxQuery={true}
         pointToLayer={pointToLayer}

@@ -1,9 +1,18 @@
+import { ViewService } from './../../../server/view/view.service';
 import { createSlice } from '@reduxjs/toolkit';
 import { AppState } from '../store';
 
+export interface LayerState {
+  visible: boolean;
+  opacity: number;
+}
+
+export interface MetarLayerState extends LayerState {
+  markerType: string;
+}
 export interface LayerControlState {
-  metarState: any;
-  pirepState: any;
+  metarState: MetarLayerState;
+  pirepState: LayerState;
 }
 
 const initialState: LayerControlState = {

@@ -3,12 +3,23 @@
 import BasePopupFrame from './BasePopupFrame';
 import L from 'leaflet';
 import { Divider } from '@material-ui/core';
-import { addLeadingZeroes, getThumbnail } from '../../common/AreoFunctions';
+import {
+  addLeadingZeroes,
+  getThumbnail,
+  simpleTimeOnlyFormat,
+} from '../../common/AreoFunctions';
+import { feature } from '@turf/helpers';
 
 interface FeatureSelectorProps {
   features: L.Layer[];
 }
 const FeatureSelector = ({ features }: FeatureSelectorProps) => {
+  const getMetarText = (feature: GeoJSON.Feature): string => {
+    const text = `METAR: ${
+      feature.properties.station_id
+    } ${simpleTimeOnlyFormat(new Date(feature.properties.observation_time))}`;
+    return text;
+  };
   return (
     <BasePopupFrame title="Select Object">
       <div style={{ maxHeight: 320, overflowY: 'auto' }}>
@@ -189,6 +200,8 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
                 ' ' +
                 layer.feature.properties.actype;
               break;
+            case 'metar':
+              text = getMetarText(layer.feature);
             default:
               break;
           }

@@ -22,7 +22,7 @@ import createControlledLayer, { OrderedLayerProps } from './controlledLayer';
 import { selectMetar, setMetar } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import { MarkerTypes } from '../layers/MetarsLayer';
+import { MetarMarkerTypes } from '../../common/AreoConstants';
 
 const POSITION_CLASSES: { [key: string]: string } = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -342,54 +342,58 @@ const LayerControl = ({
                               }}
                             >
                               <FormControlLabel
-                                value={MarkerTypes.flightCategory.value}
+                                value={MetarMarkerTypes.flightCategory.value}
                                 control={<Radio color="primary" />}
-                                label={MarkerTypes.flightCategory.text}
+                                label={MetarMarkerTypes.flightCategory.text}
                               />
                               <FormControlLabel
-                                value={MarkerTypes.ceilingHeight.value}
+                                value={MetarMarkerTypes.ceilingHeight.value}
                                 control={<Radio color="primary" />}
-                                label={MarkerTypes.ceilingHeight.text}
+                                label={MetarMarkerTypes.ceilingHeight.text}
                               />
                               <FormControlLabel
-                                value={MarkerTypes.surfaceVisibility.value}
+                                value={MetarMarkerTypes.surfaceVisibility.value}
                                 control={<Radio color="primary" />}
-                                label={MarkerTypes.surfaceVisibility.text}
+                                label={MetarMarkerTypes.surfaceVisibility.text}
                               />
                               <FormControlLabel
-                                value={MarkerTypes.surfaceWindSpeed.value}
+                                value={MetarMarkerTypes.surfaceWindSpeed.value}
                                 control={<Radio color="primary" />}
-                                label={MarkerTypes.surfaceWindSpeed.text}
+                                label={MetarMarkerTypes.surfaceWindSpeed.text}
                               />
                               <FormControlLabel
-                                value={MarkerTypes.surfaceWindBarbs.value}
+                                value={MetarMarkerTypes.surfaceWindBarbs.value}
                                 control={<Radio color="primary" />}
-                                label={MarkerTypes.surfaceWindBarbs.text}
+                                label={MetarMarkerTypes.surfaceWindBarbs.text}
                               />
                               <FormControlLabel
-                                value={MarkerTypes.surfaceWindGust.value}
+                                value={MetarMarkerTypes.surfaceWindGust.value}
                                 control={<Radio color="primary" />}
-                                label={MarkerTypes.surfaceWindGust.text}
+                                label={MetarMarkerTypes.surfaceWindGust.text}
                               />
                               <FormControlLabel
-                                value={MarkerTypes.surfaceTemperature.value}
+                                value={
+                                  MetarMarkerTypes.surfaceTemperature.value
+                                }
                                 control={<Radio color="primary" />}
-                                label={MarkerTypes.surfaceTemperature.text}
+                                label={MetarMarkerTypes.surfaceTemperature.text}
                               />
                               <FormControlLabel
-                                value={MarkerTypes.surfaceDewpoint.value}
+                                value={MetarMarkerTypes.surfaceDewpoint.value}
                                 control={<Radio color="primary" />}
-                                label={MarkerTypes.surfaceDewpoint.text}
+                                label={MetarMarkerTypes.surfaceDewpoint.text}
                               />
                               <FormControlLabel
-                                value={MarkerTypes.dewpointDepression.value}
+                                value={
+                                  MetarMarkerTypes.dewpointDepression.value
+                                }
                                 control={<Radio color="primary" />}
-                                label={MarkerTypes.dewpointDepression.text}
+                                label={MetarMarkerTypes.dewpointDepression.text}
                               />
                               <FormControlLabel
-                                value={MarkerTypes.weather.value}
+                                value={MetarMarkerTypes.weather.value}
                                 control={<Radio color="primary" />}
-                                label={MarkerTypes.weather.text}
+                                label={MetarMarkerTypes.weather.text}
                               />
                             </RadioGroup>
                           </AccordionDetails>
