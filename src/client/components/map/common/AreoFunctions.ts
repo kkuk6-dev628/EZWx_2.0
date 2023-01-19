@@ -155,91 +155,82 @@ export const diffMinutes = (date1: Date, date2: Date) => {
 export const getMetarVisibilityCategory = (
   visibility: number,
   personalMinimums: PersonalMinimums,
-) => {
-  let visibilityMinimum = 0;
+): any[] => {
+  if (visibility === null || !isFinite(visibility)) {
+    return [];
+  }
   const visibilityMinimumsValues = Object.values(personalMinimums).map(
     (val: PersonalMinimumItem) => val.visibility,
   );
 
+  let visibilityMinimum = visibilityMinimumsValues.length - 1;
   for (let i = 0; i < visibilityMinimumsValues.length; i++) {
-    if (visibilityMinimumsValues[i] < visibility) {
-      visibilityMinimum = i;
+    if (visibilityMinimumsValues[i] > visibility) {
+      visibilityMinimum = i - 1;
+      break;
     }
   }
   const cat = Object.keys(personalMinimums)[visibilityMinimum];
   const color = personalMinimums[cat].color;
-  return [cat, color];
+  return [cat, color, visibilityMinimum];
 };
 
 export const getMetarCeilingCategory = (
   ceiling: number,
   personalMinimums: PersonalMinimums,
-) => {
-  let ceilingMinimum = 0;
+): any[] => {
+  if (ceiling === null || !isFinite(ceiling)) {
+    return [undefined, '#000', Infinity];
+  }
   const ceilingMinimumsValues = Object.values(personalMinimums).map(
     (val: PersonalMinimumItem) => val.ceiling,
   );
 
+  let ceilingMinimum = ceilingMinimumsValues.length - 1;
   for (let i = 0; i < ceilingMinimumsValues.length; i++) {
-    if (ceilingMinimumsValues[i] < ceiling) {
-      ceilingMinimum = i;
+    if (ceilingMinimumsValues[i] > ceiling) {
+      ceilingMinimum = i - 1;
+      break;
     }
   }
   const cat = Object.keys(personalMinimums)[ceilingMinimum];
   const color = personalMinimums[cat].color;
-  return [cat, color];
+  return [cat, color, ceilingMinimum];
 };
 
 export const getSkyCeilingValues = (
   feature: GeoJSON.Feature,
   markerType,
 ): any[] => {
-  let skyMin = 0;
+  let skyMin = -1;
   const skyValues = Object.keys(MetarSkyValuesToString);
-  const ceilingValues: number[] = [];
-  let sky, ceiling;
-  switch (markerType) {
-    case MetarMarkerTypes.ceilingHeight.value:
-      let pos = 1;
-      for (let i = 1; i <= 6; i++) {
-        const sky = feature.properties[`sky_cover_${i}`];
-        const index = skyValues.indexOf(sky);
+  let ceiling;
+  let ceilingPos = 0;
+  for (let i = 1; i <= 6; i++) {
+    const sky = feature.properties[`sky_cover_${i}`];
+    const index = skyValues.indexOf(sky);
 
-        // consider only BKN, OVC and OVX
-        if (index < 5) continue;
-
-        // get ceiling height values
-        if (index > -1 && index > skyMin) {
-          skyMin = index;
-          pos = i;
-        }
-      }
-      sky = skyValues[skyMin];
-      ceiling = feature.properties[`cloud_base_ft_agl_${pos}`];
-      break;
-    default:
-      for (let i = 1; i <= 6; i++) {
-        const sky = feature.properties[`sky_cover_${i}`];
-        feature.properties[`cloud_base_ft_agl_${i}`] != null
-          ? ceilingValues.push(feature.properties[`cloud_base_ft_agl_${i}`])
-          : null;
-        const index = skyValues.indexOf(sky);
-        if (index > -1 && index > skyMin) {
-          skyMin = index;
-        }
-      }
-      sky = skyValues[skyMin];
-      ceiling = Math.min(...ceilingValues);
-      break;
+    // get ceiling height values
+    if (index > -1 && index > skyMin) {
+      skyMin = index;
+      // consider only BKN, OVC and OVX
+      if (index >= 5) ceilingPos = i;
+    }
   }
-  if (
-    feature.properties.vert_vis_ft &&
-    !isNaN(feature.properties.vert_vis_ft)
-  ) {
-    sky = 'OVX';
+  const sky = skyValues[skyMin];
+  if (skyMin === 7) {
     ceiling = feature.properties.vert_vis_ft;
+  } else {
+    ceiling = feature.properties[`cloud_base_ft_agl_${ceilingPos}`];
   }
-  return [sky, ceiling, skyMin];
+  // if (
+  //   feature.properties.vert_vis_ft &&
+  //   !isNaN(feature.properties.vert_vis_ft)
+  // ) {
+  //   sky = 'OVX';
+  //   ceiling = feature.properties.vert_vis_ft;
+  // }
+  return [sky, ceiling];
 };
 export const getMetarDecodedWxString = (wxString: string): string => {
   let result = wxString;

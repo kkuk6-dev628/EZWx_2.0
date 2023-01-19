@@ -6,6 +6,7 @@ import { Pane, useMap } from 'react-leaflet';
 import {
   addLeadingZeroes,
   getMetarCeilingCategory,
+  getMetarVisibilityCategory,
   getQueryTime,
   getSkyCeilingValues,
 } from '../../common/AreoFunctions';
@@ -24,55 +25,32 @@ const defaultServerFilter = `observation_time DURING ${getQueryTime(
   new Date(),
 )}`;
 
-export const getCategory = (
+export const getFlightCategory = (
   ceiling: number,
   visibility: number,
+  flightCategory: string,
   personalMinimums: PersonalMinimums,
-  markerTyle,
 ): string[] => {
-  let cat: string, color: string, visibilityMinimum: number;
-  const visibilityMinimumsValues = Object.values(personalMinimums).map(
-    (val: PersonalMinimumItem) => val.visibility,
-  );
-  const ceilingMinimumsValues = Object.values(personalMinimums).map(
-    (val: PersonalMinimumItem) => val.ceiling,
-  );
-
-  switch (markerTyle) {
-    case MetarMarkerTypes.flightCategory.value:
-      let ceilingMinimum = 0;
-      for (let i = 0; i < ceilingMinimumsValues.length; i++) {
-        if (ceilingMinimumsValues[i] < ceiling) {
-          ceilingMinimum = i;
-        }
-      }
-      visibilityMinimum = 0;
-      for (let i = 0; i < visibilityMinimumsValues.length; i++) {
-        if (visibilityMinimumsValues[i] < visibility) {
-          visibilityMinimum = i;
-        }
-      }
-      const combined =
-        ceiling && ceilingMinimum < visibilityMinimum
-          ? ceilingMinimum
-          : visibilityMinimum;
-      cat = Object.keys(personalMinimums)[combined];
-      color = personalMinimums[cat].color;
-      break;
-    case MetarMarkerTypes.surfaceVisibility.value:
-      visibilityMinimum = 0;
-      for (let i = 0; i < visibilityMinimumsValues.length; i++) {
-        if (visibilityMinimumsValues[i] < visibility) {
-          visibilityMinimum = i;
-        }
-      }
-      cat = Object.keys(personalMinimums)[visibilityMinimum];
-      color = personalMinimums[cat].color;
-      break;
-    default:
-      break;
+  if (
+    (ceiling === null || !isFinite(ceiling)) &&
+    (visibility === null || !isFinite(visibility))
+  ) {
+    return [];
   }
-  return [cat, color];
+  const [, , ceilingIndex] = getMetarCeilingCategory(ceiling, personalMinimums);
+  const [, , visibilityIndex] = getMetarVisibilityCategory(
+    visibility,
+    personalMinimums,
+  );
+  const flightCategoryIndex =
+    Object.keys(personalMinimums).indexOf(flightCategory);
+  const index = Math.min(
+    ceilingIndex as number,
+    visibilityIndex as number,
+    flightCategoryIndex,
+  );
+  const cat = Object.keys(personalMinimums)[index];
+  return [cat, cat ? personalMinimums[cat].color : '#555'];
 };
 
 const MetarsLayer = () => {
@@ -92,24 +70,26 @@ const MetarsLayer = () => {
       feature,
       MetarMarkerTypes.flightCategory.value,
     );
-    const [category, _] = getCategory(
+    const [category, _] = getFlightCategory(
       ceiling,
       feature.properties.visibility_statute_mi,
+      feature.properties.flight_category,
       personalMinimums,
-      MetarMarkerTypes.flightCategory.value,
     );
+
+    let iconUrl = '/icons/metar/MISSING.png';
+    if (category && sky) {
+      iconUrl = `/icons/metar/${category}-${sky}.png`;
+    } else if (sky) {
+      iconUrl = `/icons/metar/Black-${sky}.png`;
+    }
 
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-icon',
         html: ReactDOMServer.renderToString(
           <>
-            <Image
-              src={`/icons/metar/${category}-${sky}.png`}
-              alt={''}
-              width={16}
-              height={16}
-            />
+            <Image src={iconUrl} alt={''} width={16} height={16} />
           </>,
         ),
         iconSize: [16, 16],
@@ -126,7 +106,13 @@ const MetarsLayer = () => {
     );
     if (ceiling == undefined || !isFinite(ceiling)) return;
     const ceilingAmount = addLeadingZeroes(ceiling / 100, 3);
-    const [category, _] = getMetarCeilingCategory(ceiling, personalMinimums);
+    const [category] = getMetarCeilingCategory(ceiling, personalMinimums);
+    let iconUrl = '/icons/metar/MISSING.png';
+    if (category && sky) {
+      iconUrl = `/icons/metar/${category}-${sky}.png`;
+    } else if (sky) {
+      iconUrl = `/icons/metar/Black-${sky}.png`;
+    }
 
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
@@ -134,12 +120,7 @@ const MetarsLayer = () => {
         html: ReactDOMServer.renderToString(
           <>
             <div style={{ display: 'inline', verticalAlign: -7 }}>
-              <Image
-                src={`/icons/metar/${category}-${sky}.png`}
-                alt={''}
-                width={20}
-                height={20}
-              />
+              <Image src={iconUrl} alt={''} width={20} height={20} />
             </div>
             <div
               style={{
@@ -167,12 +148,16 @@ const MetarsLayer = () => {
   ) => {
     const visibility = feature.properties.visibility_statute_mi;
     if (!visibility) return;
-    const [category, _] = getCategory(
-      0,
+    const [category, _] = getMetarVisibilityCategory(
       visibility,
       personalMinimums,
-      MetarMarkerTypes.surfaceVisibility.value,
     );
+    let iconUrl = '/icons/metar/MISSING.png';
+    if (category) {
+      iconUrl = `/icons/metar/${category}-OVC.png`;
+    } else {
+      iconUrl = `/icons/metar/Black-OVC.png`;
+    }
 
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
@@ -180,12 +165,7 @@ const MetarsLayer = () => {
         html: ReactDOMServer.renderToString(
           <>
             <div style={{ display: 'inline', verticalAlign: -7 }}>
-              <Image
-                src={`/icons/metar/${category}-OVC.png`}
-                alt={''}
-                width={20}
-                height={20}
-              />
+              <Image src={iconUrl} alt={''} width={20} height={20} />
             </div>
             <div
               style={{
@@ -583,21 +563,12 @@ const MetarsLayer = () => {
 
     let weatherIconClass = 'fas fa-question-square';
     let iconColor = 'lightslategrey';
-    if (feature.properties.flight_category) {
-      switch (feature.properties.flight_category) {
-        case 'VFR':
-          iconColor = '#008000';
-          break;
-        case 'MVFR':
-          iconColor = '#0000FF';
-          break;
-        case 'IFR':
-          iconColor = '#FF0000';
-          break;
-        case 'LIFR':
-          iconColor = '#FF00C0';
-          break;
-      }
+    if (
+      Object.keys(personalMinimums).indexOf(
+        feature.properties.flight_category,
+      ) > -1
+    ) {
+      iconColor = personalMinimums[feature.properties.flight_category].color;
     }
 
     if (!feature.properties.wx_string) {
@@ -613,7 +584,7 @@ const MetarsLayer = () => {
         //get icon from worst sky condition
         [condition] = getSkyCeilingValues(
           feature,
-          MetarMarkerTypes.ceilingHeight.value,
+          MetarMarkerTypes.flightCategory.value,
         );
 
         worstSkyConditionFetched = true;

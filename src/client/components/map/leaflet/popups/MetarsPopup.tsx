@@ -33,10 +33,7 @@ const MetarsPopup = ({
     personalMinimums,
   );
   const skyString = MetarSkyValuesToString[sky];
-  let weatherString = undefined;
-  if (markerType === MetarMarkerTypes.weather.value) {
-    weatherString = getMetarDecodedWxString(feature.properties.wx_string);
-  }
+  const weatherString = getMetarDecodedWxString(feature.properties.wx_string);
   return (
     <>
       <div style={{ display: 'flex' }}>
