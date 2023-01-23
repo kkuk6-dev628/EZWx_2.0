@@ -27,7 +27,6 @@ import PIREPPopup from '../popups/PIREPPopup';
 import 'leaflet-responsive-popup';
 import 'leaflet-responsive-popup/leaflet.responsive.popup.css';
 import WMSLayer from './WMSLayer';
-import axios from 'axios';
 import MetarsLayer from './MetarsLayer';
 import TimeDimensionLayer from './TimeDimensionLayer';
 import MarkerClusterGroup from './MarkerClusterGroup';
@@ -115,7 +114,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
   const map = useMapEvents({
     click: (e: any) => {
       const features = [];
-      const clickedBBox = getBBoxFromPointZoom(40, e.latlng, map.getZoom());
+      const clickedBBox = getBBoxFromPointZoom(50, e.latlng, map.getZoom());
       if (debugLayerGroupRef.current) {
         debugLayerGroupRef.current.clearLayers();
       }
@@ -125,6 +124,9 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         //@ts-ignore
         if (layer.layer.resetStyle) layer.layer.resetStyle();
         if (features.length >= maxLayers) {
+          return;
+        }
+        if (layer.pickable === false) {
           return;
         }
         //@ts-ignore
@@ -255,36 +257,46 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           setLayers(lyr);
         }}
       >
-        <GroupedLayer checked name="Pirep" group="Meteo" order={0}>
-          <PirepLayer></PirepLayer>
-        </GroupedLayer>
-        <GroupedLayer checked name="Metar" group="Meteo" order={1}>
+        <GroupedLayer
+          checked
+          name="Station Markers"
+          group="Map Layers"
+          order={0}
+        >
           <MetarsLayer></MetarsLayer>
         </GroupedLayer>
-        <GroupedLayer checked name="SIGMET" group="Meteo" order={2}>
+        <GroupedLayer checked name="SIGMET" group="Map Layers" order={1}>
           <SigmetLayer></SigmetLayer>
         </GroupedLayer>
         <GroupedLayer
           checked
           name="International SIGMET"
-          group="Meteo"
-          order={3}
+          group="Map Layers"
+          order={2}
         >
           <IntlSigmetLayer></IntlSigmetLayer>
         </GroupedLayer>
-        <GroupedLayer checked name="CWA" group="Meteo" order={4}>
+        <GroupedLayer checked name="CWA" group="Map Layers" order={3}>
           <CWALayer></CWALayer>
-        </GroupedLayer>
-        <GroupedLayer checked name="Convetive Outlook" group="Meteo" order={5}>
-          <ConvectiveOutlookLayer></ConvectiveOutlookLayer>
-        </GroupedLayer>
-        <GroupedLayer checked name="GAirmet" group="Meteo" order={6}>
-          <GairmetLayer></GairmetLayer>
         </GroupedLayer>
         <GroupedLayer
           checked
+          name="Convetive Outlook"
+          group="Map Layers"
+          order={4}
+        >
+          <ConvectiveOutlookLayer></ConvectiveOutlookLayer>
+        </GroupedLayer>
+        <GroupedLayer checked name="GAirmet" group="Map Layers" order={5}>
+          <GairmetLayer></GairmetLayer>
+        </GroupedLayer>
+        <GroupedLayer checked name="Pirep" group="Map Layers" order={6}>
+          <PirepLayer></PirepLayer>
+        </GroupedLayer>
+        {/* <GroupedLayer
+          checked
           name="temperature"
-          group="Meteo"
+          group="Map Layers"
           pickable={false}
           order={7}
         >
@@ -306,8 +318,8 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
               useCache: true,
               // crossOrigin: true,
             }}
-          ></TimeDimensionLayer> */}
-        </GroupedLayer>
+          ></TimeDimensionLayer>
+        </GroupedLayer> */}
         <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
       </LayerControl>
     </div>

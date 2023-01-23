@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Radio, RadioGroup, Slider, Typography } from '@material-ui/core';
+import { Radio, RadioGroup, Typography } from '@material-ui/core';
 import { useMapEvents } from 'react-leaflet';
 import { Layer, Util, DomEvent, LayerGroup } from 'leaflet';
 import Accordion from '@material-ui/core/Accordion';
@@ -25,6 +25,7 @@ import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { MetarMarkerTypes } from '../../common/AreoConstants';
 import Image from 'next/image';
+import Slider from '@mui/material/Slider';
 
 const POSITION_CLASSES: { [key: string]: string } = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -315,7 +316,7 @@ const LayerControl = ({
                       //       </AccordionDetails>
                       //     </Accordion>
                       //   );
-                      case 'Metar':
+                      case 'Station Markers':
                         return (
                           <Accordion
                             key={`${layerObj.name} ${index}`}
@@ -353,7 +354,18 @@ const LayerControl = ({
                               />
                             </AccordionSummary>
                             <AccordionDetails style={{ paddingBottom: 4 }}>
-                              <Slider style={{ marginLeft: 26 }}></Slider>
+                              <Slider
+                                key="metar-opacity"
+                                style={{ marginLeft: 26 }}
+                                min={0}
+                                max={1}
+                                step={0.1}
+                                value={0.7}
+                                size="small"
+                                defaultValue={0.7}
+                                aria-label="Opacity"
+                                valueLabelDisplay="auto"
+                              ></Slider>
                             </AccordionDetails>
                             <AccordionDetails>
                               <RadioGroup
