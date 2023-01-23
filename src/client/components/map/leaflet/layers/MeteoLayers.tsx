@@ -31,6 +31,7 @@ import axios from 'axios';
 import MetarsLayer from './MetarsLayer';
 import TimeDimensionLayer from './TimeDimensionLayer';
 import MarkerClusterGroup from './MarkerClusterGroup';
+import Image from 'next/image';
 import MetarsPopup from '../popups/MetarsPopup';
 import { useSelector } from 'react-redux';
 import { selectMetar } from '../../../../store/layers/LayerControl';
@@ -245,7 +246,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
   // }, [map]);
 
   return (
-    <>
+    <div className="route__layer">
       <LayerControl
         position="topright"
         collapsed={layerControlCollapsed}
@@ -309,7 +310,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         </GroupedLayer>
         <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
       </LayerControl>
-    </>
+    </div>
   );
 };
 

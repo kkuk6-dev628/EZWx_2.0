@@ -11,6 +11,11 @@ export class CertificationController {
     return this.certificationService.create(dto);
   }
 
+  @Post('createAll')
+  createAll(@Body() dto: CreateCertificationDto[]) {
+    return this.certificationService.createAll(dto);
+  }
+
   @Get('findAll')
   findAll() {
     return this.certificationService.findAll({});

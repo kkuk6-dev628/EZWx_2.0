@@ -33,6 +33,33 @@ export class User {
   hearAbout: string;
 
   @Column()
+  displayName: string;
+
+  @Column({ nullable: true })
+  alternateEmail: string;
+
+  @Column({ nullable: true })
+  address1: string;
+
+  @Column({ nullable: true })
+  address2: string;
+
+  @Column({ nullable: true })
+  city: string;
+
+  @Column({ nullable: true })
+  stateProvince: string;
+
+  @Column({ nullable: true })
+  zip: string;
+
+  @Column({ nullable: true })
+  phoneType: string;
+
+  @Column({ nullable: true })
+  phone: string;
+
+  @Column()
   @CreateDateColumn()
   created_at: Date;
 
@@ -40,7 +67,11 @@ export class User {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToMany(() => Certification, { cascade: true, onDelete: 'CASCADE' })
+  @ManyToMany(() => Certification, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinTable({
     name: 'user_certification',
   })

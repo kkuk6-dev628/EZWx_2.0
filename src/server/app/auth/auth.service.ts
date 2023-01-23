@@ -34,6 +34,9 @@ export class AuthService {
 
       return {
         access_token: accessToken,
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName,
       };
     } catch (err) {
       if (err instanceof TypeORMError) {
@@ -44,12 +47,19 @@ export class AuthService {
     }
   }
 
-  async signin(dto: AuthSinginDto) {
+  async signin(dto: AuthSinginDto): Promise<{
+    access_token: string;
+    id: number;
+    email: string;
+    displayName: string;
+  }> {
     const user = await this.userService.findOne({
       where: {
         email: dto.email,
       },
     });
+
+    console.log('user is ', user.displayName);
 
     if (!user) throw new ForbiddenException('email or password incorrect');
 
@@ -64,6 +74,9 @@ export class AuthService {
 
     return {
       access_token: accessToken,
+      id: user.id,
+      email: user.email,
+      displayName: user.displayName,
     };
   }
 }

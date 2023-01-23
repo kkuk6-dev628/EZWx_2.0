@@ -1,1 +1,1 @@
-export const SESSION_COOKIE_KEY = 'session';
+export const COOKIE_KEY = 'access_token';
