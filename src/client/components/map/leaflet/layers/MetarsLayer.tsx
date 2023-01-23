@@ -5,52 +5,51 @@ import ReactDOMServer from 'react-dom/server';
 import { Pane, useMap } from 'react-leaflet';
 import {
   addLeadingZeroes,
-  getMetarCeilingCategory,
+  getLowestCeiling,
   getMetarVisibilityCategory,
   getQueryTime,
   getSkyCeilingValues,
+  getSkyConditions,
+  getWorstSkyCondition,
 } from '../../common/AreoFunctions';
 import SunCalc from 'suncalc';
 import { selectMetar } from '../../../../store/layers/LayerControl';
 import { useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
-import {
-  PersonalMinimumItem,
-  PersonalMinimums,
-  selectPersonalMinimums,
-} from '../../../../store/user/UserSettings';
+import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
 import { MetarMarkerTypes } from '../../common/AreoConstants';
+import axios from 'axios';
 
 const defaultServerFilter = `observation_time DURING ${getQueryTime(
   new Date(),
 )}`;
 
-export const getFlightCategory = (
-  ceiling: number,
-  visibility: number,
-  flightCategory: string,
-  personalMinimums: PersonalMinimums,
-): string[] => {
-  if (
-    (ceiling === null || !isFinite(ceiling)) &&
-    (visibility === null || !isFinite(visibility))
-  ) {
-    return [];
+export const getFlightCategoryIconUrl = (
+  feature: GeoJSON.Feature,
+): { iconUrl: string; ceiling: number } => {
+  const skyConditions = getSkyConditions(feature);
+  let sky: string, ceiling: number;
+  if (feature.properties.vert_vis_ft) {
+    sky = 'OVX';
+    ceiling = feature.properties.vert_vis_ft;
+  } else if (skyConditions.length > 0) {
+    const skyCondition = getLowestCeiling(skyConditions);
+    if (skyCondition) {
+      sky = skyCondition.skyCover;
+      ceiling = skyCondition.cloudBase;
+    } else {
+      sky = getWorstSkyCondition(skyConditions);
+    }
   }
-  const [, , ceilingIndex] = getMetarCeilingCategory(ceiling, personalMinimums);
-  const [, , visibilityIndex] = getMetarVisibilityCategory(
-    visibility,
-    personalMinimums,
-  );
-  const flightCategoryIndex =
-    Object.keys(personalMinimums).indexOf(flightCategory);
-  const index = Math.min(
-    ceilingIndex as number,
-    visibilityIndex as number,
-    flightCategoryIndex,
-  );
-  const cat = Object.keys(personalMinimums)[index];
-  return [cat, cat ? personalMinimums[cat].color : '#555'];
+  let flightCategory = feature.properties.flight_category;
+  if (!flightCategory) {
+    flightCategory = 'Black';
+  }
+  let iconUrl = '/icons/metar/MISSING.png';
+  if (flightCategory && sky) {
+    iconUrl = `/icons/metar/${flightCategory}-${sky}.png`;
+  }
+  return { iconUrl, ceiling };
 };
 
 const MetarsLayer = () => {
@@ -61,28 +60,60 @@ const MetarsLayer = () => {
   const [serverFilter, setServerFilter] = useState(defaultServerFilter);
   const wfsRef = useRef(null);
   const [filteredData, setFilteredData] = useState();
+  const [aireportData, setAirportData] = useState();
+
+  useEffect(() => {
+    console.log(layerStatus);
+    switch (layerStatus.markerType) {
+      case MetarMarkerTypes.surfaceVisibility.value:
+        setServerFilter(
+          defaultServerFilter + ` AND visibility_statute_mi IS NOT NULL`,
+        );
+        break;
+    }
+  }, [layerStatus]);
+
+  useEffect(() => {
+    fetchAirports();
+  }, []);
+
+  const fetchAirports = () => {
+    const params = {
+      maxFeatures: 4000,
+      request: 'GetFeature',
+      service: 'WFS',
+      typeName: 'EZWxBrief:airport',
+      version: '1.0.0',
+      srsName: 'EPSG:4326',
+      propertyName: 'icaoid, name',
+      cql_filter: "icaoid <> ''",
+      outputFormat: 'application/json',
+    } as any;
+    // if (abortController) {
+    //   abortController.abort();
+    // }
+    // setAbortController(new AbortController());
+    axios
+      .get('https://eztile4.ezwxbrief.com/geoserver/EZWxBrief/ows', {
+        params: params,
+      })
+      .then((data) => {
+        if (typeof data.data === 'string') {
+          console.log('Aireport: Invalid json data!', data.data);
+        } else {
+          setAirportData(data.data);
+        }
+      })
+      .catch((reason) => {
+        console.log('Aireport', reason);
+      });
+  };
 
   const getFlightCatMarker = (
     feature: GeoJSON.Feature,
     latlng: LatLng,
   ): L.Marker => {
-    const [sky, ceiling] = getSkyCeilingValues(
-      feature,
-      MetarMarkerTypes.flightCategory.value,
-    );
-    const [category, _] = getFlightCategory(
-      ceiling,
-      feature.properties.visibility_statute_mi,
-      feature.properties.flight_category,
-      personalMinimums,
-    );
-
-    let iconUrl = '/icons/metar/MISSING.png';
-    if (category && sky) {
-      iconUrl = `/icons/metar/${category}-${sky}.png`;
-    } else if (sky) {
-      iconUrl = `/icons/metar/Black-${sky}.png`;
-    }
+    const { iconUrl } = getFlightCategoryIconUrl(feature);
 
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
@@ -100,20 +131,22 @@ const MetarsLayer = () => {
   };
 
   const getCeilingHeightMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
-    const [sky, ceiling] = getSkyCeilingValues(
-      feature,
-      MetarMarkerTypes.ceilingHeight.value,
-    );
+    // eslint-disable-next-line prefer-const
+    let { iconUrl, ceiling } = getFlightCategoryIconUrl(feature);
     if (ceiling == undefined || !isFinite(ceiling)) return;
     const ceilingAmount = addLeadingZeroes(ceiling / 100, 3);
-    const [category] = getMetarCeilingCategory(ceiling, personalMinimums);
-    let iconUrl = '/icons/metar/MISSING.png';
-    if (category && sky) {
-      iconUrl = `/icons/metar/${category}-${sky}.png`;
-    } else if (sky) {
-      iconUrl = `/icons/metar/Black-${sky}.png`;
+    if (layerStatus.usePersonalMinimums) {
+    } else {
+      if (ceiling < 500) {
+        iconUrl = '/icons/metar/LIFR-OVC.png';
+      } else if (ceiling >= 500 && ceiling < 1000) {
+        iconUrl = '/icons/metar/IFR-OVC.png';
+      } else if (ceiling >= 1000 && ceiling <= 3000) {
+        iconUrl = '/icons/metar/MVFR-OVC.png';
+      } else if (ceiling > 3000) {
+        iconUrl = '/icons/metar/VFR-OVC.png';
+      }
     }
-
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-ceiling-icon',
@@ -525,7 +558,7 @@ const MetarsLayer = () => {
               src={iconUrl}
               style={{
                 transform: transformAngle,
-                transformOrigin: '16px 26px',
+                // transformOrigin: '16px 26px',
               }}
               alt={''}
               width={30}
@@ -656,6 +689,7 @@ const MetarsLayer = () => {
         case 'FZRA FG':
         case 'FZRA HZ':
         case 'FZDZ':
+        case 'FZDZ FZFG':
           weatherIconClass = 'fas fa-icicles';
           break;
         case 'RA':
@@ -880,16 +914,6 @@ const MetarsLayer = () => {
     return result as any;
   };
 
-  useEffect(() => {
-    console.log(layerStatus);
-    switch (layerStatus.markerType) {
-      case MetarMarkerTypes.surfaceVisibility.value:
-        setServerFilter(
-          defaultServerFilter + ` AND visibility_statute_mi IS NOT NULL`,
-        );
-        break;
-    }
-  }, [layerStatus]);
   return (
     <Pane name={'metar'} style={{ zIndex: 698 }} key={layerStatus.markerType}>
       <WFSLayer
@@ -935,10 +959,11 @@ const MetarsLayer = () => {
         pointToLayer={pointToLayer}
         isClusteredMarker={true}
         markerPane={'metar'}
-        serverFilter={serverFilter}
+        // serverFilter={serverFilter}
         clientFilter={clientFilter}
         maxClusterRadius={50}
         initData={filteredData}
+        layerStateSelector={selectMetar}
       ></WFSLayer>
     </Pane>
   );

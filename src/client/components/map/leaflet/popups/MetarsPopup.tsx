@@ -1,21 +1,18 @@
 import { Divider, Typography } from '@material-ui/core';
 import Image from 'next/image';
 import { PersonalMinimums } from '../../../../store/user/UserSettings';
-import {
-  MetarMarkerTypes,
-  MetarSkyValuesToString,
-} from '../../common/AreoConstants';
+import { MetarSkyValuesToString } from '../../common/AreoConstants';
 import {
   convertTimeFormat,
   getMetarCeilingCategory,
   getMetarDecodedWxString,
   getMetarVisibilityCategory,
-  getSkyCeilingValues,
+  getSkyConditions,
 } from '../../common/AreoFunctions';
+import { getFlightCategoryIconUrl } from '../layers/MetarsLayer';
 
 const MetarsPopup = ({
   layer,
-  markerType,
   personalMinimums,
 }: {
   layer: L.Marker;
@@ -23,26 +20,21 @@ const MetarsPopup = ({
   personalMinimums: PersonalMinimums;
 }) => {
   const feature = layer.feature;
-  const [sky, ceiling] = getSkyCeilingValues(layer.feature, markerType);
-  const [ceilingCat, ceilingColor] = getMetarCeilingCategory(
-    ceiling,
-    personalMinimums,
-  );
+  const skyConditions = getSkyConditions(layer.feature);
+  const { iconUrl, ceiling } = getFlightCategoryIconUrl(layer.feature);
+  const [, ceilingColor] = getMetarCeilingCategory(ceiling, personalMinimums);
   const [, visibilityColor] = getMetarVisibilityCategory(
     feature.properties.visibility_statute_mi,
     personalMinimums,
   );
-  const skyString = MetarSkyValuesToString[sky];
+  const skyConditionsAsc = skyConditions.sort((a, b) => {
+    return a.cloudBase > b.cloudBase ? 1 : -1;
+  });
   const weatherString = getMetarDecodedWxString(feature.properties.wx_string);
   return (
     <>
       <div style={{ display: 'flex' }}>
-        <Image
-          src={`/icons/metar/${ceilingCat}-${sky}.png`}
-          alt={''}
-          width={16}
-          height={16}
-        />
+        <Image src={iconUrl} alt={''} width={16} height={16} />
         &nbsp;<b>{feature.properties.station_id}&nbsp;Surface observation</b>
       </div>
       <Divider></Divider>
@@ -63,13 +55,28 @@ const MetarsPopup = ({
           </span>
         </Typography>
       )}
-      {isFinite(ceiling) && (
-        <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Clouds: </b>
-          <span>
-            {skyString} {ceiling} feet
-          </span>
-        </Typography>
+      {skyConditionsAsc.length > 0 && (
+        <div style={{ display: 'flex' }}>
+          <div>
+            <p style={{ margin: 3 }}>
+              <b>Clouds: </b>
+            </p>
+          </div>
+          <div style={{ margin: 3 }}>
+            {skyConditionsAsc.map((skyCondition) => {
+              return (
+                <>
+                  <span>
+                    {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
+                    {skyCondition.cloudBase}{' '}
+                    {skyCondition.skyCover !== 'CLR' && 'feet'}
+                  </span>
+                  <br />
+                </>
+              );
+            })}
+          </div>
+        </div>
       )}
       {weatherString && (
         <Typography variant="body2" style={{ margin: 3 }}>
@@ -83,14 +90,13 @@ const MetarsPopup = ({
           <span>
             {feature.properties.wind_speed_kt === 0
               ? 'Calm'
-              : feature.properties.wind_speed_kt}
-            &nbsp;knots
+              : feature.properties.wind_speed_kt + ' knots'}
           </span>
         </Typography>
       )}
       {feature.properties.wind_dir_degrees != null &&
-        feature.properties.wind_speed_kt === 0 &&
-        feature.properties.wind_speed_kt === null && (
+        feature.properties.wind_speed_kt !== 0 &&
+        feature.properties.wind_speed_kt !== null && (
           <Typography variant="body2" style={{ margin: 3 }}>
             <b>Wind direction: </b>
             <span>{feature.properties.wind_dir_degrees}&deg;</span>
@@ -105,13 +111,13 @@ const MetarsPopup = ({
       {feature.properties.temp_c != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Temperature: </b>
-          <span>{feature.properties.temp_c}&#8451;</span>
+          <span>{feature.properties.temp_c} &deg;C</span>
         </Typography>
       )}
       {feature.properties.dewpoint_c != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Dewpoint: </b>
-          <span>{feature.properties.dewpoint_c}&#8451;</span>
+          <span>{feature.properties.dewpoint_c} &deg;C</span>
         </Typography>
       )}
       {feature.properties.relativehumiditypercent != null && (

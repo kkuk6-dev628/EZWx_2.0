@@ -122,12 +122,12 @@ function LeafletMap() {
           [20.0, -60.0],
         ]}
         // @ts-ignore
-        timeDimension={true}
-        timeDimensionOptions={{
-          timeInterval: '2023-01-12T05:00:00.000Z/2023-01-12T17:00:00.000Z',
-          period: 'PT1H',
-        }}
-        timeDimensionControl={true}
+        // timeDimension={true}
+        // timeDimensionOptions={{
+        //   timeInterval: '2023-01-12T05:00:00.000Z/2023-01-12T17:00:00.000Z',
+        //   period: 'PT1H',
+        // }}
+        // timeDimensionControl={true}
         zoomControl={false}
         attributionControl={false}
         // preferCanvas={true}

@@ -8,6 +8,7 @@ export interface LayerState {
 }
 
 export interface MetarLayerState extends LayerState {
+  usePersonalMinimums: boolean;
   markerType: string;
 }
 export interface LayerControlState {
@@ -20,6 +21,7 @@ const initialState: LayerControlState = {
     visible: true,
     opacity: 1,
     markerType: 'flightCategory',
+    usePersonalMinimums: false,
   },
   pirepState: {
     visible: true,

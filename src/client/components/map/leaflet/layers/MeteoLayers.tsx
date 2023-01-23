@@ -284,7 +284,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           pickable={false}
           order={7}
         >
-          <TimeDimensionLayer
+          {/* <TimeDimensionLayer
             ref={wmsLayerRef}
             // url="https://eztile1.ezwxbrief.com/geoserver/EZWxBrief/wms?"
             url="https://{s}.ezwxbrief.com/geoserver/EZWxBrief/wms?"
@@ -302,7 +302,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
               useCache: true,
               // crossOrigin: true,
             }}
-          ></TimeDimensionLayer>
+          ></TimeDimensionLayer> */}
         </GroupedLayer>
         <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
       </LayerControl>

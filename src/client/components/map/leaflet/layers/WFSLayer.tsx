@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { generateHash } from '../../common/AreoFunctions';
 import GeoJSON, { FeatureCollection } from 'geojson';
+import { AppState } from '../../../../store/store';
 
 interface WFSLayerProps {
   url: string;
@@ -29,6 +30,7 @@ interface WFSLayerProps {
   isClusteredMarker?: boolean;
   markerPane?: string;
   maxClusterRadius?: number;
+  layerStateSelector?: (state: AppState) => any;
 }
 
 const emptyGeoJson: FeatureCollection = {
@@ -54,6 +56,7 @@ const WFSLayer = React.forwardRef(
     isClusteredMarker = false,
     markerPane,
     maxClusterRadius = 30,
+    layerStateSelector,
   }: WFSLayerProps) => {
     const observationTime = useSelector(selectObsTime);
 
@@ -84,7 +87,12 @@ const WFSLayer = React.forwardRef(
       }
     }, [geoJSON]);
 
+    let layerState = null;
+    if (layerStateSelector) {
+      layerState = useSelector(layerStateSelector);
+    }
     useEffect(() => {
+      if (layerState && layerState.visible === false) return;
       if (clientFilter && geoJSON.features.length > 0) {
         const filteredFeatures = clientFilter(
           geoJSON.features,

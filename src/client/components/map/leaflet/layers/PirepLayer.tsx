@@ -241,6 +241,7 @@ const PirepLayer = () => {
         markerPane={'pirep'}
         serverFilter={`obstime AFTER ${getTimeRangeStart().toISOString()}`}
         clientFilter={clientFilter}
+        layerStateSelector={selectPirep}
       ></WFSLayer>
     </Pane>
   );
