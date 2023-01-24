@@ -61,3 +61,8 @@ export const MetarSkyValuesToString = {
   OVC: 'Overcast',
   OVX: 'Indefinite ceiling',
 };
+
+// timestamp in seconds
+export const cacheStartTime = Math.floor(
+  new Date('2023-01-24T21:00:00.000+08:00').getTime() / 1000,
+);

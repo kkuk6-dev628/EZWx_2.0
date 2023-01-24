@@ -5,6 +5,7 @@ import ReactDOMServer from 'react-dom/server';
 import { Pane, useMap } from 'react-leaflet';
 import {
   addLeadingZeroes,
+  getCacheVersion,
   getLowestCeiling,
   getMetarVisibilityCategory,
   getQueryTime,
@@ -23,6 +24,8 @@ import axios from 'axios';
 const defaultServerFilter = `observation_time DURING ${getQueryTime(
   new Date(),
 )}`;
+
+const cacheUpdateInterval = 75; // 75 minutes
 
 export const getFlightCategoryIconUrl = (
   feature: GeoJSON.Feature,
@@ -61,9 +64,16 @@ const MetarsLayer = () => {
   const wfsRef = useRef(null);
   const [filteredData, setFilteredData] = useState();
   const [aireportData, setAirportData] = useState();
+  const [cacheVersion, setCacheVersion] = useState(
+    getCacheVersion(cacheUpdateInterval),
+  );
 
   useEffect(() => {
     console.log(layerStatus);
+    const v = getCacheVersion(cacheUpdateInterval);
+    if (v !== cacheVersion) {
+      setCacheVersion(v);
+    }
     switch (layerStatus.markerType) {
       case MetarMarkerTypes.surfaceVisibility.value:
         setServerFilter(
@@ -71,7 +81,7 @@ const MetarsLayer = () => {
         );
         break;
     }
-  }, [layerStatus]);
+  }, [layerStatus.markerType]);
 
   useEffect(() => {
     fetchAirports();
@@ -88,6 +98,7 @@ const MetarsLayer = () => {
       propertyName: 'icaoid, name',
       cql_filter: "icaoid <> ''",
       outputFormat: 'application/json',
+      v: 1,
     } as any;
     // if (abortController) {
     //   abortController.abort();
@@ -961,9 +972,10 @@ const MetarsLayer = () => {
         markerPane={'metar'}
         // serverFilter={serverFilter}
         clientFilter={clientFilter}
-        maxClusterRadius={50}
+        maxClusterRadius={30}
         initData={filteredData}
         layerStateSelector={selectMetar}
+        cacheVersion={cacheVersion}
       ></WFSLayer>
     </Pane>
   );

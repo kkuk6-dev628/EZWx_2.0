@@ -31,6 +31,7 @@ interface WFSLayerProps {
   markerPane?: string;
   maxClusterRadius?: number;
   layerStateSelector?: (state: AppState) => any;
+  cacheVersion?: number;
 }
 
 const emptyGeoJson: FeatureCollection = {
@@ -39,25 +40,29 @@ const emptyGeoJson: FeatureCollection = {
 };
 
 const WFSLayer = React.forwardRef(
-  ({
-    url,
-    initData = emptyGeoJson,
-    maxFeatures,
-    typeName,
-    propertyNames,
-    enableBBoxQuery,
-    interactive = true,
-    showLabelZoom = 5,
-    getLabel,
-    style,
-    pointToLayer,
-    serverFilter: filter,
-    clientFilter,
-    isClusteredMarker = false,
-    markerPane,
-    maxClusterRadius = 30,
-    layerStateSelector,
-  }: WFSLayerProps) => {
+  (
+    {
+      url,
+      initData = emptyGeoJson,
+      maxFeatures,
+      typeName,
+      propertyNames,
+      enableBBoxQuery,
+      interactive = true,
+      showLabelZoom = 5,
+      getLabel,
+      style,
+      pointToLayer,
+      serverFilter: filter,
+      clientFilter,
+      isClusteredMarker = false,
+      markerPane,
+      maxClusterRadius = 30,
+      layerStateSelector,
+      cacheVersion,
+    }: WFSLayerProps,
+    wfsRef: any,
+  ) => {
     const observationTime = useSelector(selectObsTime);
 
     const [geoJSON, setGeoJSON] = useState<FeatureCollection>(initData);
@@ -177,6 +182,7 @@ const WFSLayer = React.forwardRef(
       }
       params.outputFormat = 'application/json';
       params.format_options = undefined;
+      if (cacheVersion) params.v = cacheVersion;
       pendingFetch = true;
       // if (abortController) {
       //   abortController.abort();
@@ -222,6 +228,7 @@ const WFSLayer = React.forwardRef(
         {isClusteredMarker && (
           <MarkerClusterGroup
             key={geoJsonKey}
+            ref={wfsRef}
             // @ts-ignore
             iconCreateFunction={(cluster) => {
               const children = cluster.getAllChildMarkers();

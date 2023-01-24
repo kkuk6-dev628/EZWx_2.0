@@ -3,6 +3,7 @@ import {
   PersonalMinimums,
 } from './../../../store/user/UserSettings';
 import {
+  cacheStartTime,
   MetarMarkerTypes,
   MetarSkyValuesToString,
   WeatherCausings,
@@ -79,7 +80,9 @@ export const simpleTimeFormat = (time: Date) => {
 };
 
 export const simpleTimeOnlyFormat = (time: Date) => {
-  return `${time.getUTCHours()}${time.getUTCMinutes()}Z`;
+  return `${time.getUTCHours() < 10 ? '0' : ''}${time.getUTCHours()}${
+    time.getUTCMinutes() < 10 ? '0' : ''
+  }${time.getUTCMinutes()}Z`;
 };
 
 export const getThumbnail = (feature, style) => {
@@ -127,6 +130,12 @@ export const generateHash = (s: string): number => {
     hash |= 0; // Convert to 32bit integer
   }
   return hash;
+};
+
+export const getCacheVersion = (updateInterval: number): number => {
+  const now = Math.floor(Date.now() / 1000);
+  const version = Math.floor((now - cacheStartTime) / updateInterval / 60);
+  return version;
 };
 
 export const getTimeRangeStart = () => {

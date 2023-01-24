@@ -164,21 +164,21 @@ function LeafletMap() {
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               // @ts-ignore
-              useCache={true}
+              useCache={false}
             />
           </GroupedLayer>
           <GroupedLayer checked name="Topo" group="Base Maps" order={3}>
             <TileLayer
               url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
               // @ts-ignore
-              useCache={true}
+              useCache={false}
             />
           </GroupedLayer>
           <GroupedLayer checked name="Terrain" group="Base Maps" order={4}>
             <TileLayer
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
               // @ts-ignore
-              useCache={true}
+              useCache={false}
             />
           </GroupedLayer>
           <GroupedLayer checked name="Dark" group="Base Maps" order={5}>
@@ -187,7 +187,7 @@ function LeafletMap() {
               // @ts-ignore
               subdomains="abcd"
               // @ts-ignore
-              useCache={true}
+              useCache={false}
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             />
           </GroupedLayer>
@@ -195,7 +195,7 @@ function LeafletMap() {
             <TileLayer
               url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
               // @ts-ignore
-              useCache={true}
+              useCache={false}
             />
           </GroupedLayer>
         </LayerControl>

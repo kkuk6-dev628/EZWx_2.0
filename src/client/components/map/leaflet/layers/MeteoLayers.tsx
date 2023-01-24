@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import LayerControl, { GroupedLayer, ILayerObj } from '../layer-control/LayerControl';
+import LayerControl, {
+  GroupedLayer,
+  ILayerObj,
+} from '../layer-control/LayerControl';
 import WFSLayer from './WFSLayer';
 import { LayerGroup, useMapEvents } from 'react-leaflet';
 import L, { CRS, LatLng } from 'leaflet';
@@ -118,10 +121,12 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
       layers.forEach((layer) => {
         if (layer.pickable === false) return;
         if (layer.checked === false) return;
-        if (layer.layer.resetStyle !== undefined) layer.layer.resetStyle();
+        //@ts-ignore
+        if (layer.layer.resetStyle) layer.layer.resetStyle();
         if (features.length >= maxLayers) {
           return;
         }
+        //@ts-ignore
         layer.layer.eachLayer((l: any) => {
           if (features.length >= maxLayers) {
             return;

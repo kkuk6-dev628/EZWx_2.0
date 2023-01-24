@@ -218,7 +218,9 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      transform: 'none',
                     }}
+                    className="feature-selector-item-icon"
                   >
                     <div
                       style={{

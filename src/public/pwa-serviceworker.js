@@ -16,6 +16,7 @@
 
     var copy = response.clone();
     caches.open(version).then(function (cache) {
+      if (!(request.url.indexOf('http') === 0)) return;
       cache.put(request, copy);
     });
   }

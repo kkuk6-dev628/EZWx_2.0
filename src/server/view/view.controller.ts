@@ -19,7 +19,6 @@ export class ViewController {
 
   @Get('pwa-serviceworker.js')
   public async getServiceWorkerJS1(@Req() req: Request, @Res() res: Response) {
-    console.log(fs);
     const buffer = fs.readFileSync('./src/public/pwa-serviceworker.js');
     res.type('text/javascript').send(buffer);
   }

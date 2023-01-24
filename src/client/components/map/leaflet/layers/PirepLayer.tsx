@@ -5,11 +5,14 @@ import ReactDOMServer from 'react-dom/server';
 import { Pane, useMap } from 'react-leaflet';
 import {
   addLeadingZeroes,
+  getCacheVersion,
   getTimeRangeStart,
 } from '../../common/AreoFunctions';
 import { useSelector } from 'react-redux';
 import { selectPirep } from '../../../../store/layers/LayerControl';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
+const cacheUpdateInterval = 75; // 75 minutes
 
 const PirepLayer = () => {
   const map = useMap();
@@ -22,6 +25,17 @@ const PirepLayer = () => {
   };
 
   const layerStatus = useSelector(selectPirep);
+  const [cacheVersion, setCacheVersion] = useState(
+    getCacheVersion(cacheUpdateInterval),
+  );
+
+  useEffect(() => {
+    console.log(layerStatus);
+    const v = getCacheVersion(cacheUpdateInterval);
+    if (v !== cacheVersion) {
+      setCacheVersion(v);
+    }
+  }, [layerStatus.visible]);
 
   const getTbIconUrl = (intensity) => {
     let iconUrl = '/icons/pirep/negative-turb-icon.png';
@@ -199,10 +213,6 @@ const PirepLayer = () => {
     return results;
   };
 
-  useEffect(() => {
-    console.log(layerStatus);
-  }, []);
-
   return (
     <Pane name={'pirep'} style={{ zIndex: 699 }}>
       <WFSLayer
@@ -242,6 +252,7 @@ const PirepLayer = () => {
         serverFilter={`obstime AFTER ${getTimeRangeStart().toISOString()}`}
         clientFilter={clientFilter}
         layerStateSelector={selectPirep}
+        cacheVersion={cacheVersion}
       ></WFSLayer>
     </Pane>
   );
