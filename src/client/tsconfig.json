@@ -37,6 +37,7 @@
     "utils/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "pages/pwa-serviceworker.js",
   ]
 }

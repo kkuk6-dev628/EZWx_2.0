@@ -41,7 +41,7 @@ interface IProps {
   onLayersAdd?: (layers: ILayerObj[]) => void;
 }
 
-interface ILayerObj {
+export interface ILayerObj {
   layer: Layer;
   group: string;
   name: string;
@@ -195,7 +195,6 @@ const LayerControl = ({
       }
     }
     setLayers(cLayers.sort((a, b) => (a.order > b.order ? 1 : -1)));
-    if (onLayersAdd) onLayersAdd(layers);
   };
 
   const groupedLayers = lodashGroupBy(layers, 'group');
@@ -205,6 +204,10 @@ const LayerControl = ({
       DomEvent.disableClickPropagation(ref.current);
     }
   }, []);
+
+  useEffect(() => {
+    if (onLayersAdd) onLayersAdd(layers);
+  }, [layers]);
   return (
     <LayersControlProvider
       value={{
@@ -314,12 +317,18 @@ const LayerControl = ({
                                   checked={layerObj.checked}
                                   name="checkedB"
                                   color="primary"
+                                  onClick={() => {
+                                    dispatch(
+                                      setMetar({
+                                        ...layerStatus,
+                                        visible: !layerStatus.visible,
+                                      }),
+                                    );
+                                  }}
                                 />
                               }
                               label={layerObj.name}
-                              onClickCapture={(e) => {
-                                onLayerClick(layerObj);
-                              }}
+                              onClickCapture={() => onLayerClick(layerObj)}
                             />
                           </AccordionSummary>
                           <AccordionDetails style={{ paddingBottom: 4 }}>

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import LayerControl, { GroupedLayer } from '../layer-control/LayerControl';
+import LayerControl, { GroupedLayer, ILayerObj } from '../layer-control/LayerControl';
 import WFSLayer from './WFSLayer';
 import { LayerGroup, useMapEvents } from 'react-leaflet';
 import L, { CRS, LatLng } from 'leaflet';
@@ -36,7 +36,7 @@ import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
 const maxLayers = 6;
 
 const MeteoLayers = ({ layerControlCollapsed }) => {
-  const [layers, setLayers] = useState([]);
+  const [layers, setLayers] = useState<ILayerObj[]>([]);
   const wmsLayerRef = useRef(null);
   const debugLayerGroupRef = useRef(null);
   const metarLayerStatus = useSelector(selectMetar);
@@ -116,12 +116,10 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         debugLayerGroupRef.current.clearLayers();
       }
       layers.forEach((layer) => {
-        layer.layer.resetStyle && layer.layer.resetStyle();
+        if (layer.pickable === false) return;
+        if (layer.checked === false) return;
+        if (layer.layer.resetStyle !== undefined) layer.layer.resetStyle();
         if (features.length >= maxLayers) {
-          return;
-        }
-        if (layer.group !== 'Meteo') return;
-        if (layer.pickable === false) {
           return;
         }
         layer.layer.eachLayer((l: any) => {

@@ -1,6 +1,7 @@
 import { Controller, Get, Res, Req, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { parse } from 'url';
+import * as fs from 'fs';
 import { JwtAuthGuard } from '../app/auth/jwt/jwt-auth.guard';
 
 import { ViewService } from './view.service';
@@ -14,6 +15,27 @@ export class ViewController {
     await this.viewService
       .getNextServer()
       .render(req, res, parsedUrl.pathname, parsedUrl.query);
+  }
+
+  @Get('pwa-serviceworker.js')
+  public async getServiceWorkerJS1(@Req() req: Request, @Res() res: Response) {
+    console.log(fs);
+    const buffer = fs.readFileSync('./src/public/pwa-serviceworker.js');
+    res.type('text/javascript').send(buffer);
+  }
+  @Get('favicon.ico')
+  public async getFavicon(@Req() req: Request, @Res() res: Response) {
+    const parsedUrl = parse(req.url, true);
+
+    await this.viewService
+      .getNextServer()
+      .render(req, res, parsedUrl.pathname, parsedUrl.query);
+  }
+  @Get('offline.html')
+  public async getOfflineHtml(@Req() req: Request, @Res() res: Response) {
+    const parsedUrl = parse(req.url, true);
+
+    res.send('You are offline!');
   }
 
   @Get('home')

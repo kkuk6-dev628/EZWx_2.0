@@ -955,7 +955,7 @@ const MetarsLayer = () => {
           'relativehumiditypercent',
           'densityaltitudefeet',
         ]}
-        enableBBoxQuery={true}
+        enableBBoxQuery={false}
         pointToLayer={pointToLayer}
         isClusteredMarker={true}
         markerPane={'metar'}

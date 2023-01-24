@@ -6,10 +6,16 @@ import '../assets/styles/globals.scss';
 import Footer from '../components/layout/Footer';
 import { useRouter } from 'next/router';
 import { wrapper } from '../store/store';
+import * as serviceWorkerRegistration from '../app/serviceWorkerRegistration';
 
 const App = ({ Component, pageProps }: AppProps) => {
   const [showFooter, setShowFooter] = useState(false);
   const { pathname } = useRouter();
+
+  useEffect(() => {
+    serviceWorkerRegistration.register();
+  }, []);
+
   useEffect(() => {
     if (pathname === '/try-ezwxbrief' || pathname === '/imagery') {
       setShowFooter(true);
