@@ -87,6 +87,7 @@ export class ViewController {
         Object.assign(parsedUrl.query, serverSideProps),
       );
   }
+
   @Get('imagery')
   public async imagery(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);
@@ -103,7 +104,7 @@ export class ViewController {
     await this.viewService.getNextServer().render(req, res, parsedUrl.pathname);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('profile')
   public async showProfile(@Req() req: Request, @Res() res: Response) {
     await this.handler(req, res);

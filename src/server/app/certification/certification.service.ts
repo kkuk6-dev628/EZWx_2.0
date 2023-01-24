@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Certification } from './certification.entity';
 import { FindManyOptions, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,6 +23,26 @@ export class CertificationService {
       return newCertification;
     } catch (err: any) {
       console.log(err.message);
+    }
+  }
+
+  async createAll(dto: CreateCertificationDto[]) {
+    try {
+      await this.certificationRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Certification)
+        .values(dto)
+        .execute();
+
+      return {
+        statusCode: 201,
+        message: 'Successfully Certification Create',
+      };
+    } catch (err: any) {
+      console.log('main error ', err);
+      console.log(err.message);
+      throw new BadRequestException(err.message);
     }
   }
 

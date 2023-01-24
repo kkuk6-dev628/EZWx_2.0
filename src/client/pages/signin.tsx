@@ -28,7 +28,7 @@ function signin() {
   } else if (!isLoading && responseError) {
     console.log(responseError);
   } else if (!isLoading && !responseError && data) {
-    router.push('/try-ezwxbrief');
+    router.push('/profile');
   }
   return (
     <div className="sign">

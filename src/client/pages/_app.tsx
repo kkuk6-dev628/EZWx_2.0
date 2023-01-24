@@ -7,10 +7,14 @@ import Footer from '../components/layout/Footer';
 import { useRouter } from 'next/router';
 import { wrapper } from '../store/store';
 import * as serviceWorkerRegistration from '../app/serviceWorkerRegistration';
+import { Provider } from 'react-redux';
 
-const App = ({ Component, pageProps }: AppProps) => {
+const App = ({ Component, ...rest }: AppProps) => {
+  const { store, props } = wrapper.useWrappedStore(rest);
   const [showFooter, setShowFooter] = useState(false);
   const { pathname } = useRouter();
+
+  const { pageProps } = props;
 
   useEffect(() => {
     serviceWorkerRegistration.register();
@@ -23,8 +27,9 @@ const App = ({ Component, pageProps }: AppProps) => {
       setShowFooter(false);
     }
   }, [pathname]);
+
   return (
-    <>
+    <Provider store={store}>
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
         strategy="afterInteractive"
@@ -40,8 +45,8 @@ const App = ({ Component, pageProps }: AppProps) => {
       <Header />
       <Component {...pageProps} />
       {!showFooter && <Footer />}
-    </>
+    </Provider>
   );
 };
 
-export default wrapper.withRedux(App);
+export default App;

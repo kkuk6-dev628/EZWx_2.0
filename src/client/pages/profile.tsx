@@ -1,11 +1,14 @@
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import makeAnimated from 'react-select/animated';
-import Select from 'react-select';
+import Select, { OnChangeValue } from 'react-select';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { api } from '../utils';
 import Switch from 'react-switch';
 import ChangePasswordModal from '../components/shared/ChangePasswordModal';
+import { useSelector } from 'react-redux';
+import { selectAuth } from '../store/auth/authSlice';
+
 interface certifications {
   name: string;
   description: string;
@@ -17,16 +20,16 @@ interface IFormInput {
   email: string;
   displayName: string;
   alternateEmail: string;
-  Country: string;
   address1: string;
   address2: string;
   city: string;
-  state: string;
+  stateProvince: string;
   zip: number;
   phone: number;
   phoneType: string;
   certifications: certifications[];
 }
+
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
 }
@@ -55,6 +58,38 @@ function profile({ setIsShowModal }: Props) {
       checked: true,
     },
   ]);
+
+  const [userInfo, setUserInfo] = useState<{ [key: string]: any }>({});
+
+  const user = useSelector(selectAuth);
+
+  // console.log('info certificaions ', userInfo.certifications);
+  // console.log('token is ', user);
+
+  useEffect(() => {
+    api({
+      method: 'get',
+      url: `user/findOne?id=${user.id}`,
+    })
+      .then((res) => {
+        // console.log(res.data);
+        setUserInfo(res.data);
+      })
+      .catch((err) => console.log(err.message));
+  }, []);
+
+  useEffect(() => {
+    api({
+      method: 'get',
+      url: 'certification/findAll',
+    })
+      .then((res) => {
+        // console.log('certification data ', res.data);
+        setCertificationsOptions(res.data);
+      })
+      .catch((err) => console.log(err.message));
+  }, []);
+
   const {
     control,
     register,
@@ -67,11 +102,10 @@ function profile({ setIsShowModal }: Props) {
       email: '',
       displayName: '',
       alternateEmail: '',
-      Country: '',
       address1: '',
       address2: '',
       city: '',
-      state: '',
+      stateProvince: '',
       zip: null,
       phone: null,
       phoneType: '',
@@ -80,20 +114,30 @@ function profile({ setIsShowModal }: Props) {
   });
 
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
-    console.log(data);
-  };
-  const animatedComponents = makeAnimated();
-  useEffect(() => {
+    // console.log('form data is ', data);
+    // data.email = userInfo.email;
+    // data.firstname = userInfo.firstname;
+    // data.lastname = userInfo.lastname;
+    // data.displayName = userInfo.displayName;
+    // data.certifications = userInfo.certifications;
+    // data.
+    // console.log(data);
+
+    // console.log(userInfo);
+
     api({
-      method: 'get',
-      url: 'certification/findAll',
+      method: 'put',
+      url: `user/update/${user.id}`,
+      data: userInfo,
     })
       .then((res) => {
-        console.log('certification data ', res.data);
-        setCertificationsOptions(res.data);
+        console.log('updated data ', res.data);
       })
       .catch((err) => console.log(err.message));
-  }, []);
+  };
+
+  const animatedComponents = makeAnimated();
+
   const validateEmail = (value: string) => {
     const emailRegex =
       /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -112,6 +156,16 @@ function profile({ setIsShowModal }: Props) {
       }),
     );
   };
+
+  const handleInfoChange = (e, key: string) => {
+    setUserInfo((prev) => ({
+      ...prev,
+      [key]: e.target.value,
+    }));
+  };
+
+  // console.log('userInfo is ', userInfo);
+
   return (
     <div className="profile">
       {showChangePasswordMOdal && (
@@ -130,7 +184,7 @@ function profile({ setIsShowModal }: Props) {
                     alt="profile"
                   />
                 </div>
-                <h3 className="profile__name">HADID BILLA</h3>
+                <h3 className="profile__name">{userInfo.displayName}</h3>
               </div>
               <div className="profile__left__img__upload">
                 <input type="file" name="" id="" />
@@ -169,15 +223,14 @@ function profile({ setIsShowModal }: Props) {
                   <div className="csuinp__wrp__two">
                     <input
                       type="email"
-                      {...register('email', {
-                        required: 'Please enter a valid email address.',
-                        validate: validateEmail,
-                      })}
+                      {...register('email')}
                       id="email"
                       className={`csuinp__input ${
                         errors.email ? 'csuinp__input--error' : ''
                       }`}
                       placeholder="Email for Verification"
+                      value={userInfo.email ?? ''}
+                      readOnly
                     />
                     {errors.email && (
                       <p className="csuinp__error__msg">
@@ -195,14 +248,15 @@ function profile({ setIsShowModal }: Props) {
                   <div className="csuinp__wrp__two">
                     <input
                       type="text"
-                      {...register('firstname', {
-                        required: 'The First Name field is required.',
-                      })}
+                      {...register('firstname')}
                       id="firstname"
                       className={`csuinp__input ${
                         errors.firstname ? 'csuinp__input--error' : ''
                       }`}
                       placeholder="First Name"
+                      value={userInfo.firstname ?? ''}
+                      defaultValue={userInfo.firstname}
+                      onChange={(e) => handleInfoChange(e, 'firstname')}
                     />
                     {errors.firstname && (
                       <p className="csuinp__error__msg">
@@ -220,14 +274,14 @@ function profile({ setIsShowModal }: Props) {
                   <div className="csuinp__wrp__two">
                     <input
                       type="text"
-                      {...register('lastname', {
-                        required: 'The Last Name field is required.',
-                      })}
+                      {...register('lastname')}
                       id="lastname"
                       className={`csuinp__input ${
                         errors.lastname ? 'csuinp__input--error' : ''
                       }`}
                       placeholder="Last Name"
+                      value={userInfo.lastname ?? ''}
+                      onChange={(e) => handleInfoChange(e, 'lastname')}
                     />
                     {errors.lastname && (
                       <p className="csuinp__error__msg">
@@ -251,8 +305,10 @@ function profile({ setIsShowModal }: Props) {
                       {...register('displayName')}
                       id="displayname"
                       className={`csuinp__input ${
-                        errors.lastname ? 'csuinp__input--error' : ''
+                        errors.displayName ? 'csuinp__input--error' : ''
                       }`}
+                      value={userInfo.displayName ?? ''}
+                      onChange={(e) => handleInfoChange(e, 'displayName')}
                     />
                   </div>
                 </div>
@@ -271,8 +327,10 @@ function profile({ setIsShowModal }: Props) {
                       {...register('alternateEmail')}
                       id="alternateEmail"
                       className={`csuinp__input ${
-                        errors.lastname ? 'csuinp__input--error' : ''
+                        errors.alternateEmail ? 'csuinp__input--error' : ''
                       }`}
+                      value={userInfo.alternateEmail ?? ''}
+                      onChange={(e) => handleInfoChange(e, 'alternateEmail')}
                     />
                   </div>
                 </div>
@@ -291,8 +349,10 @@ function profile({ setIsShowModal }: Props) {
                       {...register('address1')}
                       id="address1"
                       className={`csuinp__input ${
-                        errors.lastname ? 'csuinp__input--error' : ''
+                        errors.address1 ? 'csuinp__input--error' : ''
                       }`}
+                      value={userInfo.address1 ?? ''}
+                      onChange={(e) => handleInfoChange(e, 'address1')}
                     />
                   </div>
                 </div>
@@ -313,6 +373,8 @@ function profile({ setIsShowModal }: Props) {
                       className={`csuinp__input ${
                         errors.lastname ? 'csuinp__input--error' : ''
                       }`}
+                      value={userInfo.address2 ?? ''}
+                      onChange={(e) => handleInfoChange(e, 'address2')}
                     />
                   </div>
                 </div>
@@ -333,6 +395,8 @@ function profile({ setIsShowModal }: Props) {
                       className={`csuinp__input ${
                         errors.lastname ? 'csuinp__input--error' : ''
                       }`}
+                      value={userInfo.city ?? ''}
+                      onChange={(e) => handleInfoChange(e, 'city')}
                     />
                   </div>
                 </div>
@@ -344,12 +408,16 @@ function profile({ setIsShowModal }: Props) {
                   </label>
                   <div className="">
                     <select
-                      {...register('state')}
+                      {...register('stateProvince')}
                       id="state"
                       className={`csuinp__input csuinp__input--select ${
-                        errors.state ? 'csuinp__input--error' : ''
+                        errors.stateProvince ? 'csuinp__input--error' : ''
                       }`}
+                      defaultValue={null}
+                      value={userInfo.stateProvince ?? ''}
+                      onChange={(e) => handleInfoChange(e, 'stateProvince')}
                     >
+                      <option value={null}>Select an option</option>
                       <option value="0">Aguascaoptionentes</option>
                       <option value="1">ALABAMA</option>
                       <option value="2">ALASKA</option>
@@ -466,6 +534,8 @@ function profile({ setIsShowModal }: Props) {
                       className={`csuinp__input ${
                         errors.lastname ? 'csuinp__input--error' : ''
                       }`}
+                      value={userInfo.zip ?? ''}
+                      onChange={(e) => handleInfoChange(e, 'zip')}
                     />
                   </div>
                 </div>
@@ -482,7 +552,11 @@ function profile({ setIsShowModal }: Props) {
                       className={`csuinp__input csuinp__input--select ${
                         errors.phoneType ? 'csuinp__input--error' : ''
                       }`}
+                      value={userInfo.phoneType ?? ''}
+                      defaultValue={null}
+                      onChange={(e) => handleInfoChange(e, 'phoneType')}
                     >
+                      <option value={null}>Select an option</option>
                       <option value="0">Home</option>
                       <option value="1">Work</option>
                       <option value="2">Mobile</option>
@@ -504,6 +578,8 @@ function profile({ setIsShowModal }: Props) {
                       className={`csuinp__input ${
                         errors.phone ? 'csuinp__input--error' : ''
                       }`}
+                      value={userInfo.phone ?? ''}
+                      onChange={(e) => handleInfoChange(e, 'phone')}
                     />
                   </div>
                 </div>
@@ -517,12 +593,19 @@ function profile({ setIsShowModal }: Props) {
                     <Controller
                       name="certificationss"
                       control={control}
-                      {...register('certifications', {
-                        required:
-                          'The Pilot certificationss (select all that apply) field is required.',
-                      })}
+                      {...register('certifications')}
                       render={({ field }) => (
                         <Select
+                          id="long-value-select"
+                          instanceId="long-value-select"
+                          value={userInfo.certifications ?? []}
+                          onChange={(e) =>
+                            setUserInfo((prev) => {
+                              const info = { ...prev };
+                              info.certifications = e;
+                              return info;
+                            })
+                          }
                           placeholder="Select your certificationss"
                           isMulti
                           styles={{
@@ -535,7 +618,6 @@ function profile({ setIsShowModal }: Props) {
                                 : '#E5E5E5',
                             }),
                           }}
-                          {...field}
                           closeMenuOnSelect={false}
                           getOptionLabel={(option: { description: string }) =>
                             option?.description

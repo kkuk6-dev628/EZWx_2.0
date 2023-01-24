@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Radio, RadioGroup, Slider, Typography } from '@material-ui/core';
+import { Radio, RadioGroup, Typography } from '@material-ui/core';
 import { useMapEvents } from 'react-leaflet';
 import { Layer, Util, DomEvent, LayerGroup } from 'leaflet';
 import Accordion from '@material-ui/core/Accordion';
@@ -17,12 +17,15 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import lodashGroupBy from 'lodash.groupby';
 import toast from 'react-hot-toast';
 import { LayersControlProvider } from './layerControlContext';
-
+import CircleCheckedFilled from '@material-ui/icons/CheckCircle';
+import CircleUnchecked from '@material-ui/icons/RadioButtonUnchecked';
 import createControlledLayer, { OrderedLayerProps } from './controlledLayer';
 import { selectMetar, setMetar } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { MetarMarkerTypes } from '../../common/AreoConstants';
+import Image from 'next/image';
+import Slider from '@mui/material/Slider';
 
 const POSITION_CLASSES: { [key: string]: string } = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -218,221 +221,266 @@ const LayerControl = ({
       <div className={positionClass}>
         <div
           id="layer-control"
-          className="leaflet-control leaflet-bar"
+          className="leaflet-control leaflet-bar leaycnt"
           ref={ref}
         >
           {!collapsed &&
             Object.keys(groupedLayers).map((section, index) => (
-              <Accordion key={`${section} ${index}`} defaultExpanded>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
-                >
-                  <Typography>{section}</Typography>
-                </AccordionSummary>
-                {groupedLayers[section]?.map((layerObj, index) => {
-                  switch (layerObj.name) {
-                    // case 'temperature':
-                    //   const groupLayer = layerObj.layer as L.LayerGroup;
-                    //   const subLayers = groupLayer.getLayers() as any;
-                    //   return (
-                    //     <Accordion
-                    //       key={`${layerObj.name} ${index}`}
-                    //       defaultExpanded={false}
-                    //       style={{ marginTop: 0 }}
-                    //     >
-                    //       <AccordionSummary
-                    //         expandIcon={<ExpandMoreIcon />}
-                    //         aria-controls="panel1a-content"
-                    //         id="panel1a-header"
-                    //         style={{ height: 48, minHeight: 48 }}
-                    //       >
-                    //         <FormControlLabel
-                    //           control={
-                    //             <Checkbox
-                    //               checked={layerObj.checked}
-                    //               name="checkedB"
-                    //               color="primary"
-                    //             />
-                    //           }
-                    //           label={layerObj.name}
-                    //           onClickCapture={(e) => {
-                    //             DomEvent.stopPropagation(e as any);
-                    //             onLayerClick(layerObj);
-                    //           }}
-                    //           onDoubleClickCapture={(e) => {
-                    //             DomEvent.stopPropagation(e as any);
-                    //           }}
-                    //         />
-                    //       </AccordionSummary>
-                    //       <AccordionDetails style={{ paddingBottom: 4 }}>
-                    //         <Slider style={{ marginLeft: 26 }}></Slider>
-                    //       </AccordionDetails>
-                    //       <AccordionDetails>
-                    //         {}
-                    //         <RadioGroup
-                    //           defaultValue={
-                    //             subLayers[subLayers.length - 1]._name
-                    //           }
-                    //           name="radio-buttons-group-metar"
-                    //           style={{ paddingLeft: 26 }}
-                    //           onChangeCapture={(e) => {
-                    //             subLayers.map((sublayer) => {
-                    //               if (sublayer._name === e.target.value) {
-                    //                 map.addLayer(sublayer);
-                    //               } else {
-                    //                 map.removeLayer(sublayer);
-                    //               }
-                    //             });
-                    //           }}
-                    //         >
-                    //           {subLayers.map((sublayer: any) => (
-                    //             <FormControlLabel
-                    //               value={sublayer._name}
-                    //               control={<Radio color="primary" />}
-                    //               label={sublayer._name}
-                    //             />
-                    //           ))}
-                    //         </RadioGroup>
-                    //       </AccordionDetails>
-                    //     </Accordion>
-                    //   );
-                    case 'Metar':
-                      return (
-                        <Accordion
-                          key={`${layerObj.name} ${index}`}
-                          defaultExpanded={false}
-                          style={{ marginTop: 0 }}
-                        >
-                          <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls="panel1a-content"
-                            id="panel1a-header"
-                            style={{ height: 48, minHeight: 48 }}
+              <div key={index} className="">
+                <div className="leaycnt__header">
+                  <div className="leaycnt__img__area">
+                    <Image
+                      src="/images/avater.png"
+                      alt="logo"
+                      width={60}
+                      height={60}
+                      className="leaycnt__header__img"
+                    />
+                  </div>
+                  <div className="leaycnt__rgt">
+                    <h3>Map Layers</h3>
+                  </div>
+                </div>
+                <Accordion key={`${section} ${index}`} defaultExpanded>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                  >
+                    <Typography>{section}</Typography>
+                  </AccordionSummary>
+                  {groupedLayers[section]?.map((layerObj, index) => {
+                    switch (layerObj.name) {
+                      // case 'temperature':
+                      //   const groupLayer = layerObj.layer as L.LayerGroup;
+                      //   const subLayers = groupLayer.getLayers() as any;
+                      //   return (
+                      //     <Accordion
+                      //       key={`${layerObj.name} ${index}`}
+                      //       defaultExpanded={false}
+                      //       style={{ marginTop: 0 }}
+                      //     >
+                      //       <AccordionSummary
+                      //         expandIcon={<ExpandMoreIcon />}
+                      //         aria-controls="panel1a-content"
+                      //         id="panel1a-header"
+                      //         style={{ height: 48, minHeight: 48 }}
+                      //       >
+                      //         <FormControlLabel
+                      //           control={
+                      //             <Checkbox
+                      //               checked={layerObj.checked}
+                      //               name="checkedB"
+                      //               color="primary"
+                      //             />
+                      //           }
+                      //           label={layerObj.name}
+                      //           onClickCapture={(e) => {
+                      //             DomEvent.stopPropagation(e as any);
+                      //             onLayerClick(layerObj);
+                      //           }}
+                      //           onDoubleClickCapture={(e) => {
+                      //             DomEvent.stopPropagation(e as any);
+                      //           }}
+                      //         />
+                      //       </AccordionSummary>
+                      //       <AccordionDetails style={{ paddingBottom: 4 }}>
+                      //         <Slider style={{ marginLeft: 26 }}></Slider>
+                      //       </AccordionDetails>
+                      //       <AccordionDetails>
+                      //         {}
+                      //         <RadioGroup
+                      //           defaultValue={
+                      //             subLayers[subLayers.length - 1]._name
+                      //           }
+                      //           name="radio-buttons-group-metar"
+                      //           style={{ paddingLeft: 26 }}
+                      //           onChangeCapture={(e) => {
+                      //             subLayers.map((sublayer) => {
+                      //               if (sublayer._name === e.target.value) {
+                      //                 map.addLayer(sublayer);
+                      //               } else {
+                      //                 map.removeLayer(sublayer);
+                      //               }
+                      //             });
+                      //           }}
+                      //         >
+                      //           {subLayers.map((sublayer: any) => (
+                      //             <FormControlLabel
+                      //               value={sublayer._name}
+                      //               control={<Radio color="primary" />}
+                      //               label={sublayer._name}
+                      //             />
+                      //           ))}
+                      //         </RadioGroup>
+                      //       </AccordionDetails>
+                      //     </Accordion>
+                      //   );
+                      case 'Station Markers':
+                        return (
+                          <Accordion
+                            key={`${layerObj.name} ${index}`}
+                            defaultExpanded={false}
+                            style={{ marginTop: 0 }}
                           >
+                            <AccordionSummary
+                              expandIcon={<ExpandMoreIcon />}
+                              aria-controls="panel1a-content"
+                              id="panel1a-header"
+                              style={{ height: 48, minHeight: 48 }}
+                            >
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={layerObj.checked}
+                                    icon={<CircleUnchecked />}
+                                    checkedIcon={<CircleCheckedFilled />}
+                                    name="checkedB"
+                                    color="primary"
+                                    onClick={() => {
+                                      dispatch(
+                                        setMetar({
+                                          ...layerStatus,
+                                          visible: !layerStatus.visible,
+                                        }),
+                                      );
+                                    }}
+                                  />
+                                }
+                                label={layerObj.name}
+                                onClickCapture={(e) => {
+                                  onLayerClick(layerObj);
+                                }}
+                              />
+                            </AccordionSummary>
+                            <AccordionDetails style={{ paddingBottom: 4 }}>
+                              {/* <Slider
+                                key="metar-opacity"
+                                style={{ marginLeft: 26 }}
+                                min={0}
+                                max={1}
+                                step={0.1}
+                                value={0.7}
+                                size="small"
+                                defaultValue={0.7}
+                                aria-label="Opacity"
+                                valueLabelDisplay="auto"
+                              ></Slider> */}
+                            </AccordionDetails>
+                            <AccordionDetails>
+                              <RadioGroup
+                                defaultValue={layerStatus.markerType}
+                                name="radio-buttons-group-metar"
+                                style={{ paddingLeft: 26 }}
+                                onChangeCapture={(
+                                  e: ChangeEvent<HTMLInputElement>,
+                                ) => {
+                                  dispatch(
+                                    setMetar({
+                                      ...layerStatus,
+                                      markerType: e.target.value,
+                                    }),
+                                  );
+                                }}
+                              >
+                                <FormControlLabel
+                                  value={MetarMarkerTypes.flightCategory.value}
+                                  control={<Radio color="primary" />}
+                                  label={MetarMarkerTypes.flightCategory.text}
+                                />
+                                <FormControlLabel
+                                  value={MetarMarkerTypes.ceilingHeight.value}
+                                  control={<Radio color="primary" />}
+                                  label={MetarMarkerTypes.ceilingHeight.text}
+                                />
+                                <FormControlLabel
+                                  value={
+                                    MetarMarkerTypes.surfaceVisibility.value
+                                  }
+                                  control={<Radio color="primary" />}
+                                  label={
+                                    MetarMarkerTypes.surfaceVisibility.text
+                                  }
+                                />
+                                <FormControlLabel
+                                  value={
+                                    MetarMarkerTypes.surfaceWindSpeed.value
+                                  }
+                                  control={<Radio color="primary" />}
+                                  label={MetarMarkerTypes.surfaceWindSpeed.text}
+                                />
+                                <FormControlLabel
+                                  value={
+                                    MetarMarkerTypes.surfaceWindBarbs.value
+                                  }
+                                  control={<Radio color="primary" />}
+                                  label={MetarMarkerTypes.surfaceWindBarbs.text}
+                                />
+                                <FormControlLabel
+                                  value={MetarMarkerTypes.surfaceWindGust.value}
+                                  control={<Radio color="primary" />}
+                                  label={MetarMarkerTypes.surfaceWindGust.text}
+                                />
+                                <FormControlLabel
+                                  value={
+                                    MetarMarkerTypes.surfaceTemperature.value
+                                  }
+                                  control={<Radio color="primary" />}
+                                  label={
+                                    MetarMarkerTypes.surfaceTemperature.text
+                                  }
+                                />
+                                <FormControlLabel
+                                  value={MetarMarkerTypes.surfaceDewpoint.value}
+                                  control={<Radio color="primary" />}
+                                  label={MetarMarkerTypes.surfaceDewpoint.text}
+                                />
+                                <FormControlLabel
+                                  value={
+                                    MetarMarkerTypes.dewpointDepression.value
+                                  }
+                                  control={<Radio color="primary" />}
+                                  label={
+                                    MetarMarkerTypes.dewpointDepression.text
+                                  }
+                                />
+                                <FormControlLabel
+                                  value={MetarMarkerTypes.weather.value}
+                                  control={<Radio color="primary" />}
+                                  label={MetarMarkerTypes.weather.text}
+                                />
+                              </RadioGroup>
+                            </AccordionDetails>
+                          </Accordion>
+                        );
+                      default:
+                        return (
+                          <AccordionDetails key={`accDetails_${index}`}>
                             <FormControlLabel
                               control={
                                 <Checkbox
                                   checked={layerObj.checked}
+                                  icon={<CircleUnchecked />}
+                                  checkedIcon={<CircleCheckedFilled />}
                                   name="checkedB"
                                   color="primary"
-                                  onClick={() => {
-                                    dispatch(
-                                      setMetar({
-                                        ...layerStatus,
-                                        visible: !layerStatus.visible,
-                                      }),
-                                    );
-                                  }}
                                 />
                               }
                               label={layerObj.name}
-                              onClickCapture={() => onLayerClick(layerObj)}
-                            />
-                          </AccordionSummary>
-                          <AccordionDetails style={{ paddingBottom: 4 }}>
-                            <Slider style={{ marginLeft: 26 }}></Slider>
-                          </AccordionDetails>
-                          <AccordionDetails>
-                            <RadioGroup
-                              defaultValue={layerStatus.markerType}
-                              name="radio-buttons-group-metar"
-                              style={{ paddingLeft: 26 }}
-                              onChangeCapture={(
-                                e: ChangeEvent<HTMLInputElement>,
-                              ) => {
-                                dispatch(
-                                  setMetar({
-                                    ...layerStatus,
-                                    markerType: e.target.value,
-                                  }),
-                                );
+                              onClickCapture={(e) => {
+                                DomEvent.stopPropagation(e as any);
+                                onLayerClick(layerObj);
                               }}
-                            >
-                              <FormControlLabel
-                                value={MetarMarkerTypes.flightCategory.value}
-                                control={<Radio color="primary" />}
-                                label={MetarMarkerTypes.flightCategory.text}
-                              />
-                              <FormControlLabel
-                                value={MetarMarkerTypes.ceilingHeight.value}
-                                control={<Radio color="primary" />}
-                                label={MetarMarkerTypes.ceilingHeight.text}
-                              />
-                              <FormControlLabel
-                                value={MetarMarkerTypes.surfaceVisibility.value}
-                                control={<Radio color="primary" />}
-                                label={MetarMarkerTypes.surfaceVisibility.text}
-                              />
-                              <FormControlLabel
-                                value={MetarMarkerTypes.surfaceWindSpeed.value}
-                                control={<Radio color="primary" />}
-                                label={MetarMarkerTypes.surfaceWindSpeed.text}
-                              />
-                              <FormControlLabel
-                                value={MetarMarkerTypes.surfaceWindBarbs.value}
-                                control={<Radio color="primary" />}
-                                label={MetarMarkerTypes.surfaceWindBarbs.text}
-                              />
-                              <FormControlLabel
-                                value={MetarMarkerTypes.surfaceWindGust.value}
-                                control={<Radio color="primary" />}
-                                label={MetarMarkerTypes.surfaceWindGust.text}
-                              />
-                              <FormControlLabel
-                                value={
-                                  MetarMarkerTypes.surfaceTemperature.value
-                                }
-                                control={<Radio color="primary" />}
-                                label={MetarMarkerTypes.surfaceTemperature.text}
-                              />
-                              <FormControlLabel
-                                value={MetarMarkerTypes.surfaceDewpoint.value}
-                                control={<Radio color="primary" />}
-                                label={MetarMarkerTypes.surfaceDewpoint.text}
-                              />
-                              <FormControlLabel
-                                value={
-                                  MetarMarkerTypes.dewpointDepression.value
-                                }
-                                control={<Radio color="primary" />}
-                                label={MetarMarkerTypes.dewpointDepression.text}
-                              />
-                              <FormControlLabel
-                                value={MetarMarkerTypes.weather.value}
-                                control={<Radio color="primary" />}
-                                label={MetarMarkerTypes.weather.text}
-                              />
-                            </RadioGroup>
+                              onDoubleClickCapture={(e) => {
+                                DomEvent.stopPropagation(e as any);
+                              }}
+                            />
                           </AccordionDetails>
-                        </Accordion>
-                      );
-                    default:
-                      return (
-                        <AccordionDetails key={`accDetails_${index}`}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={layerObj.checked}
-                                name="checkedB"
-                                color="primary"
-                              />
-                            }
-                            label={layerObj.name}
-                            onClickCapture={(e) => {
-                              DomEvent.stopPropagation(e as any);
-                              onLayerClick(layerObj);
-                            }}
-                            onDoubleClickCapture={(e) => {
-                              DomEvent.stopPropagation(e as any);
-                            }}
-                          />
-                        </AccordionDetails>
-                      );
-                  }
-                })}
-              </Accordion>
+                        );
+                    }
+                  })}
+                </Accordion>
+              </div>
             ))}
         </div>
         {children}

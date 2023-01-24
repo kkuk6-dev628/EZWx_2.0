@@ -14,26 +14,46 @@ export class UserService {
     private certificationsRepository: Repository<Certification>,
   ) {}
 
-  create(dto: CreateUserDto) {
+  async create(dto: CreateUserDto) {
     const { certifications, ...user } = dto;
 
-    const mapcertificationss = certifications.map((certificate) =>
+    const mapcertifications = certifications.map((certificate) =>
       this.certificationsRepository.create(certificate),
     );
 
     const newUser = this.userRepository.create(user);
-    newUser.certifications = mapcertificationss;
+    newUser.displayName = user.firstname + ' ' + user.lastname;
+    newUser.certifications = mapcertifications;
 
-    console.log('newUser is ', newUser);
-
-    return this.userRepository.save(newUser);
+    return await this.userRepository.save(newUser);
   }
 
-  findOne(params: FindOneOptions<User> = {}) {
-    return this.userRepository.findOne(params);
+  async findOne(params: FindOneOptions<User> = {}) {
+    return await this.userRepository.findOne(params);
   }
 
-  findAll(params: FindManyOptions<User> = {}) {
-    return this.userRepository.find(params);
+  async findAll(params: FindManyOptions<User> = {}) {
+    return await this.userRepository.find(params);
+  }
+
+  async update(id: any, updateUser: any) {
+    const findUser = await this.userRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        certifications: true,
+      },
+    });
+
+    if (findUser !== undefined) {
+      for (const key in updateUser) {
+        findUser[key] = updateUser[key];
+      }
+
+      return await this.userRepository.save(findUser);
+    } else {
+      return "user doesn't exists";
+    }
   }
 }

@@ -68,6 +68,7 @@ function CollapsibleBar() {
   return (
     <div className="collps">
       <Slider
+        key="time-range-slider"
         aria-label="Time Slider"
         defaultValue={timeToValue(new Date())}
         max={84 * 12}
