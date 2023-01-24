@@ -93,7 +93,7 @@
     background-color: var(--color-primary);
     p{
       color: var(--color-white);
-      font-size: 13px;
+      // font-size: 13px;
       font-weight: 600;
     }
   }
@@ -135,6 +135,11 @@
       background: inherit!important;
     }
   }
+  
+  .MuiTypography-body1{
+    font-size: 13px;
+  }
+
   .MuiSlider-thumb{
     background-color: white;
     width: 20px;
