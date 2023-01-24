@@ -619,9 +619,9 @@ const MetarsLayer = () => {
       //if wxString is not set, then get marker's icon from wind speed
       if (
         (feature.properties.wind_speed_kt &&
-          feature.properties.wind_speed_kt > 15) ||
+          feature.properties.wind_speed_kt > 20) ||
         (feature.properties.wind_gust_kt &&
-          feature.properties.wind_gust_kt > 20)
+          feature.properties.wind_gust_kt > 25)
       ) {
         weatherIconClass = 'fas fa-wind';
       } else {

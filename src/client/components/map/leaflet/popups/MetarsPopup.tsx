@@ -102,6 +102,15 @@ const MetarsPopup = ({
             <span>{feature.properties.wind_dir_degrees}&deg;</span>
           </Typography>
         )}
+      {(feature.properties.wind_dir_degrees === null ||
+        feature.properties.wind_dir_degrees === 0) &&
+        feature.properties.wind_speed_kt !== 0 &&
+        feature.properties.wind_speed_kt !== null && (
+          <Typography variant="body2" style={{ margin: 3 }}>
+            <b>Wind direction: </b>
+            <span>Variable</span>
+          </Typography>
+        )}
       {feature.properties.wind_gust_kt != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Wind gust: </b>
