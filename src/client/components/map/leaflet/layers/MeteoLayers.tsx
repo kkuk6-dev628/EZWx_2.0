@@ -126,9 +126,6 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         if (features.length >= maxLayers) {
           return;
         }
-        if (layer.pickable === false) {
-          return;
-        }
         //@ts-ignore
         layer.layer.eachLayer((l: any) => {
           if (features.length >= maxLayers) {

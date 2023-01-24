@@ -354,7 +354,7 @@ const LayerControl = ({
                               />
                             </AccordionSummary>
                             <AccordionDetails style={{ paddingBottom: 4 }}>
-                              <Slider
+                              {/* <Slider
                                 key="metar-opacity"
                                 style={{ marginLeft: 26 }}
                                 min={0}
@@ -365,7 +365,7 @@ const LayerControl = ({
                                 defaultValue={0.7}
                                 aria-label="Opacity"
                                 valueLabelDisplay="auto"
-                              ></Slider>
+                              ></Slider> */}
                             </AccordionDetails>
                             <AccordionDetails>
                               <RadioGroup
@@ -407,7 +407,7 @@ const LayerControl = ({
                                     MetarMarkerTypes.surfaceWindSpeed.value
                                   }
                                   control={<Radio color="primary" />}
-                                  label={MarkerTypes.surfaceWindSpeed.text}
+                                  label={MetarMarkerTypes.surfaceWindSpeed.text}
                                 />
                                 <FormControlLabel
                                   value={
