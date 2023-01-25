@@ -92,6 +92,7 @@ const LayerControl = ({
   };
 
   const onLayerClick = (layerObj: ILayerObj) => {
+    map.closePopup();
     if (checkEmptyLayer(layerObj.layer)) {
       toast.error(`No ${layerObj.name}'s data displayed`, {
         position: 'top-right',
@@ -375,6 +376,7 @@ const LayerControl = ({
                                 onChangeCapture={(
                                   e: ChangeEvent<HTMLInputElement>,
                                 ) => {
+                                  map.closePopup();
                                   dispatch(
                                     setMetar({
                                       ...layerStatus,

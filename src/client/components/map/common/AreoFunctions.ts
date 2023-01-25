@@ -169,20 +169,188 @@ export const getMetarVisibilityCategory = (
   if (visibility === null || !isFinite(visibility)) {
     return [];
   }
-  const visibilityMinimumsValues = Object.values(personalMinimums).map(
-    (val: PersonalMinimumItem) => val.visibility,
-  );
-
-  let visibilityMinimum = visibilityMinimumsValues.length - 1;
-  for (let i = 0; i < visibilityMinimumsValues.length; i++) {
-    if (visibilityMinimumsValues[i] >= visibility) {
-      visibilityMinimum = i - 1;
-      break;
-    }
+  let visibilityMinimum = personalMinimums.VFR;
+  if (visibility < personalMinimums.IFR.visibility) {
+    visibilityMinimum = personalMinimums.LIFR;
+  } else if (
+    visibility >= personalMinimums.IFR.visibility &&
+    visibility < personalMinimums.MVFR.visibility
+  ) {
+    visibilityMinimum = personalMinimums.IFR;
+  } else if (
+    visibility >= personalMinimums.MVFR.visibility &&
+    visibility <= personalMinimums.VFR.visibility
+  ) {
+    visibilityMinimum = personalMinimums.MVFR;
+  } else if (visibility > personalMinimums.VFR.visibility) {
+    visibilityMinimum = personalMinimums.VFR;
   }
-  const cat = Object.keys(personalMinimums)[visibilityMinimum];
-  const color = personalMinimums[cat].color;
-  return [cat, color, visibilityMinimum];
+
+  return [visibilityMinimum.cat, visibilityMinimum.color];
+};
+
+export const toTitleCase = (str) => {
+  return str.replace(/\w\S*/g, function (txt: string) {
+    return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
+  });
+};
+
+export const visibilityMileToMeter = (mile: number): number => {
+  let meter = 9999;
+  switch (mile) {
+    case 0:
+      meter = 0;
+      break;
+    case 0.13:
+      meter = 200;
+      break;
+    case 0.25:
+      meter = 400;
+      break;
+    case 0.38:
+      meter = 600;
+      break;
+    case 0.5:
+      meter = 800;
+      break;
+    case 0.63:
+      meter = 1000;
+      break;
+    case 0.75:
+      meter = 1200;
+      break;
+    case 0.88:
+      meter = 1400;
+      break;
+    case 1:
+      meter = 1600;
+      break;
+    case 1.13:
+      meter = 1800;
+      break;
+    case 1.25:
+      meter = 2000;
+      break;
+    case 1.38:
+      meter = 2200;
+      break;
+    case 1.5:
+      meter = 2400;
+      break;
+    case 1.63:
+      meter = 2600;
+      break;
+    case 1.75:
+      meter = 2800;
+      break;
+    case 1.88:
+      meter = 3000;
+      break;
+    case 2:
+      meter = 3200;
+      break;
+    case 2.25:
+      meter = 3600;
+      break;
+    case 2.5:
+      meter = 4000;
+      break;
+    case 2.75:
+      meter = 4400;
+      break;
+    case 3:
+      meter = 4800;
+      break;
+    case 3.5:
+      meter = 5000;
+      break;
+    case 4:
+      meter = 7000;
+      break;
+    case 5:
+      meter = 8000;
+      break;
+    case 6:
+      meter = 9000;
+      break;
+  }
+  return meter;
+};
+
+export const visibilityMileToFraction = (mile: number): string => {
+  let fraction = mile.toString();
+  switch (mile) {
+    case 0:
+      fraction = '0';
+      break;
+    case 0.06:
+      fraction = '1/16';
+      break;
+    case 0.13:
+      fraction = '1/8';
+      break;
+    case 0.25:
+      fraction = '1/4';
+      break;
+    case 0.38:
+      fraction = '3/8';
+      break;
+    case 0.5:
+      fraction = '1/2';
+      break;
+    case 0.63:
+      fraction = '5/8';
+      break;
+    case 0.75:
+      fraction = '3/4';
+      break;
+    case 0.88:
+      fraction = '7/8';
+      break;
+    case 1:
+      fraction = '1';
+      break;
+    case 1.13:
+      fraction = '1 1/8';
+      break;
+    case 1.25:
+      fraction = '1 1/4';
+      break;
+    case 1.38:
+      fraction = '1 3/8';
+      break;
+    case 1.5:
+      fraction = '1 1/2';
+      break;
+    case 1.63:
+      fraction = '1 5/8';
+      break;
+    case 1.75:
+      fraction = '1 3/4';
+      break;
+    case 1.88:
+      fraction = '1 7/8';
+      break;
+    case 2:
+      fraction = '2';
+      break;
+    case 2.25:
+      fraction = '2 1/4';
+      break;
+    case 2.5:
+      fraction = '2 1/2';
+      break;
+    case 2.75:
+      fraction = '2 3/4';
+      break;
+    case 3:
+      fraction = '3';
+      break;
+    case 3.5:
+      fraction = '3 1/2';
+      break;
+  }
+  return fraction;
 };
 
 export const getMetarCeilingCategory = (
@@ -192,20 +360,24 @@ export const getMetarCeilingCategory = (
   if (ceiling === null || !isFinite(ceiling)) {
     return [undefined, '#000', Infinity];
   }
-  const ceilingMinimumsValues = Object.values(personalMinimums).map(
-    (val: PersonalMinimumItem) => val.ceiling,
-  );
-
-  let ceilingMinimum = ceilingMinimumsValues.length - 1;
-  for (let i = 0; i < ceilingMinimumsValues.length; i++) {
-    if (ceilingMinimumsValues[i] >= ceiling) {
-      ceilingMinimum = i - 1;
-      break;
-    }
+  let ceilingMinimum = personalMinimums.VFR;
+  if (ceiling < personalMinimums.IFR.ceiling) {
+    ceilingMinimum = personalMinimums.LIFR;
+  } else if (
+    ceiling >= personalMinimums.IFR.ceiling &&
+    ceiling < personalMinimums.MVFR.ceiling
+  ) {
+    ceilingMinimum = personalMinimums.IFR;
+  } else if (
+    ceiling >= personalMinimums.MVFR.ceiling &&
+    ceiling <= personalMinimums.VFR.ceiling
+  ) {
+    ceilingMinimum = personalMinimums.MVFR;
+  } else if (ceiling > personalMinimums.VFR.ceiling) {
+    ceilingMinimum = personalMinimums.VFR;
   }
-  const cat = Object.keys(personalMinimums)[ceilingMinimum];
-  const color = personalMinimums[cat].color;
-  return [cat, color, ceilingMinimum];
+
+  return [ceilingMinimum.cat, ceilingMinimum.color];
 };
 
 export const getLowestCeiling = (
@@ -289,11 +461,11 @@ export const getWorstSkyCondition = (skyConditions: SkyCondition[]): string => {
   }
 
   const skySkyConditions = skyConditions.filter((skyCondition) => {
-    return skyCondition.skyCover === 'SKY';
+    return skyCondition.skyCover === 'SKC';
   });
 
   if (skySkyConditions.length > 0) {
-    return 'SKY';
+    return 'SKC';
   }
 
   const clrSkyConditions = skyConditions.filter((skyCondition) => {
@@ -305,40 +477,6 @@ export const getWorstSkyCondition = (skyConditions: SkyCondition[]): string => {
   }
 };
 
-export const getSkyCeilingValues = (
-  feature: GeoJSON.Feature,
-  markerType,
-): any[] => {
-  let skyMin = -1;
-  const skyValues = Object.keys(MetarSkyValuesToString);
-  let ceiling;
-  let ceilingPos = 0;
-  for (let i = 1; i <= 6; i++) {
-    const sky = feature.properties[`sky_cover_${i}`];
-    const index = skyValues.indexOf(sky);
-
-    // get ceiling height values
-    if (index > -1 && index > skyMin) {
-      skyMin = index;
-      // consider only BKN, OVC and OVX
-      if (index >= 5) ceilingPos = i;
-    }
-  }
-  const sky = skyValues[skyMin];
-  if (skyMin === 7) {
-    ceiling = feature.properties.vert_vis_ft;
-  } else {
-    ceiling = feature.properties[`cloud_base_ft_agl_${ceilingPos}`];
-  }
-  // if (
-  //   feature.properties.vert_vis_ft &&
-  //   !isNaN(feature.properties.vert_vis_ft)
-  // ) {
-  //   sky = 'OVX';
-  //   ceiling = feature.properties.vert_vis_ft;
-  // }
-  return [sky, ceiling];
-};
 export const getMetarDecodedWxString = (wxString: string): string => {
   let result = wxString;
   switch (wxString) {

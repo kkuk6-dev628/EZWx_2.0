@@ -13,10 +13,14 @@
 
   function addToCache(request, response) {
     if (!response.ok && response.type !== 'opaque') return;
+    if (!(request.url.indexOf('http') === 0)) return;
+    // for development disable caching javascript, next, webpack
+    // if (response.headers.get('Content-Type').indexOf('javascript') !== -1) return;
+    if (request.url.indexOf('_next') !== -1) return;
+    if (request.url.indexOf('webpack') !== -1) return;
 
     var copy = response.clone();
     caches.open(version).then(function (cache) {
-      if (!(request.url.indexOf('http') === 0)) return;
       cache.put(request, copy);
     });
   }

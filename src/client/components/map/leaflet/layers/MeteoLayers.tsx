@@ -35,6 +35,7 @@ import MetarsPopup from '../popups/MetarsPopup';
 import { useSelector } from 'react-redux';
 import { selectMetar } from '../../../../store/layers/LayerControl';
 import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
+import axios from 'axios';
 
 const maxLayers = 6;
 
@@ -44,6 +45,47 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
   const debugLayerGroupRef = useRef(null);
   const metarLayerStatus = useSelector(selectMetar);
   const personalMinimums = useSelector(selectPersonalMinimums);
+  const [airportData, setAirportData] = useState();
+  useEffect(() => {
+    fetchAirports();
+  }, []);
+
+  const fetchAirports = () => {
+    const params = {
+      maxFeatures: 4000,
+      request: 'GetFeature',
+      service: 'WFS',
+      typeName: 'EZWxBrief:airport',
+      version: '1.0.0',
+      srsName: 'EPSG:4326',
+      propertyName: 'icaoid,name',
+      cql_filter: "icaoid <> ''",
+      outputFormat: 'application/json',
+      v: 1,
+    } as any;
+    // if (abortController) {
+    //   abortController.abort();
+    // }
+    // setAbortController(new AbortController());
+    axios
+      .get('https://eztile4.ezwxbrief.com/geoserver/EZWxBrief/ows', {
+        params: params,
+      })
+      .then((data) => {
+        if (typeof data.data === 'string') {
+          console.log('Aireport: Invalid json data!', data.data);
+        } else {
+          const airports = {};
+          data.data.features.forEach((feature) => {
+            airports[feature.properties.icaoid] = feature.properties.name;
+          });
+          setAirportData(airports as any);
+        }
+      })
+      .catch((reason) => {
+        console.log('Aireport', reason);
+      });
+  };
 
   const showPopup = (layer: L.GeoJSON, latlng: LatLng): void => {
     if (typeof layer.setStyle === 'function') {
@@ -89,7 +131,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         popup = (
           <MetarsPopup
             layer={layer as any}
-            markerType={metarLayerStatus.markerType}
+            airportsData={airportData}
             personalMinimums={personalMinimums}
           ></MetarsPopup>
         );

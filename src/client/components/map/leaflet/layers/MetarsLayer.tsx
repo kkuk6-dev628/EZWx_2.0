@@ -7,9 +7,9 @@ import {
   addLeadingZeroes,
   getCacheVersion,
   getLowestCeiling,
+  getMetarCeilingCategory,
   getMetarVisibilityCategory,
   getQueryTime,
-  getSkyCeilingValues,
   getSkyConditions,
   getWorstSkyCondition,
 } from '../../common/AreoFunctions';
@@ -37,12 +37,8 @@ export const getFlightCategoryIconUrl = (
     ceiling = feature.properties.vert_vis_ft;
   } else if (skyConditions.length > 0) {
     const skyCondition = getLowestCeiling(skyConditions);
-    if (skyCondition) {
-      sky = skyCondition.skyCover;
-      ceiling = skyCondition.cloudBase;
-    } else {
-      sky = getWorstSkyCondition(skyConditions);
-    }
+    if (skyCondition) ceiling = skyCondition.cloudBase;
+    sky = getWorstSkyCondition(skyConditions);
   }
   let flightCategory = feature.properties.flight_category;
   if (!flightCategory) {
@@ -63,13 +59,11 @@ const MetarsLayer = () => {
   const [serverFilter, setServerFilter] = useState(defaultServerFilter);
   const wfsRef = useRef(null);
   const [filteredData, setFilteredData] = useState();
-  const [aireportData, setAirportData] = useState();
   const [cacheVersion, setCacheVersion] = useState(
     getCacheVersion(cacheUpdateInterval),
   );
 
   useEffect(() => {
-    console.log(layerStatus);
     const v = getCacheVersion(cacheUpdateInterval);
     if (v !== cacheVersion) {
       setCacheVersion(v);
@@ -82,43 +76,6 @@ const MetarsLayer = () => {
         break;
     }
   }, [layerStatus.markerType]);
-
-  useEffect(() => {
-    fetchAirports();
-  }, []);
-
-  const fetchAirports = () => {
-    const params = {
-      maxFeatures: 4000,
-      request: 'GetFeature',
-      service: 'WFS',
-      typeName: 'EZWxBrief:airport',
-      version: '1.0.0',
-      srsName: 'EPSG:4326',
-      propertyName: 'icaoid, name',
-      cql_filter: "icaoid <> ''",
-      outputFormat: 'application/json',
-      v: 1,
-    } as any;
-    // if (abortController) {
-    //   abortController.abort();
-    // }
-    // setAbortController(new AbortController());
-    axios
-      .get('https://eztile4.ezwxbrief.com/geoserver/EZWxBrief/ows', {
-        params: params,
-      })
-      .then((data) => {
-        if (typeof data.data === 'string') {
-          console.log('Aireport: Invalid json data!', data.data);
-        } else {
-          setAirportData(data.data);
-        }
-      })
-      .catch((reason) => {
-        console.log('Aireport', reason);
-      });
-  };
 
   const getFlightCatMarker = (
     feature: GeoJSON.Feature,
@@ -142,28 +99,26 @@ const MetarsLayer = () => {
   };
 
   const getCeilingHeightMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
-    // eslint-disable-next-line prefer-const
-    let { iconUrl, ceiling } = getFlightCategoryIconUrl(feature);
-    if (ceiling == undefined || !isFinite(ceiling)) return;
+    const skyConditions = getSkyConditions(feature);
+    const skyCondition = getLowestCeiling(skyConditions);
+    if (skyCondition == null) return;
+    const ceiling = skyCondition.cloudBase;
     const ceilingAmount = addLeadingZeroes(ceiling / 100, 3);
+    const worstSkyCondition = getWorstSkyCondition(skyConditions);
+    let iconUrl = '';
     if (layerStatus.usePersonalMinimums) {
     } else {
-      if (ceiling < 500) {
-        iconUrl = '/icons/metar/LIFR-OVC.png';
-      } else if (ceiling >= 500 && ceiling < 1000) {
-        iconUrl = '/icons/metar/IFR-OVC.png';
-      } else if (ceiling >= 1000 && ceiling <= 3000) {
-        iconUrl = '/icons/metar/MVFR-OVC.png';
-      } else if (ceiling > 3000) {
-        iconUrl = '/icons/metar/VFR-OVC.png';
-      }
+      const [cat] = getMetarCeilingCategory(ceiling, personalMinimums);
+      iconUrl = `/icons/metar/${cat}-${worstSkyCondition}.png`;
     }
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-ceiling-icon',
         html: ReactDOMServer.renderToString(
           <>
-            <div style={{ display: 'inline', verticalAlign: -7 }}>
+            <div
+              style={{ display: 'inline', verticalAlign: -7, marginLeft: -4 }}
+            >
               <Image src={iconUrl} alt={''} width={20} height={20} />
             </div>
             <div
@@ -208,7 +163,9 @@ const MetarsLayer = () => {
         className: 'metar-ceiling-icon',
         html: ReactDOMServer.renderToString(
           <>
-            <div style={{ display: 'inline', verticalAlign: -7 }}>
+            <div
+              style={{ display: 'inline', verticalAlign: -7, marginLeft: -4 }}
+            >
               <Image src={iconUrl} alt={''} width={20} height={20} />
             </div>
             <div
@@ -626,10 +583,7 @@ const MetarsLayer = () => {
         weatherIconClass = 'fas fa-wind';
       } else {
         //get icon from worst sky condition
-        [condition] = getSkyCeilingValues(
-          feature,
-          MetarMarkerTypes.flightCategory.value,
-        );
+        condition = getWorstSkyCondition(getSkyConditions(feature));
 
         worstSkyConditionFetched = true;
         switch (condition) {
@@ -736,10 +690,7 @@ const MetarsLayer = () => {
         case 'TS FZRA FG':
         case 'TS FZRA HZ':
           if (!worstSkyConditionFetched) {
-            [condition] = getSkyCeilingValues(
-              feature,
-              MetarMarkerTypes.ceilingHeight.value,
-            );
+            condition = getWorstSkyCondition(getSkyConditions(feature));
           }
           if (condition === 'SCT' || condition === 'FEW') {
             weatherIconClass = isDayTime
@@ -804,10 +755,7 @@ const MetarsLayer = () => {
           } else {
             //get icon from worst sky condition
             if (!worstSkyConditionFetched) {
-              [condition] = getSkyCeilingValues(
-                feature,
-                MetarMarkerTypes.ceilingHeight.value,
-              );
+              condition = getWorstSkyCondition(getSkyConditions(feature));
             }
             switch (condition) {
               case 'SKC':

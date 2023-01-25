@@ -5,6 +5,7 @@ export interface PersonalMinimumItem {
   color: string;
   ceiling: number;
   visibility: number;
+  cat: string;
 }
 
 export interface PersonalMinimums {
@@ -20,10 +21,10 @@ export interface UserSettingsState {
 
 const initialState: UserSettingsState = {
   personalMinimumsState: {
-    LIFR: { color: '#f0f', ceiling: 0, visibility: 0 },
-    IFR: { color: '#f00', ceiling: 500, visibility: 1 },
-    MVFR: { color: '#00f', ceiling: 1000, visibility: 3 },
-    VFR: { color: '#008300', ceiling: 3000, visibility: 5 },
+    LIFR: { cat: 'LIFR', color: '#f0f', ceiling: 0, visibility: 0 },
+    IFR: { cat: 'IFR', color: '#f00', ceiling: 500, visibility: 1 },
+    MVFR: { cat: 'MVFR', color: '#00f', ceiling: 1000, visibility: 3 },
+    VFR: { cat: 'VFR', color: '#008300', ceiling: 3000, visibility: 5 },
   },
 };
 

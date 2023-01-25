@@ -3,21 +3,26 @@ import Image from 'next/image';
 import { PersonalMinimums } from '../../../../store/user/UserSettings';
 import { MetarSkyValuesToString } from '../../common/AreoConstants';
 import {
+  addLeadingZeroes,
   convertTimeFormat,
   getMetarCeilingCategory,
   getMetarDecodedWxString,
   getMetarVisibilityCategory,
   getSkyConditions,
+  toTitleCase,
+  visibilityMileToFraction,
+  visibilityMileToMeter,
 } from '../../common/AreoFunctions';
 import { getFlightCategoryIconUrl } from '../layers/MetarsLayer';
 
 const MetarsPopup = ({
   layer,
   personalMinimums,
+  airportsData,
 }: {
   layer: L.Marker;
-  markerType: string;
   personalMinimums: PersonalMinimums;
+  airportsData: any;
 }) => {
   const feature = layer.feature;
   const skyConditions = getSkyConditions(layer.feature);
@@ -31,6 +36,19 @@ const MetarsPopup = ({
     return a.cloudBase > b.cloudBase ? 1 : -1;
   });
   const weatherString = getMetarDecodedWxString(feature.properties.wx_string);
+  const airportName = airportsData[feature.properties.station_id]
+    ? toTitleCase(airportsData[feature.properties.station_id])
+    : null;
+  const visibility = true
+    ? `${visibilityMileToFraction(
+        feature.properties.visibility_statute_mi,
+      )} statute ${
+        feature.properties.visibility_statute_mi <= 1 ? 'mile' : 'miles'
+      }`
+    : `${visibilityMileToMeter(
+        feature.properties.visibility_statute_mi,
+      )} meters`;
+
   return (
     <>
       <div style={{ display: 'flex' }}>
@@ -38,6 +56,12 @@ const MetarsPopup = ({
         &nbsp;<b>{feature.properties.station_id}&nbsp;Surface observation</b>
       </div>
       <Divider></Divider>
+      {airportName && (
+        <Typography variant="body2" style={{ margin: 3 }}>
+          <b>Airport name: </b>
+          <span>{airportName}</span>
+        </Typography>
+      )}
       <Typography variant="body2" style={{ margin: 3 }}>
         <b>Time: </b> {convertTimeFormat(feature.properties.observation_time)}
       </Typography>
@@ -50,13 +74,14 @@ const MetarsPopup = ({
       {feature.properties.visibility_statute_mi != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Visibility: </b>
-          <span style={{ color: visibilityColor }}>
-            {feature.properties.visibility_statute_mi} statute miles
-          </span>
+          <span style={{ color: visibilityColor }}>{visibility}</span>
         </Typography>
       )}
       {skyConditionsAsc.length > 0 && (
-        <div style={{ display: 'flex' }}>
+        <div
+          style={{ display: 'flex', lineHeight: 1, color: 'black' }}
+          className="MuiTypography-body2"
+        >
           <div>
             <p style={{ margin: 3 }}>
               <b>Clouds: </b>
@@ -65,14 +90,12 @@ const MetarsPopup = ({
           <div style={{ margin: 3 }}>
             {skyConditionsAsc.map((skyCondition) => {
               return (
-                <>
-                  <span>
-                    {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
-                    {skyCondition.cloudBase}{' '}
-                    {skyCondition.skyCover !== 'CLR' && 'feet'}
-                  </span>
-                  <br />
-                </>
+                <div key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`}>
+                  {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
+                  {skyCondition.cloudBase}{' '}
+                  {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) ===
+                    false && 'feet'}
+                </div>
               );
             })}
           </div>
@@ -94,12 +117,15 @@ const MetarsPopup = ({
           </span>
         </Typography>
       )}
-      {feature.properties.wind_dir_degrees != null &&
+      {feature.properties.wind_dir_degrees !== null &&
+        feature.properties.wind_dir_degrees !== 0 &&
         feature.properties.wind_speed_kt !== 0 &&
         feature.properties.wind_speed_kt !== null && (
           <Typography variant="body2" style={{ margin: 3 }}>
             <b>Wind direction: </b>
-            <span>{feature.properties.wind_dir_degrees}&deg;</span>
+            <span>
+              {addLeadingZeroes(feature.properties.wind_dir_degrees, 3)}&deg;
+            </span>
           </Typography>
         )}
       {(feature.properties.wind_dir_degrees === null ||

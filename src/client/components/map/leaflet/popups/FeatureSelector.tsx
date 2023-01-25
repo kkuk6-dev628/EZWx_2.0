@@ -214,11 +214,12 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
                 {layer.feature.geometry.type === 'Point' && (
                   <div
                     style={{
-                      width: 48,
+                      width: 52,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       transform: 'none',
+                      marginRight: 4,
                     }}
                     className="feature-selector-item-icon"
                   >
