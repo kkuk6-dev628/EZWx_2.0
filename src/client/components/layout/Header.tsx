@@ -108,16 +108,35 @@ export default function Header() {
   const [mapMenu, setMapMenu] = useState(false);
   const [isShowProfileModal, setIsShowProfileModal] = useState(false);
   const [activeResponsiveMenu, setActiveResponsiveMenu] = useState(false);
+  const [isUserLoginUser, setIsUserLoginUser] = useState(false);
   useEffect(() => {
     if (pathname === '/try-ezwxbrief' || pathname === '/imagery') {
       setMapMenu(true);
     } else {
       setMapMenu(false);
     }
+    if (pathname === '/profile') {
+      setIsUserLoginUser(true);
+    } else if (pathname === '/home') {
+      if (localStorage.getItem('auth')) {
+        setIsUserLoginUser(true);
+      } else {
+        setIsUserLoginUser(false);
+      }
+    }
   }, [pathname]);
   const handleActiveMenu = (id) => {
     setActiveMenu(id);
   };
+
+  useEffect(() => {
+    if (localStorage.getItem('auth')) {
+      // console.log('auth', localStorage.getItem('auth'));
+      setIsUserLoginUser(true);
+    } else {
+      setIsUserLoginUser(false);
+    }
+  }, []);
 
   // sticky header
   const [sticky, setSticky] = useState(false);
@@ -134,6 +153,9 @@ export default function Header() {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+  const handleProfileModal = () => {
+    setIsShowProfileModal(!isShowProfileModal);
+  };
   return (
     <div className={`header ${sticky && 'header--fixed'}`}>
       <div className="container">
@@ -223,7 +245,7 @@ export default function Header() {
                   </button>
                 )}
               </Link>
-              {mapMenu ? (
+              {isUserLoginUser ? (
                 <div className="header__icon__area">
                   <button className="header__rgt__btn header__rgt__btn--icon btn">
                     <SvgWarn />
@@ -235,7 +257,7 @@ export default function Header() {
                     <SvgSetting />
                   </button>
                   <button
-                    onClick={() => setIsShowProfileModal(!isShowProfileModal)}
+                    onClick={handleProfileModal}
                     className="header__rgt__btn header__rgt__btn--icon btn"
                   >
                     <SvgProfile />
@@ -250,7 +272,12 @@ export default function Header() {
             </div>
           </div>
         </div>
-        {isShowProfileModal && <ProfileModal />}
+        {isShowProfileModal && (
+          <ProfileModal
+            setIsUserLoginUser={setIsUserLoginUser}
+            handleProfileModal={handleProfileModal}
+          />
+        )}
       </div>
       <ResponsiveMenu
         activeResponsiveMenu={activeResponsiveMenu}
