@@ -191,7 +191,7 @@ export const getMetarVisibilityCategory = (
 
 export const toTitleCase = (str) => {
   return str
-    ? str.replace(/\w\S[^\/\s]*/g, function (txt: string) {
+    ? str.replace(/\w\S[^\-\/\s]*/g, function (txt: string) {
         return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
       })
     : null;
@@ -389,7 +389,11 @@ export const getLowestCeiling = (
   skyConditions: SkyCondition[],
 ): SkyCondition => {
   skyConditions = skyConditions.filter((skyCondition) => {
-    return skyCondition.skyCover === 'OVC' || skyCondition.skyCover === 'BKN';
+    return (
+      skyCondition.skyCover === 'OVC' ||
+      skyCondition.skyCover === 'OVX' ||
+      skyCondition.skyCover === 'BKN'
+    );
   });
   if (skyConditions && skyConditions.length > 0) {
     const skyCondition = skyConditions.reduce(function (acc, loc) {
@@ -410,10 +414,20 @@ export const getSkyConditions = (feature: GeoJSON.Feature): SkyCondition[] => {
           cloudBase: feature.properties.vert_vis_ft,
         });
       } else {
-        skyConditions.push({
-          skyCover: feature.properties[`sky_cover_${i}`],
-          cloudBase: feature.properties[`cloud_base_ft_agl_${i}`],
-        });
+        if (
+          feature.properties[`sky_cover_${i}`] === 'CLR' &&
+          feature.properties.auto == null
+        ) {
+          skyConditions.push({
+            skyCover: 'SKC',
+            cloudBase: feature.properties[`cloud_base_ft_agl_${i}`],
+          });
+        } else {
+          skyConditions.push({
+            skyCover: feature.properties[`sky_cover_${i}`],
+            cloudBase: feature.properties[`cloud_base_ft_agl_${i}`],
+          });
+        }
       }
     }
   }

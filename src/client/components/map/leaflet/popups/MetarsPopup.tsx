@@ -44,16 +44,18 @@ const MetarsPopup = ({
       airportsData.faaid[feature.properties.station_id.slice(1)],
     );
   }
-  const visibility = true
-    ? `${visibilityMileToFraction(
-        feature.properties.visibility_statute_mi,
-      )} statute ${
-        feature.properties.visibility_statute_mi <= 1 ? 'mile' : 'miles'
+  let vimi = feature.properties.visibility_statute_mi;
+  if (vimi >= 4) {
+    vimi = Math.ceil(vimi);
+  }
+  let visibility = true
+    ? `${visibilityMileToFraction(vimi)} statute ${
+        vimi <= 1 ? 'mile' : 'miles'
       }`
-    : `${visibilityMileToMeter(
-        feature.properties.visibility_statute_mi,
-      )} meters`;
-
+    : `${visibilityMileToMeter(vimi)} meters`;
+  if (vimi === 0.25 && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
+    visibility = 'Less than ' + visibility;
+  }
   return (
     <>
       <div style={{ display: 'flex' }}>

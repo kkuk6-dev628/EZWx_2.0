@@ -18,8 +18,12 @@ import { selectMetar } from '../../../../store/layers/LayerControl';
 import { useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
 import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
-import { MetarMarkerTypes } from '../../common/AreoConstants';
+import {
+  MetarMarkerTypes,
+  timeSliderInterval,
+} from '../../common/AreoConstants';
 import axios from 'axios';
+import { feature } from '@turf/helpers';
 
 const defaultServerFilter = `observation_time DURING ${getQueryTime(
   new Date(),
@@ -45,6 +49,9 @@ export const getFlightCategoryIconUrl = (
     flightCategory = 'Black';
   }
   let iconUrl = '/icons/metar/MISSING.png';
+  if (sky === 'CLR' && feature.properties.auto == null) {
+    sky = 'SKC';
+  }
   if (flightCategory && sky) {
     iconUrl = `/icons/metar/${flightCategory}-${sky}.png`;
   }
@@ -59,6 +66,7 @@ const MetarsLayer = () => {
   const [serverFilter, setServerFilter] = useState(defaultServerFilter);
   const wfsRef = useRef(null);
   const [filteredData, setFilteredData] = useState();
+  const [indexedData, setIndexedData] = useState();
   const [cacheVersion, setCacheVersion] = useState(
     getCacheVersion(cacheUpdateInterval),
   );
@@ -145,13 +153,22 @@ const MetarsLayer = () => {
     feature: GeoJSON.Feature,
     latlng: LatLng,
   ) => {
-    const visibility = feature.properties.visibility_statute_mi;
+    let visibility = feature.properties.visibility_statute_mi;
     if (!visibility) return;
     const [category, _] = getMetarVisibilityCategory(
       visibility,
       personalMinimums,
     );
     let iconUrl = '/icons/metar/MISSING.png';
+    if (
+      visibility === 0.25 &&
+      feature.properties.raw_text.indexOf('M1/4SM') > -1
+    ) {
+      visibility = '<0.25';
+    }
+    if (visibility > 4) {
+      visibility = Math.ceil(visibility);
+    }
     if (category) {
       iconUrl = `/icons/metar/${category}-OVC.png`;
     } else {
@@ -842,34 +859,59 @@ const MetarsLayer = () => {
     return marker;
   };
 
+  const buildIndexedData = (features: GeoJSON.Feature[]): any => {
+    const data = {};
+    features.map((feature) => {
+      const obsTime = new Date(feature.properties.observation_time).getTime();
+      const index = Math.floor(obsTime / timeSliderInterval);
+      if (index in data === false) {
+        data[index] = [];
+      }
+      data[index].push(feature);
+    });
+    setIndexedData(data as any);
+    return data;
+  };
+
   const clientFilter = (
     features: GeoJSON.Feature[],
     observationTime: Date,
   ): GeoJSON.Feature[] => {
+    // const startTime = new Date().getTime();
+    let indexedFeatures = indexedData;
+    if (!indexedFeatures) {
+      indexedFeatures = buildIndexedData(features);
+    }
+    if (!indexedFeatures) return [];
     const filteredFeatures = {};
-    features.map((feature) => {
-      const start = new Date(feature.properties.observation_time);
-      const end = new Date(feature.properties.observation_time);
-      end.setMinutes(end.getMinutes() + 75);
-      end.setSeconds(0);
-      end.setMilliseconds(0);
-      const result = start <= observationTime && observationTime < end;
-      if (result) {
-        if (filteredFeatures[feature.properties.station_id]) {
-          const prevFeature = filteredFeatures[feature.properties.station_id];
-          if (
-            new Date(prevFeature.properties.observation_time) <
-            new Date(feature.properties.observation_time)
-          ) {
+    const obsTime = new Date(observationTime).getTime();
+    const startIndex = Math.floor(
+      (obsTime - 75 * 60 * 1000) / timeSliderInterval,
+    );
+    const endIndex = Math.floor(obsTime / timeSliderInterval);
+    // let count = 0;
+    for (let index = startIndex; index < endIndex; index++) {
+      const iData = indexedFeatures[index] as GeoJSON.Feature[];
+      if (iData) {
+        iData.map((feature) => {
+          // count++;
+          if (filteredFeatures[feature.properties.station_id]) {
+            const prevFeature = filteredFeatures[feature.properties.station_id];
+            if (
+              new Date(prevFeature.properties.observation_time) <
+              new Date(feature.properties.observation_time)
+            ) {
+              filteredFeatures[feature.properties.station_id] = feature;
+            }
+          } else {
             filteredFeatures[feature.properties.station_id] = feature;
           }
-        } else {
-          filteredFeatures[feature.properties.station_id] = feature;
-        }
+        });
       }
-    });
+    }
     const result = Object.values(filteredFeatures);
     setFilteredData({ type: 'FeatureCollection', features: result } as any);
+    // console.log('filter metar', count, new Date().getTime() - startTime);
     return result as any;
   };
 
@@ -884,6 +926,7 @@ const MetarsLayer = () => {
           'wkb_geometry',
           'ogc_fid',
           'station_id',
+          'auto',
           // 'elevation_ft',
           'temp_c',
           'dewpoint_c',
