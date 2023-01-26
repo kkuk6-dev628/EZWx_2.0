@@ -36,9 +36,14 @@ const MetarsPopup = ({
     return a.cloudBase > b.cloudBase ? 1 : -1;
   });
   const weatherString = getMetarDecodedWxString(feature.properties.wx_string);
-  const airportName = airportsData[feature.properties.station_id]
-    ? toTitleCase(airportsData[feature.properties.station_id])
+  let airportName = airportsData.icaoid[feature.properties.station_id]
+    ? toTitleCase(airportsData.icaoid[feature.properties.station_id])
     : null;
+  if (!airportName) {
+    airportName = toTitleCase(
+      airportsData.faaid[feature.properties.station_id.slice(1)],
+    );
+  }
   const visibility = true
     ? `${visibilityMileToFraction(
         feature.properties.visibility_statute_mi,
@@ -87,10 +92,13 @@ const MetarsPopup = ({
               <b>Clouds: </b>
             </p>
           </div>
-          <div style={{ margin: 3 }}>
+          <div style={{ margin: 3, marginTop: -5 }}>
             {skyConditionsAsc.map((skyCondition) => {
               return (
-                <div key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`}>
+                <div
+                  key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`}
+                  style={{ marginTop: 8 }}
+                >
                   {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
                   {skyCondition.cloudBase}{' '}
                   {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) ===
@@ -167,10 +175,10 @@ const MetarsPopup = ({
           <span>{feature.properties.densityaltitudefeet} feet</span>
         </Typography>
       )}
-      {feature.properties.alt_in_hg != null && (
+      {feature.properties.altim_in_hg != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Altimeter: </b>
-          <span>{feature.properties.alt_in_hg} &deg; Hg</span>
+          <span>{feature.properties.altim_in_hg} &deg; Hg</span>
         </Typography>
       )}
       <Divider></Divider>

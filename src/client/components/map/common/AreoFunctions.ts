@@ -190,9 +190,11 @@ export const getMetarVisibilityCategory = (
 };
 
 export const toTitleCase = (str) => {
-  return str.replace(/\w\S*/g, function (txt: string) {
-    return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
-  });
+  return str
+    ? str.replace(/\w\S[^\/\s]*/g, function (txt: string) {
+        return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
+      })
+    : null;
 };
 
 export const visibilityMileToMeter = (mile: number): number => {
@@ -278,6 +280,9 @@ export const visibilityMileToMeter = (mile: number): number => {
 };
 
 export const visibilityMileToFraction = (mile: number): string => {
+  if (mile === undefined || mile === null) {
+    return null;
+  }
   let fraction = mile.toString();
   switch (mile) {
     case 0:

@@ -36,6 +36,7 @@ import { useSelector } from 'react-redux';
 import { selectMetar } from '../../../../store/layers/LayerControl';
 import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
 import axios from 'axios';
+import { MetarMarkerTypes } from '../../common/AreoConstants';
 
 const maxLayers = 6;
 
@@ -52,14 +53,14 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
 
   const fetchAirports = () => {
     const params = {
-      maxFeatures: 4000,
+      maxFeatures: 14000,
       request: 'GetFeature',
       service: 'WFS',
       typeName: 'EZWxBrief:airport',
       version: '1.0.0',
       srsName: 'EPSG:4326',
-      propertyName: 'icaoid,name',
-      cql_filter: "icaoid <> ''",
+      propertyName: 'icaoid,name,faaid',
+      cql_filter: 'faaid is not null',
       outputFormat: 'application/json',
       v: 1,
     } as any;
@@ -75,9 +76,17 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         if (typeof data.data === 'string') {
           console.log('Aireport: Invalid json data!', data.data);
         } else {
-          const airports = {};
+          const airports = { icaoid: {}, faaid: {} };
           data.data.features.forEach((feature) => {
-            airports[feature.properties.icaoid] = feature.properties.name;
+            if (!feature.properties.name) return;
+            if (feature.properties.faaid) {
+              airports.faaid[feature.properties.faaid] =
+                feature.properties.name;
+            }
+            if (feature.properties.icaoid) {
+              airports.icaoid[feature.properties.icaoid] =
+                feature.properties.name;
+            }
           });
           setAirportData(airports as any);
         }
@@ -98,6 +107,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
     const layerName = layer.feature.id.split('.')[0];
     let popup;
     let useWidePopup = false;
+    let offsetX = 10;
     switch (layerName) {
       case 'gairmet':
         popup = <GairmetPopup feature={layer.feature}></GairmetPopup>;
@@ -128,6 +138,11 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         useWidePopup = true;
         break;
       case 'metar':
+        if (
+          metarLayerStatus.markerType === MetarMarkerTypes.ceilingHeight.value
+        ) {
+          offsetX = 25;
+        }
         popup = (
           <MetarsPopup
             layer={layer as any}
@@ -147,7 +162,10 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         useWidePopup = false;
     }
     const popupContent = ReactDOMServer.renderToString(popup);
-    L.responsivePopup({ minWidth: useWidePopup ? 320 : 196, offset: [10, 19] })
+    L.responsivePopup({
+      minWidth: useWidePopup ? 320 : 196,
+      offset: [offsetX, 19],
+    })
       .setLatLng(latlng)
       .setContent(popupContent)
       .openOn(map);
