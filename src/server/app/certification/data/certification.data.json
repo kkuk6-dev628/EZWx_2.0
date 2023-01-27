@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "atp",
+    "description": "Private, Commercial or ATP"
+  },
+  {
+    "id": 2,
+    "name": "cfi",
+    "description": "Certified Flight Instructor (CFI)"
+  },
+  { 
+    "id": 3,
+    "name": "purple", 
+    "description": "Instrument Rated" 
+  },
+  {
+    "id": 4,
+    "name": "professional",
+    "description": "Professional Pilot (other than a CFI)"
+  },
+  {
+    "id": 5,
+    "name": "dpe",
+    "description": "Designated Pilot Examiner (DPE)"
+  },
+  { 
+    "id": 6,
+    "name": "other", 
+    "description": "Other" 
+  }
+]

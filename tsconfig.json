@@ -10,10 +10,11 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
-    "incremental": true
+    "incremental": true,
+    "resolveJsonModule": true
   },
   "ts-node": {
     "files": true
   },
-  "include": ["src/server", "test", "ormconfig.ts", "jest.config.ts"],
+  "include": ["src/server", "test", "ormconfig.ts", "jest.config.ts","src/server/app/certification/data/*.json"],
 }
