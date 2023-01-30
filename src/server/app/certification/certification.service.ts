@@ -1,37 +1,14 @@
-import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Certification } from './certification.entity';
 import { FindManyOptions, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateCertificationDto } from './dto/create-certification.dto';
-import * as fs from 'fs';
-import { join } from 'path';
 @Injectable()
-export class CertificationService implements OnModuleInit {
+export class CertificationService {
   constructor(
     @InjectRepository(Certification)
     private certificationRepository: Repository<Certification>,
   ) {}
-
-  async readJSON() {
-    return new Promise((resolve, reject) => {
-      fs.readFile(
-        join(__dirname, './data/certification.data.json'),
-        'utf8',
-        (err, data) => {
-          if (err) {
-            reject(err);
-          }
-          resolve(JSON.parse(data));
-        },
-      );
-    });
-  }
-
-  async onModuleInit() {
-    const data: any = await this.readJSON();
-    // console.log('json data is ', data);
-    await this.createAll(data);
-  }
 
   async create(dto: CreateCertificationDto) {
     const repoCertification = this.certificationRepository.create(dto);
