@@ -21,11 +21,14 @@ const MarkerClusterGroup = createPathComponent(
     // @ts-ignore
     const markerClusterGroup = new L.markerClusterGroup(clusterProps);
 
-    const map = useMap();
     markerClusterGroup.on('clusterclick', (a) => {
-      map.fire('click', a);
+      markerClusterGroup._map.fire('click', a);
       L.DomEvent.stopPropagation(a);
     });
+    //Remove everything outside the current view (Performance)
+    markerClusterGroup._getExpandedVisibleBounds = function () {
+      return markerClusterGroup._map.getBounds();
+    };
     // Initializing event listeners
     Object.entries(clusterEvents).forEach(([eventAsProp, callback]) => {
       const clusterEvent = `cluster${eventAsProp.substring(2).toLowerCase()}`;

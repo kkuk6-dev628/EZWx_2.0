@@ -963,7 +963,7 @@ const MetarsLayer = () => {
         markerPane={'metar'}
         // serverFilter={serverFilter}
         clientFilter={clientFilter}
-        maxClusterRadius={30}
+        maxClusterRadius={50}
         initData={filteredData}
         layerStateSelector={selectMetar}
         cacheVersion={cacheVersion}
