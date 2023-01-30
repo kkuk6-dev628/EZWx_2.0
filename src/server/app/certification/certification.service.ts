@@ -3,7 +3,6 @@ import { Certification } from './certification.entity';
 import { FindManyOptions, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateCertificationDto } from './dto/create-certification.dto';
-
 @Injectable()
 export class CertificationService {
   constructor(
@@ -28,12 +27,7 @@ export class CertificationService {
 
   async createAll(dto: CreateCertificationDto[]) {
     try {
-      await this.certificationRepository
-        .createQueryBuilder()
-        .insert()
-        .into(Certification)
-        .values(dto)
-        .execute();
+      await this.certificationRepository.save(dto);
 
       return {
         statusCode: 201,

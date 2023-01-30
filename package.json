@@ -23,9 +23,7 @@
     "console": "ts-node -r tsconfig-paths/register src/server/console.ts",
     "typeorm": "npx typeorm-ts-node-commonjs -d ormconfig.ts",
     "migration:generate": "yarn typeorm migration:generate",
-    "migration:run": "yarn typeorm migration:run",
-    "client:generate:schema": "zeus src/schema.gql src/client/app/types --typescript --apollo",
-    "cy": "cypress"
+    "migration:run": "yarn typeorm -- migration:run"
   },
   "dependencies": {
     "@babel/runtime": "^7.20.7",

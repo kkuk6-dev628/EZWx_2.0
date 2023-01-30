@@ -93,7 +93,7 @@
     background-color: var(--color-primary);
     p{
       color: var(--color-white);
-      font-size: 13px;
+      // font-size: 13px;
       font-weight: 600;
     }
   }
@@ -106,9 +106,23 @@
     }
     
   }
+  .PrivateRadioButtonIcon-root-5{
+
+    svg{
+      height: 18px!important;
+      width: 18px!important;
+    }
+  }
+
+  .MuiFormGroup-root{
+    .PrivateSwitchBase-root-1{
+      padding: 4px!important;
+    }
+  }
   
   .PrivateSwitchBase-root-1{
     color: #fff;
+    // padding: 4px!important;
   }
 
   .MuiCheckbox-colorPrimary{
@@ -119,6 +133,11 @@
     margin-bottom: 2px;
     margin-top: 2px;
     border: 0px;
+
+    .MuiSvgIcon-root{
+      height: 18px;
+      width: 18px;
+    }
   }
   .MuiRadio-root{
     color: #fff;
@@ -134,6 +153,9 @@
     &:hover{
       background: inherit!important;
     }
+  }
+  .MuiTypography-body1{
+    font-size: 13px;
   }
   .MuiSlider-thumb{
     background-color: white;
@@ -171,6 +193,6 @@
     margin: 0!important;
   }
   .MuiAccordionSummary-root.Mui-expanded{
-    min-height: 0;
+    min-height: 0!important;
   }
 }

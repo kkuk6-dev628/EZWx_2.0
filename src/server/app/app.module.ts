@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConsoleModule } from 'nestjs-console';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -14,9 +14,7 @@ import { CertificationModule } from './certification/certification.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRootAsync({
-      useFactory: async () => typeOrmConfig,
-    }),
+    TypeOrmModule.forRoot(typeOrmConfig),
     ConsoleModule,
     AuthModule,
     UserModule,

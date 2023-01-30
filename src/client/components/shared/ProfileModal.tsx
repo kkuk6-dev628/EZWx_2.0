@@ -7,16 +7,29 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectAuth, userLoggedOut } from '../../store/auth/authSlice';
 import { api } from '../../utils';
 
-function ProfileModal() {
+//handleProfileModal
+
+interface ProfileModalProps {
+  handleProfileModal: () => void;
+  setIsUserLoginUser: (value: boolean) => void;
+}
+
+function ProfileModal({
+  handleProfileModal,
+  setIsUserLoginUser,
+}: ProfileModalProps) {
   const router = useRouter();
   const user = useSelector(selectAuth);
   const dispatch = useDispatch();
 
   const changeRoute = () => {
+    handleProfileModal();
+    setIsUserLoginUser(false);
     router.push('/profile');
   };
 
   const handleSignout = () => {
+    handleProfileModal();
     api({
       method: 'get',
       url: '/auth/signout',
