@@ -26,6 +26,7 @@ import {
   setRadar,
   setSigmet,
   setMetar,
+  LayerState,
 } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
@@ -164,6 +165,7 @@ const MeteoLayerControl = ({
                 <FormControlLabel
                   control={
                     <Checkbox
+                      style={{ pointerEvents: 'none' }}
                       checked={layerStatus.metarState.visible}
                       icon={<CircleUnchecked />}
                       checkedIcon={<CircleCheckedFilled />}
@@ -187,7 +189,6 @@ const MeteoLayerControl = ({
                 <RadioGroup
                   defaultValue={layerStatus.metarState.markerType}
                   name="radio-buttons-group-metar"
-                  style={{ paddingLeft: 26 }}
                   onChangeCapture={(e: ChangeEvent<HTMLInputElement>) => {
                     map.closePopup();
                     dispatch(
@@ -292,9 +293,52 @@ const MeteoLayerControl = ({
                 style={{ height: 48, minHeight: 48 }}
               >
                 <FormControlLabel
+                  label={layerStatus.sigmetState.name}
                   control={
                     <Checkbox
                       checked={layerStatus.sigmetState.visible}
+                      style={{ pointerEvents: 'none' }}
+                      icon={<CircleUnchecked />}
+                      checkedIcon={<CircleCheckedFilled />}
+                      name="checkedB"
+                      color="primary"
+                      onClick={(e) => {
+                        // e.stopPropagation();
+                        dispatch(
+                          setSigmet({
+                            ...layerStatus.sigmetState,
+                            visible: !layerStatus.sigmetState.visible,
+                          }),
+                        );
+                        if (checkEmptyLayer(meteoLayers.intlSigmet)) {
+                          onLayerClick(
+                            meteoLayers.intlSigmet,
+                            layerStatus.sigmetState.international as any,
+                          );
+                        } else {
+                          if (!checkEmptyLayer(meteoLayers.sigmet)) {
+                            onLayerClick(
+                              meteoLayers.sigmet,
+                              layerStatus.sigmetState,
+                            );
+                          }
+                          onLayerClick(
+                            meteoLayers.intlSigmet,
+                            layerStatus.sigmetState.international as any,
+                          );
+                        }
+                      }}
+                    />
+                  }
+                />
+              </AccordionSummary>
+              <AccordionDetails
+                style={{ display: 'flex', flexDirection: 'column' }}
+              >
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={layerStatus.sigmetState.all.visible}
                       icon={<CircleUnchecked />}
                       checkedIcon={<CircleCheckedFilled />}
                       name="checkedB"
@@ -303,25 +347,19 @@ const MeteoLayerControl = ({
                         dispatch(
                           setSigmet({
                             ...layerStatus.sigmetState,
-                            visible: !layerStatus.sigmetState.visible,
+                            convection: {
+                              name: layerStatus.sigmetState.all.name,
+                              visible: !layerStatus.sigmetState.all.visible,
+                            },
                           }),
                         );
                         onLayerClick(
-                          meteoLayers.sigmet,
-                          layerStatus.sigmetState,
+                          meteoLayers.convection,
+                          layerStatus.sigmetState.all as any,
                         );
                       }}
                     />
                   }
-                  label={layerStatus.sigmetState.name}
-                />
-              </AccordionSummary>
-              <AccordionDetails
-                style={{ display: 'flex', flexDirection: 'column' }}
-              >
-                <FormControlLabel
-                  value={layerStatus.sigmetState.all.visible}
-                  control={<Radio color="primary" />}
                   label={layerStatus.sigmetState.all.name}
                 />
                 <FormControlLabel
@@ -345,7 +383,7 @@ const MeteoLayerControl = ({
                         );
                         onLayerClick(
                           meteoLayers.convection,
-                          layerStatus.sigmetState.convection,
+                          layerStatus.sigmetState.convection as any,
                         );
                       }}
                     />
@@ -373,7 +411,7 @@ const MeteoLayerControl = ({
                         );
                         onLayerClick(
                           meteoLayers.outlooks,
-                          layerStatus.sigmetState.outlooks,
+                          layerStatus.sigmetState.outlooks as any,
                         );
                       }}
                     />
@@ -399,7 +437,10 @@ const MeteoLayerControl = ({
                             },
                           }),
                         );
-                        onLayerClick(null, layerStatus.sigmetState.turbulence);
+                        onLayerClick(
+                          null,
+                          layerStatus.sigmetState.turbulence as any,
+                        );
                       }}
                     />
                   }
@@ -426,7 +467,7 @@ const MeteoLayerControl = ({
                         );
                         onLayerClick(
                           null,
-                          layerStatus.sigmetState.airframeIcing,
+                          layerStatus.sigmetState.airframeIcing as any,
                         );
                       }}
                     />
@@ -451,7 +492,7 @@ const MeteoLayerControl = ({
                             },
                           }),
                         );
-                        onLayerClick(null, layerStatus.sigmetState.dust);
+                        onLayerClick(null, layerStatus.sigmetState.dust as any);
                       }}
                     />
                   }
@@ -475,7 +516,7 @@ const MeteoLayerControl = ({
                             },
                           }),
                         );
-                        onLayerClick(null, layerStatus.sigmetState.ash);
+                        onLayerClick(null, layerStatus.sigmetState.ash as any);
                       }}
                     />
                   }
@@ -499,7 +540,10 @@ const MeteoLayerControl = ({
                             },
                           }),
                         );
-                        onLayerClick(null, layerStatus.sigmetState.other);
+                        onLayerClick(
+                          null,
+                          layerStatus.sigmetState.other as any,
+                        );
                       }}
                     />
                   }
@@ -526,7 +570,7 @@ const MeteoLayerControl = ({
                         );
                         onLayerClick(
                           meteoLayers.intlSigmet,
-                          layerStatus.sigmetState.international,
+                          layerStatus.sigmetState.international as any,
                         );
                       }}
                     />
