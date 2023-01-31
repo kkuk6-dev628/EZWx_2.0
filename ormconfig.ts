@@ -5,7 +5,7 @@ export const typeOrmConfig: DataSourceOptions = {
   type: 'postgres',
   url: process.env.DATABASE_URL,
   entities: [__dirname + '/**/*.entity{.ts,.js}'],
-  migrations: ['dist/src/server/migration/*.js'],
+  migrations: [__dirname + '/src/server/migration/*{.ts,.js}'],
   migrationsRun: true,
 };
 

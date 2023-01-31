@@ -11,7 +11,7 @@
     "build": "SET NODE_ENV=production && nest build && cd src/client && next build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "nest start --watch --preserveWatchOutput",
+    "start:dev": "yarn prebuild && nest start --watch --preserveWatchOutput",
     "start:debug": "nest start --debug --watch --preserveWatchOutput",
     "start:prod": "SET NODE_ENV=production && node dist/src/server/main",
     "lint": "eslint \"{src,test}/**/*.{ts,tsx}\"",

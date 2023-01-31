@@ -116,7 +116,7 @@
 
   .MuiFormGroup-root{
     .PrivateSwitchBase-root-1{
-      padding: 4px!important;
+      padding: 2px 4px!important;
     }
   }
   
@@ -186,7 +186,7 @@
   }
 
   .MuiAccordion-root.Mui-expanded{
-    margin: 0!important;
+    margin: 4px!important;
     margin-bottom: 10px!important;
   }
   .MuiAccordionSummary-content{
@@ -194,5 +194,21 @@
   }
   .MuiAccordionSummary-root.Mui-expanded{
     min-height: 0!important;
+    height: 23px!important;
+  }
+  .MuiRadio-colorPrimary.Mui-checked{
+    color: #fff!important;
+  }
+
+  .MuiAccordionSummary-root{
+    min-height: 0!important;
+    height: 23px!important;
+  }
+
+  .MuiAccordion-root.Mui-expanded:first-child{
+    margin-bottom: 4px!important;
+  }
+  .MuiAccordionDetails-root{
+    // pa
   }
 }
