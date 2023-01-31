@@ -1,0 +1,144 @@
+  .layer-control{
+  background-color: var(--color-primary);
+  border-radius: 8px;
+  overflow: hidden;
+
+  &__header{
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 10px;
+    margin-bottom: 0px;
+    border-bottom: 1px solid var(--color-white);
+
+    h3{
+      color: var(--color-white);
+      font-size: 20px;
+      font-weight: 600;
+    }
+  }
+  &-contents{
+    margin: 8px 2px;
+  }
+  &-item {
+    color: var(--color-white);
+    & .MuiAccordionSummary-root{
+      min-height: var(--layer-control-item-height);
+    }
+  }
+  .MuiPaper-elevation1{
+    color: var(--color-white);
+    box-shadow: none;
+    background-color: var(--color-primary);
+    p{
+      color: var(--color-white);
+      // font-size: 13px;
+      font-weight: 600;
+    }
+  }
+
+  .MuiAccordionSummary-expandIcon{
+    height: 8px!important;
+    // width: 20px!important;
+    .MuiSvgIcon-root{
+      color: var(--color-white);
+    }
+    
+  }
+  .PrivateRadioButtonIcon-root-5{
+
+    svg{
+      height: 18px!important;
+      width: 18px!important;
+    }
+  }
+
+  .MuiFormGroup-root{
+    .PrivateSwitchBase-root-1{
+      padding: 4px!important;
+    }
+  }
+  
+  .PrivateSwitchBase-root-1{
+    color: var(--color-white);
+    // padding: 4px!important;
+  }
+
+  .MuiCheckbox-colorPrimary{
+    color: var(--color-white);
+    padding: 0;
+    // padding-right: 9px;
+    margin:9px;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    border: 0px;
+
+    .MuiSvgIcon-root{
+      height: 18px;
+      width: 18px;
+    }
+  }
+  .MuiRadio-root{
+    color: var(--color-white);
+  }
+  .MuiCheckbox-colorPrimary.Mui-checked{
+    color: var(--color-primary);
+    background-color: var(--color-white);
+  }
+  .MuiAccordion-root:before{
+    display: none;
+  }
+  .MuiCheckbox-colorPrimary.Mui-checked{
+    &:hover{
+      background: inherit!important;
+    }
+  }
+  .MuiTypography-body1{
+    font-size: 13px;
+  }
+  .MuiSlider-thumb{
+    background-color: var(--color-white);
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    // border-left: 10px solid transparent;
+    // border-right: 10px solid transparent;
+    // border-bottom: 20px solid wheat;
+    // transform: rotate(45deg);
+  }
+  .MuiCheckbox-colorPrimary.Mui-checked:hover{
+    background-color: var(--color-white) !important;
+  }
+  .MuiSlider-rail{
+    width: 100%;
+    height: 5px;
+    display: block;
+    opacity: 1;
+    position: absolute;
+    border-radius: 1px;
+    background-color: var(--color-white);
+    top: 55%;
+  }
+
+  .MuiAccordionSummary-content.Mui-expanded{
+    margin: 0!important;
+  }
+
+  .MuiAccordion-root.Mui-expanded{
+    margin: 0!important;
+    margin-bottom: 4px!important;
+  }
+  .MuiAccordionSummary-content{
+    margin: 0!important;
+  }
+  .MuiAccordionSummary-root.Mui-expanded{
+    min-height: 0!important;
+  }
+  .MuiRadio-colorPrimary.Mui-checked{
+    color: var(--color-white) !important;
+  }  
+  .MuiAccordionDetails-root{
+    padding: 0 16px 0 16px !important;
+    margin: 0 16px 0 16px !important;
+  }
+}

@@ -132,453 +132,457 @@ const MeteoLayerControl = ({
       {!collapsed && (
         <div
           id="layer-control"
-          className="leaflet-control leaflet-bar leaycnt"
+          className="leaflet-control leaflet-bar layer-control"
           ref={ref}
-          style={{ paddingBottom: 8 }}
         >
-          <div className="leaycnt__header">
-            <div className="leaycnt__img__area">
+          <div className="layer-control__header">
+            <div className="layer-control__img__area">
               <Image
                 src="/images/avater.png"
                 alt="logo"
                 width={60}
                 height={60}
-                className="leaycnt__header__img"
+                className="layer-control__header__img"
               />
             </div>
-            <div className="leaycnt__rgt">
+            <div className="layer-control__rgt">
               <h3>Map Layers</h3>
             </div>
           </div>
-          <div>
-            <Accordion
-              key={`metar-layer`}
-              defaultExpanded={false}
-              style={{ marginTop: 0 }}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-                style={{ height: 48, minHeight: 48 }}
-              >
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      style={{ pointerEvents: 'none' }}
-                      checked={layerStatus.metarState.visible}
-                      icon={<CircleUnchecked />}
-                      checkedIcon={<CircleCheckedFilled />}
-                      name="checkedB"
-                      color="primary"
-                      onClick={(e) => {
-                        dispatch(
-                          setMetar({
-                            ...layerStatus.metarState,
-                            visible: !layerStatus.metarState.visible,
-                          }),
-                        );
-                        onLayerClick(meteoLayers.metar, layerStatus.metarState);
-                      }}
-                    />
-                  }
-                  label={layerStatus.metarState.name}
-                />
-              </AccordionSummary>
-              <AccordionDetails>
-                <RadioGroup
-                  defaultValue={layerStatus.metarState.markerType}
-                  name="radio-buttons-group-metar"
-                  onChangeCapture={(e: ChangeEvent<HTMLInputElement>) => {
-                    map.closePopup();
-                    dispatch(
-                      setMetar({
-                        ...layerStatus.metarState,
-                        markerType: e.target.value,
-                      }),
-                    );
-                  }}
+          <div className="layer-control-contents">
+            <div className="layer-control-item">
+              <Accordion key={`metar-layer`} defaultExpanded={false}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
                 >
                   <FormControlLabel
-                    value={MetarMarkerTypes.flightCategory.value}
-                    control={<Radio color="primary" />}
-                    label={MetarMarkerTypes.flightCategory.text}
-                  />
-                  <FormControlLabel
-                    value={MetarMarkerTypes.ceilingHeight.value}
-                    control={<Radio color="primary" />}
-                    label={MetarMarkerTypes.ceilingHeight.text}
-                  />
-                  <FormControlLabel
-                    value={MetarMarkerTypes.surfaceVisibility.value}
-                    control={<Radio color="primary" />}
-                    label={MetarMarkerTypes.surfaceVisibility.text}
-                  />
-                  <FormControlLabel
-                    value={MetarMarkerTypes.surfaceWindSpeed.value}
-                    control={<Radio color="primary" />}
-                    label={MetarMarkerTypes.surfaceWindSpeed.text}
-                  />
-                  <FormControlLabel
-                    value={MetarMarkerTypes.surfaceWindBarbs.value}
-                    control={<Radio color="primary" />}
-                    label={MetarMarkerTypes.surfaceWindBarbs.text}
-                    style={{ marginLeft: 6 }}
-                  />
-                  <FormControlLabel
-                    value={MetarMarkerTypes.surfaceWindGust.value}
-                    control={<Radio color="primary" />}
-                    label={MetarMarkerTypes.surfaceWindGust.text}
-                  />
-                  <FormControlLabel
-                    value={MetarMarkerTypes.surfaceTemperature.value}
-                    control={<Radio color="primary" />}
-                    label={MetarMarkerTypes.surfaceTemperature.text}
-                  />
-                  <FormControlLabel
-                    value={MetarMarkerTypes.surfaceDewpoint.value}
-                    control={<Radio color="primary" />}
-                    label={MetarMarkerTypes.surfaceDewpoint.text}
-                  />
-                  <FormControlLabel
-                    value={MetarMarkerTypes.dewpointDepression.value}
-                    control={<Radio color="primary" />}
-                    label={MetarMarkerTypes.dewpointDepression.text}
-                  />
-                  <FormControlLabel
-                    value={MetarMarkerTypes.weather.value}
-                    control={<Radio color="primary" />}
-                    label={MetarMarkerTypes.weather.text}
-                  />
-                </RadioGroup>
-              </AccordionDetails>
-            </Accordion>
-          </div>
-          <div
-            className="leaycnt MuiPaper-elevation1"
-            style={{ marginLeft: 12, paddingLeft: 4 }}
-          >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={layerStatus.radarState.visible}
-                  icon={<CircleUnchecked />}
-                  checkedIcon={<CircleCheckedFilled />}
-                  name="checkedB"
-                  color="primary"
-                  onClick={(e) => {
-                    dispatch(
-                      setRadar({
-                        ...layerStatus.radarState,
-                        visible: !layerStatus.radarState.visible,
-                      }),
-                    );
-                    onLayerClick(meteoLayers.radar, layerStatus.radarState);
-                  }}
-                />
-              }
-              label={layerStatus.radarState.name}
-            />
-          </div>
-          <div>
-            <Accordion
-              key={`sigmet-layer`}
-              defaultExpanded={false}
-              style={{ marginTop: 0 }}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-                style={{ height: 48, minHeight: 48 }}
-              >
-                <FormControlLabel
-                  label={layerStatus.sigmetState.name}
-                  control={
-                    <Checkbox
-                      checked={layerStatus.sigmetState.visible}
-                      style={{ pointerEvents: 'none' }}
-                      icon={<CircleUnchecked />}
-                      checkedIcon={<CircleCheckedFilled />}
-                      name="checkedB"
-                      color="primary"
-                      onClick={(e) => {
-                        // e.stopPropagation();
-                        dispatch(
-                          setSigmet({
-                            ...layerStatus.sigmetState,
-                            visible: !layerStatus.sigmetState.visible,
-                          }),
-                        );
-                        if (checkEmptyLayer(meteoLayers.intlSigmet)) {
-                          onLayerClick(
-                            meteoLayers.intlSigmet,
-                            layerStatus.sigmetState.international as any,
+                    control={
+                      <Checkbox
+                        style={{ pointerEvents: 'none' }}
+                        checked={layerStatus.metarState.visible}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(e) => {
+                          dispatch(
+                            setMetar({
+                              ...layerStatus.metarState,
+                              visible: !layerStatus.metarState.visible,
+                            }),
                           );
-                        } else {
-                          if (!checkEmptyLayer(meteoLayers.sigmet)) {
+                          onLayerClick(
+                            meteoLayers.metar,
+                            layerStatus.metarState,
+                          );
+                        }}
+                      />
+                    }
+                    label={layerStatus.metarState.name}
+                  />
+                </AccordionSummary>
+                <AccordionDetails>
+                  <RadioGroup
+                    defaultValue={layerStatus.metarState.markerType}
+                    name="radio-buttons-group-metar"
+                    onChangeCapture={(e: ChangeEvent<HTMLInputElement>) => {
+                      map.closePopup();
+                      dispatch(
+                        setMetar({
+                          ...layerStatus.metarState,
+                          markerType: e.target.value,
+                        }),
+                      );
+                    }}
+                  >
+                    <FormControlLabel
+                      value={MetarMarkerTypes.flightCategory.value}
+                      control={<Radio color="primary" />}
+                      label={MetarMarkerTypes.flightCategory.text}
+                    />
+                    <FormControlLabel
+                      value={MetarMarkerTypes.ceilingHeight.value}
+                      control={<Radio color="primary" />}
+                      label={MetarMarkerTypes.ceilingHeight.text}
+                    />
+                    <FormControlLabel
+                      value={MetarMarkerTypes.surfaceVisibility.value}
+                      control={<Radio color="primary" />}
+                      label={MetarMarkerTypes.surfaceVisibility.text}
+                    />
+                    <FormControlLabel
+                      value={MetarMarkerTypes.surfaceWindSpeed.value}
+                      control={<Radio color="primary" />}
+                      label={MetarMarkerTypes.surfaceWindSpeed.text}
+                    />
+                    <FormControlLabel
+                      value={MetarMarkerTypes.surfaceWindBarbs.value}
+                      control={<Radio color="primary" />}
+                      label={MetarMarkerTypes.surfaceWindBarbs.text}
+                      style={{ marginLeft: 6 }}
+                    />
+                    <FormControlLabel
+                      value={MetarMarkerTypes.surfaceWindGust.value}
+                      control={<Radio color="primary" />}
+                      label={MetarMarkerTypes.surfaceWindGust.text}
+                    />
+                    <FormControlLabel
+                      value={MetarMarkerTypes.surfaceTemperature.value}
+                      control={<Radio color="primary" />}
+                      label={MetarMarkerTypes.surfaceTemperature.text}
+                    />
+                    <FormControlLabel
+                      value={MetarMarkerTypes.surfaceDewpoint.value}
+                      control={<Radio color="primary" />}
+                      label={MetarMarkerTypes.surfaceDewpoint.text}
+                    />
+                    <FormControlLabel
+                      value={MetarMarkerTypes.dewpointDepression.value}
+                      control={<Radio color="primary" />}
+                      label={MetarMarkerTypes.dewpointDepression.text}
+                    />
+                    <FormControlLabel
+                      value={MetarMarkerTypes.weather.value}
+                      control={<Radio color="primary" />}
+                      label={MetarMarkerTypes.weather.text}
+                    />
+                  </RadioGroup>
+                </AccordionDetails>
+              </Accordion>
+            </div>
+            <div
+              className="layer-control-item"
+              style={{ marginLeft: 12, paddingLeft: 4 }}
+            >
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={layerStatus.radarState.visible}
+                    icon={<CircleUnchecked />}
+                    checkedIcon={<CircleCheckedFilled />}
+                    name="checkedB"
+                    color="primary"
+                    onClick={(e) => {
+                      dispatch(
+                        setRadar({
+                          ...layerStatus.radarState,
+                          visible: !layerStatus.radarState.visible,
+                        }),
+                      );
+                      onLayerClick(meteoLayers.radar, layerStatus.radarState);
+                    }}
+                  />
+                }
+                label={layerStatus.radarState.name}
+              />
+            </div>
+            <div className="layer-control-item">
+              <Accordion key={`sigmet-layer`} defaultExpanded={false}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                >
+                  <FormControlLabel
+                    label={layerStatus.sigmetState.name}
+                    control={
+                      <Checkbox
+                        checked={layerStatus.sigmetState.visible}
+                        style={{ pointerEvents: 'none' }}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(e) => {
+                          // e.stopPropagation();
+                          dispatch(
+                            setSigmet({
+                              ...layerStatus.sigmetState,
+                              visible: !layerStatus.sigmetState.visible,
+                            }),
+                          );
+                          if (checkEmptyLayer(meteoLayers.intlSigmet)) {
                             onLayerClick(
-                              meteoLayers.sigmet,
-                              layerStatus.sigmetState,
+                              meteoLayers.intlSigmet,
+                              layerStatus.sigmetState.international as any,
+                            );
+                          } else {
+                            if (!checkEmptyLayer(meteoLayers.sigmet)) {
+                              onLayerClick(
+                                meteoLayers.sigmet,
+                                layerStatus.sigmetState,
+                              );
+                            }
+                            onLayerClick(
+                              meteoLayers.intlSigmet,
+                              layerStatus.sigmetState.international as any,
                             );
                           }
+                        }}
+                      />
+                    }
+                  />
+                </AccordionSummary>
+                <AccordionDetails
+                  style={{ display: 'flex', flexDirection: 'column' }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerStatus.sigmetState.all.visible}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(e) => {
+                          dispatch(
+                            setSigmet({
+                              ...layerStatus.sigmetState,
+                              convection: {
+                                name: layerStatus.sigmetState.all.name,
+                                visible: !layerStatus.sigmetState.all.visible,
+                              },
+                            }),
+                          );
+                          onLayerClick(
+                            meteoLayers.convection,
+                            layerStatus.sigmetState.all as any,
+                          );
+                        }}
+                      />
+                    }
+                    label={layerStatus.sigmetState.all.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerStatus.sigmetState.convection.visible}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(e) => {
+                          dispatch(
+                            setSigmet({
+                              ...layerStatus.sigmetState,
+                              convection: {
+                                name: layerStatus.sigmetState.convection.name,
+                                visible:
+                                  !layerStatus.sigmetState.convection.visible,
+                              },
+                            }),
+                          );
+                          onLayerClick(
+                            meteoLayers.convection,
+                            layerStatus.sigmetState.convection as any,
+                          );
+                        }}
+                      />
+                    }
+                    label={layerStatus.sigmetState.convection.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerStatus.sigmetState.outlooks.visible}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(e) => {
+                          dispatch(
+                            setSigmet({
+                              ...layerStatus.sigmetState,
+                              outlooks: {
+                                name: layerStatus.sigmetState.outlooks.name,
+                                visible:
+                                  !layerStatus.sigmetState.outlooks.visible,
+                              },
+                            }),
+                          );
+                          onLayerClick(
+                            meteoLayers.outlooks,
+                            layerStatus.sigmetState.outlooks as any,
+                          );
+                        }}
+                      />
+                    }
+                    label={layerStatus.sigmetState.outlooks.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerStatus.sigmetState.turbulence.visible}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(e) => {
+                          dispatch(
+                            setSigmet({
+                              ...layerStatus.sigmetState,
+                              turbulence: {
+                                name: layerStatus.sigmetState.turbulence.name,
+                                visible:
+                                  !layerStatus.sigmetState.turbulence.visible,
+                              },
+                            }),
+                          );
+                          onLayerClick(
+                            null,
+                            layerStatus.sigmetState.turbulence as any,
+                          );
+                        }}
+                      />
+                    }
+                    label={layerStatus.sigmetState.turbulence.name}
+                  />{' '}
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerStatus.sigmetState.airframeIcing.visible}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(e) => {
+                          dispatch(
+                            setSigmet({
+                              ...layerStatus.sigmetState,
+                              airframeIcing: {
+                                name: layerStatus.sigmetState.airframeIcing
+                                  .name,
+                                visible:
+                                  !layerStatus.sigmetState.airframeIcing
+                                    .visible,
+                              },
+                            }),
+                          );
+                          onLayerClick(
+                            null,
+                            layerStatus.sigmetState.airframeIcing as any,
+                          );
+                        }}
+                      />
+                    }
+                    label={layerStatus.sigmetState.airframeIcing.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerStatus.sigmetState.dust.visible}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(e) => {
+                          dispatch(
+                            setSigmet({
+                              ...layerStatus.sigmetState,
+                              dust: {
+                                name: layerStatus.sigmetState.dust.name,
+                                visible: !layerStatus.sigmetState.dust.visible,
+                              },
+                            }),
+                          );
+                          onLayerClick(
+                            null,
+                            layerStatus.sigmetState.dust as any,
+                          );
+                        }}
+                      />
+                    }
+                    label={layerStatus.sigmetState.dust.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerStatus.sigmetState.ash.visible}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(e) => {
+                          dispatch(
+                            setSigmet({
+                              ...layerStatus.sigmetState,
+                              ash: {
+                                name: layerStatus.sigmetState.ash.name,
+                                visible: !layerStatus.sigmetState.ash.visible,
+                              },
+                            }),
+                          );
+                          onLayerClick(
+                            null,
+                            layerStatus.sigmetState.ash as any,
+                          );
+                        }}
+                      />
+                    }
+                    label={layerStatus.sigmetState.ash.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerStatus.sigmetState.other.visible}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(e) => {
+                          dispatch(
+                            setSigmet({
+                              ...layerStatus.sigmetState,
+                              other: {
+                                name: layerStatus.sigmetState.other.name,
+                                visible: !layerStatus.sigmetState.other.visible,
+                              },
+                            }),
+                          );
+                          onLayerClick(
+                            null,
+                            layerStatus.sigmetState.other as any,
+                          );
+                        }}
+                      />
+                    }
+                    label={layerStatus.sigmetState.other.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerStatus.sigmetState.international.visible}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(e) => {
+                          dispatch(
+                            setSigmet({
+                              ...layerStatus.sigmetState,
+                              international: {
+                                name: layerStatus.sigmetState.international
+                                  .name,
+                                visible:
+                                  !layerStatus.sigmetState.international
+                                    .visible,
+                              },
+                            }),
+                          );
                           onLayerClick(
                             meteoLayers.intlSigmet,
                             layerStatus.sigmetState.international as any,
                           );
-                        }
-                      }}
-                    />
-                  }
-                />
-              </AccordionSummary>
-              <AccordionDetails
-                style={{ display: 'flex', flexDirection: 'column' }}
-              >
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={layerStatus.sigmetState.all.visible}
-                      icon={<CircleUnchecked />}
-                      checkedIcon={<CircleCheckedFilled />}
-                      name="checkedB"
-                      color="primary"
-                      onClick={(e) => {
-                        dispatch(
-                          setSigmet({
-                            ...layerStatus.sigmetState,
-                            convection: {
-                              name: layerStatus.sigmetState.all.name,
-                              visible: !layerStatus.sigmetState.all.visible,
-                            },
-                          }),
-                        );
-                        onLayerClick(
-                          meteoLayers.convection,
-                          layerStatus.sigmetState.all as any,
-                        );
-                      }}
-                    />
-                  }
-                  label={layerStatus.sigmetState.all.name}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={layerStatus.sigmetState.convection.visible}
-                      icon={<CircleUnchecked />}
-                      checkedIcon={<CircleCheckedFilled />}
-                      name="checkedB"
-                      color="primary"
-                      onClick={(e) => {
-                        dispatch(
-                          setSigmet({
-                            ...layerStatus.sigmetState,
-                            convection: {
-                              name: layerStatus.sigmetState.convection.name,
-                              visible:
-                                !layerStatus.sigmetState.convection.visible,
-                            },
-                          }),
-                        );
-                        onLayerClick(
-                          meteoLayers.convection,
-                          layerStatus.sigmetState.convection as any,
-                        );
-                      }}
-                    />
-                  }
-                  label={layerStatus.sigmetState.convection.name}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={layerStatus.sigmetState.outlooks.visible}
-                      icon={<CircleUnchecked />}
-                      checkedIcon={<CircleCheckedFilled />}
-                      name="checkedB"
-                      color="primary"
-                      onClick={(e) => {
-                        dispatch(
-                          setSigmet({
-                            ...layerStatus.sigmetState,
-                            outlooks: {
-                              name: layerStatus.sigmetState.outlooks.name,
-                              visible:
-                                !layerStatus.sigmetState.outlooks.visible,
-                            },
-                          }),
-                        );
-                        onLayerClick(
-                          meteoLayers.outlooks,
-                          layerStatus.sigmetState.outlooks as any,
-                        );
-                      }}
-                    />
-                  }
-                  label={layerStatus.sigmetState.outlooks.name}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={layerStatus.sigmetState.turbulence.visible}
-                      icon={<CircleUnchecked />}
-                      checkedIcon={<CircleCheckedFilled />}
-                      name="checkedB"
-                      color="primary"
-                      onClick={(e) => {
-                        dispatch(
-                          setSigmet({
-                            ...layerStatus.sigmetState,
-                            turbulence: {
-                              name: layerStatus.sigmetState.turbulence.name,
-                              visible:
-                                !layerStatus.sigmetState.turbulence.visible,
-                            },
-                          }),
-                        );
-                        onLayerClick(
-                          null,
-                          layerStatus.sigmetState.turbulence as any,
-                        );
-                      }}
-                    />
-                  }
-                  label={layerStatus.sigmetState.turbulence.name}
-                />{' '}
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={layerStatus.sigmetState.airframeIcing.visible}
-                      icon={<CircleUnchecked />}
-                      checkedIcon={<CircleCheckedFilled />}
-                      name="checkedB"
-                      color="primary"
-                      onClick={(e) => {
-                        dispatch(
-                          setSigmet({
-                            ...layerStatus.sigmetState,
-                            airframeIcing: {
-                              name: layerStatus.sigmetState.airframeIcing.name,
-                              visible:
-                                !layerStatus.sigmetState.airframeIcing.visible,
-                            },
-                          }),
-                        );
-                        onLayerClick(
-                          null,
-                          layerStatus.sigmetState.airframeIcing as any,
-                        );
-                      }}
-                    />
-                  }
-                  label={layerStatus.sigmetState.airframeIcing.name}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={layerStatus.sigmetState.dust.visible}
-                      icon={<CircleUnchecked />}
-                      checkedIcon={<CircleCheckedFilled />}
-                      name="checkedB"
-                      color="primary"
-                      onClick={(e) => {
-                        dispatch(
-                          setSigmet({
-                            ...layerStatus.sigmetState,
-                            dust: {
-                              name: layerStatus.sigmetState.dust.name,
-                              visible: !layerStatus.sigmetState.dust.visible,
-                            },
-                          }),
-                        );
-                        onLayerClick(null, layerStatus.sigmetState.dust as any);
-                      }}
-                    />
-                  }
-                  label={layerStatus.sigmetState.dust.name}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={layerStatus.sigmetState.ash.visible}
-                      icon={<CircleUnchecked />}
-                      checkedIcon={<CircleCheckedFilled />}
-                      name="checkedB"
-                      color="primary"
-                      onClick={(e) => {
-                        dispatch(
-                          setSigmet({
-                            ...layerStatus.sigmetState,
-                            ash: {
-                              name: layerStatus.sigmetState.ash.name,
-                              visible: !layerStatus.sigmetState.ash.visible,
-                            },
-                          }),
-                        );
-                        onLayerClick(null, layerStatus.sigmetState.ash as any);
-                      }}
-                    />
-                  }
-                  label={layerStatus.sigmetState.ash.name}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={layerStatus.sigmetState.other.visible}
-                      icon={<CircleUnchecked />}
-                      checkedIcon={<CircleCheckedFilled />}
-                      name="checkedB"
-                      color="primary"
-                      onClick={(e) => {
-                        dispatch(
-                          setSigmet({
-                            ...layerStatus.sigmetState,
-                            other: {
-                              name: layerStatus.sigmetState.other.name,
-                              visible: !layerStatus.sigmetState.other.visible,
-                            },
-                          }),
-                        );
-                        onLayerClick(
-                          null,
-                          layerStatus.sigmetState.other as any,
-                        );
-                      }}
-                    />
-                  }
-                  label={layerStatus.sigmetState.other.name}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={layerStatus.sigmetState.international.visible}
-                      icon={<CircleUnchecked />}
-                      checkedIcon={<CircleCheckedFilled />}
-                      name="checkedB"
-                      color="primary"
-                      onClick={(e) => {
-                        dispatch(
-                          setSigmet({
-                            ...layerStatus.sigmetState,
-                            international: {
-                              name: layerStatus.sigmetState.international.name,
-                              visible:
-                                !layerStatus.sigmetState.international.visible,
-                            },
-                          }),
-                        );
-                        onLayerClick(
-                          meteoLayers.intlSigmet,
-                          layerStatus.sigmetState.international as any,
-                        );
-                      }}
-                    />
-                  }
-                  label={layerStatus.sigmetState.international.name}
-                />
-              </AccordionDetails>
-            </Accordion>
+                        }}
+                      />
+                    }
+                    label={layerStatus.sigmetState.international.name}
+                  />
+                </AccordionDetails>
+              </Accordion>
+            </div>
           </div>
         </div>
       )}
