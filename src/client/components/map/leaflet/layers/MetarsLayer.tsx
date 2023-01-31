@@ -24,6 +24,7 @@ import {
 } from '../../common/AreoConstants';
 import axios from 'axios';
 import { feature } from '@turf/helpers';
+import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
 
 const defaultServerFilter = `observation_time DURING ${getQueryTime(
   new Date(),
@@ -70,6 +71,7 @@ const MetarsLayer = () => {
   const [cacheVersion, setCacheVersion] = useState(
     getCacheVersion(cacheUpdateInterval),
   );
+  const meteoLayerControl = useMeteoLayersContext();
 
   useEffect(() => {
     const v = getCacheVersion(cacheUpdateInterval);
