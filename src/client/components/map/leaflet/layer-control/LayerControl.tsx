@@ -219,29 +219,29 @@ const LayerControl = ({
         addGroup: onGroupAdd,
       }}
     >
-      <div className={positionClass}>
-        <div
-          id="layer-control"
-          className="leaflet-control leaflet-bar leaycnt"
-          ref={ref}
-        >
-          {!collapsed &&
-            Object.keys(groupedLayers).map((section, index) => (
+      {!collapsed && (
+        <div className={positionClass}>
+          <div
+            id="base-layer-control"
+            className="leaflet-control leaflet-bar leaycnt"
+            ref={ref}
+          >
+            <div className="leaycnt__header">
+              <div className="leaycnt__img__area">
+                <Image
+                  src="/images/avater.png"
+                  alt="logo"
+                  width={60}
+                  height={60}
+                  className="leaycnt__header__img"
+                />
+              </div>
+              <div className="leaycnt__rgt">
+                <h3>Map Layers</h3>
+              </div>
+            </div>
+            {Object.keys(groupedLayers).map((section, index) => (
               <div key={index} className="">
-                <div className="leaycnt__header">
-                  <div className="leaycnt__img__area">
-                    <Image
-                      src="/images/avater.png"
-                      alt="logo"
-                      width={60}
-                      height={60}
-                      className="leaycnt__header__img"
-                    />
-                  </div>
-                  <div className="leaycnt__rgt">
-                    <h3>Map Layers</h3>
-                  </div>
-                </div>
                 <Accordion key={`${section} ${index}`} defaultExpanded>
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
@@ -484,9 +484,10 @@ const LayerControl = ({
                 </Accordion>
               </div>
             ))}
+          </div>
         </div>
-        {children}
-      </div>
+      )}
+      {children}
     </LayersControlProvider>
   );
 };

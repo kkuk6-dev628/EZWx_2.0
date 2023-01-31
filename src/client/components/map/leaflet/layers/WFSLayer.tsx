@@ -9,6 +9,7 @@ import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { generateHash } from '../../common/AreoFunctions';
 import GeoJSON, { FeatureCollection } from 'geojson';
 import { AppState } from '../../../../store/store';
+import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
 
 interface WFSLayerProps {
   url: string;
@@ -71,6 +72,8 @@ const WFSLayer = React.forwardRef(
       useState<FeatureCollection>(emptyGeoJson);
 
     const [geoJsonKey, setGeoJsonKey] = useState(12034512);
+
+    const meteoLayerControl = useMeteoLayersContext();
 
     useEffect(() => {
       const newKey = generateHash(JSON.stringify(displayedData));

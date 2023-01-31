@@ -17,6 +17,7 @@ export interface OrderedLayerProps {
   group: string;
   pickable?: boolean;
   order: number;
+  addLayerToStore?: (groupedLayer: Layer) => any;
   children: ReactNode[] | ReactNode;
 }
 
@@ -41,6 +42,8 @@ const createControlledLayer = (
           parentMap.addLayer(layerToAdd);
         }
 
+        if (propsRef.current.addLayerToStore)
+          propsRef.current.addLayerToStore(layerToAdd);
         addLayerToControl(layerContext, layerToAdd, propsRef.current);
         setLayer(layerToAdd);
       },
