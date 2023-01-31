@@ -223,20 +223,20 @@ const LayerControl = ({
         <div className={positionClass}>
           <div
             id="base-layer-control"
-            className="leaflet-control leaflet-bar leaycnt"
+            className="leaflet-control leaflet-bar layer-control"
             ref={ref}
           >
-            <div className="leaycnt__header">
-              <div className="leaycnt__img__area">
+            <div className="layer-control__header">
+              <div className="layer-control__img__area">
                 <Image
                   src="/images/avater.png"
                   alt="logo"
                   width={60}
                   height={60}
-                  className="leaycnt__header__img"
+                  className="layer-control__header__img"
                 />
               </div>
-              <div className="leaycnt__rgt">
+              <div className="layer-control__rgt">
                 <h3>Map Layers</h3>
               </div>
             </div>

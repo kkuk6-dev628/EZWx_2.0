@@ -141,4 +141,39 @@
     padding: 0 16px 0 16px !important;
     margin: 0 16px 0 16px !important;
   }
+  .MuiIconButton-root{
+    padding: 0;
+  }
+  .pirep-slider{
+    margin: 8px 0 0 8px;
+    .title{
+      display: flex;
+      color: var(--color-white) !important;
+      font-size: 13px;
+      font-weight: 400;
+      justify-content: space-between;
+    }
+    .label{
+      
+    }
+    .all-check{
+      .MuiFormControlLabel-root{
+        margin-right: -4px;
+      }
+      .MuiCheckbox-root{
+        margin-right: 2px;
+      }
+    }
+    .slider{
+      margin: 18px 0 0 0;
+      .MuiSlider-valueLabel{
+        background: transparent;
+        top: 2px;
+      }
+      .MuiSlider-track{
+        top: 56%;
+        color: var(--color-secondary);
+      }
+    }
+  }
 }

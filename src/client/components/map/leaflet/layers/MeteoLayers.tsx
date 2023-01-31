@@ -49,7 +49,7 @@ const maxLayers = 6;
 const MeteoLayers = ({ layerControlCollapsed }) => {
   const dispatch = useDispatch();
 
-  const [layers, setLayers] = useState<ILayerObj[]>([]);
+  const layers = useMeteoLayersContext();
   const wmsLayerRef = useRef(null);
   const debugLayerGroupRef = useRef(null);
   const metarLayerStatus = useSelector(selectMetar);
@@ -187,16 +187,16 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
       if (debugLayerGroupRef.current) {
         debugLayerGroupRef.current.clearLayers();
       }
-      layers.forEach((layer) => {
+      Object.values(layers).forEach((layer) => {
         if (layer.pickable === false) return;
         if (layer.checked === false) return;
         //@ts-ignore
-        if (layer.layer.resetStyle) layer.layer.resetStyle();
+        if (layer.resetStyle) layer.resetStyle();
         if (features.length >= maxLayers) {
           return;
         }
         //@ts-ignore
-        layer.layer.eachLayer((l: any) => {
+        layer.eachLayer((l: any) => {
           if (features.length >= maxLayers) {
             return;
           }
@@ -320,9 +320,6 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         position="topright"
         collapsed={layerControlCollapsed}
         exclusive={false}
-        onLayersAdd={(lyr) => {
-          setLayers(lyr);
-        }}
       >
         <GroupedLayer
           checked
