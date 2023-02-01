@@ -15,6 +15,23 @@ import { useEffect, useState } from 'react';
 const cacheUpdateInterval = 75; // 75 minutes
 
 const PirepLayer = () => {
+  const [jsonData, setJsonData] = useState();
+  const layerState = useSelector(selectPirep);
+  const [renderedTime, setRenderedTime] = useState(Date.now());
+  useEffect(() => {
+    if (layerState.checked) {
+      setRenderedTime(Date.now());
+    }
+  }, [
+    layerState.all.checked,
+    layerState.urgentOnly.checked,
+    layerState.icing.checked,
+    layerState.turbulence.checked,
+    layerState.weatherSky.checked,
+    layerState.altitude.valueMin,
+    layerState.altitude.valueMax,
+    layerState.time.hours,
+  ]);
   const map = useMap();
   const filters = {
     Type: {
@@ -202,13 +219,46 @@ const PirepLayer = () => {
     features: GeoJSON.Feature[],
     observationTime: Date,
   ): GeoJSON.Feature[] => {
+    setJsonData({ type: 'FeatureCollection', features: features } as any);
     const results = features.filter((feature) => {
       const start = new Date(feature.properties.obstime);
       const end = new Date(feature.properties.obstime);
       end.setMinutes(end.getMinutes() + 75);
       end.setSeconds(0);
       end.setMilliseconds(0);
-      return start <= observationTime && observationTime < end;
+      const inTime = start <= observationTime && observationTime < end;
+      if (!inTime) {
+        return false;
+      }
+      const inAltitudeRange =
+        layerState.altitude.valueMin <= feature.properties.fltlvl &&
+        feature.properties.fltlvl <= layerState.altitude.valueMax;
+
+      if (!inAltitudeRange) {
+        return false;
+      }
+      if (layerState.all.checked) {
+        return true;
+      }
+      if (
+        layerState.urgentOnly.checked &&
+        feature.properties.aireptype === 'Urgent PIREP'
+      ) {
+        return true;
+      }
+      if (layerState.icing.checked && feature.properties.icgint1 !== null) {
+        return true;
+      }
+      if (layerState.turbulence.checked && feature.properties.tbint1 !== null) {
+        return true;
+      }
+      if (
+        layerState.weatherSky.checked &&
+        feature.properties.tbint1 !== null &&
+        feature.properties.icgint1 !== null
+      ) {
+        return true;
+      }
     });
     return results;
   };
@@ -216,6 +266,8 @@ const PirepLayer = () => {
   return (
     <Pane name={'pirep'} style={{ zIndex: 699 }}>
       <WFSLayer
+        key={renderedTime}
+        initData={jsonData}
         url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
         maxFeatures={10000}
         typeName="EZWxBrief:pirep"

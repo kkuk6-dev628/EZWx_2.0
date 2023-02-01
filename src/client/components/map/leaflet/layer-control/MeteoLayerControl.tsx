@@ -4,22 +4,19 @@ import React, {
   ReactElement,
   useEffect,
   useRef,
-  useState,
   createContext,
   useContext,
 } from 'react';
-import { Radio, RadioGroup, Typography } from '@material-ui/core';
-import { useMap, useMapEvents } from 'react-leaflet';
-import { Layer, Util, DomEvent, LayerGroup } from 'leaflet';
+import { Radio, RadioGroup } from '@material-ui/core';
+import { useMap } from 'react-leaflet';
+import { Layer, DomEvent, LayerGroup } from 'leaflet';
 import Accordion from '@material-ui/core/Accordion';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import lodashGroupBy from 'lodash.groupby';
 import toast from 'react-hot-toast';
-import { LayersControlProvider } from './layerControlContext';
 import CircleCheckedFilled from '@material-ui/icons/CheckCircle';
 import CircleUnchecked from '@material-ui/icons/RadioButtonUnchecked';
 import createControlledLayer, { OrderedLayerProps } from './controlledLayer';
@@ -29,23 +26,21 @@ import {
   setRadar,
   setSigmet,
   setMetar,
-  LayerState,
   setLayerControl,
   LayerControlState,
   setGairmet,
   setCwa,
   GairmetLayerState,
+  PirepLayerState,
+  CwaLayerState,
+  MetarLayerState,
 } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { MetarMarkerTypes } from '../../common/AreoConstants';
 import Image from 'next/image';
 import Slider from '@mui/material/Slider';
-import {
-  MeteoLayersProvider,
-  useMeteoLayersContext,
-} from './MeteoLayerControlContext';
-import Control from 'react-leaflet-custom-control';
+import { useMeteoLayersContext } from './MeteoLayerControlContext';
 import { jsonClone } from '../../../utils/ObjectUtil';
 
 const POSITION_CLASSES: { [key: string]: string } = {
@@ -84,7 +79,6 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
   const dispatch = useDispatch();
   const meteoLayers = useMeteoLayersContext();
   const layerStatus = useSelector(selectLayerControl);
-  const [expand, setExpand] = useState(new Array(5).fill(false));
 
   const map = useMap();
 
@@ -258,12 +252,12 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                     name="radio-buttons-group-metar"
                     onChangeCapture={(e: ChangeEvent<HTMLInputElement>) => {
                       map.closePopup();
-                      dispatch(
-                        setMetar({
-                          ...layerStatus.metarState,
-                          markerType: e.target.value,
-                        }),
-                      );
+                      const cloned = jsonClone(
+                        layerStatus.metarState,
+                      ) as MetarLayerState;
+                      cloned.markerType = e.target.value;
+                      cloned.checked = true;
+                      dispatch(setMetar(cloned));
                     }}
                   >
                     <FormControlLabel
@@ -1030,8 +1024,6 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           if (cloned.urgentOnly.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.pirep, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setPirep(cloned));
                         }}
@@ -1048,19 +1040,21 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.pirepState,
-                              all: {
-                                name: layerStatus.pirepState.all.name,
-                                checked: !layerStatus.pirepState.all.checked,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            meteoLayers.pirep,
-                            layerStatus.pirepState.all as any,
-                          );
+                          const cloned = jsonClone(
+                            layerStatus.pirepState,
+                          ) as PirepLayerState;
+                          cloned.all.checked =
+                            !layerStatus.pirepState.all.checked;
+                          if (cloned.all.checked) {
+                            cloned.checked = true;
+                            cloned.icing.checked = true;
+                            cloned.turbulence.checked = true;
+                            cloned.weatherSky.checked = true;
+                            showLayer(meteoLayers.pirep, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setPirep(cloned));
                         }}
                       />
                     }
@@ -1075,19 +1069,16 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.pirepState,
-                              icing: {
-                                name: layerStatus.pirepState.icing.name,
-                                checked: !layerStatus.pirepState.icing.checked,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            meteoLayers.gairmet,
-                            layerStatus.pirepState.icing as any,
-                          );
+                          const cloned = jsonClone(layerStatus.pirepState);
+                          cloned.icing.checked =
+                            !layerStatus.pirepState.icing.checked;
+                          if (cloned.icing.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.pirep, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setPirep(cloned));
                         }}
                       />
                     }
@@ -1102,20 +1093,16 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.pirepState,
-                              turbulence: {
-                                name: layerStatus.pirepState.turbulence.name,
-                                checked:
-                                  !layerStatus.pirepState.turbulence.checked,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            null,
-                            layerStatus.pirepState.turbulence as any,
-                          );
+                          const cloned = jsonClone(layerStatus.pirepState);
+                          cloned.turbulence.checked =
+                            !layerStatus.pirepState.turbulence.checked;
+                          if (cloned.turbulence.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.pirep, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setPirep(cloned));
                         }}
                       />
                     }
@@ -1130,20 +1117,16 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.pirepState,
-                              weatherSky: {
-                                name: layerStatus.pirepState.weatherSky.name,
-                                checked:
-                                  !layerStatus.pirepState.weatherSky.checked,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            null,
-                            layerStatus.pirepState.weatherSky as any,
-                          );
+                          const cloned = jsonClone(layerStatus.pirepState);
+                          cloned.weatherSky.checked =
+                            !layerStatus.pirepState.weatherSky.checked;
+                          if (cloned.weatherSky.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.pirep, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setPirep(cloned));
                         }}
                       />
                     }
@@ -1163,18 +1146,12 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                               name="checkedB"
                               color="primary"
                               onChange={(_e) => {
-                                dispatch(
-                                  setPirep({
-                                    ...layerStatus.pirepState,
-                                    altitude: {
-                                      ...layerStatus.pirepState.altitude,
-                                      valueMin:
-                                        layerStatus.pirepState.altitude.min,
-                                      valueMax:
-                                        layerStatus.pirepState.altitude.max,
-                                    },
-                                  }),
-                                );
+                                const cloned = jsonClone(
+                                  layerStatus.pirepState,
+                                ) as PirepLayerState;
+                                cloned.altitude.valueMin = cloned.altitude.min;
+                                cloned.altitude.valueMax = cloned.altitude.max;
+                                dispatch(setPirep(cloned));
                               }}
                             />
                           }
@@ -1193,69 +1170,18 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           layerStatus.pirepState.altitude.valueMax,
                         ]}
                         onChange={(_e: Event, newValues: number[]) => {
-                          dispatch(
-                            setPirep({
-                              ...layerStatus.pirepState,
-                              altitude: {
-                                ...layerStatus.pirepState.altitude,
-                                valueMin: newValues[0],
-                                valueMax: newValues[1],
-                              },
-                            }),
-                          );
-                        }}
-                        valueLabelDisplay="on"
-                        component={null}
-                      />
-                    </div>
-                  </div>
-                  <div className="pirep-slider">
-                    <div className="title">
-                      <div className="label">
-                        {layerStatus.pirepState.time.name}
-                      </div>
-                      <div className="all-check">
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              icon={<CircleUnchecked />}
-                              checkedIcon={<CircleCheckedFilled />}
-                              name="checkedB"
-                              color="primary"
-                              onChange={(_e) => {
-                                dispatch(
-                                  setPirep({
-                                    ...layerStatus.pirepState,
-                                    time: {
-                                      ...layerStatus.pirepState.time,
-                                      hours: layerStatus.pirepState.time.max,
-                                    },
-                                  }),
-                                );
-                              }}
-                            />
+                          const cloned = jsonClone(
+                            layerStatus.pirepState,
+                          ) as PirepLayerState;
+                          cloned.altitude.valueMin = newValues[0];
+                          cloned.altitude.valueMax = newValues[1];
+                          if (
+                            newValues[0] !== cloned.altitude.min ||
+                            newValues[1] !== cloned.altitude.max
+                          ) {
+                            cloned.all.checked = false;
                           }
-                          label="All"
-                        />
-                      </div>
-                    </div>
-                    <div className="slider">
-                      <Slider
-                        getAriaLabel={() => 'Time'}
-                        min={0}
-                        step={1}
-                        defaultValue={layerStatus.pirepState.time.hours}
-                        max={layerStatus.pirepState.time.max}
-                        onChangeCommitted={(_e: Event, newValue: number) => {
-                          dispatch(
-                            setPirep({
-                              ...layerStatus.pirepState,
-                              time: {
-                                ...layerStatus.pirepState.time,
-                                hours: newValue,
-                              },
-                            }),
-                          );
+                          dispatch(setPirep(cloned));
                         }}
                         valueLabelDisplay="on"
                         component={null}
@@ -1295,14 +1221,20 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          // e.stopPropagation();
-                          dispatch(
-                            setCwa({
-                              ...layerStatus.cwaState,
-                              checked: !layerStatus.cwaState.checked,
-                            }),
-                          );
-                          onLayerClick(meteoLayers.cwa, layerStatus.cwaState);
+                          const cloned = jsonClone(
+                            layerStatus.cwaState,
+                          ) as CwaLayerState;
+                          cloned.checked = !layerStatus.cwaState.checked;
+                          dispatch(setCwa(cloned));
+                          cloned.checked
+                            ? showLayer(
+                                meteoLayers.cwa,
+                                layerStatus.cwaState.name,
+                              )
+                            : hideLayer(
+                                meteoLayers.cwa,
+                                layerStatus.cwaState.name,
+                              );
                         }}
                       />
                     }
@@ -1320,19 +1252,21 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.cwaState,
-                              all: {
-                                name: layerStatus.cwaState.all.name,
-                                checked: !layerStatus.cwaState.all.checked,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            meteoLayers.cwa,
-                            layerStatus.cwaState.all as any,
-                          );
+                          const cloned = jsonClone(
+                            layerStatus.cwaState,
+                          ) as CwaLayerState;
+                          cloned.all.checked =
+                            !layerStatus.cwaState.all.checked;
+                          if (cloned.all.checked) {
+                            cloned.checked = true;
+                            cloned.airframeIcing.checked = true;
+                            cloned.turbulence.checked = true;
+                            cloned.ifrConditions.checked = true;
+                            cloned.convection.checked = true;
+                            cloned.other.checked = true;
+                            showLayer(meteoLayers.cwa, cloned.name);
+                          }
+                          dispatch(setCwa(cloned));
                         }}
                       />
                     }
@@ -1347,20 +1281,18 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.cwaState,
-                              airframeIcing: {
-                                name: layerStatus.cwaState.airframeIcing.name,
-                                checked:
-                                  !layerStatus.cwaState.airframeIcing.checked,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            meteoLayers.cwa,
-                            layerStatus.cwaState.airframeIcing as any,
-                          );
+                          const cloned = jsonClone(
+                            layerStatus.cwaState,
+                          ) as CwaLayerState;
+                          cloned.airframeIcing.checked =
+                            !layerStatus.cwaState.airframeIcing.checked;
+                          if (cloned.airframeIcing.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.cwa, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setCwa(cloned));
                         }}
                       />
                     }
@@ -1375,21 +1307,18 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.cwaState,
-                              icing: {
-                                turbulence:
-                                  layerStatus.cwaState.turbulence.name,
-                                checked:
-                                  !layerStatus.cwaState.turbulence.checked,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            meteoLayers.cwa,
-                            layerStatus.cwaState.turbulence as any,
-                          );
+                          const cloned = jsonClone(
+                            layerStatus.cwaState,
+                          ) as CwaLayerState;
+                          cloned.turbulence.checked =
+                            !layerStatus.cwaState.turbulence.checked;
+                          if (cloned.turbulence.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.cwa, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setCwa(cloned));
                         }}
                       />
                     }
@@ -1404,20 +1333,18 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.cwaState,
-                              ifrConditions: {
-                                name: layerStatus.cwaState.ifrConditions.name,
-                                checked:
-                                  !layerStatus.cwaState.ifrConditions.checked,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            null,
-                            layerStatus.cwaState.ifrConditions as any,
-                          );
+                          const cloned = jsonClone(
+                            layerStatus.cwaState,
+                          ) as CwaLayerState;
+                          cloned.ifrConditions.checked =
+                            !layerStatus.cwaState.ifrConditions.checked;
+                          if (cloned.ifrConditions.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.cwa, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setCwa(cloned));
                         }}
                       />
                     }
@@ -1432,20 +1359,18 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.cwaState,
-                              convection: {
-                                name: layerStatus.cwaState.convection.name,
-                                checked:
-                                  !layerStatus.cwaState.convection.checked,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            null,
-                            layerStatus.cwaState.convection as any,
-                          );
+                          const cloned = jsonClone(
+                            layerStatus.cwaState,
+                          ) as CwaLayerState;
+                          cloned.convection.checked =
+                            !layerStatus.cwaState.convection.checked;
+                          if (cloned.convection.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.cwa, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setCwa(cloned));
                         }}
                       />
                     }
@@ -1460,16 +1385,18 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.cwaState,
-                              other: {
-                                name: layerStatus.cwaState.other.name,
-                                checked: !layerStatus.cwaState.other.checked,
-                              },
-                            }),
-                          );
-                          onLayerClick(null, layerStatus.cwaState.other as any);
+                          const cloned = jsonClone(
+                            layerStatus.cwaState,
+                          ) as CwaLayerState;
+                          cloned.other.checked =
+                            !layerStatus.cwaState.other.checked;
+                          if (cloned.other.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.cwa, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setCwa(cloned));
                         }}
                       />
                     }

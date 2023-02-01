@@ -135,9 +135,9 @@ const initialState: LayerControlState = {
     altitude: {
       name: 'Altitude(FL)',
       min: 0,
-      max: 425,
+      max: 600,
       valueMin: 0,
-      valueMax: 425,
+      valueMax: 600,
       unit: 'feet',
     },
     time: { name: 'Time (past hours)', hours: 12, max: 24 },

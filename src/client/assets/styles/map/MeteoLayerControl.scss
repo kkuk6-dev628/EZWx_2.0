@@ -64,6 +64,15 @@
     }
   }
   
+  .MuiFormControlLabel-root{
+    height: 24px;
+  }
+
+  .PrivateRadioButtonIcon-root-8 > svg{
+    width: 18px;
+    height: 18px;
+  }
+
   .PrivateSwitchBase-root-1{
     color: var(--color-white);
     // padding: 4px!important;
