@@ -1,7 +1,12 @@
+  .layer-control-container{
+    right: 54px !important;
+  }
+
   .layer-control{
   background-color: var(--color-primary);
   border-radius: 8px;
   overflow: hidden;
+  min-width: 240px;
 
   &__header{
     display: flex;

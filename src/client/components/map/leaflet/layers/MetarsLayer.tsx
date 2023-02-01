@@ -913,7 +913,6 @@ const MetarsLayer = () => {
     }
     const result = Object.values(filteredFeatures);
     setFilteredData({ type: 'FeatureCollection', features: result } as any);
-    // console.log('filter metar', count, new Date().getTime() - startTime);
     return result as any;
   };
 

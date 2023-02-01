@@ -5,7 +5,22 @@ import { selectSigmet } from '../../../../store/layers/LayerControl';
 import WFSLayer from './WFSLayer';
 
 const SigmetLayer = () => {
+  const [jsonData, setJsonData] = useState();
   const layerState = useSelector(selectSigmet);
+  const [renderedTime, setRenderedTime] = useState(Date.now());
+  useEffect(() => {
+    if (layerState.checked) {
+      setRenderedTime(Date.now());
+    }
+  }, [
+    layerState.all.checked,
+    layerState.convection.checked,
+    layerState.turbulence.checked,
+    layerState.airframeIcing.checked,
+    layerState.dust.checked,
+    layerState.ash.checked,
+    layerState.other.checked,
+  ]);
 
   const gairmetStyle = (): PathOptions => {
     const style = {
@@ -42,6 +57,7 @@ const SigmetLayer = () => {
     features: GeoJSON.Feature[],
     observationTime: Date,
   ): GeoJSON.Feature[] => {
+    setJsonData({ type: 'FeatureCollection', features: features } as any);
     const results = features.filter((feature) => {
       const start = new Date(feature.properties.validtimefrom);
       const end = new Date(feature.properties.validtimeto);
@@ -49,35 +65,35 @@ const SigmetLayer = () => {
       if (!inTime) {
         return false;
       }
-      if (layerState.all.visible) {
+      if (layerState.all.checked) {
         return true;
       }
       if (
-        layerState.convection.visible &&
+        layerState.convection.checked &&
         feature.properties.hazard === 'CONVECTIVE'
       ) {
         return true;
       }
       if (
-        layerState.turbulence.visible &&
+        layerState.turbulence.checked &&
         feature.properties.hazard === 'TURB'
       ) {
         return true;
       }
       if (
-        layerState.airframeIcing.visible &&
+        layerState.airframeIcing.checked &&
         feature.properties.hazard === 'ICING'
       ) {
         return true;
       }
-      if (layerState.dust.visible && feature.properties.hazard === 'IFR') {
+      if (layerState.dust.checked && feature.properties.hazard === 'IFR') {
         return true;
       }
-      if (layerState.ash.visible && feature.properties.hazard === 'ASH') {
+      if (layerState.ash.checked && feature.properties.hazard === 'ASH') {
         return true;
       }
       if (
-        layerState.other.visible &&
+        layerState.other.checked &&
         ['CONVECTIVE', 'TURB', 'ICING', 'IFR', 'ASH'].includes(
           feature.properties.hazard,
         ) === false
@@ -90,10 +106,11 @@ const SigmetLayer = () => {
 
   return (
     <WFSLayer
-      key={JSON.stringify(layerState)}
+      key={renderedTime}
       url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
       maxFeatures={256}
       typeName="EZWxBrief:sigmet"
+      initData={jsonData}
       propertyNames={[
         'wkb_geometry',
         'id',

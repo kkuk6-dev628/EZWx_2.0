@@ -7,7 +7,7 @@ import WFSLayer from './WFSLayer';
 import { LayerGroup, useMapEvents } from 'react-leaflet';
 import L, { CRS, LatLng } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import FeatureSelector from '../popups/FeatureSelector';
 import ReactDOMServer from 'react-dom/server';
@@ -43,6 +43,7 @@ import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
 import axios from 'axios';
 import { MetarMarkerTypes } from '../../common/AreoConstants';
 import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
+import { InLayerControl } from '../layer-control/MeteoLayerControl';
 
 const maxLayers = 6;
 
@@ -180,8 +181,11 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
       .openOn(map);
   };
 
+  const inLayerControl = useContext(InLayerControl);
+
   const map = useMapEvents({
     click: (e: any) => {
+      if (inLayerControl.value) return;
       const features = [];
       const clickedBBox = getBBoxFromPointZoom(50, e.latlng, map.getZoom());
       if (debugLayerGroupRef.current) {
@@ -319,86 +323,85 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
       <LayerControl
         position="topright"
         collapsed={layerControlCollapsed}
-        exclusive={false}
+      ></LayerControl>
+      <GroupedLayer
+        checked
+        name="Station Markers"
+        group="Map Layers"
+        order={0}
+        addLayerToStore={(layer) => {
+          meteoLayers.metar = layer;
+        }}
       >
-        <GroupedLayer
-          checked
-          name="Station Markers"
-          group="Map Layers"
-          order={0}
-          addLayerToStore={(layer) => {
-            meteoLayers.metar = layer;
-          }}
-        >
-          <MetarsLayer></MetarsLayer>
-        </GroupedLayer>
-        <GroupedLayer
-          checked
-          name="SIGMET"
-          group="Map Layers"
-          order={1}
-          addLayerToStore={(layer) => {
-            meteoLayers.sigmet = layer;
-          }}
-        >
-          <SigmetLayer></SigmetLayer>
-        </GroupedLayer>
-        <GroupedLayer
-          checked
-          name="International SIGMET"
-          group="Map Layers"
-          order={2}
-          addLayerToStore={(layer) => {
-            meteoLayers.intlSigmet = layer;
-          }}
-        >
-          <IntlSigmetLayer></IntlSigmetLayer>
-        </GroupedLayer>
-        <GroupedLayer
-          checked
-          name="CWA"
-          group="Map Layers"
-          order={3}
-          addLayerToStore={(layer) => {
-            meteoLayers.cwa = layer;
-          }}
-        >
-          <CWALayer></CWALayer>
-        </GroupedLayer>
-        <GroupedLayer
-          checked
-          name="Convetive Outlook"
-          group="Map Layers"
-          order={4}
-          addLayerToStore={(layer) => {
-            meteoLayers.convection = layer;
-          }}
-        >
-          <ConvectiveOutlookLayer></ConvectiveOutlookLayer>
-        </GroupedLayer>
-        <GroupedLayer
-          checked
-          name="GAirmet"
-          group="Map Layers"
-          order={5}
-          addLayerToStore={(layer) => {
-            meteoLayers.gairmet = layer;
-          }}
-        >
-          <GairmetLayer></GairmetLayer>
-        </GroupedLayer>
-        <GroupedLayer
-          checked
-          name="Pirep"
-          group="Map Layers"
-          order={6}
-          addLayerToStore={(layer) => {
-            meteoLayers.pirep = layer;
-          }}
-        >
-          <PirepLayer></PirepLayer>
-        </GroupedLayer>
-        {/* <GroupedLayer
+        <MetarsLayer></MetarsLayer>
+      </GroupedLayer>
+      <GroupedLayer
+        checked
+        name="SIGMET"
+        group="Map Layers"
+        order={1}
+        addLayerToStore={(layer) => {
+          meteoLayers.sigmet = layer;
+        }}
+      >
+        <SigmetLayer></SigmetLayer>
+      </GroupedLayer>
+      <GroupedLayer
+        checked
+        name="International SIGMET"
+        group="Map Layers"
+        order={2}
+        addLayerToStore={(layer) => {
+          meteoLayers.intlSigmet = layer;
+        }}
+      >
+        <IntlSigmetLayer></IntlSigmetLayer>
+      </GroupedLayer>
+      <GroupedLayer
+        checked
+        name="CWA"
+        group="Map Layers"
+        order={3}
+        addLayerToStore={(layer) => {
+          meteoLayers.cwa = layer;
+        }}
+      >
+        <CWALayer></CWALayer>
+      </GroupedLayer>
+      <GroupedLayer
+        checked
+        name="Convetive Outlook"
+        group="Map Layers"
+        order={4}
+        addLayerToStore={(layer) => {
+          meteoLayers.convection = layer;
+        }}
+      >
+        <ConvectiveOutlookLayer></ConvectiveOutlookLayer>
+      </GroupedLayer>
+      <GroupedLayer
+        checked
+        name="GAirmet"
+        group="Map Layers"
+        order={5}
+        addLayerToStore={(layer) => {
+          meteoLayers.gairmet = layer;
+        }}
+      >
+        <GairmetLayer></GairmetLayer>
+      </GroupedLayer>
+      <GroupedLayer
+        checked
+        name="Pirep"
+        group="Map Layers"
+        order={6}
+        addLayerToStore={(layer) => {
+          meteoLayers.pirep = layer;
+        }}
+      >
+        <PirepLayer></PirepLayer>
+      </GroupedLayer>
+      {/* <GroupedLayer
           checked
           name="temperature"
           group="Map Layers"
@@ -425,8 +428,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
             }}
           ></TimeDimensionLayer>
         </GroupedLayer> */}
-        <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
-      </LayerControl>
+      <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
     </div>
   );
 };

@@ -1,7 +1,28 @@
 import { PathOptions } from 'leaflet';
+import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { selectGairmet } from '../../../../store/layers/LayerControl';
 import WFSLayer from './WFSLayer';
 
 const GairmetLayer = () => {
+  const [jsonData, setJsonData] = useState();
+  const layerState = useSelector(selectGairmet);
+  const [renderedTime, setRenderedTime] = useState(Date.now());
+  useEffect(() => {
+    if (layerState.checked) {
+      setRenderedTime(Date.now());
+    }
+  }, [
+    layerState.all.checked,
+    layerState.multiFrzLevels.checked,
+    layerState.turbulenceHi.checked,
+    layerState.airframeIcing.checked,
+    layerState.turbulenceLow.checked,
+    layerState.ifrConditions.checked,
+    layerState.mountainObscuration.checked,
+    layerState.nonconvectiveLlws.checked,
+    layerState.sfcWinds.checked,
+  ]);
   const gairmetStyle = (feature: GeoJSON.Feature): PathOptions => {
     const style = {
       color: '#333333',
@@ -82,6 +103,7 @@ const GairmetLayer = () => {
     features: GeoJSON.Feature[],
     observationTime: Date,
   ): GeoJSON.Feature[] => {
+    setJsonData({ type: 'FeatureCollection', features: features } as any);
     const results = features.filter((feature) => {
       const start = new Date(feature.properties.validtime);
       let duration = 3 * 60; // minutes
@@ -92,13 +114,70 @@ const GairmetLayer = () => {
       end.setMinutes(end.getMinutes() + duration);
       end.setSeconds(0);
       end.setMilliseconds(0);
-      return start <= observationTime && observationTime < end;
+      const inTime = start <= observationTime && observationTime < end;
+      if (!inTime) {
+        return false;
+      }
+      if (layerState.all.checked) {
+        return true;
+      }
+      if (
+        layerState.airframeIcing.checked &&
+        feature.properties.hazard === 'ICE'
+      ) {
+        return true;
+      }
+      if (
+        layerState.multiFrzLevels.checked &&
+        feature.properties.hazard === 'M_FZLVL'
+      ) {
+        return true;
+      }
+      if (
+        layerState.turbulenceHi.checked &&
+        feature.properties.hazard === 'TURB-HI'
+      ) {
+        return true;
+      }
+      if (
+        layerState.turbulenceLow.checked &&
+        feature.properties.hazard === 'TURB-LO'
+      ) {
+        return true;
+      }
+      if (
+        layerState.ifrConditions.checked &&
+        feature.properties.hazard === 'IFR'
+      ) {
+        return true;
+      }
+      if (
+        layerState.mountainObscuration.checked &&
+        feature.properties.hazard === 'MT_OBSC'
+      ) {
+        return true;
+      }
+      if (
+        layerState.nonconvectiveLlws.checked &&
+        feature.properties.hazard === 'LLWS'
+      ) {
+        return true;
+      }
+      if (
+        layerState.sfcWinds.checked &&
+        feature.properties.hazard === 'SFC_WND'
+      ) {
+        return true;
+      }
+      return false;
     });
     return results;
   };
 
   return (
     <WFSLayer
+      key={renderedTime}
+      initData={jsonData}
       url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
       maxFeatures={256}
       typeName="EZWxBrief:gairmet"

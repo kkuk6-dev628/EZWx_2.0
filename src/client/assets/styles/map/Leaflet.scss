@@ -1,12 +1,12 @@
 //leaflet override
 .leaflet-touch .leaflet-bar{
-  top: 40px;
-  right: 50%!important;
-  box-shadow: none;
+  // top: 40px;
+  // right: 50%!important;
+  // box-shadow: none;
   border: 0!important;
 
   @media screen and (max-width: 768px) {
-    right: 30%!important;
+    // right: 30%!important;
   }
 }
 

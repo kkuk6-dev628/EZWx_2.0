@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, {
   ChangeEvent,
   ReactElement,
   useEffect,
   useRef,
   useState,
+  createContext,
+  useContext,
 } from 'react';
 import { Radio, RadioGroup, Typography } from '@material-ui/core';
 import { useMap, useMapEvents } from 'react-leaflet';
@@ -31,6 +34,7 @@ import {
   LayerControlState,
   setGairmet,
   setCwa,
+  GairmetLayerState,
 } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
@@ -41,6 +45,8 @@ import {
   MeteoLayersProvider,
   useMeteoLayersContext,
 } from './MeteoLayerControlContext';
+import Control from 'react-leaflet-custom-control';
+import { jsonClone } from '../../../utils/ObjectUtil';
 
 const POSITION_CLASSES: { [key: string]: string } = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -50,13 +56,9 @@ const POSITION_CLASSES: { [key: string]: string } = {
 };
 
 interface IProps {
-  children: ReactElement[];
+  children?: ReactElement[];
   position: string;
   collapsed: boolean;
-  exclusive: boolean;
-  defaultLayer?: string;
-  exclusiveSkipLayers?: string[];
-  onLayersAdd?: (layers: ILayerObj[]) => void;
 }
 
 export interface ILayerObj {
@@ -70,15 +72,11 @@ export interface ILayerObj {
   order: number;
 }
 
-const MeteoLayerControl = ({
-  position,
-  collapsed,
-  children,
-  exclusive,
-  defaultLayer,
-  exclusiveSkipLayers,
-  onLayersAdd,
-}: IProps) => {
+export const InLayerControl = createContext<{ value: boolean }>({
+  value: false,
+});
+
+const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
   const positionClass =
     (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright;
 
@@ -98,31 +96,47 @@ const MeteoLayerControl = ({
     );
   };
 
-  const onLayerClick = (layerObj: Layer, layerState: LayerState) => {
+  // const onLayerClick = (layerObj: Layer, layerState: LayerState) => {
+  //   map.closePopup();
+  //   if (!layerObj) return;
+  //   if (checkEmptyLayer(layerObj)) {
+  //     toast.error(`No ${layerState.name}'s data displayed`, {
+  //       position: 'top-right',
+  //     });
+  //   } else {
+  //     if (map?.hasLayer(layerObj)) {
+  //       hideLayer(layerObj);
+  //     } else {
+  //       showLayer(layerObj);
+  //     }
+  //   }
+  // };
+
+  const showLayer = (layerObj: Layer, layerName: string) => {
     map.closePopup();
     if (!layerObj) return;
     if (checkEmptyLayer(layerObj)) {
-      toast.error(`No ${layerState.name}'s data displayed`, {
+      toast.error(`No ${layerName}'s data displayed`, {
         position: 'top-right',
       });
     } else {
-      if (map?.hasLayer(layerObj)) {
-        hideLayer(layerObj);
-      } else {
-        showLayer(layerObj);
+      if (!map?.hasLayer(layerObj)) {
+        map.addLayer(layerObj);
       }
     }
   };
 
-  const showLayer = (layerObj: Layer) => {
-    if (!map?.hasLayer(layerObj)) {
-      map.addLayer(layerObj);
-    }
-  };
-
-  const hideLayer = (layerObj: Layer) => {
-    if (map?.hasLayer(layerObj)) {
-      map.removeLayer(layerObj);
+  const hideLayer = (layerObj: Layer, layerName: string) => {
+    map.closePopup();
+    if (!layerObj) return;
+    if (checkEmptyLayer(layerObj)) {
+      toast.error(`No ${layerName}'s data displayed`, {
+        position: 'top-right',
+      });
+    } else {
+      if (map?.hasLayer(layerObj)) {
+        map.removeLayer(layerObj);
+      }
     }
   };
 
@@ -136,32 +150,44 @@ const MeteoLayerControl = ({
     return cloned;
   };
 
+  const inLayerControl = useContext(InLayerControl);
+
   useEffect(() => {
     if (ref?.current) {
       // DomEvent.disableClickPropagation(ref.current);
-      // DomEvent.disableScrollPropagation(ref.current);
+      DomEvent.disableScrollPropagation(ref.current);
       // Disable dragging when user's cursor enters the element
       ref.current.addEventListener('mouseover', function () {
         map.dragging.disable();
         map.doubleClickZoom.disable();
         map.scrollWheelZoom.disable();
+        map.touchZoom.disable();
+        map.boxZoom.disable();
+        map.keyboard.disable();
+        if (map.tap) map.tap.disable();
+        inLayerControl.value = true;
       });
       // Re-enable dragging when user's cursor leaves the element
       ref.current.addEventListener('mouseout', function () {
         map.dragging.enable();
         map.doubleClickZoom.enable();
         map.scrollWheelZoom.enable();
+        map.touchZoom.enable();
+        map.boxZoom.enable();
+        map.keyboard.enable();
+        if (map.tap) map.tap.enable();
+        inLayerControl.value = false;
       });
     }
   }, [ref?.current]);
 
   return (
-    <div className={positionClass}>
+    //@ts-ignore
+    <div className={positionClass + ' layer-control-container'} ref={ref}>
       {!collapsed && (
         <div
           id="layer-control"
           className="leaflet-control leaflet-bar layer-control"
-          ref={ref}
         >
           <div className="layer-control__header">
             <div className="layer-control__img__area">
@@ -202,22 +228,24 @@ const MeteoLayerControl = ({
                     control={
                       <Checkbox
                         style={{ pointerEvents: 'none' }}
-                        checked={layerStatus.metarState.visible}
+                        checked={layerStatus.metarState.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setMetar({
-                              ...layerStatus.metarState,
-                              visible: !layerStatus.metarState.visible,
-                            }),
-                          );
-                          onLayerClick(
-                            meteoLayers.metar,
-                            layerStatus.metarState,
-                          );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.metarState);
+                          cloned.checked = !layerStatus.metarState.checked;
+                          dispatch(setMetar(cloned));
+                          cloned.checked
+                            ? showLayer(
+                                meteoLayers.metar,
+                                layerStatus.metarState.name,
+                              )
+                            : hideLayer(
+                                meteoLayers.metar,
+                                layerStatus.metarState.name,
+                              );
                         }}
                       />
                     }
@@ -300,19 +328,27 @@ const MeteoLayerControl = ({
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={layerStatus.radarState.visible}
+                    checked={layerStatus.radarState.checked}
                     icon={<CircleUnchecked />}
                     checkedIcon={<CircleCheckedFilled />}
                     name="checkedB"
                     color="primary"
-                    onClick={(e) => {
+                    onClick={(_e) => {
                       dispatch(
                         setRadar({
                           ...layerStatus.radarState,
-                          visible: !layerStatus.radarState.visible,
+                          checked: !layerStatus.radarState.checked,
                         }),
                       );
-                      onLayerClick(meteoLayers.radar, layerStatus.radarState);
+                      layerStatus.radarState.checked
+                        ? showLayer(
+                            meteoLayers.radar,
+                            layerStatus.radarState.name,
+                          )
+                        : hideLayer(
+                            meteoLayers.radar,
+                            layerStatus.radarState.name,
+                          );
                     }}
                   />
                 }
@@ -342,35 +378,46 @@ const MeteoLayerControl = ({
                     label={layerStatus.sigmetState.name}
                     control={
                       <Checkbox
-                        checked={layerStatus.sigmetState.visible}
+                        checked={layerStatus.sigmetState.checked}
                         style={{ pointerEvents: 'none' }}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
+                        onClick={() => {
                           // e.stopPropagation();
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.sigmetState,
-                              visible: !layerStatus.sigmetState.visible,
-                            }),
-                          );
-                          if (checkEmptyLayer(meteoLayers.intlSigmet)) {
-                            onLayerClick(
-                              meteoLayers.intlSigmet,
-                              layerStatus.sigmetState.international as any,
+                          const cloned = jsonClone(layerStatus.sigmetState);
+                          cloned.checked = !layerStatus.sigmetState.checked;
+                          dispatch(setSigmet(cloned));
+                          if (cloned.checked) {
+                            showLayer(
+                              meteoLayers.sigmet,
+                              layerStatus.sigmetState.name,
                             );
-                          } else {
-                            if (!checkEmptyLayer(meteoLayers.sigmet)) {
-                              onLayerClick(
-                                meteoLayers.sigmet,
-                                layerStatus.sigmetState,
+                            if (layerStatus.sigmetState.outlooks.checked) {
+                              showLayer(
+                                meteoLayers.outlooks,
+                                layerStatus.sigmetState.outlooks.name,
                               );
                             }
-                            onLayerClick(
+                            if (layerStatus.sigmetState.international.checked) {
+                              showLayer(
+                                meteoLayers.intlSigmet,
+                                layerStatus.sigmetState.international.name,
+                              );
+                            }
+                          } else {
+                            hideLayer(
+                              meteoLayers.sigmet,
+                              layerStatus.sigmetState.name,
+                            );
+                            hideLayer(
+                              meteoLayers.outlooks,
+                              layerStatus.sigmetState.outlooks.name,
+                            );
+                            hideLayer(
                               meteoLayers.intlSigmet,
-                              layerStatus.sigmetState.international as any,
+                              layerStatus.sigmetState.international.name,
                             );
                           }
                         }}
@@ -384,25 +431,39 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.sigmetState.all.visible}
+                        checked={layerStatus.sigmetState.all.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.sigmetState,
-                              all: {
-                                name: layerStatus.sigmetState.all.name,
-                                visible: !layerStatus.sigmetState.all.visible,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            meteoLayers.sigmet,
-                            layerStatus.sigmetState.all as any,
-                          );
+                        onClick={() => {
+                          const cloned = jsonClone(layerStatus.sigmetState);
+                          if (layerStatus.sigmetState.all.checked) {
+                            cloned.all.checked = false;
+                          } else {
+                            cloned.all.checked = true;
+                            cloned.convection.checked = true;
+                            cloned.outlooks.checked = true;
+                            cloned.turbulence.checked = true;
+                            cloned.airframeIcing.checked = true;
+                            cloned.dust.checked = true;
+                            cloned.ash.checked = true;
+                            cloned.other.checked = true;
+                            cloned.international.checked = true;
+                            showLayer(
+                              meteoLayers.sigmet,
+                              layerStatus.sigmetState.name,
+                            );
+                            showLayer(
+                              meteoLayers.outlooks,
+                              layerStatus.sigmetState.outlooks.name,
+                            );
+                            showLayer(
+                              meteoLayers.intlSigmet,
+                              layerStatus.sigmetState.international.name,
+                            );
+                          }
+                          dispatch(setSigmet(cloned));
                         }}
                       />
                     }
@@ -411,25 +472,20 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.sigmetState.convection.visible}
+                        checked={layerStatus.sigmetState.convection.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          const cloned = {
-                            ...layerStatus.sigmetState,
-                            convection: {
-                              name: layerStatus.sigmetState.convection.name,
-                              visible:
-                                !layerStatus.sigmetState.convection.visible,
-                            },
-                          };
-                          if (!cloned.convection.visible) {
-                            cloned.all = {
-                              ...cloned.all,
-                              visible: false,
-                            };
+                        onClick={() => {
+                          const cloned = jsonClone(layerStatus.sigmetState);
+                          cloned.convection.checked =
+                            !layerStatus.sigmetState.convection.checked;
+                          if (!cloned.convection.checked) {
+                            cloned.all.checked = false;
+                          } else {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.sigmet, cloned.name);
                           }
                           dispatch(setSigmet(cloned));
                         }}
@@ -440,31 +496,29 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.sigmetState.outlooks.visible}
+                        checked={layerStatus.sigmetState.outlooks.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          const cloned = {
-                            ...layerStatus.sigmetState,
-                            outlooks: {
-                              name: layerStatus.sigmetState.outlooks.name,
-                              visible:
-                                !layerStatus.sigmetState.outlooks.visible,
-                            },
-                          };
-                          if (!cloned.outlooks.visible) {
-                            cloned.all = {
-                              ...cloned.all,
-                              visible: false,
-                            };
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.sigmetState);
+                          cloned.outlooks.checked =
+                            !layerStatus.sigmetState.outlooks.checked;
+                          if (!cloned.outlooks.checked) {
+                            cloned.all.checked = false;
+                            hideLayer(
+                              meteoLayers.outlooks,
+                              layerStatus.sigmetState.outlooks.name,
+                            );
+                          } else {
+                            cloned.checked = true;
+                            showLayer(
+                              meteoLayers.outlooks,
+                              layerStatus.sigmetState.outlooks.name,
+                            );
                           }
                           dispatch(setSigmet(cloned));
-                          onLayerClick(
-                            meteoLayers.outlooks,
-                            layerStatus.sigmetState.outlooks as any,
-                          );
                         }}
                       />
                     }
@@ -473,31 +527,22 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.sigmetState.turbulence.visible}
+                        checked={layerStatus.sigmetState.turbulence.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          const cloned = {
-                            ...layerStatus.sigmetState,
-                            turbulence: {
-                              name: layerStatus.sigmetState.turbulence.name,
-                              visible:
-                                !layerStatus.sigmetState.turbulence.visible,
-                            },
-                          };
-                          if (!cloned.turbulence.visible) {
-                            cloned.all = {
-                              ...cloned.all,
-                              visible: false,
-                            };
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.sigmetState);
+                          cloned.turbulence.checked =
+                            !layerStatus.sigmetState.turbulence.checked;
+                          if (!cloned.turbulence.checked) {
+                            cloned.all.checked = false;
+                          } else {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.sigmet, cloned.name);
                           }
                           dispatch(setSigmet(cloned));
-                          // onLayerClick(
-                          //   null,
-                          //   layerStatus.sigmetState.turbulence as any,
-                          // );
                         }}
                       />
                     }
@@ -506,28 +551,22 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.sigmetState.airframeIcing.visible}
+                        checked={layerStatus.sigmetState.airframeIcing.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.sigmetState,
-                              airframeIcing: {
-                                name: layerStatus.sigmetState.airframeIcing
-                                  .name,
-                                visible:
-                                  !layerStatus.sigmetState.airframeIcing
-                                    .visible,
-                              },
-                            }),
-                          );
-                          // onLayerClick(
-                          //   null,
-                          //   layerStatus.sigmetState.airframeIcing as any,
-                          // );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.sigmetState);
+                          cloned.airframeIcing.checked =
+                            !layerStatus.sigmetState.airframeIcing.checked;
+                          if (!cloned.airframeIcing.checked) {
+                            cloned.all.checked = false;
+                          } else {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.sigmet, cloned.name);
+                          }
+                          dispatch(setSigmet(cloned));
                         }}
                       />
                     }
@@ -536,25 +575,22 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.sigmetState.dust.visible}
+                        checked={layerStatus.sigmetState.dust.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.sigmetState,
-                              dust: {
-                                name: layerStatus.sigmetState.dust.name,
-                                visible: !layerStatus.sigmetState.dust.visible,
-                              },
-                            }),
-                          );
-                          // onLayerClick(
-                          //   null,
-                          //   layerStatus.sigmetState.dust as any,
-                          // );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.sigmetState);
+                          cloned.dust.checked =
+                            !layerStatus.sigmetState.dust.checked;
+                          if (!cloned.dust.checked) {
+                            cloned.all.checked = false;
+                          } else {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.sigmet, cloned.name);
+                          }
+                          dispatch(setSigmet(cloned));
                         }}
                       />
                     }
@@ -563,25 +599,22 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.sigmetState.ash.visible}
+                        checked={layerStatus.sigmetState.ash.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.sigmetState,
-                              ash: {
-                                name: layerStatus.sigmetState.ash.name,
-                                visible: !layerStatus.sigmetState.ash.visible,
-                              },
-                            }),
-                          );
-                          // onLayerClick(
-                          //   null,
-                          //   layerStatus.sigmetState.ash as any,
-                          // );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.sigmetState);
+                          cloned.ash.checked =
+                            !layerStatus.sigmetState.ash.checked;
+                          if (!cloned.ash.checked) {
+                            cloned.all.checked = false;
+                          } else {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.sigmet, cloned.name);
+                          }
+                          dispatch(setSigmet(cloned));
                         }}
                       />
                     }
@@ -590,25 +623,22 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.sigmetState.other.visible}
+                        checked={layerStatus.sigmetState.other.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.sigmetState,
-                              other: {
-                                name: layerStatus.sigmetState.other.name,
-                                visible: !layerStatus.sigmetState.other.visible,
-                              },
-                            }),
-                          );
-                          // onLayerClick(
-                          //   null,
-                          //   layerStatus.sigmetState.other as any,
-                          // );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.sigmetState);
+                          cloned.other.checked =
+                            !layerStatus.sigmetState.other.checked;
+                          if (!cloned.other.checked) {
+                            cloned.all.checked = false;
+                          } else {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.sigmet, cloned.name);
+                          }
+                          dispatch(setSigmet(cloned));
                         }}
                       />
                     }
@@ -617,28 +647,29 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.sigmetState.international.visible}
+                        checked={layerStatus.sigmetState.international.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.sigmetState,
-                              international: {
-                                name: layerStatus.sigmetState.international
-                                  .name,
-                                visible:
-                                  !layerStatus.sigmetState.international
-                                    .visible,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            meteoLayers.intlSigmet,
-                            layerStatus.sigmetState.international as any,
-                          );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.sigmetState);
+                          cloned.international.checked =
+                            !layerStatus.sigmetState.international.checked;
+                          if (!cloned.international.checked) {
+                            cloned.all.checked = false;
+                            hideLayer(
+                              meteoLayers.intlSigmet,
+                              layerStatus.sigmetState.international.name,
+                            );
+                          } else {
+                            cloned.checked = true;
+                            showLayer(
+                              meteoLayers.intlSigmet,
+                              layerStatus.sigmetState.international.name,
+                            );
+                          }
+                          dispatch(setSigmet(cloned));
                         }}
                       />
                     }
@@ -670,24 +701,25 @@ const MeteoLayerControl = ({
                     label={layerStatus.gairmetState.name}
                     control={
                       <Checkbox
-                        checked={layerStatus.gairmetState.visible}
+                        checked={layerStatus.gairmetState.checked}
                         style={{ pointerEvents: 'none' }}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          // e.stopPropagation();
-                          dispatch(
-                            setGairmet({
-                              ...layerStatus.gairmetState,
-                              visible: !layerStatus.gairmetState.visible,
-                            }),
-                          );
-                          onLayerClick(
-                            meteoLayers.gairmet,
-                            layerStatus.gairmetState,
-                          );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.gairmetState);
+                          cloned.checked = !layerStatus.gairmetState.checked;
+                          dispatch(setGairmet(cloned));
+                          cloned.checked
+                            ? showLayer(
+                                meteoLayers.gairmet,
+                                layerStatus.gairmetState.name,
+                              )
+                            : hideLayer(
+                                meteoLayers.gairmet,
+                                layerStatus.gairmetState.name,
+                              );
                         }}
                       />
                     }
@@ -699,28 +731,57 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.gairmetState.airframeIcing.visible}
+                        checked={layerStatus.gairmetState.all.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.gairmetState,
-                              airframeIcing: {
-                                name: layerStatus.gairmetState.airframeIcing
-                                  .name,
-                                visible:
-                                  !layerStatus.gairmetState.airframeIcing
-                                    .visible,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            meteoLayers.gairmet,
-                            layerStatus.gairmetState.airframeIcing as any,
-                          );
+                        onClick={() => {
+                          const cloned = jsonClone(
+                            layerStatus.gairmetState,
+                          ) as GairmetLayerState;
+                          if (layerStatus.gairmetState.all.checked) {
+                            cloned.all.checked = false;
+                          } else {
+                            cloned.all.checked = true;
+                            cloned.airframeIcing.checked = true;
+                            cloned.multiFrzLevels.checked = true;
+                            cloned.turbulenceHi.checked = true;
+                            cloned.turbulenceLow.checked = true;
+                            cloned.ifrConditions.checked = true;
+                            cloned.mountainObscuration.checked = true;
+                            cloned.nonconvectiveLlws.checked = true;
+                            cloned.sfcWinds.checked = true;
+                            showLayer(
+                              meteoLayers.gairmet,
+                              layerStatus.gairmetState.name,
+                            );
+                          }
+                          dispatch(setGairmet(cloned));
+                        }}
+                      />
+                    }
+                    label={layerStatus.gairmetState.all.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerStatus.gairmetState.airframeIcing.checked}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.gairmetState);
+                          cloned.airframeIcing.checked =
+                            !layerStatus.gairmetState.airframeIcing.checked;
+                          if (cloned.airframeIcing.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.gairmet, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setGairmet(cloned));
                         }}
                       />
                     }
@@ -730,29 +791,23 @@ const MeteoLayerControl = ({
                     control={
                       <Checkbox
                         checked={
-                          layerStatus.gairmetState.multiFrzLevels.visible
+                          layerStatus.gairmetState.multiFrzLevels.checked
                         }
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.gairmetState,
-                              multiFrzLevels: {
-                                name: layerStatus.gairmetState.multiFrzLevels
-                                  .name,
-                                visible:
-                                  !layerStatus.gairmetState.multiFrzLevels
-                                    .visible,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            meteoLayers.gairmet,
-                            layerStatus.gairmetState.multiFrzLevels as any,
-                          );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.gairmetState);
+                          cloned.multiFrzLevels.checked =
+                            !layerStatus.gairmetState.multiFrzLevels.checked;
+                          if (cloned.multiFrzLevels.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.gairmet, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setGairmet(cloned));
                         }}
                       />
                     }
@@ -761,28 +816,22 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.gairmetState.turbulenceHi.visible}
+                        checked={layerStatus.gairmetState.turbulenceHi.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.gairmetState,
-                              turbulenceHi: {
-                                name: layerStatus.gairmetState.turbulenceHi
-                                  .name,
-                                visible:
-                                  !layerStatus.gairmetState.turbulenceHi
-                                    .visible,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            meteoLayers.gairmet,
-                            layerStatus.gairmetState.turbulenceHi as any,
-                          );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.gairmetState);
+                          cloned.turbulenceHi.checked =
+                            !layerStatus.gairmetState.turbulenceHi.checked;
+                          if (cloned.turbulenceHi.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.gairmet, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setGairmet(cloned));
                         }}
                       />
                     }
@@ -791,28 +840,22 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.gairmetState.turbulenceLow.visible}
+                        checked={layerStatus.gairmetState.turbulenceLow.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.gairmetState,
-                              turbulenceLow: {
-                                name: layerStatus.gairmetState.turbulenceLow
-                                  .name,
-                                visible:
-                                  !layerStatus.gairmetState.turbulenceLow
-                                    .visible,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            null,
-                            layerStatus.gairmetState.turbulenceLow as any,
-                          );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.gairmetState);
+                          cloned.turbulenceLow.checked =
+                            !layerStatus.gairmetState.turbulenceLow.checked;
+                          if (cloned.turbulenceLow.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.gairmet, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setGairmet(cloned));
                         }}
                       />
                     }
@@ -821,28 +864,22 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.gairmetState.ifrConditions.visible}
+                        checked={layerStatus.gairmetState.ifrConditions.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.gairmetState,
-                              ifrConditions: {
-                                name: layerStatus.gairmetState.ifrConditions
-                                  .name,
-                                visible:
-                                  !layerStatus.gairmetState.ifrConditions
-                                    .visible,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            null,
-                            layerStatus.gairmetState.ifrConditions as any,
-                          );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.gairmetState);
+                          cloned.ifrConditions.checked =
+                            !layerStatus.gairmetState.ifrConditions.checked;
+                          if (cloned.ifrConditions.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.gairmet, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setGairmet(cloned));
                         }}
                       />
                     }
@@ -852,29 +889,24 @@ const MeteoLayerControl = ({
                     control={
                       <Checkbox
                         checked={
-                          layerStatus.gairmetState.mountainObscuration.visible
+                          layerStatus.gairmetState.mountainObscuration.checked
                         }
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.gairmetState,
-                              mountainObscuration: {
-                                name: layerStatus.gairmetState
-                                  .mountainObscuration.name,
-                                visible:
-                                  !layerStatus.gairmetState.mountainObscuration
-                                    .visible,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            null,
-                            layerStatus.gairmetState.mountainObscuration as any,
-                          );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.gairmetState);
+                          cloned.mountainObscuration.checked =
+                            !layerStatus.gairmetState.mountainObscuration
+                              .checked;
+                          if (cloned.mountainObscuration.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.gairmet, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setGairmet(cloned));
                         }}
                       />
                     }
@@ -884,29 +916,23 @@ const MeteoLayerControl = ({
                     control={
                       <Checkbox
                         checked={
-                          layerStatus.gairmetState.nonconvectiveLlws.visible
+                          layerStatus.gairmetState.nonconvectiveLlws.checked
                         }
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.gairmetState,
-                              nonconvectiveLlws: {
-                                name: layerStatus.gairmetState.nonconvectiveLlws
-                                  .name,
-                                visible:
-                                  !layerStatus.gairmetState.nonconvectiveLlws
-                                    .visible,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            null,
-                            layerStatus.gairmetState.nonconvectiveLlws as any,
-                          );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.gairmetState);
+                          cloned.nonconvectiveLlws.checked =
+                            !layerStatus.gairmetState.nonconvectiveLlws.checked;
+                          if (cloned.nonconvectiveLlws.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.gairmet, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setGairmet(cloned));
                         }}
                       />
                     }
@@ -915,26 +941,22 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.gairmetState.sfcWinds.visible}
+                        checked={layerStatus.gairmetState.sfcWinds.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.gairmetState,
-                              sfcWinds: {
-                                name: layerStatus.gairmetState.sfcWinds.name,
-                                visible:
-                                  !layerStatus.gairmetState.sfcWinds.visible,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            null,
-                            layerStatus.gairmetState.sfcWinds as any,
-                          );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.gairmetState);
+                          cloned.sfcWinds.checked =
+                            !layerStatus.gairmetState.sfcWinds.checked;
+                          if (cloned.sfcWinds.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.gairmet, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setGairmet(cloned));
                         }}
                       />
                     }
@@ -966,24 +988,25 @@ const MeteoLayerControl = ({
                     label={layerStatus.pirepState.name}
                     control={
                       <Checkbox
-                        checked={layerStatus.pirepState.visible}
+                        checked={layerStatus.pirepState.checked}
                         style={{ pointerEvents: 'none' }}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          // e.stopPropagation();
-                          dispatch(
-                            setPirep({
-                              ...layerStatus.pirepState,
-                              visible: !layerStatus.pirepState.visible,
-                            }),
-                          );
-                          onLayerClick(
-                            meteoLayers.pirep,
-                            layerStatus.pirepState,
-                          );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.pirepState);
+                          cloned.checked = !layerStatus.pirepState.checked;
+                          dispatch(setPirep(cloned));
+                          cloned.checked
+                            ? showLayer(
+                                meteoLayers.pirep,
+                                layerStatus.pirepState.name,
+                              )
+                            : hideLayer(
+                                meteoLayers.pirep,
+                                layerStatus.pirepState.name,
+                              );
                         }}
                       />
                     }
@@ -995,26 +1018,22 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.pirepState.urgentOnly.visible}
+                        checked={layerStatus.pirepState.urgentOnly.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
-                          dispatch(
-                            setSigmet({
-                              ...layerStatus.pirepState,
-                              urgentOnly: {
-                                name: layerStatus.pirepState.urgentOnly.name,
-                                visible:
-                                  !layerStatus.pirepState.urgentOnly.visible,
-                              },
-                            }),
-                          );
-                          onLayerClick(
-                            meteoLayers.pirep,
-                            layerStatus.pirepState.urgentOnly as any,
-                          );
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.pirepState);
+                          cloned.urgentOnly.checked =
+                            !layerStatus.pirepState.urgentOnly.checked;
+                          if (cloned.urgentOnly.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.pirep, cloned.name);
+                          } else {
+                            cloned.all.checked = false;
+                          }
+                          dispatch(setPirep(cloned));
                         }}
                       />
                     }
@@ -1023,18 +1042,18 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.pirepState.all.visible}
+                        checked={layerStatus.pirepState.all.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
+                        onClick={(_e) => {
                           dispatch(
                             setSigmet({
                               ...layerStatus.pirepState,
                               all: {
                                 name: layerStatus.pirepState.all.name,
-                                visible: !layerStatus.pirepState.all.visible,
+                                checked: !layerStatus.pirepState.all.checked,
                               },
                             }),
                           );
@@ -1050,18 +1069,18 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.pirepState.icing.visible}
+                        checked={layerStatus.pirepState.icing.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
+                        onClick={(_e) => {
                           dispatch(
                             setSigmet({
                               ...layerStatus.pirepState,
                               icing: {
                                 name: layerStatus.pirepState.icing.name,
-                                visible: !layerStatus.pirepState.icing.visible,
+                                checked: !layerStatus.pirepState.icing.checked,
                               },
                             }),
                           );
@@ -1077,19 +1096,19 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.pirepState.turbulence.visible}
+                        checked={layerStatus.pirepState.turbulence.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
+                        onClick={(_e) => {
                           dispatch(
                             setSigmet({
                               ...layerStatus.pirepState,
                               turbulence: {
                                 name: layerStatus.pirepState.turbulence.name,
-                                visible:
-                                  !layerStatus.pirepState.turbulence.visible,
+                                checked:
+                                  !layerStatus.pirepState.turbulence.checked,
                               },
                             }),
                           );
@@ -1105,19 +1124,19 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.pirepState.weatherSky.visible}
+                        checked={layerStatus.pirepState.weatherSky.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
+                        onClick={(_e) => {
                           dispatch(
                             setSigmet({
                               ...layerStatus.pirepState,
                               weatherSky: {
                                 name: layerStatus.pirepState.weatherSky.name,
-                                visible:
-                                  !layerStatus.pirepState.weatherSky.visible,
+                                checked:
+                                  !layerStatus.pirepState.weatherSky.checked,
                               },
                             }),
                           );
@@ -1143,7 +1162,7 @@ const MeteoLayerControl = ({
                               checkedIcon={<CircleCheckedFilled />}
                               name="checkedB"
                               color="primary"
-                              onChange={(e) => {
+                              onChange={(_e) => {
                                 dispatch(
                                   setPirep({
                                     ...layerStatus.pirepState,
@@ -1168,12 +1187,12 @@ const MeteoLayerControl = ({
                         getAriaLabel={() => 'Altitude range'}
                         min={layerStatus.pirepState.altitude.min}
                         max={layerStatus.pirepState.altitude.max}
-                        step={20}
+                        step={2}
                         value={[
                           layerStatus.pirepState.altitude.valueMin,
                           layerStatus.pirepState.altitude.valueMax,
                         ]}
-                        onChange={(e: Event, newValues: number[]) => {
+                        onChange={(_e: Event, newValues: number[]) => {
                           dispatch(
                             setPirep({
                               ...layerStatus.pirepState,
@@ -1186,6 +1205,7 @@ const MeteoLayerControl = ({
                           );
                         }}
                         valueLabelDisplay="on"
+                        component={null}
                       />
                     </div>
                   </div>
@@ -1202,7 +1222,7 @@ const MeteoLayerControl = ({
                               checkedIcon={<CircleCheckedFilled />}
                               name="checkedB"
                               color="primary"
-                              onChange={(e) => {
+                              onChange={(_e) => {
                                 dispatch(
                                   setPirep({
                                     ...layerStatus.pirepState,
@@ -1226,18 +1246,19 @@ const MeteoLayerControl = ({
                         step={1}
                         defaultValue={layerStatus.pirepState.time.hours}
                         max={layerStatus.pirepState.time.max}
-                        onChange={(e: Event, newValue: number) => {
-                          // dispatch(
-                          //   setPirep({
-                          //     ...layerStatus.pirepState,
-                          //     time: {
-                          //       ...layerStatus.pirepState.time,
-                          //       hours: newValue,
-                          //     },
-                          //   }),
-                          // );
+                        onChangeCommitted={(_e: Event, newValue: number) => {
+                          dispatch(
+                            setPirep({
+                              ...layerStatus.pirepState,
+                              time: {
+                                ...layerStatus.pirepState.time,
+                                hours: newValue,
+                              },
+                            }),
+                          );
                         }}
                         valueLabelDisplay="on"
+                        component={null}
                       />
                     </div>
                   </div>
@@ -1267,18 +1288,18 @@ const MeteoLayerControl = ({
                     label={layerStatus.cwaState.name}
                     control={
                       <Checkbox
-                        checked={layerStatus.cwaState.visible}
+                        checked={layerStatus.cwaState.checked}
                         style={{ pointerEvents: 'none' }}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
+                        onClick={(_e) => {
                           // e.stopPropagation();
                           dispatch(
                             setCwa({
                               ...layerStatus.cwaState,
-                              visible: !layerStatus.cwaState.visible,
+                              checked: !layerStatus.cwaState.checked,
                             }),
                           );
                           onLayerClick(meteoLayers.cwa, layerStatus.cwaState);
@@ -1293,18 +1314,18 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.cwaState.all.visible}
+                        checked={layerStatus.cwaState.all.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
+                        onClick={(_e) => {
                           dispatch(
                             setSigmet({
                               ...layerStatus.cwaState,
                               all: {
                                 name: layerStatus.cwaState.all.name,
-                                visible: !layerStatus.cwaState.all.visible,
+                                checked: !layerStatus.cwaState.all.checked,
                               },
                             }),
                           );
@@ -1320,19 +1341,19 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.cwaState.airframeIcing.visible}
+                        checked={layerStatus.cwaState.airframeIcing.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
+                        onClick={(_e) => {
                           dispatch(
                             setSigmet({
                               ...layerStatus.cwaState,
                               airframeIcing: {
                                 name: layerStatus.cwaState.airframeIcing.name,
-                                visible:
-                                  !layerStatus.cwaState.airframeIcing.visible,
+                                checked:
+                                  !layerStatus.cwaState.airframeIcing.checked,
                               },
                             }),
                           );
@@ -1348,20 +1369,20 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.cwaState.turbulence.visible}
+                        checked={layerStatus.cwaState.turbulence.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
+                        onClick={(_e) => {
                           dispatch(
                             setSigmet({
                               ...layerStatus.cwaState,
                               icing: {
                                 turbulence:
                                   layerStatus.cwaState.turbulence.name,
-                                visible:
-                                  !layerStatus.cwaState.turbulence.visible,
+                                checked:
+                                  !layerStatus.cwaState.turbulence.checked,
                               },
                             }),
                           );
@@ -1377,19 +1398,19 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.cwaState.ifrConditions.visible}
+                        checked={layerStatus.cwaState.ifrConditions.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
+                        onClick={(_e) => {
                           dispatch(
                             setSigmet({
                               ...layerStatus.cwaState,
                               ifrConditions: {
                                 name: layerStatus.cwaState.ifrConditions.name,
-                                visible:
-                                  !layerStatus.cwaState.ifrConditions.visible,
+                                checked:
+                                  !layerStatus.cwaState.ifrConditions.checked,
                               },
                             }),
                           );
@@ -1405,19 +1426,19 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.cwaState.convection.visible}
+                        checked={layerStatus.cwaState.convection.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
+                        onClick={(_e) => {
                           dispatch(
                             setSigmet({
                               ...layerStatus.cwaState,
                               convection: {
                                 name: layerStatus.cwaState.convection.name,
-                                visible:
-                                  !layerStatus.cwaState.convection.visible,
+                                checked:
+                                  !layerStatus.cwaState.convection.checked,
                               },
                             }),
                           );
@@ -1433,18 +1454,18 @@ const MeteoLayerControl = ({
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={layerStatus.cwaState.other.visible}
+                        checked={layerStatus.cwaState.other.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
-                        onClick={(e) => {
+                        onClick={(_e) => {
                           dispatch(
                             setSigmet({
                               ...layerStatus.cwaState,
                               other: {
                                 name: layerStatus.cwaState.other.name,
-                                visible: !layerStatus.cwaState.other.visible,
+                                checked: !layerStatus.cwaState.other.checked,
                               },
                             }),
                           );
@@ -1466,7 +1487,7 @@ const MeteoLayerControl = ({
 };
 const GroupedLayer = createControlledLayer(
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  (layersControl, layer, options: OrderedLayerProps): any => {},
+  (_layersControl, _layer, _options: OrderedLayerProps): any => {},
 );
 export { GroupedLayer };
 

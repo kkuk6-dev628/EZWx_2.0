@@ -35,7 +35,7 @@ const PirepLayer = () => {
     if (v !== cacheVersion) {
       setCacheVersion(v);
     }
-  }, [layerStatus.visible]);
+  }, [layerStatus.checked]);
 
   const getTbIconUrl = (intensity) => {
     let iconUrl = '/icons/pirep/negative-turb-icon.png';

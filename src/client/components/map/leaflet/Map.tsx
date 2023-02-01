@@ -25,6 +25,7 @@ import DateSliderModal from '../../shared/DateSliderModal';
 import MeteoLayers from './layers/MeteoLayers';
 import './layers/CacheTileLayer';
 import WFSLayer from './layers/WFSLayer';
+import Slider from '@mui/material/Slider';
 
 function LeafletMap() {
   const { pathname } = useRouter();
@@ -112,7 +113,6 @@ function LeafletMap() {
       isHideResponsive: true,
     },
   ];
-
   return (
     <div className="map__container">
       <MapContainer

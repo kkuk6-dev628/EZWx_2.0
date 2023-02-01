@@ -3,11 +3,11 @@ import { AppState } from '../store';
 
 export interface SublayerState {
   name: string;
-  visible: boolean;
+  checked: boolean;
 }
 
 export interface LayerState {
-  visible: boolean;
+  checked: boolean;
   opacity: number;
   name: string;
   expanded: boolean;
@@ -31,6 +31,7 @@ export interface SigmetsLayerState extends LayerState {
 }
 
 export interface GairmetLayerState extends LayerState {
+  all: SublayerState;
   airframeIcing: SublayerState;
   multiFrzLevels: SublayerState;
   turbulenceHi: SublayerState;
@@ -78,7 +79,7 @@ export interface LayerControlState {
 
 const initialState: LayerControlState = {
   metarState: {
-    visible: true,
+    checked: true,
     opacity: 1,
     expanded: false,
     markerType: 'flightCategory',
@@ -87,49 +88,50 @@ const initialState: LayerControlState = {
   },
   radarState: {
     expanded: false,
-    visible: false,
+    checked: false,
     opacity: 1,
     name: 'Radar',
   },
   sigmetState: {
-    visible: true,
+    checked: true,
     opacity: 1,
     name: 'SIGMETs',
     expanded: false,
-    all: { name: 'All', visible: true },
-    convection: { name: 'Convection', visible: true },
-    outlooks: { name: 'Outlooks', visible: true },
-    turbulence: { name: 'turbulence', visible: true },
-    airframeIcing: { name: 'Airframe Icing', visible: true },
-    dust: { name: 'Dust & Sandstorms', visible: true },
-    ash: { name: 'Volcanic Ash', visible: true },
-    international: { name: 'International', visible: true },
-    other: { name: 'Other', visible: true },
+    all: { name: 'All', checked: true },
+    convection: { name: 'Convection', checked: true },
+    outlooks: { name: 'Outlooks', checked: true },
+    turbulence: { name: 'turbulence', checked: true },
+    airframeIcing: { name: 'Airframe Icing', checked: true },
+    dust: { name: 'Dust & Sandstorms', checked: true },
+    ash: { name: 'Volcanic Ash', checked: true },
+    international: { name: 'International', checked: true },
+    other: { name: 'Other', checked: true },
   },
   gairmetState: {
-    visible: true,
+    checked: true,
     opacity: 1,
     name: 'G-AIRMETs',
     expanded: false,
-    airframeIcing: { name: 'Airframe Icing', visible: true },
-    multiFrzLevels: { name: 'Mult Frz Levels', visible: true },
-    turbulenceHi: { name: 'Turbulence HI', visible: true },
-    turbulenceLow: { name: 'Turbulence LO', visible: true },
-    ifrConditions: { name: 'IFR Conditions', visible: true },
-    mountainObscuration: { name: 'Mountain Obscuration', visible: true },
-    nonconvectiveLlws: { name: 'Nonconvective LLWS', visible: true },
-    sfcWinds: { name: 'SFC Winds > 30 knots', visible: true },
+    all: { name: 'All', checked: true },
+    airframeIcing: { name: 'Airframe Icing', checked: true },
+    multiFrzLevels: { name: 'Mult Frz Levels', checked: true },
+    turbulenceHi: { name: 'Turbulence HI', checked: true },
+    turbulenceLow: { name: 'Turbulence LO', checked: true },
+    ifrConditions: { name: 'IFR Conditions', checked: true },
+    mountainObscuration: { name: 'Mountain Obscuration', checked: true },
+    nonconvectiveLlws: { name: 'Nonconvective LLWS', checked: true },
+    sfcWinds: { name: 'SFC Winds > 30 knots', checked: true },
   },
   pirepState: {
-    visible: true,
+    checked: true,
     opacity: 1,
     name: 'Pilot Weather Reports',
     expanded: false,
-    urgentOnly: { name: 'Urgent Only', visible: true },
-    all: { name: 'All', visible: true },
-    icing: { name: 'Icing', visible: true },
-    turbulence: { name: 'Turbulence', visible: true },
-    weatherSky: { name: 'Weather & Sky', visible: true },
+    urgentOnly: { name: 'Urgent Only', checked: true },
+    all: { name: 'All', checked: true },
+    icing: { name: 'Icing', checked: true },
+    turbulence: { name: 'Turbulence', checked: true },
+    weatherSky: { name: 'Weather & Sky', checked: true },
     altitude: {
       name: 'Altitude(FL)',
       min: 0,
@@ -142,15 +144,15 @@ const initialState: LayerControlState = {
   },
   cwaState: {
     name: 'Center Weather Reports',
-    visible: true,
+    checked: true,
     opacity: 1,
     expanded: false,
-    all: { name: 'All', visible: true },
-    airframeIcing: { name: 'Airframe Icing', visible: true },
-    turbulence: { name: 'Turbulence', visible: true },
-    ifrConditions: { name: 'IFR Conditions', visible: true },
-    convection: { name: 'Convection', visible: true },
-    other: { name: 'Other', visible: true },
+    all: { name: 'All', checked: true },
+    airframeIcing: { name: 'Airframe Icing', checked: true },
+    turbulence: { name: 'Turbulence', checked: true },
+    ifrConditions: { name: 'IFR Conditions', checked: true },
+    convection: { name: 'Convection', checked: true },
+    other: { name: 'Other', checked: true },
   },
 };
 

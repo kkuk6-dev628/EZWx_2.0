@@ -220,7 +220,7 @@ const LayerControl = ({
       }}
     >
       {!collapsed && (
-        <div className={positionClass}>
+        <div className={positionClass + ' layer-control-container'}>
           <div
             id="base-layer-control"
             className="leaflet-control leaflet-bar layer-control"
@@ -342,7 +342,7 @@ const LayerControl = ({
                                       dispatch(
                                         setMetar({
                                           ...layerStatus,
-                                          visible: !layerStatus.visible,
+                                          visible: !layerStatus.checked,
                                         }),
                                       );
                                     }}
