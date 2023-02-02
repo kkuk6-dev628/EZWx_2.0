@@ -49,6 +49,7 @@ export interface PirepLayerState extends LayerState {
   turbulence: SublayerState;
   weatherSky: SublayerState;
   altitude: {
+    all: boolean;
     name: string;
     min: number;
     max: number;
@@ -69,6 +70,7 @@ export interface CwaLayerState extends LayerState {
 }
 
 export interface LayerControlState {
+  show: boolean;
   metarState: MetarLayerState;
   radarState: LayerState;
   sigmetState: SigmetsLayerState;
@@ -78,6 +80,7 @@ export interface LayerControlState {
 }
 
 const initialState: LayerControlState = {
+  show: false,
   metarState: {
     checked: true,
     opacity: 1,
@@ -99,8 +102,8 @@ const initialState: LayerControlState = {
     expanded: false,
     all: { name: 'All', checked: true },
     convection: { name: 'Convection', checked: true },
-    outlooks: { name: 'Outlooks', checked: true },
-    turbulence: { name: 'turbulence', checked: true },
+    outlooks: { name: 'Convective Outlooks', checked: true },
+    turbulence: { name: 'Turbulence', checked: true },
     airframeIcing: { name: 'Airframe Icing', checked: true },
     dust: { name: 'Dust & Sandstorms', checked: true },
     ash: { name: 'Volcanic Ash', checked: true },
@@ -127,13 +130,14 @@ const initialState: LayerControlState = {
     opacity: 1,
     name: 'Pilot Weather Reports',
     expanded: false,
-    urgentOnly: { name: 'Urgent Only', checked: true },
+    urgentOnly: { name: 'Urgent Only', checked: false },
     all: { name: 'All', checked: true },
     icing: { name: 'Icing', checked: true },
     turbulence: { name: 'Turbulence', checked: true },
     weatherSky: { name: 'Weather & Sky', checked: true },
     altitude: {
-      name: 'Altitude(FL)',
+      name: 'Altitude (FL)',
+      all: true,
       min: 0,
       max: 600,
       valueMin: 0,
@@ -186,6 +190,9 @@ export const LayerControlSlice = createSlice({
       state.pirepState = action.payload.pirepState;
       state.cwaState = action.payload.cwaState;
     },
+    setLayerControlShow: (state, action) => {
+      state.show = action.payload;
+    },
   },
 });
 
@@ -197,6 +204,7 @@ export const {
   setGairmet,
   setCwa,
   setLayerControl,
+  setLayerControlShow,
 } = LayerControlSlice.actions;
 
 export const selectMetar = (state: AppState) => state.layerControl.metarState;
@@ -208,5 +216,7 @@ export const selectPirep = (state: AppState) => state.layerControl.pirepState;
 export const selectCwa = (state: AppState) => state.layerControl.cwaState;
 
 export const selectLayerControl = (state: AppState) => state.layerControl;
+export const selectLayerControlShow = (state: AppState) =>
+  state.layerControl.show;
 
 export default LayerControlSlice;

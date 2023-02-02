@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import LayerControl, {
-  GroupedLayer,
-  ILayerObj,
-} from '../layer-control/MeteoLayerControl';
-import WFSLayer from './WFSLayer';
+import LayerControl, { GroupedLayer } from '../layer-control/MeteoLayerControl';
 import { LayerGroup, useMapEvents } from 'react-leaflet';
-import L, { CRS, LatLng } from 'leaflet';
+import L, { LatLng } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
 import { useContext, useEffect, useRef, useState } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
@@ -26,35 +22,22 @@ import PirepLayer from './PirepLayer';
 import PIREPPopup from '../popups/PIREPPopup';
 import 'leaflet-responsive-popup';
 import 'leaflet-responsive-popup/leaflet.responsive.popup.css';
-import WMSLayer from './WMSLayer';
 import MetarsLayer from './MetarsLayer';
-import TimeDimensionLayer from './TimeDimensionLayer';
-import MarkerClusterGroup from './MarkerClusterGroup';
-import Image from 'next/image';
 import MetarsPopup from '../popups/MetarsPopup';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  selectMetar,
-  setMetar,
-  selectPirep,
-  setPirep,
-} from '../../../../store/layers/LayerControl';
+import { useSelector } from 'react-redux';
+import { selectMetar } from '../../../../store/layers/LayerControl';
 import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
-import axios from 'axios';
 import { MetarMarkerTypes } from '../../common/AreoConstants';
 import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
 import { InLayerControl } from '../layer-control/MeteoLayerControl';
+import axios from 'axios';
 
 const maxLayers = 6;
 
-const MeteoLayers = ({ layerControlCollapsed }) => {
-  const dispatch = useDispatch();
-
+const MeteoLayers = () => {
   const layers = useMeteoLayersContext();
-  const wmsLayerRef = useRef(null);
   const debugLayerGroupRef = useRef(null);
   const metarLayerStatus = useSelector(selectMetar);
-  const pirepLayerStatus = useSelector(selectPirep);
   const personalMinimums = useSelector(selectPersonalMinimums);
   const [airportData, setAirportData] = useState();
   useEffect(() => {
@@ -320,10 +303,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
 
   return (
     <div className="route__layer">
-      <LayerControl
-        position="topright"
-        collapsed={layerControlCollapsed}
-      ></LayerControl>
+      <LayerControl position="topright"></LayerControl>
       <GroupedLayer
         checked
         name="Station Markers"
@@ -374,7 +354,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         group="Map Layers"
         order={4}
         addLayerToStore={(layer) => {
-          meteoLayers.convection = layer;
+          meteoLayers.convectiveOutlooks = layer;
         }}
       >
         <ConvectiveOutlookLayer></ConvectiveOutlookLayer>

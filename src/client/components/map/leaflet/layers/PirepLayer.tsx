@@ -1,5 +1,5 @@
 import WFSLayer from './WFSLayer';
-import L, { LatLng } from 'leaflet';
+import L, { FeatureGroup, LatLng, Layer } from 'leaflet';
 import Image from 'next/image';
 import ReactDOMServer from 'react-dom/server';
 import { Pane, useMap } from 'react-leaflet';
@@ -215,6 +215,13 @@ const PirepLayer = () => {
     return pirepMarker;
   };
 
+  const selectUrgentMarker4Cluster = (layers) => {
+    const urgentMarkers = layers.filter((layer) => {
+      return layer.feature.properties.aireptype === 'Urgent PIREP';
+    });
+    return urgentMarkers.length > 0 ? urgentMarkers[0] : undefined;
+  };
+
   const clientFilter = (
     features: GeoJSON.Feature[],
     observationTime: Date,
@@ -230,9 +237,15 @@ const PirepLayer = () => {
       if (!inTime) {
         return false;
       }
+      if (layerState.urgentOnly.checked) {
+        if (feature.properties.aireptype !== 'Urgent PIREP') {
+          return false;
+        }
+      }
       const inAltitudeRange =
-        layerState.altitude.valueMin <= feature.properties.fltlvl &&
-        feature.properties.fltlvl <= layerState.altitude.valueMax;
+        (layerState.altitude.valueMin <= feature.properties.fltlvl &&
+          feature.properties.fltlvl <= layerState.altitude.valueMax) ||
+        feature.properties.fltlvl == 0;
 
       if (!inAltitudeRange) {
         return false;
@@ -240,25 +253,23 @@ const PirepLayer = () => {
       if (layerState.all.checked) {
         return true;
       }
-      if (
-        layerState.urgentOnly.checked &&
-        feature.properties.aireptype === 'Urgent PIREP'
-      ) {
-        return true;
-      }
-      if (layerState.icing.checked && feature.properties.icgint1 !== null) {
-        return true;
-      }
-      if (layerState.turbulence.checked && feature.properties.tbint1 !== null) {
-        return true;
+      if (!layerState.icing.checked && feature.properties.icgint1 !== null) {
+        return false;
       }
       if (
-        layerState.weatherSky.checked &&
-        feature.properties.tbint1 !== null &&
-        feature.properties.icgint1 !== null
+        !layerState.turbulence.checked &&
+        feature.properties.tbint1 !== null
       ) {
-        return true;
+        return false;
       }
+      if (
+        !layerState.weatherSky.checked &&
+        feature.properties.tbint1 === null &&
+        feature.properties.icgint1 === null
+      ) {
+        return false;
+      }
+      return true;
     });
     return results;
   };
@@ -300,6 +311,7 @@ const PirepLayer = () => {
         ]}
         pointToLayer={pointToLayer}
         isClusteredMarker={true}
+        selectClusterMarker={selectUrgentMarker4Cluster}
         markerPane={'pirep'}
         serverFilter={`obstime AFTER ${getTimeRangeStart().toISOString()}`}
         clientFilter={clientFilter}

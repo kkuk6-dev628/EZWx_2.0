@@ -8,8 +8,7 @@ export interface MeteoLayers {
   radar: Layer;
   sigmet: Layer;
   intlSigmet: Layer;
-  outlooks: Layer;
-  convection: Layer;
+  convectiveOutlooks: Layer;
   cwa: Layer;
   gairmet: Layer;
 }

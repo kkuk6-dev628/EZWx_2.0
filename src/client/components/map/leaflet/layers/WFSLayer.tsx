@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useRef, useState } from 'react';
 import { useMapEvents, GeoJSON as GeoJSONLayer } from 'react-leaflet';
-import L, { LatLng, PathOptions } from 'leaflet';
+import L, { LatLng, Layer, PathOptions } from 'leaflet';
 import axios from 'axios';
 import MarkerClusterGroup from './MarkerClusterGroup';
 import { useSelector } from 'react-redux';
@@ -29,6 +29,7 @@ interface WFSLayerProps {
     obsTime: Date,
   ) => GeoJSON.Feature[];
   isClusteredMarker?: boolean;
+  selectClusterMarker?: (layers: Layer[]) => Layer;
   markerPane?: string;
   maxClusterRadius?: number;
   layerStateSelector?: (state: AppState) => any;
@@ -57,6 +58,7 @@ const WFSLayer = React.forwardRef(
       serverFilter: filter,
       clientFilter,
       isClusteredMarker = false,
+      selectClusterMarker,
       markerPane,
       maxClusterRadius = 30,
       layerStateSelector,
@@ -235,9 +237,15 @@ const WFSLayer = React.forwardRef(
             // @ts-ignore
             iconCreateFunction={(cluster) => {
               const children = cluster.getAllChildMarkers();
-              const marker = children.sort((a: any, b: any) => {
-                return a._leaflet_id > b._leaflet_id ? 1 : -1;
-              })[0];
+              let marker;
+              if (selectClusterMarker) {
+                marker = selectClusterMarker(children);
+              }
+              if (!marker) {
+                marker = children.sort((a: any, b: any) => {
+                  return a._leaflet_id > b._leaflet_id ? 1 : -1;
+                })[0];
+              }
               return marker.getIcon();
             }}
             zoomToBoundsOnClick={false}

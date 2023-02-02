@@ -34,6 +34,8 @@ import {
   PirepLayerState,
   CwaLayerState,
   MetarLayerState,
+  setLayerControlShow,
+  SigmetsLayerState,
 } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
@@ -53,7 +55,6 @@ const POSITION_CLASSES: { [key: string]: string } = {
 interface IProps {
   children?: ReactElement[];
   position: string;
-  collapsed: boolean;
 }
 
 export interface ILayerObj {
@@ -71,7 +72,7 @@ export const InLayerControl = createContext<{ value: boolean }>({
   value: false,
 });
 
-const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
+const MeteoLayerControl = ({ position, children }: IProps) => {
   const positionClass =
     (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright;
 
@@ -134,6 +135,38 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
     }
   };
 
+  const isCheckedAllSigmets = (cloned: SigmetsLayerState): boolean =>
+    cloned.convection.checked &&
+    cloned.outlooks.checked &&
+    cloned.turbulence.checked &&
+    cloned.airframeIcing.checked &&
+    cloned.dust.checked &&
+    cloned.ash.checked &&
+    cloned.other.checked &&
+    cloned.international.checked;
+
+  const isCheckedAllGairmets = (cloned: GairmetLayerState): boolean =>
+    cloned.airframeIcing.checked &&
+    cloned.multiFrzLevels.checked &&
+    cloned.turbulenceHi.checked &&
+    cloned.turbulenceLow.checked &&
+    cloned.ifrConditions.checked &&
+    cloned.mountainObscuration.checked &&
+    cloned.nonconvectiveLlws.checked &&
+    cloned.sfcWinds.checked;
+
+  const isCheckedAllCwa = (cloned: CwaLayerState): boolean =>
+    cloned.airframeIcing.checked &&
+    cloned.turbulence.checked &&
+    cloned.ifrConditions.checked &&
+    cloned.convection.checked &&
+    cloned.other.checked;
+
+  const isCheckedAllPirep = (cloned: PirepLayerState): boolean =>
+    cloned.icing.checked &&
+    cloned.turbulence.checked &&
+    cloned.weatherSky.checked;
+
   const getLayerControlStateWithAllClosed = (): LayerControlState => {
     const cloned = JSON.parse(JSON.stringify(layerStatus));
     cloned.metarState.expanded = false;
@@ -178,7 +211,7 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
   return (
     //@ts-ignore
     <div className={positionClass + ' layer-control-container'} ref={ref}>
-      {!collapsed && (
+      {layerStatus.show && (
         <div
           id="layer-control"
           className="leaflet-control leaflet-bar layer-control"
@@ -196,6 +229,14 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
             <div className="layer-control__rgt">
               <h3>Map Layers</h3>
             </div>
+          </div>
+          <div
+            className="btn-close"
+            onClick={() => {
+              dispatch(setLayerControlShow(false));
+            }}
+          >
+            <i className="fa-regular fa-circle-xmark"></i>
           </div>
           <div className="layer-control-contents">
             <div className="layer-control-item">
@@ -390,7 +431,7 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                             );
                             if (layerStatus.sigmetState.outlooks.checked) {
                               showLayer(
-                                meteoLayers.outlooks,
+                                meteoLayers.convectiveOutlooks,
                                 layerStatus.sigmetState.outlooks.name,
                               );
                             }
@@ -406,7 +447,7 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                               layerStatus.sigmetState.name,
                             );
                             hideLayer(
-                              meteoLayers.outlooks,
+                              meteoLayers.convectiveOutlooks,
                               layerStatus.sigmetState.outlooks.name,
                             );
                             hideLayer(
@@ -432,31 +473,28 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                         color="primary"
                         onClick={() => {
                           const cloned = jsonClone(layerStatus.sigmetState);
-                          if (layerStatus.sigmetState.all.checked) {
-                            cloned.all.checked = false;
-                          } else {
-                            cloned.all.checked = true;
-                            cloned.convection.checked = true;
-                            cloned.outlooks.checked = true;
-                            cloned.turbulence.checked = true;
-                            cloned.airframeIcing.checked = true;
-                            cloned.dust.checked = true;
-                            cloned.ash.checked = true;
-                            cloned.other.checked = true;
-                            cloned.international.checked = true;
-                            showLayer(
-                              meteoLayers.sigmet,
-                              layerStatus.sigmetState.name,
-                            );
-                            showLayer(
-                              meteoLayers.outlooks,
-                              layerStatus.sigmetState.outlooks.name,
-                            );
-                            showLayer(
-                              meteoLayers.intlSigmet,
-                              layerStatus.sigmetState.international.name,
-                            );
-                          }
+                          cloned.all.checked = true;
+                          cloned.all.checked = true;
+                          cloned.convection.checked = true;
+                          cloned.outlooks.checked = true;
+                          cloned.turbulence.checked = true;
+                          cloned.airframeIcing.checked = true;
+                          cloned.dust.checked = true;
+                          cloned.ash.checked = true;
+                          cloned.other.checked = true;
+                          cloned.international.checked = true;
+                          showLayer(
+                            meteoLayers.sigmet,
+                            layerStatus.sigmetState.name,
+                          );
+                          showLayer(
+                            meteoLayers.convectiveOutlooks,
+                            layerStatus.sigmetState.outlooks.name,
+                          );
+                          showLayer(
+                            meteoLayers.intlSigmet,
+                            layerStatus.sigmetState.international.name,
+                          );
                           dispatch(setSigmet(cloned));
                         }}
                       />
@@ -479,6 +517,7 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                             cloned.all.checked = false;
                           } else {
                             cloned.checked = true;
+                            cloned.all.checked = isCheckedAllSigmets(cloned);
                             showLayer(meteoLayers.sigmet, cloned.name);
                           }
                           dispatch(setSigmet(cloned));
@@ -499,16 +538,16 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.sigmetState);
                           cloned.outlooks.checked =
                             !layerStatus.sigmetState.outlooks.checked;
-                          if (!cloned.outlooks.checked) {
-                            cloned.all.checked = false;
-                            hideLayer(
-                              meteoLayers.outlooks,
+                          cloned.all.checked = isCheckedAllSigmets(cloned);
+                          if (cloned.outlooks.checked) {
+                            cloned.checked = true;
+                            showLayer(
+                              meteoLayers.convectiveOutlooks,
                               layerStatus.sigmetState.outlooks.name,
                             );
                           } else {
-                            cloned.checked = true;
-                            showLayer(
-                              meteoLayers.outlooks,
+                            hideLayer(
+                              meteoLayers.convectiveOutlooks,
                               layerStatus.sigmetState.outlooks.name,
                             );
                           }
@@ -530,9 +569,8 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.sigmetState);
                           cloned.turbulence.checked =
                             !layerStatus.sigmetState.turbulence.checked;
-                          if (!cloned.turbulence.checked) {
-                            cloned.all.checked = false;
-                          } else {
+                          cloned.all.checked = isCheckedAllSigmets(cloned);
+                          if (cloned.turbulence.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.sigmet, cloned.name);
                           }
@@ -554,9 +592,8 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.sigmetState);
                           cloned.airframeIcing.checked =
                             !layerStatus.sigmetState.airframeIcing.checked;
-                          if (!cloned.airframeIcing.checked) {
-                            cloned.all.checked = false;
-                          } else {
+                          cloned.all.checked = isCheckedAllSigmets(cloned);
+                          if (cloned.airframeIcing.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.sigmet, cloned.name);
                           }
@@ -578,9 +615,8 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.sigmetState);
                           cloned.dust.checked =
                             !layerStatus.sigmetState.dust.checked;
-                          if (!cloned.dust.checked) {
-                            cloned.all.checked = false;
-                          } else {
+                          cloned.all.checked = isCheckedAllSigmets(cloned);
+                          if (cloned.dust.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.sigmet, cloned.name);
                           }
@@ -602,9 +638,8 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.sigmetState);
                           cloned.ash.checked =
                             !layerStatus.sigmetState.ash.checked;
-                          if (!cloned.ash.checked) {
-                            cloned.all.checked = false;
-                          } else {
+                          cloned.all.checked = isCheckedAllSigmets(cloned);
+                          if (cloned.ash.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.sigmet, cloned.name);
                           }
@@ -626,9 +661,8 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.sigmetState);
                           cloned.other.checked =
                             !layerStatus.sigmetState.other.checked;
-                          if (!cloned.other.checked) {
-                            cloned.all.checked = false;
-                          } else {
+                          cloned.all.checked = isCheckedAllSigmets(cloned);
+                          if (cloned.other.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.sigmet, cloned.name);
                           }
@@ -650,15 +684,15 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.sigmetState);
                           cloned.international.checked =
                             !layerStatus.sigmetState.international.checked;
-                          if (!cloned.international.checked) {
-                            cloned.all.checked = false;
-                            hideLayer(
+                          cloned.all.checked = isCheckedAllSigmets(cloned);
+                          if (cloned.international.checked) {
+                            cloned.checked = true;
+                            showLayer(
                               meteoLayers.intlSigmet,
                               layerStatus.sigmetState.international.name,
                             );
                           } else {
-                            cloned.checked = true;
-                            showLayer(
+                            hideLayer(
                               meteoLayers.intlSigmet,
                               layerStatus.sigmetState.international.name,
                             );
@@ -734,23 +768,19 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(
                             layerStatus.gairmetState,
                           ) as GairmetLayerState;
-                          if (layerStatus.gairmetState.all.checked) {
-                            cloned.all.checked = false;
-                          } else {
-                            cloned.all.checked = true;
-                            cloned.airframeIcing.checked = true;
-                            cloned.multiFrzLevels.checked = true;
-                            cloned.turbulenceHi.checked = true;
-                            cloned.turbulenceLow.checked = true;
-                            cloned.ifrConditions.checked = true;
-                            cloned.mountainObscuration.checked = true;
-                            cloned.nonconvectiveLlws.checked = true;
-                            cloned.sfcWinds.checked = true;
-                            showLayer(
-                              meteoLayers.gairmet,
-                              layerStatus.gairmetState.name,
-                            );
-                          }
+                          cloned.all.checked = true;
+                          cloned.airframeIcing.checked = true;
+                          cloned.multiFrzLevels.checked = true;
+                          cloned.turbulenceHi.checked = true;
+                          cloned.turbulenceLow.checked = true;
+                          cloned.ifrConditions.checked = true;
+                          cloned.mountainObscuration.checked = true;
+                          cloned.nonconvectiveLlws.checked = true;
+                          cloned.sfcWinds.checked = true;
+                          showLayer(
+                            meteoLayers.gairmet,
+                            layerStatus.gairmetState.name,
+                          );
                           dispatch(setGairmet(cloned));
                         }}
                       />
@@ -769,11 +799,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.gairmetState);
                           cloned.airframeIcing.checked =
                             !layerStatus.gairmetState.airframeIcing.checked;
+                          cloned.all.checked = isCheckedAllGairmets(cloned);
                           if (cloned.airframeIcing.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setGairmet(cloned));
                         }}
@@ -795,11 +824,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.gairmetState);
                           cloned.multiFrzLevels.checked =
                             !layerStatus.gairmetState.multiFrzLevels.checked;
+                          cloned.all.checked = isCheckedAllGairmets(cloned);
                           if (cloned.multiFrzLevels.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setGairmet(cloned));
                         }}
@@ -819,11 +847,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.gairmetState);
                           cloned.turbulenceHi.checked =
                             !layerStatus.gairmetState.turbulenceHi.checked;
+                          cloned.all.checked = isCheckedAllGairmets(cloned);
                           if (cloned.turbulenceHi.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setGairmet(cloned));
                         }}
@@ -843,11 +870,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.gairmetState);
                           cloned.turbulenceLow.checked =
                             !layerStatus.gairmetState.turbulenceLow.checked;
+                          cloned.all.checked = isCheckedAllGairmets(cloned);
                           if (cloned.turbulenceLow.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setGairmet(cloned));
                         }}
@@ -867,11 +893,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.gairmetState);
                           cloned.ifrConditions.checked =
                             !layerStatus.gairmetState.ifrConditions.checked;
+                          cloned.all.checked = isCheckedAllGairmets(cloned);
                           if (cloned.ifrConditions.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setGairmet(cloned));
                         }}
@@ -894,11 +919,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           cloned.mountainObscuration.checked =
                             !layerStatus.gairmetState.mountainObscuration
                               .checked;
+                          cloned.all.checked = isCheckedAllGairmets(cloned);
                           if (cloned.mountainObscuration.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setGairmet(cloned));
                         }}
@@ -920,11 +944,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.gairmetState);
                           cloned.nonconvectiveLlws.checked =
                             !layerStatus.gairmetState.nonconvectiveLlws.checked;
+                          cloned.all.checked = isCheckedAllGairmets(cloned);
                           if (cloned.nonconvectiveLlws.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setGairmet(cloned));
                         }}
@@ -944,11 +967,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.gairmetState);
                           cloned.sfcWinds.checked =
                             !layerStatus.gairmetState.sfcWinds.checked;
+                          cloned.all.checked = isCheckedAllGairmets(cloned);
                           if (cloned.sfcWinds.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setGairmet(cloned));
                         }}
@@ -1043,17 +1065,12 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(
                             layerStatus.pirepState,
                           ) as PirepLayerState;
-                          cloned.all.checked =
-                            !layerStatus.pirepState.all.checked;
-                          if (cloned.all.checked) {
-                            cloned.checked = true;
-                            cloned.icing.checked = true;
-                            cloned.turbulence.checked = true;
-                            cloned.weatherSky.checked = true;
-                            showLayer(meteoLayers.pirep, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
-                          }
+                          cloned.all.checked = true;
+                          cloned.checked = true;
+                          cloned.icing.checked = true;
+                          cloned.turbulence.checked = true;
+                          cloned.weatherSky.checked = true;
+                          showLayer(meteoLayers.pirep, cloned.name);
                           dispatch(setPirep(cloned));
                         }}
                       />
@@ -1072,11 +1089,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.pirepState);
                           cloned.icing.checked =
                             !layerStatus.pirepState.icing.checked;
+                          cloned.all.checked = isCheckedAllPirep(cloned);
                           if (cloned.icing.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.pirep, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setPirep(cloned));
                         }}
@@ -1096,11 +1112,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.pirepState);
                           cloned.turbulence.checked =
                             !layerStatus.pirepState.turbulence.checked;
+                          cloned.all.checked = isCheckedAllPirep(cloned);
                           if (cloned.turbulence.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.pirep, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setPirep(cloned));
                         }}
@@ -1120,11 +1135,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.pirepState);
                           cloned.weatherSky.checked =
                             !layerStatus.pirepState.weatherSky.checked;
+                          cloned.all.checked = isCheckedAllPirep(cloned);
                           if (cloned.weatherSky.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.pirep, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setPirep(cloned));
                         }}
@@ -1141,6 +1155,7 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                         <FormControlLabel
                           control={
                             <Checkbox
+                              checked={layerStatus.pirepState.altitude.all}
                               icon={<CircleUnchecked />}
                               checkedIcon={<CircleCheckedFilled />}
                               name="checkedB"
@@ -1176,10 +1191,12 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           cloned.altitude.valueMin = newValues[0];
                           cloned.altitude.valueMax = newValues[1];
                           if (
-                            newValues[0] !== cloned.altitude.min ||
-                            newValues[1] !== cloned.altitude.max
+                            newValues[0] === cloned.altitude.min &&
+                            newValues[1] === cloned.altitude.max
                           ) {
-                            cloned.all.checked = false;
+                            cloned.altitude.all = true;
+                          } else {
+                            cloned.altitude.all = false;
                           }
                           dispatch(setPirep(cloned));
                         }}
@@ -1255,17 +1272,14 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           const cloned = jsonClone(
                             layerStatus.cwaState,
                           ) as CwaLayerState;
-                          cloned.all.checked =
-                            !layerStatus.cwaState.all.checked;
-                          if (cloned.all.checked) {
-                            cloned.checked = true;
-                            cloned.airframeIcing.checked = true;
-                            cloned.turbulence.checked = true;
-                            cloned.ifrConditions.checked = true;
-                            cloned.convection.checked = true;
-                            cloned.other.checked = true;
-                            showLayer(meteoLayers.cwa, cloned.name);
-                          }
+                          cloned.all.checked = true;
+                          cloned.checked = true;
+                          cloned.airframeIcing.checked = true;
+                          cloned.turbulence.checked = true;
+                          cloned.ifrConditions.checked = true;
+                          cloned.convection.checked = true;
+                          cloned.other.checked = true;
+                          showLayer(meteoLayers.cwa, cloned.name);
                           dispatch(setCwa(cloned));
                         }}
                       />
@@ -1286,11 +1300,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           ) as CwaLayerState;
                           cloned.airframeIcing.checked =
                             !layerStatus.cwaState.airframeIcing.checked;
+                          cloned.all.checked = isCheckedAllCwa(cloned);
                           if (cloned.airframeIcing.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.cwa, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setCwa(cloned));
                         }}
@@ -1312,11 +1325,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           ) as CwaLayerState;
                           cloned.turbulence.checked =
                             !layerStatus.cwaState.turbulence.checked;
+                          cloned.all.checked = isCheckedAllCwa(cloned);
                           if (cloned.turbulence.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.cwa, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setCwa(cloned));
                         }}
@@ -1338,11 +1350,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           ) as CwaLayerState;
                           cloned.ifrConditions.checked =
                             !layerStatus.cwaState.ifrConditions.checked;
+                          cloned.all.checked = isCheckedAllCwa(cloned);
                           if (cloned.ifrConditions.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.cwa, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setCwa(cloned));
                         }}
@@ -1364,11 +1375,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           ) as CwaLayerState;
                           cloned.convection.checked =
                             !layerStatus.cwaState.convection.checked;
+                          cloned.all.checked = isCheckedAllCwa(cloned);
                           if (cloned.convection.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.cwa, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setCwa(cloned));
                         }}
@@ -1390,11 +1400,10 @@ const MeteoLayerControl = ({ position, collapsed, children }: IProps) => {
                           ) as CwaLayerState;
                           cloned.other.checked =
                             !layerStatus.cwaState.other.checked;
+                          cloned.all.checked = isCheckedAllCwa(cloned);
                           if (cloned.other.checked) {
                             cloned.checked = true;
                             showLayer(meteoLayers.cwa, cloned.name);
-                          } else {
-                            cloned.all.checked = false;
                           }
                           dispatch(setCwa(cloned));
                         }}

@@ -26,6 +26,12 @@ import MeteoLayers from './layers/MeteoLayers';
 import './layers/CacheTileLayer';
 import WFSLayer from './layers/WFSLayer';
 import Slider from '@mui/material/Slider';
+import { useDispatch } from 'react-redux';
+import {
+  selectLayerControlShow,
+  setLayerControlShow,
+} from '../../../store/layers/LayerControl';
+import { useSelector } from 'react-redux';
 
 function LeafletMap() {
   const { pathname } = useRouter();
@@ -34,6 +40,8 @@ function LeafletMap() {
   const [isShowModal, setIsShowModal] = useState(false);
   const [layerControlCollapsed, setLayerControlCollapsed] = useState(true);
   const [baseMapControlCollapsed, setBaseMapControlCollapsed] = useState(true);
+  const dispatch = useDispatch();
+  const meteoLayerControlShow = useSelector(selectLayerControlShow);
 
   useEffect(() => {
     if (pathname === '/try-ezwxbrief') {
@@ -45,10 +53,10 @@ function LeafletMap() {
     switch (id) {
       case 'layer':
         setBaseMapControlCollapsed(true);
-        setLayerControlCollapsed(!layerControlCollapsed);
+        dispatch(setLayerControlShow(!meteoLayerControlShow));
         break;
       case 'basemap':
-        setLayerControlCollapsed(true);
+        dispatch(setLayerControlShow(false));
         setBaseMapControlCollapsed(!baseMapControlCollapsed);
         break;
       case 'route':
@@ -199,9 +207,7 @@ function LeafletMap() {
             />
           </GroupedLayer>
         </LayerControl>
-        <MeteoLayers
-          layerControlCollapsed={layerControlCollapsed}
-        ></MeteoLayers>
+        <MeteoLayers></MeteoLayers>
         <ZoomControl
           position="topright"
           zoomInText={ReactDOMServer.renderToString(

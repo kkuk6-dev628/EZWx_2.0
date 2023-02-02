@@ -2,6 +2,7 @@ import { PathOptions } from 'leaflet';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectGairmet } from '../../../../store/layers/LayerControl';
+import { addLeadingZeroes } from '../../common/AreoFunctions';
 import WFSLayer from './WFSLayer';
 
 const GairmetLayer = () => {
@@ -95,6 +96,10 @@ const GairmetLayer = () => {
         label = 'Mtn Obsc';
         break;
       case 'M_FZLVL':
+        label = `Frz<br/>${addLeadingZeroes(
+          feature.properties.top,
+          3,
+        )}<br/>${addLeadingZeroes(base, 3)}`;
         break;
     }
     return label;

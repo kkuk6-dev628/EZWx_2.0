@@ -71,18 +71,23 @@ const MetarsLayer = () => {
   const [cacheVersion, setCacheVersion] = useState(
     getCacheVersion(cacheUpdateInterval),
   );
-  const meteoLayerControl = useMeteoLayersContext();
+  const [clusterRadius, setClusterRadius] = useState(50);
 
   useEffect(() => {
     const v = getCacheVersion(cacheUpdateInterval);
     if (v !== cacheVersion) {
       setCacheVersion(v);
     }
+    layerStatus.markerType === MetarMarkerTypes.surfaceWindBarbs.value
+      ? setClusterRadius(25)
+      : setClusterRadius(50);
     switch (layerStatus.markerType) {
       case MetarMarkerTypes.surfaceVisibility.value:
         setServerFilter(
           defaultServerFilter + ` AND visibility_statute_mi IS NOT NULL`,
         );
+        break;
+      case MetarMarkerTypes.surfaceWindBarbs.value:
         break;
     }
   }, [layerStatus.markerType]);
@@ -964,7 +969,7 @@ const MetarsLayer = () => {
         markerPane={'metar'}
         // serverFilter={serverFilter}
         clientFilter={clientFilter}
-        maxClusterRadius={50}
+        maxClusterRadius={clusterRadius}
         initData={filteredData}
         layerStateSelector={selectMetar}
         cacheVersion={cacheVersion}

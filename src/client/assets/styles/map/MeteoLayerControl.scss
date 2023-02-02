@@ -22,6 +22,14 @@
       font-weight: 600;
     }
   }
+  .btn-close{
+    position: absolute;
+    font-size: 18px;
+    color: white;
+    right: 8px;
+    top: 4px;
+    cursor: pointer;
+  }
   &-contents{
     margin: 8px 2px;
   }
