@@ -1,4 +1,5 @@
 import { PathOptions } from 'leaflet';
+import { selectOutlooks } from '../../../../store/layers/LayerControl';
 import WFSLayer from './WFSLayer';
 
 const ConvectiveOutlookLayer = () => {
@@ -50,6 +51,7 @@ const ConvectiveOutlookLayer = () => {
       style={style}
       getLabel={getLabel}
       clientFilter={clientFilter}
+      layerStateSelector={selectOutlooks}
     ></WFSLayer>
   );
 };

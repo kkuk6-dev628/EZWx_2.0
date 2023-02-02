@@ -1,4 +1,5 @@
 import { PathOptions } from 'leaflet';
+import { selectIntlSigmet } from '../../../../store/layers/LayerControl';
 import WFSLayer from './WFSLayer';
 
 const IntlSigmetLayer = () => {
@@ -46,6 +47,7 @@ const IntlSigmetLayer = () => {
       style={gairmetStyle}
       getLabel={getLabel}
       clientFilter={clientFilter}
+      layerStateSelector={selectIntlSigmet}
     ></WFSLayer>
   );
 };

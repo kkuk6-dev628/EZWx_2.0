@@ -546,17 +546,17 @@ const MetarsLayer = () => {
             weatherIconClass = isDayTime ? 'fas fa-sun' : 'fas fa-moon';
             break;
           case 'FEW':
-            weatherIconClass = isDayTime ? 'fas fa-cloud-bolt-sun' : 'fas fa-cloud-bolt-moon';
+            weatherIconClass = isDayTime ? 'fas fa-sun-cloud' : 'fas fa-moon-cloud';
             break;
           case 'SCT':
-            weatherIconClass = isDayTime ? 'fas fa-cloud-bolt-sun' : 'fas fa-cloud-bolt-moon';
+            weatherIconClass = isDayTime ? 'fas fa-cloud-sun' : 'fas fa-cloud-moon';
             break;
           case 'BKN':
-            weatherIconClass = isDayTime ? 'fas fa-cloud-bolt' : 'fas fa-cloud-bolt';
+            weatherIconClass = isDayTime ? 'fas fa-clouds-sun' : 'fas fa-clouds-moon';
             break;
           case 'OVC':
           case 'OVX':
-            weatherIconClass = 'fas fa-cloud-bolt';
+            weatherIconClass = 'fas fa-cloud';
         }
       }
     } else {
@@ -665,7 +665,7 @@ const MetarsLayer = () => {
           weatherIconClass = 'fas fa-snow-blowing';
           break;
         case 'IC':
-          weatherIconClass = 'fa-sharp fa-solid fa-sparkles';
+          weatherIconClass = 'fas fa-sparkles';
           break;
         case 'FC':
           weatherIconClass = 'fas fa-tornado';
@@ -724,6 +724,26 @@ const MetarsLayer = () => {
               case 'OVX':
                 weatherIconClass = 'fas fa-cloud';
             }
+          }
+          break;
+        case 'TSPL':
+          if (!worstSkyConditionFetched) {
+            condition = getWorstSkyCondition(getSkyConditions(feature));
+          }
+          switch (condition) {
+            case 'SKC':
+            case 'CLR':
+              weatherIconClass = isDayTime ? 'fas fa-sun' : 'fas fa-moon';
+              break;
+            case 'FEW':
+            case 'SCT':
+              weatherIconClass = isDayTime ? 'fas fa-cloud-bolt-sun' : 'fas fa-cloud-bolt-moon';
+              break;
+            case 'BKN':
+            case 'OVC':
+            case 'OVX':
+              weatherIconClass = 'fas fa-cloud-bolt';
+              break;
           }
           break;
       }

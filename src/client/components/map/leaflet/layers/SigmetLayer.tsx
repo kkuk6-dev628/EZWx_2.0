@@ -110,6 +110,7 @@ const SigmetLayer = () => {
       style={gairmetStyle}
       getLabel={getLabel}
       clientFilter={clientFilter}
+      layerStateSelector={selectSigmet}
     ></WFSLayer>
   );
 };

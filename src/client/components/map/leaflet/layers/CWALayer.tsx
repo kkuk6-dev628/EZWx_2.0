@@ -111,6 +111,7 @@ const CWALayer = () => {
       style={style}
       getLabel={getLabel}
       clientFilter={clientFilter}
+      layerStateSelector={selectCwa}
     ></WFSLayer>
   );
 };

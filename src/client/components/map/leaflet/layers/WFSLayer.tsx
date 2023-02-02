@@ -95,7 +95,7 @@ const WFSLayer = React.forwardRef(
       layerState = useSelector(layerStateSelector);
     }
     useEffect(() => {
-      if (layerState && layerState.visible === false) return;
+      if (layerState && layerState.checked === false) return;
       if (clientFilter && geoJSON.features.length > 0) {
         const filteredFeatures = clientFilter(geoJSON.features, new Date(observationTime));
         setDisplayedData({

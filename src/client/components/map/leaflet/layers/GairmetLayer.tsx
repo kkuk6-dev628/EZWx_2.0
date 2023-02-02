@@ -173,6 +173,7 @@ const GairmetLayer = () => {
       // serverFilter={`forecast IN ('0')`}
       getLabel={getLabel}
       clientFilter={clientFilter}
+      layerStateSelector={selectGairmet}
     ></WFSLayer>
   );
 };

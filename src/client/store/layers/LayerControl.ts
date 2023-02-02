@@ -205,6 +205,8 @@ export const selectSigmet = (state: AppState) => state.layerControl.sigmetState;
 export const selectGairmet = (state: AppState) => state.layerControl.gairmetState;
 export const selectPirep = (state: AppState) => state.layerControl.pirepState;
 export const selectCwa = (state: AppState) => state.layerControl.cwaState;
+export const selectIntlSigmet = (state: AppState) => state.layerControl.sigmetState.international;
+export const selectOutlooks = (state: AppState) => state.layerControl.sigmetState.outlooks;
 
 export const selectLayerControl = (state: AppState) => state.layerControl;
 export const selectLayerControlShow = (state: AppState) => state.layerControl.show;
