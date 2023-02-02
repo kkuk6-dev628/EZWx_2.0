@@ -1094,6 +1094,42 @@ export const getMetarDecodedWxString = (wxString: string): string => {
     case 'IC':
       result = 'Ice cystals';
       break;
+    case 'IC DRSN':
+      result = 'Ice crystals and drifting snow';
+      break;
+    case 'VCSH DRSN':
+      result = 'Showers in the vicinity and drifting snow';
+      break;
+    case 'FZFG UP':
+      result = 'Unknown precipitation and freezing fog';
+      break;
+    case '-FZDZ BR':
+      result = 'Light freezing drizzle and mist';
+      break;
+    case 'FZDZ BR':
+      result = 'Moderate freezing drizzle and mist';
+      break;
+    case '+FZDZ BR':
+      result = 'Heavy freezing drizzle and mist';
+      break;
+    case '-FZDZ FZFG':
+      result = 'Light freezing drizzle and freezing fog';
+      break;
+    case 'FZDZ FZFG':
+      result = 'Moderate freezing drizzle and freezing fog';
+      break;
+    case '+FZDZ FZFG':
+      result = 'Heavy freezing drizzle and freezing fog';
+      break;
+    case '-TSPL':
+      result = 'Thunderstorms and light ice pellets';
+      break;
+    case 'TSPL':
+      result = 'Thunderstorms and moderate ice pellets';
+      break;
+    case '+TSPL':
+      result = 'Thunderstorms and heavy ice pellets';
+      break;
   }
   return result;
 };

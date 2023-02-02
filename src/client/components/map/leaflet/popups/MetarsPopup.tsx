@@ -158,7 +158,7 @@ const MetarsPopup = ({
       {feature.properties.altim_in_hg != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Altimeter: </b>
-          <span>{feature.properties.altim_in_hg} &deg; Hg</span>
+          <span>{feature.properties.altim_in_hg}" Hg</span>
         </Typography>
       )}
       <Divider></Divider>

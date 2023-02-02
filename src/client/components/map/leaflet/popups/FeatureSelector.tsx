@@ -192,7 +192,7 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
                 {layer.feature.geometry.type === 'Point' && (
                   <div
                     style={{
-                      width: 52,
+                      width: 54,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',

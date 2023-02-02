@@ -157,7 +157,7 @@ const MetarsLayer = () => {
 
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
-        className: 'metar-ceiling-icon',
+        className: 'metar-visibility-icon',
         html: ReactDOMServer.renderToString(
           <>
             <div style={{ display: 'inline', verticalAlign: -7, marginLeft: -4 }}>
@@ -546,17 +546,17 @@ const MetarsLayer = () => {
             weatherIconClass = isDayTime ? 'fas fa-sun' : 'fas fa-moon';
             break;
           case 'FEW':
-            weatherIconClass = isDayTime ? 'fas fa-sun-cloud' : 'fas fa-moon-cloud';
+            weatherIconClass = isDayTime ? 'fas fa-cloud-bolt-sun' : 'fas fa-cloud-bolt-moon';
             break;
           case 'SCT':
-            weatherIconClass = isDayTime ? 'fas fa-cloud-sun' : 'fas fa-cloud-moon';
+            weatherIconClass = isDayTime ? 'fas fa-cloud-bolt-sun' : 'fas fa-cloud-bolt-moon';
             break;
           case 'BKN':
-            weatherIconClass = isDayTime ? 'fas fa-clouds-sun' : 'fas fa-clouds-moon';
+            weatherIconClass = isDayTime ? 'fas fa-cloud-bolt' : 'fas fa-cloud-bolt';
             break;
           case 'OVC':
           case 'OVX':
-            weatherIconClass = 'fas fa-cloud';
+            weatherIconClass = 'fas fa-cloud-bolt';
         }
       }
     } else {
@@ -572,6 +572,7 @@ const MetarsLayer = () => {
         case 'SN DRSN':
         case 'SG DRSN':
         case 'SG':
+        case 'VCSH DRSN':
           weatherIconClass = 'fas fa-cloud-snow';
           break;
         case 'RASN':
@@ -601,6 +602,9 @@ const MetarsLayer = () => {
         case 'FZDZ':
         case 'FZDZ FZFG':
           weatherIconClass = 'fas fa-icicles';
+          break;
+        case 'FZFG UP':
+          weatherIconClass = 'fas fa-cloud-fog';
           break;
         case 'RA':
         case 'RA BR':
@@ -657,7 +661,11 @@ const MetarsLayer = () => {
         case 'BLSN':
         case 'DRSN':
         case 'SN BLSN':
+        case 'IC DRSN':
           weatherIconClass = 'fas fa-snow-blowing';
+          break;
+        case 'IC':
+          weatherIconClass = 'fa-sharp fa-solid fa-sparkles';
           break;
         case 'FC':
           weatherIconClass = 'fas fa-tornado';

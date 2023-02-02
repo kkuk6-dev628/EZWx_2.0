@@ -80,22 +80,6 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
     return typeof (layer as any).getLayers === 'function' && (layer as LayerGroup).getLayers().length === 0;
   };
 
-  // const onLayerClick = (layerObj: Layer, layerState: LayerState) => {
-  //   map.closePopup();
-  //   if (!layerObj) return;
-  //   if (checkEmptyLayer(layerObj)) {
-  //     toast.error(`No ${layerState.name}'s data displayed`, {
-  //       position: 'top-right',
-  //     });
-  //   } else {
-  //     if (map?.hasLayer(layerObj)) {
-  //       hideLayer(layerObj);
-  //     } else {
-  //       showLayer(layerObj);
-  //     }
-  //   }
-  // };
-
   const showLayer = (layerObj: Layer, layerName: string) => {
     map.closePopup();
     if (!layerObj) return;
@@ -166,31 +150,37 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
 
   const inLayerControl = useContext(InLayerControl);
 
+  const disableMapInteraction = (disable: boolean) => {
+    inLayerControl.value = disable;
+
+    if (disable) {
+      map.dragging.disable();
+      map.doubleClickZoom.disable();
+      map.scrollWheelZoom.disable();
+      map.touchZoom.disable();
+      map.boxZoom.disable();
+      map.keyboard.disable();
+    } else {
+      map.dragging.enable();
+      map.doubleClickZoom.enable();
+      map.scrollWheelZoom.enable();
+      map.touchZoom.enable();
+      map.boxZoom.enable();
+      map.keyboard.enable();
+    }
+  };
+
   useEffect(() => {
     if (ref?.current) {
       // DomEvent.disableClickPropagation(ref.current);
       DomEvent.disableScrollPropagation(ref.current);
       // Disable dragging when user's cursor enters the element
       ref.current.addEventListener('mouseover', function () {
-        map.dragging.disable();
-        map.doubleClickZoom.disable();
-        map.scrollWheelZoom.disable();
-        map.touchZoom.disable();
-        map.boxZoom.disable();
-        map.keyboard.disable();
-        if (map.tap) map.tap.disable();
-        inLayerControl.value = true;
+        disableMapInteraction(true);
       });
       // Re-enable dragging when user's cursor leaves the element
       ref.current.addEventListener('mouseout', function () {
-        map.dragging.enable();
-        map.doubleClickZoom.enable();
-        map.scrollWheelZoom.enable();
-        map.touchZoom.enable();
-        map.boxZoom.enable();
-        map.keyboard.enable();
-        if (map.tap) map.tap.enable();
-        inLayerControl.value = false;
+        disableMapInteraction(false);
       });
     }
   }, [ref?.current]);
@@ -218,6 +208,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
             className="btn-close"
             onClick={() => {
               dispatch(setLayerControlShow(false));
+              disableMapInteraction(false);
             }}
           >
             <i className="fa-regular fa-circle-xmark"></i>
