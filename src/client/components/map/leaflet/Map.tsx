@@ -27,10 +27,7 @@ import './layers/CacheTileLayer';
 import WFSLayer from './layers/WFSLayer';
 import Slider from '@mui/material/Slider';
 import { useDispatch } from 'react-redux';
-import {
-  selectLayerControlShow,
-  setLayerControlShow,
-} from '../../../store/layers/LayerControl';
+import { selectLayerControlShow, setLayerControlShow } from '../../../store/layers/LayerControl';
 import { useSelector } from 'react-redux';
 
 function LeafletMap() {
@@ -148,13 +145,7 @@ function LeafletMap() {
           defaultLayer="Street"
           exclusiveSkipLayers={['U.S. States']}
         >
-          <GroupedLayer
-            checked
-            name="U.S. States"
-            group="Base Admin"
-            pickable={false}
-            order={0}
-          >
+          <GroupedLayer checked name="U.S. States" group="Base Admin" pickable={false} order={0}>
             <WFSLayer
               url="http://3.95.80.120:8080/geoserver/topp/ows"
               maxFeatures={256}
@@ -210,19 +201,13 @@ function LeafletMap() {
         <MeteoLayers></MeteoLayers>
         <ZoomControl
           position="topright"
-          zoomInText={ReactDOMServer.renderToString(
-            <SvgRoundPlus></SvgRoundPlus>,
-          )}
-          zoomOutText={ReactDOMServer.renderToString(
-            <SvgRoundMinus></SvgRoundMinus>,
-          )}
+          zoomInText={ReactDOMServer.renderToString(<SvgRoundPlus></SvgRoundPlus>)}
+          zoomOutText={ReactDOMServer.renderToString(<SvgRoundMinus></SvgRoundMinus>)}
         />
       </MapContainer>
       {isShowTabs && <MapTabs tabMenus={tabMenus} />}
       {isShowModal && <Route setIsShowModal={setIsShowModal} />}
-      {isShowDateModal && (
-        <DateSliderModal setIsShowDateModal={setIsShowDateModal} />
-      )}
+      {isShowDateModal && <DateSliderModal setIsShowDateModal={setIsShowDateModal} />}
       <CollapsibleBar />
     </div>
   );

@@ -1,9 +1,6 @@
 import { Divider, Typography } from '@material-ui/core';
 import BasePopupFrame from './BasePopupFrame';
-import {
-  convertTimeFormat,
-  getAltitudeString,
-} from '../../common/AreoFunctions';
+import { convertTimeFormat, getAltitudeString } from '../../common/AreoFunctions';
 
 const hazardTranslation = {
   TS: 'Thunderstorms',
@@ -24,15 +21,12 @@ const qualifiersTranslation = {
 
 const IntlSigmetPopup = ({ feature }: { feature: any }) => {
   let title = hazardTranslation[feature.properties.hazard]
-    ? `${qualifiersTranslation[feature.properties.qualifier]} ${
-        hazardTranslation[feature.properties.hazard]
-      }`
+    ? `${qualifiersTranslation[feature.properties.qualifier]} ${hazardTranslation[feature.properties.hazard]}`
     : 'Other';
   let base;
   if (
     feature.properties.base !== null &&
-    (isNaN(parseInt(feature.properties.base)) ||
-      feature.properties.base === '0')
+    (isNaN(parseInt(feature.properties.base)) || feature.properties.base === '0')
   ) {
     base = 'Surface';
   } else {

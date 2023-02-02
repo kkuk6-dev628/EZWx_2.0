@@ -4,15 +4,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import ProfileModal from '../shared/ProfileModal';
-import {
-  SvgDropDown,
-  SvgMenuBurger,
-  SvgProfile,
-  SvgRoundClose,
-  SvgSave,
-  SvgSetting,
-  SvgWarn,
-} from '../utils/SvgIcons';
+import { SvgDropDown, SvgMenuBurger, SvgProfile, SvgRoundClose, SvgSave, SvgSetting, SvgWarn } from '../utils/SvgIcons';
 
 const links = [
   {
@@ -165,27 +157,16 @@ export default function Header() {
             <div className="header__lft">
               <Link href="/home">
                 <div className="header__img__area">
-                  <Image
-                    src="/images/Logo.png"
-                    layout={'fill'}
-                    alt="logo"
-                    className="header__img"
-                  />
+                  <Image src="/images/Logo.png" layout={'fill'} alt="logo" className="header__img" />
                 </div>
               </Link>
-              <button
-                onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)}
-                className="header__menu btn"
-              >
+              <button onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)} className="header__menu btn">
                 {activeResponsiveMenu ? <SvgRoundClose /> : <SvgMenuBurger />}
               </button>
               {mapMenu && <button className="header__tab__text">1040Z</button>}
             </div>
           ) : (
-            <button
-              onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)}
-              className="header__menu btn"
-            >
+            <button onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)} className="header__menu btn">
               {activeResponsiveMenu ? <SvgRoundClose /> : <SvgMenuBurger />}
             </button>
           )}
@@ -203,25 +184,15 @@ export default function Header() {
                     <li key={link.id} className="header__nav__item">
                       <Link className="header__nav__anc" href={link.link}>
                         <span className="header__nav__link">{link.name}</span>
-                        <div className="header__nav__icon">
-                          {link.children && <SvgDropDown />}
-                        </div>
+                        <div className="header__nav__icon">{link.children && <SvgDropDown />}</div>
                       </Link>
                       {link.children && (
                         <div className="header__nav__dropdown">
                           <ul className="header__nav__dropdown__list flex flex-column">
                             {link.children.map((child) => (
-                              <li
-                                key={child.id}
-                                className="header__nav__dropdown__item"
-                              >
-                                <Link
-                                  className="header__nav__dropdown__anc"
-                                  href={child.link}
-                                >
-                                  <span className="header__nav__dropdown__link">
-                                    {child.name}
-                                  </span>
+                              <li key={child.id} className="header__nav__dropdown__item">
+                                <Link className="header__nav__dropdown__anc" href={child.link}>
+                                  <span className="header__nav__dropdown__link">{child.name}</span>
                                 </Link>
                               </li>
                             ))}
@@ -236,13 +207,9 @@ export default function Header() {
             <div className="header__rgt__btns flex flex-align-center">
               <Link href="/login">
                 {mapMenu ? (
-                  <button className="header__rgt__btn header__rgt__btn--map btn">
-                    BACK TO SITE
-                  </button>
+                  <button className="header__rgt__btn header__rgt__btn--map btn">BACK TO SITE</button>
                 ) : (
-                  <button className="header__rgt__btn header__rgt__btn--lft btn">
-                    New to EZWxBrief?
-                  </button>
+                  <button className="header__rgt__btn header__rgt__btn--lft btn">New to EZWxBrief?</button>
                 )}
               </Link>
               {isUserLoginUser ? (
@@ -256,10 +223,7 @@ export default function Header() {
                   <button className="header__rgt__btn header__rgt__btn--icon btn">
                     <SvgSetting />
                   </button>
-                  <button
-                    onClick={handleProfileModal}
-                    className="header__rgt__btn header__rgt__btn--icon btn"
-                  >
+                  <button onClick={handleProfileModal} className="header__rgt__btn header__rgt__btn--icon btn">
                     <SvgProfile />
                   </button>
                 </div>
@@ -273,10 +237,7 @@ export default function Header() {
           </div>
         </div>
         {isShowProfileModal && (
-          <ProfileModal
-            setIsUserLoginUser={setIsUserLoginUser}
-            handleProfileModal={handleProfileModal}
-          />
+          <ProfileModal setIsUserLoginUser={setIsUserLoginUser} handleProfileModal={handleProfileModal} />
         )}
       </div>
       <ResponsiveMenu
@@ -289,18 +250,9 @@ export default function Header() {
   );
 }
 
-const ResponsiveMenu = ({
-  activeResponsiveMenu,
-  activeMenu,
-  handleActiveMenu,
-  mapMenu,
-}) => {
+const ResponsiveMenu = ({ activeResponsiveMenu, activeMenu, handleActiveMenu, mapMenu }) => {
   return (
-    <div
-      className={`responsive__menu ${
-        activeResponsiveMenu ? 'responsive__menu__show' : ''
-      }`}
-    >
+    <div className={`responsive__menu ${activeResponsiveMenu ? 'responsive__menu__show' : ''}`}>
       {mapMenu
         ? responsiveLink.map((link) => (
             <div key={link.id}>
@@ -308,9 +260,7 @@ const ResponsiveMenu = ({
                 onClick={() => handleActiveMenu(link.id)}
                 key={link.id}
                 className={`responsive__menu__item ${
-                  activeMenu && activeMenu === link.id
-                    ? 'responsive__menu__active'
-                    : ''
+                  activeMenu && activeMenu === link.id ? 'responsive__menu__active' : ''
                 }`}
               >
                 <Link href={link.link}>
@@ -325,9 +275,7 @@ const ResponsiveMenu = ({
                 onClick={() => handleActiveMenu(link.id)}
                 key={link.id}
                 className={`responsive__menu__item ${
-                  activeMenu && activeMenu === link.id
-                    ? 'responsive__menu__active'
-                    : ''
+                  activeMenu && activeMenu === link.id ? 'responsive__menu__active' : ''
                 }`}
               >
                 <Link href={link.link}>
@@ -342,15 +290,12 @@ const ResponsiveMenu = ({
               {link.children && (
                 <div
                   className={`responsive__menu__dropdown__list ${
-                    activeMenu == link.id &&
-                    'responsive__menu__dropdown__list-visible'
+                    activeMenu == link.id && 'responsive__menu__dropdown__list-visible'
                   }`}
                 >
                   {link.children.map((child) => (
                     <Link href={child.link} key={child.id}>
-                      <span className="responsive__menu__dropdown__link">
-                        {child.name}
-                      </span>
+                      <span className="responsive__menu__dropdown__link">{child.name}</span>
                     </Link>
                   ))}
                 </div>

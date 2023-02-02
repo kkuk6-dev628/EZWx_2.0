@@ -96,18 +96,12 @@ const GairmetLayer = () => {
         label = 'Mtn Obsc';
         break;
       case 'M_FZLVL':
-        label = `Frz<br/>${addLeadingZeroes(
-          feature.properties.top,
-          3,
-        )}<br/>${addLeadingZeroes(base, 3)}`;
+        label = `Frz<br/>${addLeadingZeroes(feature.properties.top, 3)}<br/>${addLeadingZeroes(base, 3)}`;
         break;
     }
     return label;
   };
-  const clientFilter = (
-    features: GeoJSON.Feature[],
-    observationTime: Date,
-  ): GeoJSON.Feature[] => {
+  const clientFilter = (features: GeoJSON.Feature[], observationTime: Date): GeoJSON.Feature[] => {
     setJsonData({ type: 'FeatureCollection', features: features } as any);
     const results = features.filter((feature) => {
       const start = new Date(feature.properties.validtime);
@@ -126,52 +120,28 @@ const GairmetLayer = () => {
       if (layerState.all.checked) {
         return true;
       }
-      if (
-        layerState.airframeIcing.checked &&
-        feature.properties.hazard === 'ICE'
-      ) {
+      if (layerState.airframeIcing.checked && feature.properties.hazard === 'ICE') {
         return true;
       }
-      if (
-        layerState.multiFrzLevels.checked &&
-        feature.properties.hazard === 'M_FZLVL'
-      ) {
+      if (layerState.multiFrzLevels.checked && feature.properties.hazard === 'M_FZLVL') {
         return true;
       }
-      if (
-        layerState.turbulenceHi.checked &&
-        feature.properties.hazard === 'TURB-HI'
-      ) {
+      if (layerState.turbulenceHi.checked && feature.properties.hazard === 'TURB-HI') {
         return true;
       }
-      if (
-        layerState.turbulenceLow.checked &&
-        feature.properties.hazard === 'TURB-LO'
-      ) {
+      if (layerState.turbulenceLow.checked && feature.properties.hazard === 'TURB-LO') {
         return true;
       }
-      if (
-        layerState.ifrConditions.checked &&
-        feature.properties.hazard === 'IFR'
-      ) {
+      if (layerState.ifrConditions.checked && feature.properties.hazard === 'IFR') {
         return true;
       }
-      if (
-        layerState.mountainObscuration.checked &&
-        feature.properties.hazard === 'MT_OBSC'
-      ) {
+      if (layerState.mountainObscuration.checked && feature.properties.hazard === 'MT_OBSC') {
         return true;
       }
-      if (
-        layerState.nonconvectiveLlws.checked &&
-        feature.properties.hazard === 'LLWS'
-      ) {
+      if (layerState.nonconvectiveLlws.checked && feature.properties.hazard === 'LLWS') {
         return true;
       }
-      if (
-        layerState.sfcWinds.checked &&
-        feature.properties.hazard === 'SFC_WND'
-      ) {
+      if (layerState.sfcWinds.checked && feature.properties.hazard === 'SFC_WND') {
         return true;
       }
       return false;

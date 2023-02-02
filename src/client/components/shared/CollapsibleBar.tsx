@@ -1,18 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import Slider from '@mui/material/Slider';
 import React from 'react';
-import {
-  diffMinutes,
-  getTimeRangeStart,
-  simpleTimeFormat,
-} from '../map/common/AreoFunctions';
+import { diffMinutes, getTimeRangeStart, simpleTimeFormat } from '../map/common/AreoFunctions';
 import { useDispatch, useSelector } from 'react-redux';
 import { setObsTime } from '../../store/time-slider/ObsTimeSlice';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import {
-  selectObsInterval,
-  setObsInterval,
-} from '../../store/time-slider/ObsIntervalSlice';
+import { selectObsInterval, setObsInterval } from '../../store/time-slider/ObsIntervalSlice';
 
 function CollapsibleBar() {
   const dispatch = useDispatch();

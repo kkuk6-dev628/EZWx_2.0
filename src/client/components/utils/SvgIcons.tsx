@@ -2,32 +2,14 @@ import React from 'react';
 
 function SvgDropDown() {
   return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M8 10L12 14L16 10"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 10L12 14L16 10" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 function SvgMenuBurger() {
   return (
-    <svg
-      width="44"
-      height="44"
-      viewBox="0 0 44 44"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="8" y="12" width="28" height="4" rx="2" fill="white" />
       <rect x="8" y="20" width="28" height="4" rx="2" fill="white" />
       <rect x="8" y="28" width="28" height="4" rx="2" fill="white" />
@@ -36,59 +18,19 @@ function SvgMenuBurger() {
 }
 function SvgRoundClose() {
   return (
-    <svg
-      width="44"
-      height="44"
-      viewBox="0 0 44 44"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect width="44" height="44" rx="8" fill="#791DC6" />
-      <rect
-        x="13.5146"
-        y="10.6865"
-        width="28"
-        height="4"
-        rx="2"
-        transform="rotate(45 13.5146 10.6865)"
-        fill="white"
-      />
-      <rect
-        x="10.6863"
-        y="30.4854"
-        width="28"
-        height="4"
-        rx="2"
-        transform="rotate(-45 10.6863 30.4854)"
-        fill="white"
-      />
+      <rect x="13.5146" y="10.6865" width="28" height="4" rx="2" transform="rotate(45 13.5146 10.6865)" fill="white" />
+      <rect x="10.6863" y="30.4854" width="28" height="4" rx="2" transform="rotate(-45 10.6863 30.4854)" fill="white" />
     </svg>
   );
 }
 
 function SvgRoundPlus() {
   return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M12 8V16"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M16 12H8"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 8V16" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 12H8" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -103,20 +45,8 @@ function SvgRoundPlus() {
 }
 function SvgRoundMinus() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
-      <path
-        d="M16 12H8"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M16 12H8" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -132,15 +62,7 @@ function SvgRoundMinus() {
 
 function SvgBulbDollar() {
   return (
-    <svg
-      version="1.1"
-      id="Capa_1"
-      x="0px"
-      y="0px"
-      width="55px"
-      height="55px"
-      viewBox="0 0 571.199 571.199"
-    >
+    <svg version="1.1" id="Capa_1" x="0px" y="0px" width="55px" height="55px" viewBox="0 0 571.199 571.199">
       <g>
         <path
           d="M352.898,534.834c-1.795,5.664-7.527,9.166-13.477,9.166h-0.205c-7.854,0-15.035,4.441-18.551,11.465l-0.143,0.285
@@ -192,13 +114,7 @@ function SvgBulbDollar() {
 }
 function SvgSave() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="23px"
-      height="23px"
-      viewBox="0 0 44 44"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="23px" height="23px" viewBox="0 0 44 44" fill="none">
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -213,13 +129,7 @@ function SvgSave() {
 }
 function SvgWarn() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="23px"
-      height="23px"
-      viewBox="0 0 46 46"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="23px" height="23px" viewBox="0 0 46 46" fill="none">
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -248,13 +158,7 @@ function SvgWarn() {
 }
 function SvgSetting() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="23px"
-      height="23px"
-      viewBox="0 0 44 44"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="23px" height="23px" viewBox="0 0 44 44" fill="none">
       <path
         d="M25.5002 18.4999C27.4333 20.433 27.4333 23.5671 25.5002 25.5002C23.5671 27.4333 20.4329 27.4333 18.4998 25.5002C16.5667 23.5671 16.5667 20.433 18.4998 18.4999C20.4329 16.5668 23.5671 16.5668 25.5002 18.4999"
         stroke="white"
@@ -276,13 +180,7 @@ function SvgSetting() {
 }
 function SvgProfile() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="23px"
-      height="23px"
-      viewBox="0 0 44 44"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="23px" height="23px" viewBox="0 0 44 44" fill="none">
       <path
         d="M33.6673 10.3327C40.111 16.7764 40.111 27.2236 33.6673 33.6672C27.2237 40.1109 16.7765 40.1109 10.3329 33.6672C3.88921 27.2236 3.88921 16.7764 10.3329 10.3327C16.7765 3.88909 27.2237 3.88909 33.6673 10.3327"
         stroke="white"
@@ -309,13 +207,7 @@ function SvgProfile() {
 }
 function SvgRefresh() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="34"
-      height="34"
-      viewBox="0 0 34 34"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34" fill="none">
       <path
         d="M17 6.32886C11.6194 6.32968 7.08111 10.3362 6.41311 15.6751C5.74511 21.0141 9.15641 26.0153 14.3709 27.3417C19.5855 28.6682 24.9719 25.905 26.9362 20.8958C28.9006 15.8866 26.8283 10.1985 22.1022 7.62673"
         stroke="#3F0C69"
@@ -335,13 +227,7 @@ function SvgRefresh() {
 }
 function SvgLayer() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="32"
-      height="32"
-      viewBox="0 0 32 32"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
       <path
         d="M28 22.6399L15.9867 27.9999"
         stroke="#3F0C69"
@@ -356,20 +242,8 @@ function SvgLayer() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path
-        d="M28 16L15.9867 21.36"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M15.9867 21.36L4 16"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M28 16L15.9867 21.36" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M15.9867 21.36L4 16" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -384,13 +258,7 @@ function SvgLayer() {
 }
 function SvgRoute() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="32"
-      height="32"
-      viewBox="0 0 32 32"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
       <path
         d="M10.5523 6.1143C11.5937 7.1557 11.5937 8.84414 10.5523 9.88554C9.51089 10.9269 7.82245 10.9269 6.78105 9.88554C5.73965 8.84414 5.73965 7.1557 6.78105 6.1143C7.82245 5.0729 9.51089 5.0729 10.5523 6.1143"
         stroke="#3F0C69"
@@ -419,13 +287,7 @@ function SvgRoute() {
 }
 function SvgProfileCharge() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="34"
-      height="34"
-      viewBox="0 0 34 34"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34" fill="none">
       <path
         d="M10.9974 19.6678L14.3322 16.1103L17.6669 19.6678L23.0024 14.3323"
         stroke="#3F0C69"
@@ -449,13 +311,7 @@ function SvgProfileCharge() {
 }
 function SvgMap() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="32"
-      height="32"
-      viewBox="0 0 32 32"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -465,32 +321,14 @@ function SvgMap() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path
-        d="M20 12.7068V20.6268"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M12 10.04V17.96"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M20 12.7068V20.6268" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 10.04V17.96" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 function SvgTemperature() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="32"
-      height="32"
-      viewBox="0 0 32 32"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
       <path
         d="M7.50671 18.2427V7.25867C7.50671 5.45867 8.96537 4 10.7654 4C12.5654 4 14.024 5.45867 14.024 7.25867V18.2427V18.2453C15.336 19.2373 16.1974 20.7947 16.1974 22.5653C16.1974 25.568 13.7654 28 10.7654 28C7.76537 28 5.33337 25.568 5.33337 22.568C5.33337 20.7973 6.19471 19.2373 7.50671 18.248"
         stroke="#3F0C69"
@@ -498,34 +336,10 @@ function SvgTemperature() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path
-        d="M20 9.33341H26.6667"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M20 5.33341H26.6667"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M20 13.3334H26.6667"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M20 17.3334H26.6667"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M20 9.33341H26.6667" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M20 5.33341H26.6667" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M20 13.3334H26.6667" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M20 17.3334H26.6667" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -535,25 +349,13 @@ function SvgTemperature() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path
-        d="M10.6667 20.6667V12"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M10.6667 20.6667V12" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 function SvgThreeDot() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="30px"
-      height="30px"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" viewBox="0 0 24 24" fill="none">
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -589,20 +391,8 @@ function SvgThreeDot() {
 }
 function SvgAir() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
-      <path
-        d="M3 20H16"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M3 20H16" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -617,13 +407,7 @@ function SvgAir() {
 }
 function SvgTabs() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="26px"
-      height="26px"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="26px" height="26px" viewBox="0 0 24 24" fill="none">
       <path
         d="M19.0029 5.99752H4.99707"
         stroke="#3F0C69"
@@ -654,34 +438,10 @@ function SvgTabs() {
 }
 function SvgZoom() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="26px"
-      height="26px"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
-      <path
-        d="M8 16L16 8"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M12 8H16V12"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M12 16H8V12"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg xmlns="http://www.w3.org/2000/svg" width="26px" height="26px" viewBox="0 0 24 24" fill="none">
+      <path d="M8 16L16 8" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 8H16V12" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 16H8V12" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -696,41 +456,11 @@ function SvgZoom() {
 }
 function SvgBin() {
   return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M18 6.53003H19"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M9 10.47V16.53"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M12 9.31006V17.5801"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M15 10.47V16.53"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18 6.53003H19" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9 10.47V16.53" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 9.31006V17.5801" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M15 10.47V16.53" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -747,25 +477,13 @@ function SvgBin() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path
-        d="M5 6.53003H6"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M5 6.53003H6" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 function SvgLeftRight() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
       <path
         d="M8.6 3.3999L5 6.9999L8.6 10.5999"
         stroke="#3F0C69"
@@ -773,13 +491,7 @@ function SvgLeftRight() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path
-        d="M19 7H5"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M19 7H5" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       <path
         d="M15.4 20.5999L19 16.9999L15.4 13.3999"
         stroke="#3F0C69"
@@ -787,25 +499,13 @@ function SvgLeftRight() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path
-        d="M5 17H19"
-        stroke="#3F0C69"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <path d="M5 17H19" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 function SvgBookmark() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="32"
-      height="32"
-      viewBox="0 0 32 32"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
       <path
         fill-rule="evenodd"
         clip-rule="evenodd"
@@ -815,13 +515,7 @@ function SvgBookmark() {
         stroke-linecap="round"
         stroke-linejoin="round"
       />
-      <path
-        d="M12 14.6667H20"
-        stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
+      <path d="M12 14.6667H20" stroke="#3F0C69" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
       <path
         d="M16 18.6665V10.6665"
         stroke="#3F0C69"
@@ -834,20 +528,8 @@ function SvgBookmark() {
 }
 function SvgDownload() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="32"
-      height="32"
-      viewBox="0 0 32 32"
-      fill="none"
-    >
-      <path
-        d="M16 4V22.6667"
-        stroke="#3F0C69"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <path d="M16 4V22.6667" stroke="#3F0C69" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
       <path
         d="M12 18.6665L16 22.6665L20 18.6665"
         stroke="#3F0C69"
@@ -867,13 +549,7 @@ function SvgDownload() {
 }
 function SvgShare() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="17"
-      height="24"
-      viewBox="0 0 17 24"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="24" viewBox="0 0 17 24" fill="none">
       <path
         d="M11.04 6.02686L5.62665 10.0802"
         stroke="#3F0C69"
@@ -914,13 +590,7 @@ function SvgShare() {
 }
 function SvgLeftArrow() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
       <path
         d="M16.5 21L7.5 12L16.5 3"
         stroke="black"
@@ -933,13 +603,7 @@ function SvgLeftArrow() {
 }
 function SvgRightArrow() {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
       <path
         d="M7.5 3L16.5 12L7.5 21"
         stroke="black"

@@ -196,27 +196,17 @@ export const LayerControlSlice = createSlice({
   },
 });
 
-export const {
-  setMetar,
-  setPirep,
-  setRadar,
-  setSigmet,
-  setGairmet,
-  setCwa,
-  setLayerControl,
-  setLayerControlShow,
-} = LayerControlSlice.actions;
+export const { setMetar, setPirep, setRadar, setSigmet, setGairmet, setCwa, setLayerControl, setLayerControlShow } =
+  LayerControlSlice.actions;
 
 export const selectMetar = (state: AppState) => state.layerControl.metarState;
 export const selectRadar = (state: AppState) => state.layerControl.radarState;
 export const selectSigmet = (state: AppState) => state.layerControl.sigmetState;
-export const selectGairmet = (state: AppState) =>
-  state.layerControl.gairmetState;
+export const selectGairmet = (state: AppState) => state.layerControl.gairmetState;
 export const selectPirep = (state: AppState) => state.layerControl.pirepState;
 export const selectCwa = (state: AppState) => state.layerControl.cwaState;
 
 export const selectLayerControl = (state: AppState) => state.layerControl;
-export const selectLayerControlShow = (state: AppState) =>
-  state.layerControl.show;
+export const selectLayerControlShow = (state: AppState) => state.layerControl.show;
 
 export default LayerControlSlice;

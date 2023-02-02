@@ -19,11 +19,7 @@ function Route({ setIsShowModal }: Props) {
       <div className="modal__wrp">
         <div className="modal__top">
           <p className="modal__top__text text">Enter/Edit/Delete route</p>
-          <button
-            onClick={() => setIsShowModal(false)}
-            className="modal__top__close"
-            type="button"
-          >
+          <button onClick={() => setIsShowModal(false)} className="modal__top__close" type="button">
             <AiOutlineClose className="modal__icon" />
           </button>
         </div>
@@ -52,37 +48,19 @@ function Route({ setIsShowModal }: Props) {
                 <label htmlFor="route-name" className="modal__label text">
                   Departure*
                 </label>
-                <input
-                  type="text"
-                  className="modal__input"
-                  id="route-name"
-                  placeholder="ICAO or FAA"
-                />
+                <input type="text" className="modal__input" id="route-name" placeholder="ICAO or FAA" />
               </div>
               <div className="modal__input__grp">
                 <label htmlFor="route-flight" className="modal__label text">
                   Route of Flight
                 </label>
-                <input
-                  type="text"
-                  className="modal__input"
-                  id="route-flight"
-                  placeholder="ICAO or FAA"
-                />
+                <input type="text" className="modal__input" id="route-flight" placeholder="ICAO or FAA" />
               </div>
               <div className="modal__input__grp">
-                <label
-                  htmlFor="route-destination"
-                  className="modal__label text"
-                >
+                <label htmlFor="route-destination" className="modal__label text">
                   Destination*
                 </label>
-                <input
-                  type="text"
-                  className="modal__input"
-                  id="route-destination"
-                  placeholder="ICAO or FAA"
-                />
+                <input type="text" className="modal__input" id="route-destination" placeholder="ICAO or FAA" />
               </div>
               <div className="modal__swd">
                 <div className="modal__numin__area">
@@ -93,12 +71,7 @@ function Route({ setIsShowModal }: Props) {
                     <span className="modal__lft">
                       <AiOutlineMinus className="modal__icon--mi" />
                     </span>
-                    <input
-                      type="number"
-                      className="modal__input__num"
-                      id="route-numin"
-                      placeholder="0"
-                    />
+                    <input type="number" className="modal__input__num" id="route-numin" placeholder="0" />
                     <span className="modal__rgt">+</span>
                   </div>
                 </div>

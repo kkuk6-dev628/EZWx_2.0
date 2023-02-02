@@ -16,8 +16,7 @@ function signin() {
     formState: { errors },
   } = useForm<IFormInput>();
   const router = useRouter();
-  const [signin, { data, isLoading, error: responseError }] =
-    useSigninMutation();
+  const [signin, { data, isLoading, error: responseError }] = useSigninMutation();
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
     console.log(data);
     signin(data);
@@ -36,15 +35,12 @@ function signin() {
         <div className="sign__left">
           <div className="sign__lft__hdr">
             <h3 className="sign__title">
-              The simplest way to choose the best time to depart while factoring
-              in your own personal minimums
+              The simplest way to choose the best time to depart while factoring in your own personal minimums
             </h3>
             <p className="sign__txt">
-              EZWxBrief provides access to the highest resolution weather
-              guidance available online with seamless access to expert weather
-              training. You'll enjoy robust visualizations of weather along your
-              route that will minimize your exposure to adverse weather.
-              Experience the simplicity of EZWxBrief.
+              EZWxBrief provides access to the highest resolution weather guidance available online with seamless access
+              to expert weather training. You'll enjoy robust visualizations of weather along your route that will
+              minimize your exposure to adverse weather. Experience the simplicity of EZWxBrief.
             </p>
           </div>
           <div className="sign__btn__area">
@@ -69,11 +65,7 @@ function signin() {
           </div>
         </div>
         <div className="sign__frm__area">
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="sign__frm"
-            action=""
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className="sign__frm" action="">
             <div className="csuinp">
               <div className="csuinp__ipt__wrp">
                 <label htmlFor="email" className="csuinp__lbl">
@@ -89,14 +81,10 @@ function signin() {
                     className="csuinp__input"
                     placeholder="Email for Verification"
                   />
-                  {errors.email && (
-                    <p className="csuinp__error__msg">{errors.email.message}</p>
-                  )}
+                  {errors.email && <p className="csuinp__error__msg">{errors.email.message}</p>}
                 </div>
               </div>
-              <p className="csuinp__txt">
-                The email address you registered with
-              </p>
+              <p className="csuinp__txt">The email address you registered with</p>
             </div>
             <div className="csuinp">
               <div className="csuinp__ipt__wrp">
@@ -111,9 +99,7 @@ function signin() {
                   placeholder="The password you specified during registration"
                 />
               </div>
-              <p className="csuinp__txt">
-                The password you specified during registration
-              </p>
+              <p className="csuinp__txt">The password you specified during registration</p>
             </div>
             <div className="csuinp csuinp--checkbox">
               <div className="csuinp__ipt__wrp">

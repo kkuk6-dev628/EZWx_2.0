@@ -89,12 +89,7 @@ describe('Application', () => {
         beforeEach(async () => {
           user = await userService.create(usersFactory.build());
           const thing = await thingsService.create(thingsFactory.build());
-          order = await ordersService.create(
-            ordersFactory.build(
-              {},
-              { associations: { user: user, thing: thing } },
-            ),
-          );
+          order = await ordersService.create(ordersFactory.build({}, { associations: { user: user, thing: thing } }));
         });
 
         it('returns orders', () => {

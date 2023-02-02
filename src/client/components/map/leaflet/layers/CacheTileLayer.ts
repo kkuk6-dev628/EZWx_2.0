@@ -73,11 +73,7 @@ L.TileLayer.include({
     const cacheName = this._maskURL(tileUrl);
 
     if (this.options.useCache) {
-      this._db.get(
-        cacheName,
-        { revs_info: true },
-        this._onCacheLookup(tile, tileUrl, done),
-      );
+      this._db.get(cacheName, { revs_info: true }, this._onCacheLookup(tile, tileUrl, done));
     } else {
       // Fall back to standard behaviour
       tile.onload = L.bind(this._tileOnLoad, this, done, tile);
@@ -118,22 +114,12 @@ L.TileLayer.include({
       function (blob) {
         const url = URL.createObjectURL(blob);
 
-        if (
-          Date.now() > data.timestamp + this.options.cacheMaxAge &&
-          !this.options.useOnlyCache
-        ) {
+        if (Date.now() > data.timestamp + this.options.cacheMaxAge && !this.options.useOnlyCache) {
           // Tile is too old, try to refresh it
           console.log('Tile is too old: ', tileUrl);
 
           if (this.options.saveToCache) {
-            tile.onload = L.bind(
-              this._saveTile,
-              this,
-              tile,
-              tileUrl,
-              data._revs_info[0].rev,
-              done,
-            );
+            tile.onload = L.bind(this._saveTile, this, tile, tileUrl, data._revs_info[0].rev, done);
           }
           tile.crossOrigin = 'Anonymous';
           tile.src = tileUrl;
@@ -166,14 +152,7 @@ L.TileLayer.include({
       // Online, not cached, request the tile normally
       // console.log('Requesting tile normally', tileUrl);
       if (this.options.saveToCache) {
-        tile.onload = L.bind(
-          this._saveTile,
-          this,
-          tile,
-          tileUrl,
-          undefined,
-          done,
-        );
+        tile.onload = L.bind(this._saveTile, this, tile, tileUrl, undefined, done);
       } else {
         tile.onload = L.bind(this._tileOnLoad, this, done, tile);
       }
@@ -213,13 +192,7 @@ L.TileLayer.include({
           })
           .then(
             function (status) {
-              return this._db.putAttachment(
-                maskedId,
-                'tile',
-                status.rev,
-                blob,
-                format,
-              );
+              return this._db.putAttachment(maskedId, 'tile', status.rev, blob, format);
             }.bind(this),
           )
           .then(function (resp) {
@@ -256,9 +229,7 @@ L.TileLayer.include({
       const southWestPoint = this._map.project(bbox.getSouthWest(), z);
 
       // Then to tile coords bounds, as per GridLayer
-      const tileBounds = this._pxBoundsToTileRange(
-        L.bounds([northEastPoint, southWestPoint]),
-      );
+      const tileBounds = this._pxBoundsToTileRange(L.bounds([northEastPoint, southWestPoint]));
 
       for (let j = tileBounds.min.y; j <= tileBounds.max.y; j++) {
         for (let i = tileBounds.min.x; i <= tileBounds.max.x; i++) {
@@ -298,20 +269,11 @@ L.TileLayer.include({
       this._url,
       L.extend(
         {
-          r:
-            this.options.detectRetina &&
-            L.Browser.retina &&
-            this.options.maxZoom > 0
-              ? '@2x'
-              : '',
+          r: this.options.detectRetina && L.Browser.retina && this.options.maxZoom > 0 ? '@2x' : '',
           s: this._getSubdomain(coords),
           x: coords.x,
-          y: this.options.tms
-            ? this._globalTileRange.max.y - coords.y
-            : coords.y,
-          z: this.options.maxNativeZoom
-            ? Math.min(zoom, this.options.maxNativeZoom)
-            : zoom,
+          y: this.options.tms ? this._globalTileRange.max.y - coords.y : coords.y,
+          z: this.options.maxNativeZoom ? Math.min(zoom, this.options.maxNativeZoom) : zoom,
         },
         this.options,
       ),

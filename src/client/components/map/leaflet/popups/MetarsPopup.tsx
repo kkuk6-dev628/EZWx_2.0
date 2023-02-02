@@ -28,10 +28,7 @@ const MetarsPopup = ({
   const skyConditions = getSkyConditions(layer.feature);
   const { iconUrl, ceiling } = getFlightCategoryIconUrl(layer.feature);
   const [, ceilingColor] = getMetarCeilingCategory(ceiling, personalMinimums);
-  const [, visibilityColor] = getMetarVisibilityCategory(
-    feature.properties.visibility_statute_mi,
-    personalMinimums,
-  );
+  const [, visibilityColor] = getMetarVisibilityCategory(feature.properties.visibility_statute_mi, personalMinimums);
   const skyConditionsAsc = skyConditions.sort((a, b) => {
     return a.cloudBase > b.cloudBase ? 1 : -1;
   });
@@ -40,18 +37,14 @@ const MetarsPopup = ({
     ? toTitleCase(airportsData.icaoid[feature.properties.station_id])
     : null;
   if (!airportName) {
-    airportName = toTitleCase(
-      airportsData.faaid[feature.properties.station_id.slice(1)],
-    );
+    airportName = toTitleCase(airportsData.faaid[feature.properties.station_id.slice(1)]);
   }
   let vimi = feature.properties.visibility_statute_mi;
   if (vimi >= 4) {
     vimi = Math.ceil(vimi);
   }
   let visibility = true
-    ? `${visibilityMileToFraction(vimi)} statute ${
-        vimi <= 1 ? 'mile' : 'miles'
-      }`
+    ? `${visibilityMileToFraction(vimi)} statute ${vimi <= 1 ? 'mile' : 'miles'}`
     : `${visibilityMileToMeter(vimi)} meters`;
   if (vimi === 0.25 && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
     visibility = 'Less than ' + visibility;
@@ -85,10 +78,7 @@ const MetarsPopup = ({
         </Typography>
       )}
       {skyConditionsAsc.length > 0 && (
-        <div
-          style={{ display: 'flex', lineHeight: 1, color: 'black' }}
-          className="MuiTypography-body2"
-        >
+        <div style={{ display: 'flex', lineHeight: 1, color: 'black' }} className="MuiTypography-body2">
           <div>
             <p style={{ margin: 3 }}>
               <b>Clouds: </b>
@@ -97,14 +87,9 @@ const MetarsPopup = ({
           <div style={{ margin: 3, marginTop: -5 }}>
             {skyConditionsAsc.map((skyCondition) => {
               return (
-                <div
-                  key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`}
-                  style={{ marginTop: 8 }}
-                >
-                  {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
-                  {skyCondition.cloudBase}{' '}
-                  {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) ===
-                    false && 'feet'}
+                <div key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`} style={{ marginTop: 8 }}>
+                  {MetarSkyValuesToString[skyCondition.skyCover]} {skyCondition.cloudBase}{' '}
+                  {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false && 'feet'}
                 </div>
               );
             })}
@@ -120,11 +105,7 @@ const MetarsPopup = ({
       {feature.properties.wind_speed_kt != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Wind speed: </b>
-          <span>
-            {feature.properties.wind_speed_kt === 0
-              ? 'Calm'
-              : feature.properties.wind_speed_kt + ' knots'}
-          </span>
+          <span>{feature.properties.wind_speed_kt === 0 ? 'Calm' : feature.properties.wind_speed_kt + ' knots'}</span>
         </Typography>
       )}
       {feature.properties.wind_dir_degrees !== null &&
@@ -133,13 +114,10 @@ const MetarsPopup = ({
         feature.properties.wind_speed_kt !== null && (
           <Typography variant="body2" style={{ margin: 3 }}>
             <b>Wind direction: </b>
-            <span>
-              {addLeadingZeroes(feature.properties.wind_dir_degrees, 3)}&deg;
-            </span>
+            <span>{addLeadingZeroes(feature.properties.wind_dir_degrees, 3)}&deg;</span>
           </Typography>
         )}
-      {(feature.properties.wind_dir_degrees === null ||
-        feature.properties.wind_dir_degrees === 0) &&
+      {(feature.properties.wind_dir_degrees === null || feature.properties.wind_dir_degrees === 0) &&
         feature.properties.wind_speed_kt !== 0 &&
         feature.properties.wind_speed_kt !== null && (
           <Typography variant="body2" style={{ margin: 3 }}>

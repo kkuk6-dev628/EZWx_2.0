@@ -9,9 +9,7 @@ export function useLayerControlContext() {
   const context = useContext(LayersControlContext);
 
   if (context == null) {
-    throw new Error(
-      'No context provided: useLayerControlContext() can only be used in a descendant of <LayerControl>',
-    );
+    throw new Error('No context provided: useLayerControlContext() can only be used in a descendant of <LayerControl>');
   }
 
   return context;

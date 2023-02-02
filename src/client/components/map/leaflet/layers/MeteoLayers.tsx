@@ -73,12 +73,10 @@ const MeteoLayers = () => {
           data.data.features.forEach((feature) => {
             if (!feature.properties.name) return;
             if (feature.properties.faaid) {
-              airports.faaid[feature.properties.faaid] =
-                feature.properties.name;
+              airports.faaid[feature.properties.faaid] = feature.properties.name;
             }
             if (feature.properties.icaoid) {
-              airports.icaoid[feature.properties.icaoid] =
-                feature.properties.name;
+              airports.icaoid[feature.properties.icaoid] = feature.properties.name;
             }
           });
           setAirportData(airports as any);
@@ -119,11 +117,7 @@ const MeteoLayers = () => {
         useWidePopup = true;
         break;
       case 'conv_outlook':
-        popup = (
-          <ConvectiveOutlookPopup
-            feature={layer.feature}
-          ></ConvectiveOutlookPopup>
-        );
+        popup = <ConvectiveOutlookPopup feature={layer.feature}></ConvectiveOutlookPopup>;
         useWidePopup = true;
         break;
       case 'pirep':
@@ -131,9 +125,7 @@ const MeteoLayers = () => {
         useWidePopup = true;
         break;
       case 'metar':
-        if (
-          metarLayerStatus.markerType === MetarMarkerTypes.ceilingHeight.value
-        ) {
+        if (metarLayerStatus.markerType === MetarMarkerTypes.ceilingHeight.value) {
           offsetX = 25;
         }
         popup = (
@@ -146,12 +138,7 @@ const MeteoLayers = () => {
         useWidePopup = true;
         break;
       default:
-        popup = (
-          <GeneralPopup
-            feature={layer.feature}
-            title={`${layerName} properties`}
-          ></GeneralPopup>
-        );
+        popup = <GeneralPopup feature={layer.feature} title={`${layerName} properties`}></GeneralPopup>;
         useWidePopup = false;
     }
     const popupContent = ReactDOMServer.renderToString(popup);
@@ -187,10 +174,7 @@ const MeteoLayers = () => {
           if (features.length >= maxLayers) {
             return;
           }
-          if (
-            l.feature.geometry.type === 'Point' ||
-            l.feature.geometry.type === 'MultiPoint'
-          ) {
+          if (l.feature.geometry.type === 'Point' || l.feature.geometry.type === 'MultiPoint') {
             if (
               clickedBBox.latMin < l.feature.geometry.coordinates[1] &&
               l.feature.geometry.coordinates[1] < clickedBBox.latMax &&
@@ -199,9 +183,7 @@ const MeteoLayers = () => {
             ) {
               features.push(l);
             }
-          } else if (
-            booleanPointInPolygon([e.latlng.lng, e.latlng.lat], l.toGeoJSON())
-          ) {
+          } else if (booleanPointInPolygon([e.latlng.lng, e.latlng.lat], l.toGeoJSON())) {
             features.push(l);
           }
         });
@@ -256,15 +238,9 @@ const MeteoLayers = () => {
       } else {
         L.responsivePopup({ offset: [10, 19] })
           .setLatLng(e.latlng)
-          .setContent(
-            ReactDOMServer.renderToString(
-              <FeatureSelector features={features}></FeatureSelector>,
-            ),
-          )
+          .setContent(ReactDOMServer.renderToString(<FeatureSelector features={features}></FeatureSelector>))
           .openOn(map);
-        const selectorFeatureNodes = document.getElementsByClassName(
-          'feature-selector-item',
-        );
+        const selectorFeatureNodes = document.getElementsByClassName('feature-selector-item');
         for (let i = 0; i < selectorFeatureNodes.length; i++) {
           selectorFeatureNodes[i].addEventListener('click', (ee) => {
             map.closePopup();

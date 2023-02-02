@@ -1,10 +1,4 @@
-import React, {
-  ChangeEvent,
-  ReactElement,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { ChangeEvent, ReactElement, useEffect, useRef, useState } from 'react';
 import { Radio, RadioGroup, Typography } from '@material-ui/core';
 import { useMapEvents } from 'react-leaflet';
 import { Layer, Util, DomEvent, LayerGroup } from 'leaflet';
@@ -65,8 +59,7 @@ const LayerControl = ({
   onLayersAdd,
 }: IProps) => {
   const [layers, setLayers] = useState<ILayerObj[]>([]);
-  const positionClass =
-    (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright;
+  const positionClass = (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright;
 
   const ref = useRef<HTMLDivElement>();
   const dispatch = useDispatch();
@@ -85,10 +78,7 @@ const LayerControl = ({
   });
 
   const checkEmptyLayer = (layer: Layer): boolean => {
-    return (
-      typeof (layer as any).getLayers === 'function' &&
-      (layer as LayerGroup).getLayers().length === 0
-    );
+    return typeof (layer as any).getLayers === 'function' && (layer as LayerGroup).getLayers().length === 0;
   };
 
   const onLayerClick = (layerObj: ILayerObj) => {
@@ -140,10 +130,7 @@ const LayerControl = ({
 
   const hideAllLayers = () => {
     const layersNew = layers.map((layerObj) => {
-      if (
-        exclusiveSkipLayers.length > 0 &&
-        exclusiveSkipLayers.includes(layerObj.name)
-      ) {
+      if (exclusiveSkipLayers.length > 0 && exclusiveSkipLayers.includes(layerObj.name)) {
         return;
       }
       map.removeLayer(layerObj.layer);
@@ -186,10 +173,7 @@ const LayerControl = ({
     }
     if (exclusive) {
       for (let i = 0; i < cLayers.length; i++) {
-        if (
-          cLayers[i].name === defaultLayer ||
-          exclusiveSkipLayers.includes(cLayers[i].name)
-        ) {
+        if (cLayers[i].name === defaultLayer || exclusiveSkipLayers.includes(cLayers[i].name)) {
           cLayers[i].checked = true;
           continue;
         }
@@ -221,11 +205,7 @@ const LayerControl = ({
     >
       {!collapsed && (
         <div className={positionClass + ' layer-control-container'}>
-          <div
-            id="base-layer-control"
-            className="leaflet-control leaflet-bar layer-control"
-            ref={ref}
-          >
+          <div id="base-layer-control" className="leaflet-control leaflet-bar layer-control" ref={ref}>
             <div className="layer-control__header">
               <div className="layer-control__img__area">
                 <Image
@@ -243,11 +223,7 @@ const LayerControl = ({
             {Object.keys(groupedLayers).map((section, index) => (
               <div key={index} className="">
                 <Accordion key={`${section} ${index}`} defaultExpanded>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1a-content"
-                    id="panel1a-header"
-                  >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
                     <Typography>{section}</Typography>
                   </AccordionSummary>
                   {groupedLayers[section]?.map((layerObj, index) => {
@@ -319,11 +295,7 @@ const LayerControl = ({
                       //   );
                       case 'Station Markers':
                         return (
-                          <Accordion
-                            key={`${layerObj.name} ${index}`}
-                            defaultExpanded={false}
-                            style={{ marginTop: 0 }}
-                          >
+                          <Accordion key={`${layerObj.name} ${index}`} defaultExpanded={false} style={{ marginTop: 0 }}>
                             <AccordionSummary
                               expandIcon={<ExpandMoreIcon />}
                               aria-controls="panel1a-content"
@@ -373,9 +345,7 @@ const LayerControl = ({
                                 defaultValue={layerStatus.markerType}
                                 name="radio-buttons-group-metar"
                                 style={{ paddingLeft: 26 }}
-                                onChangeCapture={(
-                                  e: ChangeEvent<HTMLInputElement>,
-                                ) => {
+                                onChangeCapture={(e: ChangeEvent<HTMLInputElement>) => {
                                   map.closePopup();
                                   dispatch(
                                     setMetar({
@@ -396,25 +366,17 @@ const LayerControl = ({
                                   label={MetarMarkerTypes.ceilingHeight.text}
                                 />
                                 <FormControlLabel
-                                  value={
-                                    MetarMarkerTypes.surfaceVisibility.value
-                                  }
+                                  value={MetarMarkerTypes.surfaceVisibility.value}
                                   control={<Radio color="primary" />}
-                                  label={
-                                    MetarMarkerTypes.surfaceVisibility.text
-                                  }
+                                  label={MetarMarkerTypes.surfaceVisibility.text}
                                 />
                                 <FormControlLabel
-                                  value={
-                                    MetarMarkerTypes.surfaceWindSpeed.value
-                                  }
+                                  value={MetarMarkerTypes.surfaceWindSpeed.value}
                                   control={<Radio color="primary" />}
                                   label={MetarMarkerTypes.surfaceWindSpeed.text}
                                 />
                                 <FormControlLabel
-                                  value={
-                                    MetarMarkerTypes.surfaceWindBarbs.value
-                                  }
+                                  value={MetarMarkerTypes.surfaceWindBarbs.value}
                                   control={<Radio color="primary" />}
                                   label={MetarMarkerTypes.surfaceWindBarbs.text}
                                 />
@@ -424,13 +386,9 @@ const LayerControl = ({
                                   label={MetarMarkerTypes.surfaceWindGust.text}
                                 />
                                 <FormControlLabel
-                                  value={
-                                    MetarMarkerTypes.surfaceTemperature.value
-                                  }
+                                  value={MetarMarkerTypes.surfaceTemperature.value}
                                   control={<Radio color="primary" />}
-                                  label={
-                                    MetarMarkerTypes.surfaceTemperature.text
-                                  }
+                                  label={MetarMarkerTypes.surfaceTemperature.text}
                                 />
                                 <FormControlLabel
                                   value={MetarMarkerTypes.surfaceDewpoint.value}
@@ -438,13 +396,9 @@ const LayerControl = ({
                                   label={MetarMarkerTypes.surfaceDewpoint.text}
                                 />
                                 <FormControlLabel
-                                  value={
-                                    MetarMarkerTypes.dewpointDepression.value
-                                  }
+                                  value={MetarMarkerTypes.dewpointDepression.value}
                                   control={<Radio color="primary" />}
-                                  label={
-                                    MetarMarkerTypes.dewpointDepression.text
-                                  }
+                                  label={MetarMarkerTypes.dewpointDepression.text}
                                 />
                                 <FormControlLabel
                                   value={MetarMarkerTypes.weather.value}
@@ -492,11 +446,9 @@ const LayerControl = ({
   );
 };
 
-const GroupedLayer = createControlledLayer(
-  (layersControl, layer, options: OrderedLayerProps): any => {
-    layersControl.addGroup(layer, options);
-  },
-);
+const GroupedLayer = createControlledLayer((layersControl, layer, options: OrderedLayerProps): any => {
+  layersControl.addGroup(layer, options);
+});
 
 export default LayerControl;
 export { GroupedLayer };

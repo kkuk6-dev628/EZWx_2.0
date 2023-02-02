@@ -43,8 +43,7 @@ export const UserSettingsSlice = createSlice({
 
 export const { setPersonalMinimums } = UserSettingsSlice.actions;
 
-export const selectPersonalMinimums = (state: AppState) =>
-  state.userSettings.personalMinimumsState;
+export const selectPersonalMinimums = (state: AppState) => state.userSettings.personalMinimumsState;
 
 // export const selectPirep = (state: AppState) => state.layerControl.pirepState;
 

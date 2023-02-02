@@ -17,47 +17,26 @@ function HomeHero() {
           slidesPerView={1}
         >
           <SwiperSlide className="hero__slider">
-            <Image
-              className="slider__img"
-              src="/images/slide1.jpeg"
-              layout={'fill'}
-              alt={''}
-            />
+            <Image className="slider__img" src="/images/slide1.jpeg" layout={'fill'} alt={''} />
             <div className="container hero__slider__content">
               <h1 className="hero__title">Comprehensive weather imagery</h1>
-              <p className="hero__subtitle">
-                This is not your ordinary static imagery
-              </p>
+              <p className="hero__subtitle">This is not your ordinary static imagery</p>
               <button className="btn btn--primary">Learn More</button>
             </div>
           </SwiperSlide>
           <SwiperSlide className="hero__slider">
-            <Image
-              className="slider__img"
-              src="/images/slider2.jpeg"
-              layout={'fill'}
-              alt={''}
-            />
+            <Image className="slider__img" src="/images/slider2.jpeg" layout={'fill'} alt={''} />
             <div className="container hero__slider__content">
               <h1 className="hero__title">Comprehensive weather imagery</h1>
-              <p className="hero__subtitle">
-                This is not your ordinary static imagery
-              </p>
+              <p className="hero__subtitle">This is not your ordinary static imagery</p>
               <button className="btn btn--primary">Learn More</button>
             </div>
           </SwiperSlide>
           <SwiperSlide className="hero__slider">
-            <Image
-              className="slider__img"
-              src="/images/slider3.jpeg"
-              layout={'fill'}
-              alt={''}
-            />
+            <Image className="slider__img" src="/images/slider3.jpeg" layout={'fill'} alt={''} />
             <div className="container hero__slider__content">
               <h1 className="hero__title">Comprehensive weather imagery</h1>
-              <p className="hero__subtitle">
-                This is not your ordinary static imagery
-              </p>
+              <p className="hero__subtitle">This is not your ordinary static imagery</p>
               <button className="btn btn--primary">Learn More</button>
             </div>
           </SwiperSlide>

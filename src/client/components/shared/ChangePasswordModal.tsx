@@ -36,8 +36,7 @@ function ChangePasswordModal({ setIsShowModal }: IProps) {
       return 'Password is required';
     }
 
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
     return passwordRegex.test(value)
       ? true
       : 'Password must be at least 6 characters and contain at least one upper case (A-Z), one lower case (a-z), one number (0-9) and one special character (e.g. !@#$%^&*-,.)';
@@ -55,10 +54,7 @@ function ChangePasswordModal({ setIsShowModal }: IProps) {
       <div className="pmodal__wrp">
         <div className="pmodal__header">
           <h3 className="pmodal__title">Change Password</h3>
-          <button
-            onClick={() => setIsShowModal(false)}
-            className="pmodal__close__btn"
-          >
+          <button onClick={() => setIsShowModal(false)} className="pmodal__close__btn">
             <AiOutlineClose className="pmodal__close__icon" />
           </button>
         </div>
@@ -77,16 +73,10 @@ function ChangePasswordModal({ setIsShowModal }: IProps) {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`csuinp__input ${
-                    errors.currentPassword ? 'csuinp__input--error' : ''
-                  }`}
+                  className={`csuinp__input ${errors.currentPassword ? 'csuinp__input--error' : ''}`}
                   placeholder="Password (minimum 6 characters)"
                 />
-                {errors.currentPassword && (
-                  <p className="csuinp__error__msg">
-                    {errors.currentPassword.message}
-                  </p>
-                )}
+                {errors.currentPassword && <p className="csuinp__error__msg">{errors.currentPassword.message}</p>}
               </div>
             </div>
           </div>
@@ -104,16 +94,10 @@ function ChangePasswordModal({ setIsShowModal }: IProps) {
                   id="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className={`csuinp__input ${
-                    errors.newPassword ? 'csuinp__input--error' : ''
-                  }`}
+                  className={`csuinp__input ${errors.newPassword ? 'csuinp__input--error' : ''}`}
                   placeholder="Password (minimum 6 characters)"
                 />
-                {errors.newPassword && (
-                  <p className="csuinp__error__msg">
-                    {errors.newPassword.message}
-                  </p>
-                )}
+                {errors.newPassword && <p className="csuinp__error__msg">{errors.newPassword.message}</p>}
               </div>
             </div>
           </div>
@@ -130,25 +114,16 @@ function ChangePasswordModal({ setIsShowModal }: IProps) {
                   })}
                   type="password"
                   id="password"
-                  className={`csuinp__input ${
-                    errors.confirmPassword ? 'csuinp__input--error' : ''
-                  }`}
+                  className={`csuinp__input ${errors.confirmPassword ? 'csuinp__input--error' : ''}`}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
-                {errors.confirmPassword && (
-                  <p className="csuinp__error__msg">
-                    {errors.confirmPassword.message}
-                  </p>
-                )}
+                {errors.confirmPassword && <p className="csuinp__error__msg">{errors.confirmPassword.message}</p>}
               </div>
             </div>
           </div>
           <div className="pmodal__btn__area">
-            <button
-              onClick={() => setIsShowModal(false)}
-              className="pmodal__btn-gray"
-            >
+            <button onClick={() => setIsShowModal(false)} className="pmodal__btn-gray">
               Close
             </button>
             <button className="pmodal__btn-blue">Change Password</button>

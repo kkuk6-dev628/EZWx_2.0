@@ -1,9 +1,6 @@
 import { Divider, Typography } from '@material-ui/core';
 import BasePopupFrame from './BasePopupFrame';
-import {
-  convertTimeFormat,
-  getAltitudeString,
-} from '../../common/AreoFunctions';
+import { convertTimeFormat, getAltitudeString } from '../../common/AreoFunctions';
 
 const CWAPopup = ({ feature }) => {
   let title = 'CWA';

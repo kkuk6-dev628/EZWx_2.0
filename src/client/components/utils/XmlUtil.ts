@@ -17,8 +17,7 @@ class XmlUtil {
     for (const name in attributes) {
       if (attributes[name] != null && attributes[name].toString) {
         const value = attributes[name].toString();
-        const uri =
-          XmlUtil.namespaces[name.substring(0, name.indexOf(':'))] || null;
+        const uri = XmlUtil.namespaces[name.substring(0, name.indexOf(':'))] || null;
         node.setAttributeNS(uri, name, value);
       }
     }
@@ -46,9 +45,7 @@ class XmlUtil {
       uri = XmlUtil.namespaces[options.prefix];
     }
 
-    const node = uri
-      ? XmlUtil.xmldoc.createElementNS(uri, name)
-      : XmlUtil.xmldoc.createElement(name);
+    const node = uri ? XmlUtil.xmldoc.createElementNS(uri, name) : XmlUtil.xmldoc.createElement(name);
 
     if (attributes) {
       XmlUtil.setAttributes(node, attributes);
@@ -110,10 +107,7 @@ class XmlUtil {
 
   public static parseOwsExceptionReport(rawXml) {
     const exceptionReportElement = XmlUtil.parseXml(rawXml).documentElement;
-    if (
-      !exceptionReportElement ||
-      exceptionReportElement.tagName !== 'ows:ExceptionReport'
-    ) {
+    if (!exceptionReportElement || exceptionReportElement.tagName !== 'ows:ExceptionReport') {
       return null;
     }
 
@@ -122,36 +116,19 @@ class XmlUtil {
       message: '',
     };
 
-    const exceptionsNodes = exceptionReportElement.getElementsByTagNameNS(
-      XmlUtil.namespaces.ows,
-      'Exception',
-    );
-    for (
-      let i = 0, exceptionsNodesCount = exceptionsNodes.length;
-      i < exceptionsNodesCount;
-      i++
-    ) {
+    const exceptionsNodes = exceptionReportElement.getElementsByTagNameNS(XmlUtil.namespaces.ows, 'Exception');
+    for (let i = 0, exceptionsNodesCount = exceptionsNodes.length; i < exceptionsNodesCount; i++) {
       const exceptionNode = exceptionsNodes[i];
       const exceptionCode = exceptionNode.getAttribute('exceptionCode');
-      const exceptionsTextNodes = exceptionNode.getElementsByTagNameNS(
-        XmlUtil.namespaces.ows,
-        'ExceptionText',
-      );
+      const exceptionsTextNodes = exceptionNode.getElementsByTagNameNS(XmlUtil.namespaces.ows, 'ExceptionText');
       const exception = {
         code: exceptionCode,
         text: '',
       };
 
-      for (
-        let j = 0, textNodesCount = exceptionsTextNodes.length;
-        j < textNodesCount;
-        j++
-      ) {
+      for (let j = 0, textNodesCount = exceptionsTextNodes.length; j < textNodesCount; j++) {
         const exceptionTextNode = exceptionsTextNodes[j];
-        const exceptionText =
-          exceptionTextNode.innerText ||
-          exceptionTextNode.textContent ||
-          exceptionTextNode.text;
+        const exceptionText = exceptionTextNode.innerText || exceptionTextNode.textContent || exceptionTextNode.text;
 
         exception.text += exceptionText;
         if (j < textNodesCount - 1) {

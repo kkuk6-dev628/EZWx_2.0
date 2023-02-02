@@ -97,12 +97,7 @@ function Imagery() {
         </div>
         <div className="igry__mid">
           <div className="igry__img__area">
-            <Image
-              className="igry__img"
-              src="/images/map__img.png"
-              layout={'fill'}
-              alt={''}
-            />
+            <Image className="igry__img" src="/images/map__img.png" layout={'fill'} alt={''} />
           </div>
         </div>
         <div className="igry__rgt igry__blu">
@@ -111,9 +106,7 @@ function Imagery() {
       </div>
       <div className="igry__range">
         <div className="container">
-          <h2 className="igry__range__title">
-            Valid 0000Z Feb 27 to 1200Z Feb 27
-          </h2>
+          <h2 className="igry__range__title">Valid 0000Z Feb 27 to 1200Z Feb 27</h2>
           <div className=" container">
             <div className="igry__range__wrp">
               <div className="igry__btn__area">
@@ -122,26 +115,12 @@ function Imagery() {
                 </button>
               </div>
               <div className="igry__slider__area">
-                <Slider
-                  min={20}
-                  defaultValue={20}
-                  marks={marks}
-                  step={null}
-                  className="igry__range__slider"
-                />
+                <Slider min={20} defaultValue={20} marks={marks} step={null} className="igry__range__slider" />
                 <div className="igry__marker__area">
-                  <p className="igry__range__txt">
-                    1200Z Feb 27 - 0000Z Feb 28
-                  </p>
-                  <p className="igry__range__txt">
-                    1200Z Feb 27 - 0000Z Feb 28
-                  </p>
-                  <p className="igry__range__txt">
-                    1200Z Feb 27 - 0000Z Feb 28
-                  </p>
-                  <p className="igry__range__txt">
-                    1200Z Feb 27 - 0000Z Feb 28
-                  </p>
+                  <p className="igry__range__txt">1200Z Feb 27 - 0000Z Feb 28</p>
+                  <p className="igry__range__txt">1200Z Feb 27 - 0000Z Feb 28</p>
+                  <p className="igry__range__txt">1200Z Feb 27 - 0000Z Feb 28</p>
+                  <p className="igry__range__txt">1200Z Feb 27 - 0000Z Feb 28</p>
                 </div>
               </div>
             </div>
@@ -297,18 +276,11 @@ const ImageryDropDown = () => {
   return (
     <div className="igryDrop">
       <div className="igryDrop__wrp">
-        <div
-          onClick={() => setIsShowDropDown(!isShowDropDown)}
-          className="igryDrop__header"
-        >
+        <div onClick={() => setIsShowDropDown(!isShowDropDown)} className="igryDrop__header">
           <div className="igryDrop__header__lft">
             <h3 className="igryDrop__title">Prob of Precipitation</h3>
           </div>
-          <div
-            className={`igryDrop__header__rgt ${
-              isShowDropDown && 'igryDrop__header__rgt--rotate'
-            }`}
-          >
+          <div className={`igryDrop__header__rgt ${isShowDropDown && 'igryDrop__header__rgt--rotate'}`}>
             <IoMdArrowDropdown className="igryDrop__icon" />
           </div>
         </div>
@@ -319,13 +291,7 @@ const ImageryDropDown = () => {
                 <button className="igryDrop__submit">
                   <AiOutlineSearch className="igryDrop__search__icon" />
                 </button>
-                <input
-                  type="text"
-                  name="data"
-                  id="data"
-                  className="igryDrop__input"
-                  placeholder="Filter menu"
-                />
+                <input type="text" name="data" id="data" className="igryDrop__input" placeholder="Filter menu" />
                 <button className="igryDrop__close">
                   <GrFormClose className="igryDrop__icon__close" />
                 </button>
@@ -335,17 +301,12 @@ const ImageryDropDown = () => {
               {dropDownMenu.map((item) => {
                 return (
                   <>
-                    <div
-                      onClick={() => handleShowChildren(item.id)}
-                      className="igryDrop__menu__item"
-                      key={item.id}
-                    >
+                    <div onClick={() => handleShowChildren(item.id)} className="igryDrop__menu__item" key={item.id}>
                       <p className="igryDrop__menu__text">{item.name}</p>
                       {item.children && (
                         <div
                           className={`igryDrop__menu__icon ${
-                            isShowChildren === item.id &&
-                            'igryDrop__menu__icon--rotate'
+                            isShowChildren === item.id && 'igryDrop__menu__icon--rotate'
                           }`}
                         >
                           <SvgDropDown />
@@ -357,8 +318,7 @@ const ImageryDropDown = () => {
                         return (
                           <div
                             className={`igryDrop__menu__item igryDrop__menu__item--cld ${
-                              isShowChildren === item.id &&
-                              'igryDrop__menu__item--cld--show'
+                              isShowChildren === item.id && 'igryDrop__menu__item--cld--show'
                             }
                               `}
                             key={child.id}

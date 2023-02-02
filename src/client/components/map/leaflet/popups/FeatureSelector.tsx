@@ -3,11 +3,7 @@
 import BasePopupFrame from './BasePopupFrame';
 import L from 'leaflet';
 import { Divider } from '@material-ui/core';
-import {
-  addLeadingZeroes,
-  getThumbnail,
-  simpleTimeOnlyFormat,
-} from '../../common/AreoFunctions';
+import { addLeadingZeroes, getThumbnail, simpleTimeOnlyFormat } from '../../common/AreoFunctions';
 import { feature } from '@turf/helpers';
 
 interface FeatureSelectorProps {
@@ -15,9 +11,9 @@ interface FeatureSelectorProps {
 }
 const FeatureSelector = ({ features }: FeatureSelectorProps) => {
   const getMetarText = (feature: GeoJSON.Feature): string => {
-    const text = `METAR: ${
-      feature.properties.station_id
-    } ${simpleTimeOnlyFormat(new Date(feature.properties.observation_time))}`;
+    const text = `METAR: ${feature.properties.station_id} ${simpleTimeOnlyFormat(
+      new Date(feature.properties.observation_time),
+    )}`;
     return text;
   };
   return (
@@ -27,17 +23,13 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
           const layerName = layer.feature.id.split('.')[0];
           let text = layerName;
           let icon, imgSrc, base, top;
-          if (
-            layer.feature.geometry.type === 'Point' ||
-            layer.feature.geometry.type === 'MultiPoint'
-          ) {
+          if (layer.feature.geometry.type === 'Point' || layer.feature.geometry.type === 'MultiPoint') {
             icon = layer.getIcon().createIcon();
           } else {
             let weight = 0.2;
             if (
               layerName === 'gairmet' &&
-              (layer.feature.properties.hazard === 'SFC_WND' ||
-                layer.feature.properties.hazard === 'LLWS')
+              (layer.feature.properties.hazard === 'SFC_WND' || layer.feature.properties.hazard === 'LLWS')
             ) {
               weight = 0.1;
             }
@@ -91,27 +83,19 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
               }
               switch (layer.feature.properties.hazard) {
                 case 'TS':
-                  text =
-                    `CWA: Thunderstorms` + top === '000' ? '' : ` to ${top}`;
+                  text = `CWA: Thunderstorms` + top === '000' ? '' : ` to ${top}`;
                   break;
                 case 'TURB':
-                  text =
-                    `CWA: Turbulence` + top === '000'
-                      ? ''
-                      : ` ${base} to ${top}`;
+                  text = `CWA: Turbulence` + top === '000' ? '' : ` ${base} to ${top}`;
                   break;
                 case 'ICE':
-                  text =
-                    `CWA: Icing` + top === '000' ? '' : ` ${base} to ${top}`;
+                  text = `CWA: Icing` + top === '000' ? '' : ` ${base} to ${top}`;
                   break;
                 case 'IFR':
                   text = `CWA: IFR`;
                   break;
                 case 'PCPN':
-                  text =
-                    `CWA: Heavy precipitation` + top === '000'
-                      ? ''
-                      : ` to ${top}`;
+                  text = `CWA: Heavy precipitation` + top === '000' ? '' : ` to ${top}`;
                   break;
                 default:
                   text = `CWA: Unknown`;
@@ -195,10 +179,7 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
               }
               break;
             case 'pirep':
-              text =
-                layer.feature.properties.aireptype +
-                ' ' +
-                layer.feature.properties.actype;
+              text = layer.feature.properties.aireptype + ' ' + layer.feature.properties.actype;
               break;
             case 'metar':
               text = getMetarText(layer.feature);
@@ -207,10 +188,7 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
           }
           return (
             <div key={layer.feature.id}>
-              <span
-                className="feature-selector-item"
-                data-featureid={layer.feature.id}
-              >
+              <span className="feature-selector-item" data-featureid={layer.feature.id}>
                 {layer.feature.geometry.type === 'Point' && (
                   <div
                     style={{
@@ -233,9 +211,7 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
                     />
                   </div>
                 )}
-                {layer.feature.geometry.type !== 'Point' && (
-                  <img className="feature-selector-item-icon" src={imgSrc} />
-                )}
+                {layer.feature.geometry.type !== 'Point' && <img className="feature-selector-item-icon" src={imgSrc} />}
                 <p>{text}</p>
               </span>
               <Divider />

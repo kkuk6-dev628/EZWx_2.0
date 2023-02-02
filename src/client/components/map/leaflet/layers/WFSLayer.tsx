@@ -24,10 +24,7 @@ interface WFSLayerProps {
   style?: (feature: GeoJSON.Feature) => PathOptions;
   pointToLayer?: (feature: GeoJSON.Feature, latlng: LatLng) => L.Layer;
   serverFilter?: string;
-  clientFilter?: (
-    features: GeoJSON.Feature[],
-    obsTime: Date,
-  ) => GeoJSON.Feature[];
+  clientFilter?: (features: GeoJSON.Feature[], obsTime: Date) => GeoJSON.Feature[];
   isClusteredMarker?: boolean;
   selectClusterMarker?: (layers: Layer[]) => Layer;
   markerPane?: string;
@@ -70,8 +67,7 @@ const WFSLayer = React.forwardRef(
 
     const [geoJSON, setGeoJSON] = useState<FeatureCollection>(initData);
 
-    const [displayedData, setDisplayedData] =
-      useState<FeatureCollection>(emptyGeoJson);
+    const [displayedData, setDisplayedData] = useState<FeatureCollection>(emptyGeoJson);
 
     const [geoJsonKey, setGeoJsonKey] = useState(12034512);
 
@@ -84,10 +80,7 @@ const WFSLayer = React.forwardRef(
 
     useEffect(() => {
       if (clientFilter && geoJSON.features.length > 0) {
-        const filteredFeatures = clientFilter(
-          geoJSON.features,
-          new Date(observationTime),
-        );
+        const filteredFeatures = clientFilter(geoJSON.features, new Date(observationTime));
         setDisplayedData({
           type: 'FeatureCollection',
           features: filteredFeatures,
@@ -104,10 +97,7 @@ const WFSLayer = React.forwardRef(
     useEffect(() => {
       if (layerState && layerState.visible === false) return;
       if (clientFilter && geoJSON.features.length > 0) {
-        const filteredFeatures = clientFilter(
-          geoJSON.features,
-          new Date(observationTime),
-        );
+        const filteredFeatures = clientFilter(geoJSON.features, new Date(observationTime));
         setDisplayedData({
           type: 'FeatureCollection',
           features: filteredFeatures,
@@ -127,10 +117,7 @@ const WFSLayer = React.forwardRef(
               });
             }
           });
-        } else if (
-          zoom >= showLabelZoom &&
-          (!lastZoom || lastZoom < showLabelZoom)
-        ) {
+        } else if (zoom >= showLabelZoom && (!lastZoom || lastZoom < showLabelZoom)) {
           ref.current.eachLayer(function (l) {
             if (l.getTooltip()) {
               const tooltip = l.getTooltip();
@@ -156,8 +143,7 @@ const WFSLayer = React.forwardRef(
     let pendingFetch = false;
     const fetchGeoJSON = () => {
       if (pendingFetch) return;
-      const callbackName =
-        'jsonp_callback_' + Math.round(100000 * Math.random());
+      const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
       const params = {
         outputFormat: 'text/javascript',
         maxFeatures,
@@ -176,13 +162,9 @@ const WFSLayer = React.forwardRef(
       }
       if (enableBBoxQuery) {
         if (params.cql_filter) {
-          params.cql_filter += ` AND BBOX(wkb_geometry, ${map
-            .getBounds()
-            .toBBoxString()})`;
+          params.cql_filter += ` AND BBOX(wkb_geometry, ${map.getBounds().toBBoxString()})`;
         } else {
-          params.cql_filter = `BBOX(wkb_geometry, ${map
-            .getBounds()
-            .toBBoxString()})`;
+          params.cql_filter = `BBOX(wkb_geometry, ${map.getBounds().toBBoxString()})`;
         }
       }
       params.outputFormat = 'application/json';

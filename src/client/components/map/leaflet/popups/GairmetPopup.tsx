@@ -1,26 +1,12 @@
 import { Typography } from '@material-ui/core';
 import BasePopupFrame from './BasePopupFrame';
-import {
-  getAltitudeString,
-  translateWeatherClausings,
-  convertTimeFormat,
-} from '../../common/AreoFunctions';
+import { getAltitudeString, translateWeatherClausings, convertTimeFormat } from '../../common/AreoFunctions';
 
 const GairmetPopup = ({ feature }) => {
   let title = 'G-AIRMET';
   let dueto = 'Moderate';
-  const top = getAltitudeString(
-    feature.properties.top,
-    true,
-    feature.properties.fzlbase,
-    feature.properties.fzltop,
-  );
-  const base = getAltitudeString(
-    feature.properties.base,
-    true,
-    feature.properties.fzlbase,
-    feature.properties.fzltop,
-  );
+  const top = getAltitudeString(feature.properties.top, true, feature.properties.fzlbase, feature.properties.fzltop);
+  const base = getAltitudeString(feature.properties.base, true, feature.properties.fzlbase, feature.properties.fzltop);
   switch (feature.properties.hazard) {
     case 'ICE':
       title = `Icing G-AIRMET`;
@@ -50,9 +36,7 @@ const GairmetPopup = ({ feature }) => {
       break;
     case 'MT_OBSC':
       title = 'Mountains obscuration G-AIRMET';
-      dueto =
-        'Mountains obscured by ' +
-        translateWeatherClausings(feature.properties.dueto);
+      dueto = 'Mountains obscured by ' + translateWeatherClausings(feature.properties.dueto);
       break;
     case 'M_FZLVL':
       title = 'Multiple Freezing Level G-AIRMET';

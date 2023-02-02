@@ -38,10 +38,7 @@ const WMSLayer = createPathComponent<WMS, WMSLayerProps>(
     const layerGroup = L.layerGroup(layers);
     // @ts-ignore
     layerGroup.source = source;
-    return createElementObject(
-      layerGroup,
-      extendContext(ctx, { overlayContainer: layerGroup }),
-    );
+    return createElementObject(layerGroup, extendContext(ctx, { overlayContainer: layerGroup }));
   },
   function updateWMSLayer(layer, props, prevProps) {
     updateGridLayer(layer, props, prevProps);

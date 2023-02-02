@@ -20,14 +20,10 @@ function MapTabs({ tabMenus }: TabMenus) {
       {tabMenus.map((tabMenu) => (
         <button
           key={tabMenu.id}
-          className={`tabs__btn ${
-            tabMenu.isHideResponsive && 'tabs__btn--hide'
-          } ${tabMenu.id === 'more' && 'tabs__btn--more'}`}
-          onClick={
-            tabMenu.id === 'more'
-              ? () => setShowDropDown(!showDropDown)
-              : () => tabMenu.handler(tabMenu.id)
-          }
+          className={`tabs__btn ${tabMenu.isHideResponsive && 'tabs__btn--hide'} ${
+            tabMenu.id === 'more' && 'tabs__btn--more'
+          }`}
+          onClick={tabMenu.id === 'more' ? () => setShowDropDown(!showDropDown) : () => tabMenu.handler(tabMenu.id)}
         >
           {tabMenu.svg && tabMenu.svg}
           <p className="btn__text">{tabMenu.name}</p>
