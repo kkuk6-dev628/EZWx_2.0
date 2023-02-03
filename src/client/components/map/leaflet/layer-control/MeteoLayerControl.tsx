@@ -2,7 +2,7 @@
 import React, { ChangeEvent, ReactElement, useEffect, useRef, createContext, useContext } from 'react';
 import { Radio, RadioGroup } from '@material-ui/core';
 import { useMap } from 'react-leaflet';
-import { Layer, DomEvent, LayerGroup } from 'leaflet';
+import { Layer, DomEvent, LayerGroup, CircleMarker, FeatureGroup } from 'leaflet';
 import Accordion from '@material-ui/core/Accordion';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -191,7 +191,25 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
       {layerStatus.show && (
         <div id="layer-control" className="leaflet-control leaflet-bar layer-control">
           <div className="layer-control__header">
-            <div className="layer-control__img__area">
+            <div
+              className="layer-control__img__area"
+              onDoubleClick={() => {
+                const stationId = prompt('Input Station ID');
+                const markers = new FeatureGroup();
+                //@ts-ignore
+                meteoLayers.metar.eachLayer((layer) => {
+                  if (layer.feature.properties.station_id == stationId) {
+                    const coords = layer.feature.geometry.coordinates;
+                    const marker = new CircleMarker([coords[1], coords[0]]);
+                    markers.addLayer(marker);
+                  }
+                });
+                if (markers.getLayers().length > 0) {
+                  markers.addTo(map);
+                  map.fitBounds(markers.getBounds());
+                }
+              }}
+            >
               <Image
                 src="/images/avater.png"
                 alt="logo"

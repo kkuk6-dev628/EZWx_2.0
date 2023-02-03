@@ -147,7 +147,7 @@ const initialState: LayerControlState = {
     time: { name: 'Time (past hours)', hours: 12, max: 24 },
   },
   cwaState: {
-    name: 'Center Weather Reports',
+    name: 'Center Weather Advisories',
     checked: true,
     opacity: 1,
     expanded: false,

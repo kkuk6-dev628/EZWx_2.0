@@ -603,9 +603,6 @@ const MetarsLayer = () => {
         case 'FZDZ FZFG':
           weatherIconClass = 'fas fa-icicles';
           break;
-        case 'FZFG UP':
-          weatherIconClass = 'fas fa-cloud-fog';
-          break;
         case 'RA':
         case 'RA BR':
         case 'RA HZ':
@@ -683,6 +680,7 @@ const MetarsLayer = () => {
         case 'BCFG BR':
         case 'BCFG HZ':
         case 'MIFG BR':
+        case 'FZFG UP':
           weatherIconClass = 'fas fa-fog';
           break;
         case 'FU':
@@ -737,7 +735,7 @@ const MetarsLayer = () => {
               break;
             case 'FEW':
             case 'SCT':
-              weatherIconClass = isDayTime ? 'fas fa-cloud-bolt-sun' : 'fas fa-cloud-bolt-moon';
+              weatherIconClass = isDayTime ? 'fas fa-thunderstorm-sun' : 'fas fa-thunderstorm-moon';
               break;
             case 'BKN':
             case 'OVC':
