@@ -18,7 +18,7 @@ import { selectMetar } from '../../../../store/layers/LayerControl';
 import { useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
 import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
-import { MetarMarkerTypes, timeSliderInterval } from '../../common/AreoConstants';
+import { MetarMarkerTypes, timeSliderInterval, windIconLimit } from '../../common/AreoConstants';
 import axios from 'axios';
 import { feature } from '@turf/helpers';
 import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
@@ -57,7 +57,7 @@ const MetarsLayer = () => {
 
   const layerStatus = useSelector(selectMetar);
   const personalMinimums = useSelector(selectPersonalMinimums);
-  const [serverFilter, setServerFilter] = useState(defaultServerFilter);
+  const [renderedTime, setRenderedTime] = useState(Date.now());
   const wfsRef = useRef(null);
   const [filteredData, setFilteredData] = useState();
   const [indexedData, setIndexedData] = useState();
@@ -65,6 +65,7 @@ const MetarsLayer = () => {
   const [clusterRadius, setClusterRadius] = useState(50);
 
   useEffect(() => {
+    setRenderedTime(Date.now());
     const v = getCacheVersion(cacheUpdateInterval);
     if (v !== cacheVersion) {
       setCacheVersion(v);
@@ -72,12 +73,18 @@ const MetarsLayer = () => {
     layerStatus.markerType === MetarMarkerTypes.surfaceWindBarbs.value ? setClusterRadius(25) : setClusterRadius(50);
     switch (layerStatus.markerType) {
       case MetarMarkerTypes.surfaceVisibility.value:
-        setServerFilter(defaultServerFilter + ` AND visibility_statute_mi IS NOT NULL`);
         break;
-      case MetarMarkerTypes.surfaceWindBarbs.value:
+      case MetarMarkerTypes.flightCategory.value:
         break;
     }
-  }, [layerStatus.markerType]);
+  }, [
+    layerStatus.markerType,
+    layerStatus.flightCategory.all.checked,
+    layerStatus.flightCategory.vfr.checked,
+    layerStatus.flightCategory.mvfr.checked,
+    layerStatus.flightCategory.ifr.checked,
+    layerStatus.flightCategory.lifr.checked,
+  ]);
 
   const getFlightCatMarker = (feature: GeoJSON.Feature, latlng: LatLng): L.Marker => {
     const { iconUrl } = getFlightCategoryIconUrl(feature);
@@ -530,8 +537,8 @@ const MetarsLayer = () => {
     if (!feature.properties.wx_string) {
       //if wxString is not set, then get marker's icon from wind speed
       if (
-        (feature.properties.wind_speed_kt && feature.properties.wind_speed_kt > 20) ||
-        (feature.properties.wind_gust_kt && feature.properties.wind_gust_kt > 25)
+        (feature.properties.wind_speed_kt && feature.properties.wind_speed_kt > windIconLimit.windSpeed) ||
+        (feature.properties.wind_gust_kt && feature.properties.wind_gust_kt > windIconLimit.windGust)
       ) {
         weatherIconClass = 'fas fa-wind';
       } else {
@@ -695,8 +702,8 @@ const MetarsLayer = () => {
         case 'BR':
         case 'HZ':
           if (
-            (feature.properties.wind_speed_kt && feature.properties.wind_speed_kt > 15) ||
-            (feature.properties.wind_gust_kt && feature.properties.wind_gust_kt > 20)
+            (feature.properties.wind_speed_kt && feature.properties.wind_speed_kt > windIconLimit.windSpeed) ||
+            (feature.properties.wind_gust_kt && feature.properties.wind_gust_kt > windIconLimit.windGust)
           ) {
             weatherIconClass = 'fas fa-wind';
           } else {
@@ -813,7 +820,7 @@ const MetarsLayer = () => {
   };
 
   const clientFilter = (features: GeoJSON.Feature[], observationTime: Date): GeoJSON.Feature[] => {
-    // const startTime = new Date().getTime();
+    setFilteredData({ type: 'FeatureCollection', features: features } as any);
     let indexedFeatures = indexedData;
     if (!indexedFeatures) {
       indexedFeatures = buildIndexedData(features);
@@ -823,12 +830,24 @@ const MetarsLayer = () => {
     const obsTime = new Date(observationTime).getTime();
     const startIndex = Math.floor((obsTime - 75 * 60 * 1000) / timeSliderInterval);
     const endIndex = Math.floor(obsTime / timeSliderInterval);
-    // let count = 0;
     for (let index = startIndex; index < endIndex; index++) {
       const iData = indexedFeatures[index] as GeoJSON.Feature[];
       if (iData) {
         iData.map((feature) => {
-          // count++;
+          if (layerStatus.flightCategory.all.checked === false) {
+            if (!layerStatus.flightCategory.vfr.checked && feature.properties.flight_category === 'VFR') {
+              return;
+            }
+            if (!layerStatus.flightCategory.mvfr.checked && feature.properties.flight_category === 'MVFR') {
+              return;
+            }
+            if (!layerStatus.flightCategory.ifr.checked && feature.properties.flight_category === 'IFR') {
+              return;
+            }
+            if (!layerStatus.flightCategory.lifr.checked && feature.properties.flight_category === 'LIFR') {
+              return;
+            }
+          }
           if (filteredFeatures[feature.properties.station_id]) {
             const prevFeature = filteredFeatures[feature.properties.station_id];
             if (new Date(prevFeature.properties.observation_time) < new Date(feature.properties.observation_time)) {
@@ -841,12 +860,11 @@ const MetarsLayer = () => {
       }
     }
     const result = Object.values(filteredFeatures);
-    setFilteredData({ type: 'FeatureCollection', features: result } as any);
     return result as any;
   };
 
   return (
-    <Pane name={'metar'} style={{ zIndex: 698 }} key={layerStatus.markerType}>
+    <Pane name={'metar'} style={{ zIndex: 698 }} key={renderedTime}>
       <WFSLayer
         ref={wfsRef}
         url="https://eztile4.ezwxbrief.com/geoserver/EZWxBrief/ows"

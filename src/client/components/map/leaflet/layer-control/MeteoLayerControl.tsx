@@ -108,6 +108,12 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
     }
   };
 
+  const isCheckedAllMetarFlightCategory = (cloned: MetarLayerState): boolean =>
+    cloned.flightCategory.vfr.checked &&
+    cloned.flightCategory.mvfr.checked &&
+    cloned.flightCategory.ifr.checked &&
+    cloned.flightCategory.lifr.checked;
+
   const isCheckedAllSigmets = (cloned: SigmetsLayerState): boolean =>
     cloned.convection.checked &&
     cloned.outlooks.checked &&
@@ -272,7 +278,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                   <RadioGroup
                     defaultValue={layerStatus.metarState.markerType}
                     name="radio-buttons-group-metar"
-                    onChangeCapture={(e: ChangeEvent<HTMLInputElement>) => {
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       map.closePopup();
                       const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
                       cloned.markerType = e.target.value;
@@ -285,6 +291,117 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                       control={<Radio color="primary" />}
                       label={MetarMarkerTypes.flightCategory.text}
                     />
+                    <div className="flight-category-filters">
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={layerStatus.metarState.flightCategory.all.checked}
+                            icon={<CircleUnchecked />}
+                            checkedIcon={<CircleCheckedFilled />}
+                            name="checkedB"
+                            color="primary"
+                            onClick={(_e) => {
+                              const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
+                              cloned.flightCategory.all.checked = true;
+                              cloned.flightCategory.vfr.checked = true;
+                              cloned.flightCategory.mvfr.checked = true;
+                              cloned.flightCategory.ifr.checked = true;
+                              cloned.flightCategory.lifr.checked = true;
+                              cloned.markerType = MetarMarkerTypes.flightCategory.value;
+                              dispatch(setMetar(cloned));
+                            }}
+                          />
+                        }
+                        label={layerStatus.metarState.flightCategory.all.name}
+                      />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={layerStatus.metarState.flightCategory.vfr.checked}
+                            icon={<CircleUnchecked />}
+                            checkedIcon={<CircleCheckedFilled />}
+                            name="checkedB"
+                            color="primary"
+                            onClick={(_e) => {
+                              const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
+                              cloned.flightCategory.vfr.checked = !layerStatus.metarState.flightCategory.vfr.checked;
+                              cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
+                              if (cloned.flightCategory.vfr.checked) {
+                                cloned.markerType = MetarMarkerTypes.flightCategory.value;
+                              }
+                              dispatch(setMetar(cloned));
+                            }}
+                          />
+                        }
+                        label={layerStatus.metarState.flightCategory.vfr.name}
+                      />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={layerStatus.metarState.flightCategory.mvfr.checked}
+                            value={MetarMarkerTypes.flightCategory.value}
+                            icon={<CircleUnchecked />}
+                            checkedIcon={<CircleCheckedFilled />}
+                            name="checkedB"
+                            color="primary"
+                            onClick={(_e) => {
+                              const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
+                              cloned.flightCategory.mvfr.checked = !layerStatus.metarState.flightCategory.mvfr.checked;
+                              cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
+                              if (cloned.flightCategory.mvfr.checked) {
+                                cloned.markerType = MetarMarkerTypes.flightCategory.value;
+                              }
+                              dispatch(setMetar(cloned));
+                            }}
+                          />
+                        }
+                        label={layerStatus.metarState.flightCategory.mvfr.name}
+                      />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={layerStatus.metarState.flightCategory.ifr.checked}
+                            value={MetarMarkerTypes.flightCategory.value}
+                            icon={<CircleUnchecked />}
+                            checkedIcon={<CircleCheckedFilled />}
+                            name="checkedB"
+                            color="primary"
+                            onClick={(_e) => {
+                              const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
+                              cloned.flightCategory.ifr.checked = !layerStatus.metarState.flightCategory.ifr.checked;
+                              cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
+                              if (cloned.flightCategory.ifr.checked) {
+                                cloned.markerType = MetarMarkerTypes.flightCategory.value;
+                              }
+                              dispatch(setMetar(cloned));
+                            }}
+                          />
+                        }
+                        label={layerStatus.metarState.flightCategory.ifr.name}
+                      />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={layerStatus.metarState.flightCategory.lifr.checked}
+                            value={MetarMarkerTypes.flightCategory.value}
+                            icon={<CircleUnchecked />}
+                            checkedIcon={<CircleCheckedFilled />}
+                            name="checkedB"
+                            color="primary"
+                            onClick={(_e) => {
+                              const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
+                              cloned.flightCategory.lifr.checked = !layerStatus.metarState.flightCategory.lifr.checked;
+                              cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
+                              if (cloned.flightCategory.lifr.checked) {
+                                cloned.markerType = MetarMarkerTypes.flightCategory.value;
+                              }
+                              dispatch(setMetar(cloned));
+                            }}
+                          />
+                        }
+                        label={layerStatus.metarState.flightCategory.lifr.name}
+                      />
+                    </div>
                     <FormControlLabel
                       value={MetarMarkerTypes.ceilingHeight.value}
                       control={<Radio color="primary" />}
@@ -448,11 +565,9 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                         onClick={() => {
                           const cloned = jsonClone(layerStatus.sigmetState);
                           cloned.convection.checked = !layerStatus.sigmetState.convection.checked;
-                          if (!cloned.convection.checked) {
-                            cloned.all.checked = false;
-                          } else {
+                          cloned.all.checked = isCheckedAllSigmets(cloned);
+                          if (cloned.convection.checked) {
                             cloned.checked = true;
-                            cloned.all.checked = isCheckedAllSigmets(cloned);
                             showLayer(meteoLayers.sigmet, cloned.name);
                           }
                           dispatch(setSigmet(cloned));

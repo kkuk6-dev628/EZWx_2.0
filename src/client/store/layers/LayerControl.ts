@@ -16,6 +16,13 @@ export interface LayerState {
 export interface MetarLayerState extends LayerState {
   usePersonalMinimums: boolean;
   markerType: string;
+  flightCategory: {
+    all: SublayerState;
+    vfr: SublayerState;
+    mvfr: SublayerState;
+    ifr: SublayerState;
+    lifr: SublayerState;
+  };
 }
 
 export interface SigmetsLayerState extends LayerState {
@@ -88,6 +95,13 @@ const initialState: LayerControlState = {
     markerType: 'flightCategory',
     usePersonalMinimums: false,
     name: 'Station Markers',
+    flightCategory: {
+      all: { name: 'All', checked: true },
+      vfr: { name: 'VFR', checked: true },
+      mvfr: { name: 'MVFR', checked: true },
+      ifr: { name: 'IFR', checked: true },
+      lifr: { name: 'LIFR', checked: true },
+    },
   },
   radarState: {
     expanded: false,
