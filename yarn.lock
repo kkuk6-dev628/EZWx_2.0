@@ -1040,10 +1040,10 @@
     webpack "5.75.0"
     webpack-node-externals "3.0.0"
 
-"@nestjs/common@^9.3.2":
-  version "9.3.2"
-  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-9.3.2.tgz#a29e26b3a90f903f374efd321d7434db68a7ac32"
-  integrity sha512-YUqY9qPMxiMqO/pRNXJehR18LFL6Y9BN5Qn0FylVbdpKd7/QKZHVWRKNaAYNu0mGfyJhRJI6oEr/1Tn5GEo6GQ==
+"@nestjs/common@^9.3.3":
+  version "9.3.3"
+  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-9.3.3.tgz#41e05020d2d37caf015453f913d7fab356c5d97b"
+  integrity sha512-NZI9RC5oI/WLtwjl/JWZJ1ltBDniG6dp+tLSaf9S9U6SmwaOq5eVtMxSlwHpaJ2pzpZVA6VqaEq9dHONUwdW3A==
   dependencies:
     uid "2.0.1"
     iterare "1.2.1"
@@ -1452,7 +1452,16 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.51.tgz#cfd70924a25a3fd32b218e5e420e6897e1ac4f40"
   integrity sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==
 
-"@types/express-serve-static-core@4.17.33", "@types/express-serve-static-core@^4.17.31":
+"@types/express-serve-static-core@4.17.21":
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.17.21.tgz#a427278e106bca77b83ad85221eae709a3414d42"
+  integrity sha512-gwCiEZqW6f7EoR8TTEfalyEhb1zA5jQJnRngr97+3pzMaO1RKoI1w2bw07TK72renMUVWcWS5mLI6rk1NqN0nA==
+  dependencies:
+    "@types/node" "*"
+    "@types/qs" "*"
+    "@types/range-parser" "*"
+
+"@types/express-serve-static-core@^4.17.31":
   version "4.17.33"
   resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.17.33.tgz#de35d30a9d637dc1450ad18dd583d75d5733d543"
   integrity sha512-TPBqmR/HRYI3eC2E5hmiivIzv+bidAfXofM+sbonAGvyDhySGw9/PQZFt2BLOrjUUR++4eJVpx6KnLQK1Fk9tA==
