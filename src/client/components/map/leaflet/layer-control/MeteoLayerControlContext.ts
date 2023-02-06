@@ -4,6 +4,7 @@ import { Layer } from 'leaflet';
 
 export interface MeteoLayers {
   metar: Layer;
+  nbmMarkers: Layer;
   pirep: Layer;
   radar: Layer;
   sigmet: Layer;

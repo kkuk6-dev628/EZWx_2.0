@@ -185,6 +185,7 @@ export const visibilityMileToMeter = (mile: number): number => {
     case 0.5:
       meter = 800;
       break;
+    case 0.62:
     case 0.63:
       meter = 1000;
       break;
@@ -200,6 +201,7 @@ export const visibilityMileToMeter = (mile: number): number => {
     case 1.13:
       meter = 1800;
       break;
+    case 1.24:
     case 1.25:
       meter = 2000;
       break;
@@ -215,6 +217,7 @@ export const visibilityMileToMeter = (mile: number): number => {
     case 1.75:
       meter = 2800;
       break;
+    case 1.86:
     case 1.88:
       meter = 3000;
       break;
@@ -224,6 +227,7 @@ export const visibilityMileToMeter = (mile: number): number => {
     case 2.25:
       meter = 3600;
       break;
+    case 2.49:
     case 2.5:
       meter = 4000;
       break;
@@ -233,8 +237,12 @@ export const visibilityMileToMeter = (mile: number): number => {
     case 3:
       meter = 4800;
       break;
+    case 3.11:
     case 3.5:
       meter = 5000;
+      break;
+    case 3.73:
+      meter = 6000;
       break;
     case 4:
       meter = 7000;
@@ -273,6 +281,7 @@ export const visibilityMileToFraction = (mile: number): string => {
     case 0.5:
       fraction = '1/2';
       break;
+    case 0.62:
     case 0.63:
       fraction = '5/8';
       break;
@@ -288,6 +297,7 @@ export const visibilityMileToFraction = (mile: number): string => {
     case 1.13:
       fraction = '1 1/8';
       break;
+    case 1.24:
     case 1.25:
       fraction = '1 1/4';
       break;
@@ -301,6 +311,7 @@ export const visibilityMileToFraction = (mile: number): string => {
       fraction = '1 5/8';
       break;
     case 1.75:
+    case 1.86:
       fraction = '1 3/4';
       break;
     case 1.88:
@@ -312,6 +323,7 @@ export const visibilityMileToFraction = (mile: number): string => {
     case 2.25:
       fraction = '2 1/4';
       break;
+    case 2.49:
     case 2.5:
       fraction = '2 1/2';
       break;
@@ -319,10 +331,14 @@ export const visibilityMileToFraction = (mile: number): string => {
       fraction = '2 3/4';
       break;
     case 3:
+    case 3.11:
       fraction = '3';
       break;
     case 3.5:
       fraction = '3 1/2';
+      break;
+    case 3.73:
+      fraction = '4';
       break;
   }
   return fraction;

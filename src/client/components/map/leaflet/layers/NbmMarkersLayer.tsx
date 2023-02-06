@@ -52,7 +52,7 @@ export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): { iconUrl: s
   return { iconUrl, ceiling };
 };
 
-const MetarsLayer = () => {
+const NbmMarkersLayer = () => {
   const map = useMap();
 
   const layerStatus = useSelector(selectMetar);
@@ -766,39 +766,49 @@ const MetarsLayer = () => {
     return metarMarker;
   };
   const pointToLayer = (feature: GeoJSON.Feature, latlng: LatLng): L.Layer => {
-    let marker = null;
-    switch (layerStatus.markerType) {
-      case MetarMarkerTypes.flightCategory.value:
-        marker = getFlightCatMarker(feature, latlng);
-        break;
-      case MetarMarkerTypes.ceilingHeight.value:
-        marker = getCeilingHeightMarker(feature, latlng);
-        break;
-      case MetarMarkerTypes.surfaceVisibility.value:
-        marker = getSurfaceVisibilityMarker(feature, latlng);
-        break;
-      case MetarMarkerTypes.surfaceWindSpeed.value:
-        marker = getSurfaceWindSpeedMarker(feature, latlng);
-        break;
-      case MetarMarkerTypes.surfaceWindBarbs.value:
-        marker = getSurfaceWindBarbsMarker(feature, latlng);
-        break;
-      case MetarMarkerTypes.surfaceWindGust.value:
-        marker = getSurfaceWindGustMarker(feature, latlng);
-        break;
-      case MetarMarkerTypes.surfaceTemperature.value:
-        marker = getSurfaceTemperatureMarker(feature, latlng);
-        break;
-      case MetarMarkerTypes.surfaceDewpoint.value:
-        marker = getSurfaceDewpointMarker(feature, latlng);
-        break;
-      case MetarMarkerTypes.dewpointDepression.value:
-        marker = getDewpointDepressionMarker(feature, latlng);
-        break;
-      case MetarMarkerTypes.weather.value:
-        marker = getWeatherMarker(feature, latlng);
-        break;
-    }
+    // let marker = null;
+    // switch (layerStatus.markerType) {
+    //   case MetarMarkerTypes.flightCategory.value:
+    //     marker = getFlightCatMarker(feature, latlng);
+    //     break;
+    //   case MetarMarkerTypes.ceilingHeight.value:
+    //     marker = getCeilingHeightMarker(feature, latlng);
+    //     break;
+    //   case MetarMarkerTypes.surfaceVisibility.value:
+    //     marker = getSurfaceVisibilityMarker(feature, latlng);
+    //     break;
+    //   case MetarMarkerTypes.surfaceWindSpeed.value:
+    //     marker = getSurfaceWindSpeedMarker(feature, latlng);
+    //     break;
+    //   case MetarMarkerTypes.surfaceWindBarbs.value:
+    //     marker = getSurfaceWindBarbsMarker(feature, latlng);
+    //     break;
+    //   case MetarMarkerTypes.surfaceWindGust.value:
+    //     marker = getSurfaceWindGustMarker(feature, latlng);
+    //     break;
+    //   case MetarMarkerTypes.surfaceTemperature.value:
+    //     marker = getSurfaceTemperatureMarker(feature, latlng);
+    //     break;
+    //   case MetarMarkerTypes.surfaceDewpoint.value:
+    //     marker = getSurfaceDewpointMarker(feature, latlng);
+    //     break;
+    //   case MetarMarkerTypes.dewpointDepression.value:
+    //     marker = getDewpointDepressionMarker(feature, latlng);
+    //     break;
+    //   case MetarMarkerTypes.weather.value:
+    //     marker = getWeatherMarker(feature, latlng);
+    //     break;
+    // }
+    const marker = L.marker(latlng, {
+      icon: new L.DivIcon({
+        className: 'metar-weather-icon',
+        html: "<i style='color:#00f' class='fas fa-sun fa-2x'></i>",
+        iconSize: [32, 26],
+        iconAnchor: [16, 13],
+        //popupAnchor: [0, -13]
+      }),
+      pane: 'metar',
+    });
     marker?.on('click', (e) => {
       map.fire('click', e);
     });
@@ -820,10 +830,11 @@ const MetarsLayer = () => {
   };
 
   const clientFilter = (features: GeoJSON.Feature[], observationTime: Date): GeoJSON.Feature[] => {
-    if (observationTime.getTime() - Date.now() > 0) {
+    if (observationTime.getTime() - Date.now() <= 0) {
       return [];
     }
     setFilteredData({ type: 'FeatureCollection', features: features } as any);
+    return features;
     let indexedFeatures = indexedData;
     if (!indexedFeatures) {
       indexedFeatures = buildIndexedData(features);
@@ -867,51 +878,17 @@ const MetarsLayer = () => {
   };
 
   return (
-    <Pane name={'metar'} style={{ zIndex: 698 }} key={renderedTime}>
+    <Pane name={'nbm_markers'} style={{ zIndex: 697 }} key={renderedTime}>
       <WFSLayer
         ref={wfsRef}
         url="https://eztile4.ezwxbrief.com/geoserver/EZWxBrief/ows"
         maxFeatures={164096}
-        typeName="EZWxBrief:metar"
-        propertyNames={[
-          'wkb_geometry',
-          'ogc_fid',
-          'station_id',
-          'auto',
-          // 'elevation_ft',
-          'temp_c',
-          'dewpoint_c',
-          'wind_dir_degrees',
-          'observation_time',
-          'wind_speed_kt',
-          'wind_gust_kt',
-          'flight_category',
-          'raw_text',
-          'visibility_statute_mi',
-          'cloud_base_ft_agl_1',
-          'sky_cover_1',
-          'cloud_base_ft_agl_2',
-          'sky_cover_2',
-          'cloud_base_ft_agl_3',
-          'sky_cover_3',
-          'cloud_base_ft_agl_4',
-          'sky_cover_4',
-          'cloud_base_ft_agl_5',
-          'sky_cover_5',
-          'cloud_base_ft_agl_6',
-          'sky_cover_6',
-          'altim_in_hg',
-          // 'sea_level_pressure_mb',
-          'wx_string',
-          'vert_vis_ft',
-          // 'dewpointdepression',
-          'relativehumiditypercent',
-          'densityaltitudefeet',
-        ]}
+        typeName="EZWxBrief:airport_nbm_32"
+        propertyNames={['wkb_geometry', 'icaoid', 'val']}
         enableBBoxQuery={false}
         pointToLayer={pointToLayer}
         isClusteredMarker={true}
-        markerPane={'metar'}
+        markerPane={'nbm_markers'}
         // serverFilter={serverFilter}
         clientFilter={clientFilter}
         maxClusterRadius={clusterRadius}
@@ -923,4 +900,4 @@ const MetarsLayer = () => {
   );
 };
 
-export default MetarsLayer;
+export default NbmMarkersLayer;

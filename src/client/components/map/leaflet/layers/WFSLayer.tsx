@@ -105,26 +105,25 @@ const WFSLayer = React.forwardRef(
       }
     }, [observationTime]);
 
+    const setLabelShow = (layer: Layer, show: boolean) => {
+      if (layer.getTooltip()) {
+        const tooltip = layer.getTooltip();
+        layer.unbindTooltip().bindTooltip(tooltip, {
+          permanent: show,
+        });
+      }
+    };
+
     const map = useMapEvents({
       zoomend: () => {
         const zoom = map.getZoom();
         if (zoom < showLabelZoom && (!lastZoom || lastZoom >= showLabelZoom)) {
           ref.current.eachLayer((l) => {
-            if (l.getTooltip()) {
-              const tooltip = l.getTooltip();
-              l.unbindTooltip().bindTooltip(tooltip, {
-                permanent: false,
-              });
-            }
+            setLabelShow(l, false);
           });
         } else if (zoom >= showLabelZoom && (!lastZoom || lastZoom < showLabelZoom)) {
           ref.current.eachLayer(function (l) {
-            if (l.getTooltip()) {
-              const tooltip = l.getTooltip();
-              l.unbindTooltip().bindTooltip(tooltip, {
-                permanent: true,
-              });
-            }
+            setLabelShow(l, true);
           });
         }
         lastZoom = zoom;
@@ -200,8 +199,9 @@ const WFSLayer = React.forwardRef(
     const onEachFeature = (feature, layer) => {
       if (feature.properties) {
         if (getLabel) {
+          const zoom = map.getZoom();
           layer.bindTooltip(getLabel(feature), {
-            permanent: false,
+            permanent: zoom > showLabelZoom,
             direction: 'center',
             className: 'my-labels',
             opacity: 1,

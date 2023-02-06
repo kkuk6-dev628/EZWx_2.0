@@ -421,7 +421,6 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                       value={MetarMarkerTypes.surfaceWindBarbs.value}
                       control={<Radio color="primary" />}
                       label={MetarMarkerTypes.surfaceWindBarbs.text}
-                      style={{ marginLeft: 6 }}
                     />
                     <FormControlLabel
                       value={MetarMarkerTypes.surfaceWindGust.value}

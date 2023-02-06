@@ -31,6 +31,7 @@ import { MetarMarkerTypes } from '../../common/AreoConstants';
 import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
 import { InLayerControl } from '../layer-control/MeteoLayerControl';
 import axios from 'axios';
+import NbmMarkersLayer from './NbmMarkersLayer';
 
 const maxLayers = 6;
 
@@ -290,6 +291,17 @@ const MeteoLayers = () => {
         }}
       >
         <MetarsLayer></MetarsLayer>
+      </GroupedLayer>
+      <GroupedLayer
+        checked
+        name="Nbm Markers"
+        group="Map Layers"
+        order={0}
+        addLayerToStore={(layer) => {
+          meteoLayers.nbmMarkers = layer;
+        }}
+      >
+        <NbmMarkersLayer></NbmMarkersLayer>
       </GroupedLayer>
       <GroupedLayer
         checked
