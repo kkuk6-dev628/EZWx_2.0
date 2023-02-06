@@ -1,4 +1,5 @@
 import { PathOptions } from 'leaflet';
+import { selectIntlSigmet } from '../../../../store/layers/LayerControl';
 import WFSLayer from './WFSLayer';
 
 const IntlSigmetLayer = () => {
@@ -14,10 +15,7 @@ const IntlSigmetLayer = () => {
   const getLabel = (feature) => {
     return feature.properties.hazard;
   };
-  const clientFilter = (
-    features: GeoJSON.Feature[],
-    observationTime: Date,
-  ): GeoJSON.Feature[] => {
+  const clientFilter = (features: GeoJSON.Feature[], observationTime: Date): GeoJSON.Feature[] => {
     const results = features.filter((feature) => {
       const start = new Date(feature.properties.validtimefrom);
       const end = new Date(feature.properties.validtimeto);
@@ -49,6 +47,7 @@ const IntlSigmetLayer = () => {
       style={gairmetStyle}
       getLabel={getLabel}
       clientFilter={clientFilter}
+      layerStateSelector={selectIntlSigmet}
     ></WFSLayer>
   );
 };

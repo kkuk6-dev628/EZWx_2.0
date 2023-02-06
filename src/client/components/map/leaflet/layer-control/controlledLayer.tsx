@@ -1,12 +1,6 @@
 import { LeafletProvider, useLeafletContext } from '@react-leaflet/core';
 import { Layer } from 'leaflet';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ReactNode } from 'react';
 import { useLayerControlContext } from './layerControlContext';
 import { useMap } from 'react-leaflet';
@@ -22,11 +16,7 @@ export interface OrderedLayerProps {
 }
 
 const createControlledLayer = (
-  addLayerToControl: (
-    layerContext: any,
-    layer: Layer,
-    options: OrderedLayerProps,
-  ) => any,
+  addLayerToControl: (layerContext: any, layer: Layer, options: OrderedLayerProps) => any,
 ) => {
   const ControlledLayer = (props: OrderedLayerProps) => {
     const context = useLeafletContext();
@@ -42,8 +32,7 @@ const createControlledLayer = (
           parentMap.addLayer(layerToAdd);
         }
 
-        if (propsRef.current.addLayerToStore)
-          propsRef.current.addLayerToStore(layerToAdd);
+        if (propsRef.current.addLayerToStore) propsRef.current.addLayerToStore(layerToAdd);
         addLayerToControl(layerContext, layerToAdd, propsRef.current);
         setLayer(layerToAdd);
       },
@@ -71,16 +60,9 @@ const createControlledLayer = (
 
     useEffect(() => {
       if (layer !== null && propsRef.current !== props) {
-        if (
-          props.checked === true &&
-          (propsRef.current.checked == null ||
-            propsRef.current.checked === false)
-        ) {
+        if (props.checked === true && (propsRef.current.checked == null || propsRef.current.checked === false)) {
           parentMap.addLayer(layer);
-        } else if (
-          propsRef.current.checked === true &&
-          (props.checked == null || props.checked === false)
-        ) {
+        } else if (propsRef.current.checked === true && (props.checked == null || props.checked === false)) {
           parentMap.removeLayer(layer);
         }
 

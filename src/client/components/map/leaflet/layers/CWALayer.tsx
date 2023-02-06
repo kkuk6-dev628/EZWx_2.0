@@ -51,10 +51,7 @@ const CWALayer = () => {
     // }
     return label;
   };
-  const clientFilter = (
-    features: GeoJSON.Feature[],
-    observationTime: Date,
-  ): GeoJSON.Feature[] => {
+  const clientFilter = (features: GeoJSON.Feature[], observationTime: Date): GeoJSON.Feature[] => {
     setJsonData({ type: 'FeatureCollection', features: features } as any);
     const results = features.filter((feature) => {
       const start = new Date(feature.properties.validtimefrom);
@@ -66,36 +63,24 @@ const CWALayer = () => {
       if (layerState.all.checked) {
         return true;
       }
-      if (
-        layerState.airframeIcing.checked &&
-        feature.properties.hazard === 'ICE'
-      ) {
+      if (layerState.airframeIcing.checked && feature.properties.hazard === 'ICE') {
         return true;
       }
-      if (
-        layerState.turbulence.checked &&
-        feature.properties.hazard === 'TURB'
-      ) {
+      if (layerState.turbulence.checked && feature.properties.hazard === 'TURB') {
         return true;
       }
-      if (
-        layerState.ifrConditions.checked &&
-        feature.properties.hazard === 'IFR'
-      ) {
+      if (layerState.ifrConditions.checked && feature.properties.hazard === 'IFR') {
         return true;
       }
       if (
         layerState.convection.checked &&
-        (feature.properties.hazard === 'TS' ||
-          feature.properties.hazard === 'PCPN')
+        (feature.properties.hazard === 'TS' || feature.properties.hazard === 'PCPN')
       ) {
         return true;
       }
       if (
         layerState.other.checked &&
-        ['ICE', 'TURB', 'IFR', 'TS', 'PCPN'].includes(
-          feature.properties.hazard,
-        ) === false
+        ['ICE', 'TURB', 'IFR', 'TS', 'PCPN'].includes(feature.properties.hazard) === false
       ) {
         return true;
       }
@@ -126,6 +111,7 @@ const CWALayer = () => {
       style={style}
       getLabel={getLabel}
       clientFilter={clientFilter}
+      layerStateSelector={selectCwa}
     ></WFSLayer>
   );
 };

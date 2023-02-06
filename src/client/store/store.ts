@@ -18,17 +18,11 @@ const makeStore = () =>
       [UserSettingsSlice.name]: UserSettingsSlice.reducer,
     },
     devTools: process.env.NODE_ENV !== 'production',
-    middleware: (getDefaultMiddlewares) =>
-      getDefaultMiddlewares().concat(apiSlice.middleware),
+    middleware: (getDefaultMiddlewares) => getDefaultMiddlewares().concat(apiSlice.middleware),
   });
 
 export type AppStore = ReturnType<typeof makeStore>;
 export type AppState = ReturnType<AppStore['getState']>;
-export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  AppState,
-  unknown,
-  Action
->;
+export type AppThunk<ReturnType = void> = ThunkAction<ReturnType, AppState, unknown, Action>;
 
 export const wrapper = createWrapper<AppStore>(makeStore);

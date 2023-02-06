@@ -59,9 +59,7 @@ const PIREPPopup = ({ feature }) => {
         ) : (
           feature.properties.aireptype
         )}{' '}
-        {feature.properties.actype === 'NMRS'
-          ? 'Numerous Aircraft'
-          : feature.properties.actype}
+        {feature.properties.actype === 'NMRS' ? 'Numerous Aircraft' : feature.properties.actype}
       </Typography>
       <Divider />
       <Typography variant="body2" style={{ margin: 3 }}>
@@ -88,15 +86,12 @@ const PIREPPopup = ({ feature }) => {
           <b>Temperature:</b>{' '}
           {useCelsus
             ? feature.properties.temp + String.fromCharCode(176) + 'C'
-            : Math.round(parseFloat(feature.properties.temp) * 1.8 + 32) +
-              String.fromCharCode(176) +
-              'F'}
+            : Math.round(parseFloat(feature.properties.temp) * 1.8 + 32) + String.fromCharCode(176) + 'F'}
         </Typography>
       )}
       {feature.properties.wdir && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Wind direction:</b>{' '}
-          {feature.properties.wdir + String.fromCharCode(176)}
+          <b>Wind direction:</b> {feature.properties.wdir + String.fromCharCode(176)}
         </Typography>
       )}
       {feature.properties.wspd && (
@@ -114,61 +109,47 @@ const PIREPPopup = ({ feature }) => {
       )}
       {icingIntensityTranslations[feature.properties.icgint1] && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Icing intensity:</b>{' '}
-          {icingIntensityTranslations[feature.properties.icgint1]}
+          <b>Icing intensity:</b> {icingIntensityTranslations[feature.properties.icgint1]}
         </Typography>
       )}
       {icingTypeTranslations[feature.properties.icgtype1] && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Icing type:</b>{' '}
-          {icingTypeTranslations[feature.properties.icgtype1]}
+          <b>Icing type:</b> {icingTypeTranslations[feature.properties.icgtype1]}
         </Typography>
       )}
       {turbulenceIntensityTranslations[feature.properties.tbint1] && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Turbulence intensity:</b>{' '}
-          {turbulenceIntensityTranslations[feature.properties.tbint1]}
+          <b>Turbulence intensity:</b> {turbulenceIntensityTranslations[feature.properties.tbint1]}
         </Typography>
       )}
       {turblenceTypeTranslations[feature.properties.tbtype1] && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Turbulence type:</b>{' '}
-          {turblenceTypeTranslations[feature.properties.tbtype1]}
+          <b>Turbulence type:</b> {turblenceTypeTranslations[feature.properties.tbtype1]}
         </Typography>
       )}
       {turbulenceFrequencyTranslations[feature.properties.tbfreq1] && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Turbulence frequency:</b>{' '}
-          {turbulenceFrequencyTranslations[feature.properties.tbfreq1]}
+          <b>Turbulence frequency:</b> {turbulenceFrequencyTranslations[feature.properties.tbfreq1]}
         </Typography>
       )}
       {cloudCoverageTranslations[feature.properties.cloudcvg1] && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Cloud coverage:</b>{' '}
-          {cloudCoverageTranslations[feature.properties.cloudcvg1]}
+          <b>Cloud coverage:</b> {cloudCoverageTranslations[feature.properties.cloudcvg1]}
         </Typography>
       )}
       {feature.properties.cloudbas1 && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Cloud base:</b>{' '}
-          {parseInt(feature.properties.cloudbas1) * 100 + ' ft MSL'}
+          <b>Cloud base:</b> {parseInt(feature.properties.cloudbas1) * 100 + ' ft MSL'}
         </Typography>
       )}
       {feature.properties.cloudtop1 && (
         <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Cloud top:</b>{' '}
-          {parseInt(feature.properties.cloudtop1) * 100 + ' ft MSL'}
+          <b>Cloud top:</b> {parseInt(feature.properties.cloudtop1) * 100 + ' ft MSL'}
         </Typography>
       )}
       <Divider></Divider>
       <Typography variant="body2" style={{ margin: 3, whiteSpace: 'pre-line' }}>
-        <b>
-          {feature.properties.aireptype
-            ? feature.properties.aireptype
-            : 'PIREP'}
-          :
-        </b>{' '}
-        {feature.properties.rawob}
+        <b>{feature.properties.aireptype ? feature.properties.aireptype : 'PIREP'}:</b> {feature.properties.rawob}
       </Typography>
     </>
   );

@@ -26,6 +26,9 @@ import MeteoLayers from './layers/MeteoLayers';
 import './layers/CacheTileLayer';
 import WFSLayer from './layers/WFSLayer';
 import Slider from '@mui/material/Slider';
+import { useDispatch } from 'react-redux';
+import { selectLayerControlShow, setLayerControlShow } from '../../../store/layers/LayerControl';
+import { useSelector } from 'react-redux';
 
 function LeafletMap() {
   const { pathname } = useRouter();
@@ -34,6 +37,8 @@ function LeafletMap() {
   const [isShowModal, setIsShowModal] = useState(false);
   const [layerControlCollapsed, setLayerControlCollapsed] = useState(true);
   const [baseMapControlCollapsed, setBaseMapControlCollapsed] = useState(true);
+  const dispatch = useDispatch();
+  const meteoLayerControlShow = useSelector(selectLayerControlShow);
 
   useEffect(() => {
     if (pathname === '/try-ezwxbrief') {
@@ -45,10 +50,10 @@ function LeafletMap() {
     switch (id) {
       case 'layer':
         setBaseMapControlCollapsed(true);
-        setLayerControlCollapsed(!layerControlCollapsed);
+        dispatch(setLayerControlShow(!meteoLayerControlShow));
         break;
       case 'basemap':
-        setLayerControlCollapsed(true);
+        dispatch(setLayerControlShow(false));
         setBaseMapControlCollapsed(!baseMapControlCollapsed);
         break;
       case 'route':
@@ -140,13 +145,7 @@ function LeafletMap() {
           defaultLayer="Street"
           exclusiveSkipLayers={['U.S. States']}
         >
-          <GroupedLayer
-            checked
-            name="U.S. States"
-            group="Base Admin"
-            pickable={false}
-            order={0}
-          >
+          <GroupedLayer checked name="U.S. States" group="Base Admin" pickable={false} order={0}>
             <WFSLayer
               url="http://3.95.80.120:8080/geoserver/topp/ows"
               maxFeatures={256}
@@ -199,24 +198,16 @@ function LeafletMap() {
             />
           </GroupedLayer>
         </LayerControl>
-        <MeteoLayers
-          layerControlCollapsed={layerControlCollapsed}
-        ></MeteoLayers>
+        <MeteoLayers></MeteoLayers>
         <ZoomControl
           position="topright"
-          zoomInText={ReactDOMServer.renderToString(
-            <SvgRoundPlus></SvgRoundPlus>,
-          )}
-          zoomOutText={ReactDOMServer.renderToString(
-            <SvgRoundMinus></SvgRoundMinus>,
-          )}
+          zoomInText={ReactDOMServer.renderToString(<SvgRoundPlus></SvgRoundPlus>)}
+          zoomOutText={ReactDOMServer.renderToString(<SvgRoundMinus></SvgRoundMinus>)}
         />
       </MapContainer>
       {isShowTabs && <MapTabs tabMenus={tabMenus} />}
       {isShowModal && <Route setIsShowModal={setIsShowModal} />}
-      {isShowDateModal && (
-        <DateSliderModal setIsShowDateModal={setIsShowDateModal} />
-      )}
+      {isShowDateModal && <DateSliderModal setIsShowDateModal={setIsShowDateModal} />}
       <CollapsibleBar />
     </div>
   );

@@ -17,9 +17,7 @@ const Home: NextPage<{ data: string }> = () => {
 
 Home.getInitialProps = ({ query }) => {
   return {
-    data: `some initial props including query params and controller data: ${JSON.stringify(
-      query,
-    )}`,
+    data: `some initial props including query params and controller data: ${JSON.stringify(query)}`,
   };
 };
 

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useRef, useState } from 'react';
 import { useMapEvents, GeoJSON as GeoJSONLayer } from 'react-leaflet';
-import L, { LatLng, PathOptions } from 'leaflet';
+import L, { LatLng, Layer, PathOptions } from 'leaflet';
 import axios from 'axios';
 import MarkerClusterGroup from './MarkerClusterGroup';
 import { useSelector } from 'react-redux';
@@ -24,11 +24,9 @@ interface WFSLayerProps {
   style?: (feature: GeoJSON.Feature) => PathOptions;
   pointToLayer?: (feature: GeoJSON.Feature, latlng: LatLng) => L.Layer;
   serverFilter?: string;
-  clientFilter?: (
-    features: GeoJSON.Feature[],
-    obsTime: Date,
-  ) => GeoJSON.Feature[];
+  clientFilter?: (features: GeoJSON.Feature[], obsTime: Date) => GeoJSON.Feature[];
   isClusteredMarker?: boolean;
+  selectClusterMarker?: (layers: Layer[]) => Layer;
   markerPane?: string;
   maxClusterRadius?: number;
   layerStateSelector?: (state: AppState) => any;
@@ -57,6 +55,7 @@ const WFSLayer = React.forwardRef(
       serverFilter: filter,
       clientFilter,
       isClusteredMarker = false,
+      selectClusterMarker,
       markerPane,
       maxClusterRadius = 30,
       layerStateSelector,
@@ -68,8 +67,7 @@ const WFSLayer = React.forwardRef(
 
     const [geoJSON, setGeoJSON] = useState<FeatureCollection>(initData);
 
-    const [displayedData, setDisplayedData] =
-      useState<FeatureCollection>(emptyGeoJson);
+    const [displayedData, setDisplayedData] = useState<FeatureCollection>(emptyGeoJson);
 
     const [geoJsonKey, setGeoJsonKey] = useState(12034512);
 
@@ -82,10 +80,7 @@ const WFSLayer = React.forwardRef(
 
     useEffect(() => {
       if (clientFilter && geoJSON.features.length > 0) {
-        const filteredFeatures = clientFilter(
-          geoJSON.features,
-          new Date(observationTime),
-        );
+        const filteredFeatures = clientFilter(geoJSON.features, new Date(observationTime));
         setDisplayedData({
           type: 'FeatureCollection',
           features: filteredFeatures,
@@ -100,12 +95,9 @@ const WFSLayer = React.forwardRef(
       layerState = useSelector(layerStateSelector);
     }
     useEffect(() => {
-      if (layerState && layerState.visible === false) return;
+      if (layerState && layerState.checked === false) return;
       if (clientFilter && geoJSON.features.length > 0) {
-        const filteredFeatures = clientFilter(
-          geoJSON.features,
-          new Date(observationTime),
-        );
+        const filteredFeatures = clientFilter(geoJSON.features, new Date(observationTime));
         setDisplayedData({
           type: 'FeatureCollection',
           features: filteredFeatures,
@@ -125,10 +117,7 @@ const WFSLayer = React.forwardRef(
               });
             }
           });
-        } else if (
-          zoom >= showLabelZoom &&
-          (!lastZoom || lastZoom < showLabelZoom)
-        ) {
+        } else if (zoom >= showLabelZoom && (!lastZoom || lastZoom < showLabelZoom)) {
           ref.current.eachLayer(function (l) {
             if (l.getTooltip()) {
               const tooltip = l.getTooltip();
@@ -154,8 +143,7 @@ const WFSLayer = React.forwardRef(
     let pendingFetch = false;
     const fetchGeoJSON = () => {
       if (pendingFetch) return;
-      const callbackName =
-        'jsonp_callback_' + Math.round(100000 * Math.random());
+      const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
       const params = {
         outputFormat: 'text/javascript',
         maxFeatures,
@@ -174,13 +162,9 @@ const WFSLayer = React.forwardRef(
       }
       if (enableBBoxQuery) {
         if (params.cql_filter) {
-          params.cql_filter += ` AND BBOX(wkb_geometry, ${map
-            .getBounds()
-            .toBBoxString()})`;
+          params.cql_filter += ` AND BBOX(wkb_geometry, ${map.getBounds().toBBoxString()})`;
         } else {
-          params.cql_filter = `BBOX(wkb_geometry, ${map
-            .getBounds()
-            .toBBoxString()})`;
+          params.cql_filter = `BBOX(wkb_geometry, ${map.getBounds().toBBoxString()})`;
         }
       }
       params.outputFormat = 'application/json';
@@ -235,9 +219,15 @@ const WFSLayer = React.forwardRef(
             // @ts-ignore
             iconCreateFunction={(cluster) => {
               const children = cluster.getAllChildMarkers();
-              const marker = children.sort((a: any, b: any) => {
-                return a._leaflet_id > b._leaflet_id ? 1 : -1;
-              })[0];
+              let marker;
+              if (selectClusterMarker) {
+                marker = selectClusterMarker(children);
+              }
+              if (!marker) {
+                marker = children.sort((a: any, b: any) => {
+                  return a._leaflet_id > b._leaflet_id ? 1 : -1;
+                })[0];
+              }
               return marker.getIcon();
             }}
             zoomToBoundsOnClick={false}

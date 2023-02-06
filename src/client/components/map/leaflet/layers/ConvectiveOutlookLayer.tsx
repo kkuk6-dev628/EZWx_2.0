@@ -1,4 +1,5 @@
 import { PathOptions } from 'leaflet';
+import { selectOutlooks } from '../../../../store/layers/LayerControl';
 import WFSLayer from './WFSLayer';
 
 const ConvectiveOutlookLayer = () => {
@@ -32,10 +33,7 @@ const ConvectiveOutlookLayer = () => {
     // }
     return label;
   };
-  const clientFilter = (
-    features: GeoJSON.Feature[],
-    observationTime: Date,
-  ): GeoJSON.Feature[] => {
+  const clientFilter = (features: GeoJSON.Feature[], observationTime: Date): GeoJSON.Feature[] => {
     const results = features.filter((feature) => {
       const start = new Date(feature.properties.valid_time_from);
       const end = new Date(feature.properties.valid_time_to);
@@ -49,16 +47,11 @@ const ConvectiveOutlookLayer = () => {
       url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
       maxFeatures={256}
       typeName="EZWxBrief:conv_outlook"
-      propertyNames={[
-        'wkb_geometry',
-        'ogc_fid',
-        'valid_time_from',
-        'valid_time_to',
-        'raw_text',
-      ]}
+      propertyNames={['wkb_geometry', 'ogc_fid', 'valid_time_from', 'valid_time_to', 'raw_text']}
       style={style}
       getLabel={getLabel}
       clientFilter={clientFilter}
+      layerStateSelector={selectOutlooks}
     ></WFSLayer>
   );
 };

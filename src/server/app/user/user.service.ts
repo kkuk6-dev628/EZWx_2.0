@@ -17,9 +17,7 @@ export class UserService {
   async create(dto: CreateUserDto) {
     const { certifications, ...user } = dto;
 
-    const mapcertifications = certifications.map((certificate) =>
-      this.certificationsRepository.create(certificate),
-    );
+    const mapcertifications = certifications.map((certificate) => this.certificationsRepository.create(certificate));
 
     const newUser = this.userRepository.create(user);
     newUser.displayName = user.firstname + ' ' + user.lastname;

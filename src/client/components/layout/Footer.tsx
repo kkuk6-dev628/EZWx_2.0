@@ -8,9 +8,7 @@ function Footer() {
       <div className="container ">
         <div className="ftr__wrp">
           <div className="ftr__lft">
-            <p className="text">
-              © Copyright 2022 Avwxworkshops Inc - All Rights Reserved
-            </p>
+            <p className="text">© Copyright 2022 Avwxworkshops Inc - All Rights Reserved</p>
           </div>
           <div className="ftr__rgt">
             <div className="ftr__rgt__items">

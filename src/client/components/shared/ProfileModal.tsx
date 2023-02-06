@@ -14,10 +14,7 @@ interface ProfileModalProps {
   setIsUserLoginUser: (value: boolean) => void;
 }
 
-function ProfileModal({
-  handleProfileModal,
-  setIsUserLoginUser,
-}: ProfileModalProps) {
+function ProfileModal({ handleProfileModal, setIsUserLoginUser }: ProfileModalProps) {
   const router = useRouter();
   const user = useSelector(selectAuth);
   const dispatch = useDispatch();
@@ -48,12 +45,7 @@ function ProfileModal({
       <div className="prom__header">
         <div className="prom__lft">
           <div className="prom__lft__img">
-            <Image
-              height={50}
-              width={50}
-              src="/images/sunny.png"
-              alt="profile"
-            />
+            <Image height={50} width={50} src="/images/sunny.png" alt="profile" />
           </div>
         </div>
         <div className="prom__rgt">

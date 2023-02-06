@@ -21,7 +21,6 @@ export const ObsIntervalSlice = createSlice({
 
 export const { setObsInterval } = ObsIntervalSlice.actions;
 
-export const selectObsInterval = (state: AppState) =>
-  state.obsInterval.obsIntervalState;
+export const selectObsInterval = (state: AppState) => state.obsInterval.obsIntervalState;
 
 export default ObsIntervalSlice;

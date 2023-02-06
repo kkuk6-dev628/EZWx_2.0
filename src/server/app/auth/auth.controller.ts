@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthSignupDto, AuthSinginDto } from './dto';
 import { ValidationPipe } from '@nestjs/common';
@@ -16,12 +8,8 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('signup')
-  async signup(
-    @Body(new ValidationPipe()) dto: AuthSignupDto,
-    @Res() res: Response,
-  ) {
-    const { access_token, id, email, displayName } =
-      await this.authService.signup(dto);
+  async signup(@Body(new ValidationPipe()) dto: AuthSignupDto, @Res() res: Response) {
+    const { access_token, id, email, displayName } = await this.authService.signup(dto);
     res
       .cookie('access_token', access_token, {
         httpOnly: true,
@@ -32,12 +20,8 @@ export class AuthController {
   }
 
   @Post('signin')
-  async signin(
-    @Body(new ValidationPipe()) dto: AuthSinginDto,
-    @Res() res: Response,
-  ) {
-    const { access_token, id, email, displayName } =
-      await this.authService.signin(dto);
+  async signin(@Body(new ValidationPipe()) dto: AuthSinginDto, @Res() res: Response) {
+    const { access_token, id, email, displayName } = await this.authService.signin(dto);
     res
       .cookie('access_token', access_token, {
         httpOnly: true,

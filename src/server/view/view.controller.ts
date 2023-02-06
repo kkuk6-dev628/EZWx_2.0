@@ -12,9 +12,7 @@ export class ViewController {
 
   async handler(req: Request, res: Response) {
     const parsedUrl = parse(req.url, true);
-    await this.viewService
-      .getNextServer()
-      .render(req, res, parsedUrl.pathname, parsedUrl.query);
+    await this.viewService.getNextServer().render(req, res, parsedUrl.pathname, parsedUrl.query);
   }
 
   @Get('pwa-serviceworker.js')
@@ -26,9 +24,7 @@ export class ViewController {
   public async getFavicon(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);
 
-    await this.viewService
-      .getNextServer()
-      .render(req, res, parsedUrl.pathname, parsedUrl.query);
+    await this.viewService.getNextServer().render(req, res, parsedUrl.pathname, parsedUrl.query);
   }
   @Get('offline.html')
   public async getOfflineHtml(@Req() req: Request, @Res() res: Response) {
@@ -44,12 +40,7 @@ export class ViewController {
 
     await this.viewService
       .getNextServer()
-      .render(
-        req,
-        res,
-        parsedUrl.pathname,
-        Object.assign(parsedUrl.query, serverSideProps),
-      );
+      .render(req, res, parsedUrl.pathname, Object.assign(parsedUrl.query, serverSideProps));
   }
 
   @Get('pricing')
@@ -80,21 +71,14 @@ export class ViewController {
 
     await this.viewService
       .getNextServer()
-      .render(
-        req,
-        res,
-        parsedUrl.pathname,
-        Object.assign(parsedUrl.query, serverSideProps),
-      );
+      .render(req, res, parsedUrl.pathname, Object.assign(parsedUrl.query, serverSideProps));
   }
 
   @Get('imagery')
   public async imagery(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);
 
-    await this.viewService
-      .getNextServer()
-      .render(req, res, parsedUrl.pathname, Object.assign(parsedUrl.query));
+    await this.viewService.getNextServer().render(req, res, parsedUrl.pathname, Object.assign(parsedUrl.query));
   }
 
   @Get('training')
@@ -119,8 +103,6 @@ export class ViewController {
   @Get('_next*')
   public async assets(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);
-    await this.viewService
-      .getNextServer()
-      .render(req, res, parsedUrl.pathname, parsedUrl.query);
+    await this.viewService.getNextServer().render(req, res, parsedUrl.pathname, parsedUrl.query);
   }
 }

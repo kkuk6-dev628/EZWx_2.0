@@ -126,10 +126,7 @@ function TimeSlider({
     <>
       <div className="collps__top__area">
         <div className="collps__btn__area">
-          <button
-            onClick={() => setIsColleps(!isColleps)}
-            className="collps__btn"
-          >
+          <button onClick={() => setIsColleps(!isColleps)} className="collps__btn">
             {selectedDate
               ? `${selectedDate.weekDay} ${selectedDate.day}, ${selectedDate.month} ${selectedDate.hour}:${selectedDate.minute}`
               : `${date.weekDay.shortName} ${date.day}, ${date.month.shortName} ${date.hour}:${date.minute}`}
@@ -148,9 +145,9 @@ function TimeSlider({
                     <div
                       key={index}
                       id={timeSliderSteps.toString()}
-                      className={`collps__dot__btn ${
-                        randomColorData[index % 4]
-                      } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                      className={`collps__dot__btn ${randomColorData[index % 4]} ${
+                        isColleps ? 'collps__dot__btn--full' : ''
+                      }`}
                     >
                       {[...Array(1)].map((_, i) => (
                         <Tippy
@@ -169,11 +166,7 @@ function TimeSlider({
                             </span>
                           }
                         >
-                          <span
-                            key={i}
-                            onClick={() => hnadelSetDate(index * step, 24, 11)}
-                            className="collps__dot"
-                          >
+                          <span key={i} onClick={() => hnadelSetDate(index * step, 24, 11)} className="collps__dot">
                             &nbsp;
                           </span>
                         </Tippy>
@@ -186,9 +179,9 @@ function TimeSlider({
                     <div
                       key={index}
                       id={'' + index}
-                      className={`collps__dot__btn ${
-                        randomColorData[index % 4]
-                      } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                      className={`collps__dot__btn ${randomColorData[index % 4]} ${
+                        isColleps ? 'collps__dot__btn--full' : ''
+                      }`}
                     >
                       {[...Array(1)].map((_, i) =>
                         index === 0 ? (
@@ -208,11 +201,7 @@ function TimeSlider({
                               </span>
                             }
                           >
-                            <span
-                              key={i}
-                              onClick={() => hnadelSetDate(index * step, 0, 11)}
-                              className="collps__dot"
-                            >
+                            <span key={i} onClick={() => hnadelSetDate(index * step, 0, 11)} className="collps__dot">
                               &nbsp;
                             </span>
                           </Tippy>
@@ -233,11 +222,7 @@ function TimeSlider({
                               </span>
                             }
                           >
-                            <span
-                              key={i}
-                              onClick={() => hnadelSetDate(index * step, 0, 11)}
-                              className="collps__dot"
-                            >
+                            <span key={i} onClick={() => hnadelSetDate(index * step, 0, 11)} className="collps__dot">
                               &nbsp;
                             </span>
                           </Tippy>
@@ -251,9 +236,9 @@ function TimeSlider({
                     <div
                       key={index}
                       id={'' + index}
-                      className={`collps__dot__btn ${
-                        randomColorData[index % 4]
-                      } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                      className={`collps__dot__btn ${randomColorData[index % 4]} ${
+                        isColleps ? 'collps__dot__btn--full' : ''
+                      }`}
                     >
                       {[...Array(1)].map((_, i) => (
                         <Tippy
@@ -272,11 +257,7 @@ function TimeSlider({
                             </span>
                           }
                         >
-                          <span
-                            key={i}
-                            onClick={() => hnadelSetDate(index * step, -24, 11)}
-                            className="collps__dot"
-                          >
+                          <span key={i} onClick={() => hnadelSetDate(index * step, -24, 11)} className="collps__dot">
                             &nbsp;
                           </span>
                         </Tippy>
@@ -289,9 +270,9 @@ function TimeSlider({
                     <div
                       key={index}
                       id={'' + index}
-                      className={`collps__dot__btn ${
-                        randomColorData[index % 4]
-                      } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                      className={`collps__dot__btn ${randomColorData[index % 4]} ${
+                        isColleps ? 'collps__dot__btn--full' : ''
+                      }`}
                     >
                       {[...Array(1)].map((_, i) => (
                         <Tippy
@@ -310,11 +291,7 @@ function TimeSlider({
                             </span>
                           }
                         >
-                          <span
-                            key={i}
-                            onClick={() => hnadelSetDate(index * step, -48, 11)}
-                            className="collps__dot"
-                          >
+                          <span key={i} onClick={() => hnadelSetDate(index * step, -48, 11)} className="collps__dot">
                             &nbsp;
                           </span>
                         </Tippy>
@@ -331,9 +308,9 @@ function TimeSlider({
                     //get
                     <div
                       key={index}
-                      className={`collps__dot__btn ${
-                        randomColorData[index % 4]
-                      } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                      className={`collps__dot__btn ${randomColorData[index % 4]} ${
+                        isColleps ? 'collps__dot__btn--full' : ''
+                      }`}
                     >
                       {[...Array(12)].map((_, i) => (
                         <Tippy
@@ -352,11 +329,7 @@ function TimeSlider({
                             </span>
                           }
                         >
-                          <span
-                            key={i}
-                            onClick={() => hnadelSetDate(index * step, 24, i)}
-                            className="collps__dot"
-                          >
+                          <span key={i} onClick={() => hnadelSetDate(index * step, 24, i)} className="collps__dot">
                             &nbsp;
                           </span>
                         </Tippy>
@@ -369,9 +342,9 @@ function TimeSlider({
                     <div
                       key={index}
                       id={'' + index}
-                      className={`collps__dot__btn ${
-                        randomColorData[index % 4]
-                      } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                      className={`collps__dot__btn ${randomColorData[index % 4]} ${
+                        isColleps ? 'collps__dot__btn--full' : ''
+                      }`}
                     >
                       {[...Array(12)].map((_, i) =>
                         index === 0 ? (
@@ -391,11 +364,7 @@ function TimeSlider({
                               </span>
                             }
                           >
-                            <span
-                              key={i}
-                              onClick={() => hnadelSetDate(index * step, 0, i)}
-                              className="collps__dot"
-                            >
+                            <span key={i} onClick={() => hnadelSetDate(index * step, 0, i)} className="collps__dot">
                               &nbsp;
                             </span>
                           </Tippy>
@@ -416,11 +385,7 @@ function TimeSlider({
                               </span>
                             }
                           >
-                            <span
-                              key={i}
-                              onClick={() => hnadelSetDate(index * step, 0, i)}
-                              className="collps__dot"
-                            >
+                            <span key={i} onClick={() => hnadelSetDate(index * step, 0, i)} className="collps__dot">
                               &nbsp;
                             </span>
                           </Tippy>
@@ -434,9 +399,9 @@ function TimeSlider({
                     <div
                       key={index}
                       id={'' + index}
-                      className={`collps__dot__btn ${
-                        randomColorData[index % 4]
-                      } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                      className={`collps__dot__btn ${randomColorData[index % 4]} ${
+                        isColleps ? 'collps__dot__btn--full' : ''
+                      }`}
                     >
                       {[...Array(12)].map((_, i) => (
                         <Tippy
@@ -455,11 +420,7 @@ function TimeSlider({
                             </span>
                           }
                         >
-                          <span
-                            key={i}
-                            onClick={() => hnadelSetDate(index * step, 0, i)}
-                            className="collps__dot"
-                          >
+                          <span key={i} onClick={() => hnadelSetDate(index * step, 0, i)} className="collps__dot">
                             &nbsp;
                           </span>
                         </Tippy>
@@ -472,9 +433,9 @@ function TimeSlider({
                     <div
                       key={index}
                       id={'' + index}
-                      className={`collps__dot__btn ${
-                        randomColorData[index % 4]
-                      } ${isColleps ? 'collps__dot__btn--full' : ''}`}
+                      className={`collps__dot__btn ${randomColorData[index % 4]} ${
+                        isColleps ? 'collps__dot__btn--full' : ''
+                      }`}
                     >
                       {[...Array(12)].map((_, i) => (
                         <Tippy
@@ -493,11 +454,7 @@ function TimeSlider({
                             </span>
                           }
                         >
-                          <span
-                            key={i}
-                            onClick={() => hnadelSetDate(index * step, 0, i)}
-                            className="collps__dot"
-                          >
+                          <span key={i} onClick={() => hnadelSetDate(index * step, 0, i)} className="collps__dot">
                             &nbsp;
                           </span>
                         </Tippy>

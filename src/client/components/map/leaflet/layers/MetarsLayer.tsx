@@ -18,23 +18,16 @@ import { selectMetar } from '../../../../store/layers/LayerControl';
 import { useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
 import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
-import {
-  MetarMarkerTypes,
-  timeSliderInterval,
-} from '../../common/AreoConstants';
+import { MetarMarkerTypes, timeSliderInterval, windIconLimit } from '../../common/AreoConstants';
 import axios from 'axios';
 import { feature } from '@turf/helpers';
 import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
 
-const defaultServerFilter = `observation_time DURING ${getQueryTime(
-  new Date(),
-)}`;
+const defaultServerFilter = `observation_time DURING ${getQueryTime(new Date())}`;
 
 const cacheUpdateInterval = 75; // 75 minutes
 
-export const getFlightCategoryIconUrl = (
-  feature: GeoJSON.Feature,
-): { iconUrl: string; ceiling: number } => {
+export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): { iconUrl: string; ceiling: number } => {
   const skyConditions = getSkyConditions(feature);
   let sky: string, ceiling: number;
   if (feature.properties.vert_vis_ft) {
@@ -64,33 +57,36 @@ const MetarsLayer = () => {
 
   const layerStatus = useSelector(selectMetar);
   const personalMinimums = useSelector(selectPersonalMinimums);
-  const [serverFilter, setServerFilter] = useState(defaultServerFilter);
+  const [renderedTime, setRenderedTime] = useState(Date.now());
   const wfsRef = useRef(null);
   const [filteredData, setFilteredData] = useState();
   const [indexedData, setIndexedData] = useState();
-  const [cacheVersion, setCacheVersion] = useState(
-    getCacheVersion(cacheUpdateInterval),
-  );
-  const meteoLayerControl = useMeteoLayersContext();
+  const [cacheVersion, setCacheVersion] = useState(getCacheVersion(cacheUpdateInterval));
+  const [clusterRadius, setClusterRadius] = useState(50);
 
   useEffect(() => {
+    setRenderedTime(Date.now());
     const v = getCacheVersion(cacheUpdateInterval);
     if (v !== cacheVersion) {
       setCacheVersion(v);
     }
+    layerStatus.markerType === MetarMarkerTypes.surfaceWindBarbs.value ? setClusterRadius(25) : setClusterRadius(50);
     switch (layerStatus.markerType) {
       case MetarMarkerTypes.surfaceVisibility.value:
-        setServerFilter(
-          defaultServerFilter + ` AND visibility_statute_mi IS NOT NULL`,
-        );
+        break;
+      case MetarMarkerTypes.flightCategory.value:
         break;
     }
-  }, [layerStatus.markerType]);
+  }, [
+    layerStatus.markerType,
+    layerStatus.flightCategory.all.checked,
+    layerStatus.flightCategory.vfr.checked,
+    layerStatus.flightCategory.mvfr.checked,
+    layerStatus.flightCategory.ifr.checked,
+    layerStatus.flightCategory.lifr.checked,
+  ]);
 
-  const getFlightCatMarker = (
-    feature: GeoJSON.Feature,
-    latlng: LatLng,
-  ): L.Marker => {
+  const getFlightCatMarker = (feature: GeoJSON.Feature, latlng: LatLng): L.Marker => {
     const { iconUrl } = getFlightCategoryIconUrl(feature);
 
     const metarMarker = L.marker(latlng, {
@@ -126,9 +122,7 @@ const MetarsLayer = () => {
         className: 'metar-ceiling-icon',
         html: ReactDOMServer.renderToString(
           <>
-            <div
-              style={{ display: 'inline', verticalAlign: -7, marginLeft: -4 }}
-            >
+            <div style={{ display: 'inline', verticalAlign: -7, marginLeft: -4 }}>
               <Image src={iconUrl} alt={''} width={20} height={20} />
             </div>
             <div
@@ -151,21 +145,12 @@ const MetarsLayer = () => {
     return metarMarker;
   };
 
-  const getSurfaceVisibilityMarker = (
-    feature: GeoJSON.Feature,
-    latlng: LatLng,
-  ) => {
+  const getSurfaceVisibilityMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
     let visibility = feature.properties.visibility_statute_mi;
     if (!visibility) return;
-    const [category, _] = getMetarVisibilityCategory(
-      visibility,
-      personalMinimums,
-    );
+    const [category, _] = getMetarVisibilityCategory(visibility, personalMinimums);
     let iconUrl = '/icons/metar/MISSING.png';
-    if (
-      visibility === 0.25 &&
-      feature.properties.raw_text.indexOf('M1/4SM') > -1
-    ) {
+    if (visibility === 0.25 && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
       visibility = '<0.25';
     }
     if (visibility > 4) {
@@ -179,12 +164,10 @@ const MetarsLayer = () => {
 
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
-        className: 'metar-ceiling-icon',
+        className: 'metar-visibility-icon',
         html: ReactDOMServer.renderToString(
           <>
-            <div
-              style={{ display: 'inline', verticalAlign: -7, marginLeft: -4 }}
-            >
+            <div style={{ display: 'inline', verticalAlign: -7, marginLeft: -4 }}>
               <Image src={iconUrl} alt={''} width={20} height={20} />
             </div>
             <div
@@ -207,10 +190,7 @@ const MetarsLayer = () => {
     return metarMarker;
   };
 
-  const getSurfaceWindSpeedMarker = (
-    feature: GeoJSON.Feature,
-    latlng: LatLng,
-  ) => {
+  const getSurfaceWindSpeedMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
     const windSpeed = parseFloat(feature.properties.wind_speed_kt);
     if (Number.isNaN(windSpeed)) return;
     let colorCode = 'black';
@@ -247,10 +227,7 @@ const MetarsLayer = () => {
     return metarMarker;
   };
 
-  const getSurfaceWindGustMarker = (
-    feature: GeoJSON.Feature,
-    latlng: LatLng,
-  ) => {
+  const getSurfaceWindGustMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
     const windGust = parseFloat(feature.properties.wind_gust_kt);
     if (Number.isNaN(windGust)) return;
     let colorCode = 'black';
@@ -287,10 +264,7 @@ const MetarsLayer = () => {
     return metarMarker;
   };
 
-  const getSurfaceTemperatureMarker = (
-    feature: GeoJSON.Feature,
-    latlng: LatLng,
-  ) => {
+  const getSurfaceTemperatureMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
     let tempInCelcius = parseFloat(feature.properties.temp_c);
     if (Number.isNaN(tempInCelcius)) return;
     tempInCelcius = Math.round(tempInCelcius);
@@ -341,10 +315,7 @@ const MetarsLayer = () => {
     return metarMarker;
   };
 
-  const getSurfaceDewpointMarker = (
-    feature: GeoJSON.Feature,
-    latlng: LatLng,
-  ) => {
+  const getSurfaceDewpointMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
     let tempInCelcius = parseFloat(feature.properties.dewpoint_c);
     if (Number.isNaN(tempInCelcius)) return;
     tempInCelcius = Math.round(tempInCelcius);
@@ -395,10 +366,7 @@ const MetarsLayer = () => {
     return metarMarker;
   };
 
-  const getDewpointDepressionMarker = (
-    feature: GeoJSON.Feature,
-    latlng: LatLng,
-  ) => {
+  const getDewpointDepressionMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
     const temperature = parseFloat(feature.properties.temp_c);
     const dewpointTemperature = parseFloat(feature.properties.dewpoint_c);
     // const useCelcius =
@@ -422,20 +390,11 @@ const MetarsLayer = () => {
     let colorCode = 'black';
     if (dewpointDepressionInCelcius > 7) {
       colorCode = 'darkerGreen';
-    } else if (
-      dewpointDepressionInCelcius > 4 &&
-      dewpointDepressionInCelcius <= 7
-    ) {
+    } else if (dewpointDepressionInCelcius > 4 && dewpointDepressionInCelcius <= 7) {
       colorCode = 'lightBlue';
-    } else if (
-      dewpointDepressionInCelcius > 2 &&
-      dewpointDepressionInCelcius <= 4
-    ) {
+    } else if (dewpointDepressionInCelcius > 2 && dewpointDepressionInCelcius <= 4) {
       colorCode = 'darkerBlue';
-    } else if (
-      dewpointDepressionInCelcius > 1 &&
-      dewpointDepressionInCelcius <= 2
-    ) {
+    } else if (dewpointDepressionInCelcius > 1 && dewpointDepressionInCelcius <= 2) {
       colorCode = 'purple';
     } else if (dewpointDepressionInCelcius <= 1) {
       colorCode = 'magenta';
@@ -458,10 +417,7 @@ const MetarsLayer = () => {
     return metarMarker;
   };
 
-  const getSurfaceWindBarbsMarker = (
-    feature: GeoJSON.Feature,
-    latlng: LatLng,
-  ) => {
+  const getSurfaceWindBarbsMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
     let windSpeed = feature.properties.wind_speed_kt;
     let windDirection = feature.properties.wind_dir_degrees;
     let iconUrl = '/icons/barbs/0-kt.png';
@@ -564,40 +520,25 @@ const MetarsLayer = () => {
 
   const getWeatherMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
     let isDayTime = true;
-    const sunsetSunriseTime = SunCalc.getTimes(
-      new Date(),
-      latlng.lat,
-      latlng.lng,
-    );
-    if (
-      Date.parse(sunsetSunriseTime.sunrise) &&
-      Date.parse(sunsetSunriseTime.sunset)
-    ) {
+    const sunsetSunriseTime = SunCalc.getTimes(new Date(), latlng.lat, latlng.lng);
+    if (Date.parse(sunsetSunriseTime.sunrise) && Date.parse(sunsetSunriseTime.sunset)) {
       const obsTime = new Date(feature.properties.observation_time).getTime();
-      isDayTime =
-        obsTime >= sunsetSunriseTime.sunrise.getTime() &&
-        obsTime <= sunsetSunriseTime.sunset.getTime();
+      isDayTime = obsTime >= sunsetSunriseTime.sunrise.getTime() && obsTime <= sunsetSunriseTime.sunset.getTime();
     }
     let condition = '';
     let worstSkyConditionFetched = false;
 
     let weatherIconClass = 'fas fa-question-square';
     let iconColor = 'lightslategrey';
-    if (
-      Object.keys(personalMinimums).indexOf(
-        feature.properties.flight_category,
-      ) > -1
-    ) {
+    if (Object.keys(personalMinimums).indexOf(feature.properties.flight_category) > -1) {
       iconColor = personalMinimums[feature.properties.flight_category].color;
     }
 
     if (!feature.properties.wx_string) {
       //if wxString is not set, then get marker's icon from wind speed
       if (
-        (feature.properties.wind_speed_kt &&
-          feature.properties.wind_speed_kt > 20) ||
-        (feature.properties.wind_gust_kt &&
-          feature.properties.wind_gust_kt > 25)
+        (feature.properties.wind_speed_kt && feature.properties.wind_speed_kt > windIconLimit.windSpeed) ||
+        (feature.properties.wind_gust_kt && feature.properties.wind_gust_kt > windIconLimit.windGust)
       ) {
         weatherIconClass = 'fas fa-wind';
       } else {
@@ -612,19 +553,13 @@ const MetarsLayer = () => {
             weatherIconClass = isDayTime ? 'fas fa-sun' : 'fas fa-moon';
             break;
           case 'FEW':
-            weatherIconClass = isDayTime
-              ? 'fas fa-sun-cloud'
-              : 'fas fa-moon-cloud';
+            weatherIconClass = isDayTime ? 'fas fa-sun-cloud' : 'fas fa-moon-cloud';
             break;
           case 'SCT':
-            weatherIconClass = isDayTime
-              ? 'fas fa-cloud-sun'
-              : 'fas fa-cloud-moon';
+            weatherIconClass = isDayTime ? 'fas fa-cloud-sun' : 'fas fa-cloud-moon';
             break;
           case 'BKN':
-            weatherIconClass = isDayTime
-              ? 'fas fa-clouds-sun'
-              : 'fas fa-clouds-moon';
+            weatherIconClass = isDayTime ? 'fas fa-clouds-sun' : 'fas fa-clouds-moon';
             break;
           case 'OVC':
           case 'OVX':
@@ -632,9 +567,7 @@ const MetarsLayer = () => {
         }
       }
     } else {
-      const weatherString = feature.properties.wx_string
-        .replace('-', '')
-        .replace('+', '');
+      const weatherString = feature.properties.wx_string.replace('-', '').replace('+', '');
       switch (weatherString) {
         case 'SN':
         case 'SHSN':
@@ -646,6 +579,7 @@ const MetarsLayer = () => {
         case 'SN DRSN':
         case 'SG DRSN':
         case 'SG':
+        case 'VCSH DRSN':
           weatherIconClass = 'fas fa-cloud-snow';
           break;
         case 'RASN':
@@ -712,9 +646,7 @@ const MetarsLayer = () => {
             condition = getWorstSkyCondition(getSkyConditions(feature));
           }
           if (condition === 'SCT' || condition === 'FEW') {
-            weatherIconClass = isDayTime
-              ? 'fas fa-thunderstorm-sun'
-              : 'fas fa-thunderstorm-moon';
+            weatherIconClass = isDayTime ? 'fas fa-thunderstorm-sun' : 'fas fa-thunderstorm-moon';
           } else {
             weatherIconClass = 'fas fa-thunderstorm';
           }
@@ -733,7 +665,11 @@ const MetarsLayer = () => {
         case 'BLSN':
         case 'DRSN':
         case 'SN BLSN':
+        case 'IC DRSN':
           weatherIconClass = 'fas fa-snow-blowing';
+          break;
+        case 'IC':
+          weatherIconClass = 'fas fa-sparkles';
           break;
         case 'FC':
           weatherIconClass = 'fas fa-tornado';
@@ -751,6 +687,7 @@ const MetarsLayer = () => {
         case 'BCFG BR':
         case 'BCFG HZ':
         case 'MIFG BR':
+        case 'FZFG UP':
           weatherIconClass = 'fas fa-fog';
           break;
         case 'FU':
@@ -765,10 +702,8 @@ const MetarsLayer = () => {
         case 'BR':
         case 'HZ':
           if (
-            (feature.properties.wind_speed_kt &&
-              feature.properties.wind_speed_kt > 15) ||
-            (feature.properties.wind_gust_kt &&
-              feature.properties.wind_gust_kt > 20)
+            (feature.properties.wind_speed_kt && feature.properties.wind_speed_kt > windIconLimit.windSpeed) ||
+            (feature.properties.wind_gust_kt && feature.properties.wind_gust_kt > windIconLimit.windGust)
           ) {
             weatherIconClass = 'fas fa-wind';
           } else {
@@ -782,19 +717,13 @@ const MetarsLayer = () => {
                 weatherIconClass = isDayTime ? 'fas fa-sun' : 'fas fa-moon';
                 break;
               case 'FEW':
-                weatherIconClass = isDayTime
-                  ? 'fas fa-sun-cloud'
-                  : 'fas fa-moon-cloud';
+                weatherIconClass = isDayTime ? 'fas fa-sun-cloud' : 'fas fa-moon-cloud';
                 break;
               case 'SCT':
-                weatherIconClass = isDayTime
-                  ? 'fas fa-cloud-sun'
-                  : 'fas fa-cloud-moon';
+                weatherIconClass = isDayTime ? 'fas fa-cloud-sun' : 'fas fa-cloud-moon';
                 break;
               case 'BKN':
-                weatherIconClass = isDayTime
-                  ? 'fas fa-clouds-sun'
-                  : 'fas fa-clouds-moon';
+                weatherIconClass = isDayTime ? 'fas fa-clouds-sun' : 'fas fa-clouds-moon';
                 break;
               case 'OVC':
               case 'OVX':
@@ -802,17 +731,32 @@ const MetarsLayer = () => {
             }
           }
           break;
+        case 'TSPL':
+          if (!worstSkyConditionFetched) {
+            condition = getWorstSkyCondition(getSkyConditions(feature));
+          }
+          switch (condition) {
+            case 'SKC':
+            case 'CLR':
+              weatherIconClass = isDayTime ? 'fas fa-sun' : 'fas fa-moon';
+              break;
+            case 'FEW':
+            case 'SCT':
+              weatherIconClass = isDayTime ? 'fas fa-thunderstorm-sun' : 'fas fa-thunderstorm-moon';
+              break;
+            case 'BKN':
+            case 'OVC':
+            case 'OVX':
+              weatherIconClass = 'fas fa-cloud-bolt';
+              break;
+          }
+          break;
       }
     }
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-weather-icon',
-        html:
-          "<i style='color:" +
-          iconColor +
-          "' class='" +
-          weatherIconClass +
-          " fa-2x'></i>",
+        html: "<i style='color:" + iconColor + "' class='" + weatherIconClass + " fa-2x'></i>",
         iconSize: [32, 26],
         iconAnchor: [16, 13],
         //popupAnchor: [0, -13]
@@ -875,11 +819,8 @@ const MetarsLayer = () => {
     return data;
   };
 
-  const clientFilter = (
-    features: GeoJSON.Feature[],
-    observationTime: Date,
-  ): GeoJSON.Feature[] => {
-    // const startTime = new Date().getTime();
+  const clientFilter = (features: GeoJSON.Feature[], observationTime: Date): GeoJSON.Feature[] => {
+    setFilteredData({ type: 'FeatureCollection', features: features } as any);
     let indexedFeatures = indexedData;
     if (!indexedFeatures) {
       indexedFeatures = buildIndexedData(features);
@@ -887,22 +828,29 @@ const MetarsLayer = () => {
     if (!indexedFeatures) return [];
     const filteredFeatures = {};
     const obsTime = new Date(observationTime).getTime();
-    const startIndex = Math.floor(
-      (obsTime - 75 * 60 * 1000) / timeSliderInterval,
-    );
+    const startIndex = Math.floor((obsTime - 75 * 60 * 1000) / timeSliderInterval);
     const endIndex = Math.floor(obsTime / timeSliderInterval);
-    // let count = 0;
     for (let index = startIndex; index < endIndex; index++) {
       const iData = indexedFeatures[index] as GeoJSON.Feature[];
       if (iData) {
         iData.map((feature) => {
-          // count++;
+          if (layerStatus.flightCategory.all.checked === false) {
+            if (!layerStatus.flightCategory.vfr.checked && feature.properties.flight_category === 'VFR') {
+              return;
+            }
+            if (!layerStatus.flightCategory.mvfr.checked && feature.properties.flight_category === 'MVFR') {
+              return;
+            }
+            if (!layerStatus.flightCategory.ifr.checked && feature.properties.flight_category === 'IFR') {
+              return;
+            }
+            if (!layerStatus.flightCategory.lifr.checked && feature.properties.flight_category === 'LIFR') {
+              return;
+            }
+          }
           if (filteredFeatures[feature.properties.station_id]) {
             const prevFeature = filteredFeatures[feature.properties.station_id];
-            if (
-              new Date(prevFeature.properties.observation_time) <
-              new Date(feature.properties.observation_time)
-            ) {
+            if (new Date(prevFeature.properties.observation_time) < new Date(feature.properties.observation_time)) {
               filteredFeatures[feature.properties.station_id] = feature;
             }
           } else {
@@ -912,12 +860,11 @@ const MetarsLayer = () => {
       }
     }
     const result = Object.values(filteredFeatures);
-    setFilteredData({ type: 'FeatureCollection', features: result } as any);
     return result as any;
   };
 
   return (
-    <Pane name={'metar'} style={{ zIndex: 698 }} key={layerStatus.markerType}>
+    <Pane name={'metar'} style={{ zIndex: 698 }} key={renderedTime}>
       <WFSLayer
         ref={wfsRef}
         url="https://eztile4.ezwxbrief.com/geoserver/EZWxBrief/ows"
@@ -964,7 +911,7 @@ const MetarsLayer = () => {
         markerPane={'metar'}
         // serverFilter={serverFilter}
         clientFilter={clientFilter}
-        maxClusterRadius={50}
+        maxClusterRadius={clusterRadius}
         initData={filteredData}
         layerStateSelector={selectMetar}
         cacheVersion={cacheVersion}

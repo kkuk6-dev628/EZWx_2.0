@@ -1,13 +1,9 @@
 import WFSLayer from './WFSLayer';
-import L, { LatLng } from 'leaflet';
+import L, { FeatureGroup, LatLng, Layer } from 'leaflet';
 import Image from 'next/image';
 import ReactDOMServer from 'react-dom/server';
 import { Pane, useMap } from 'react-leaflet';
-import {
-  addLeadingZeroes,
-  getCacheVersion,
-  getTimeRangeStart,
-} from '../../common/AreoFunctions';
+import { addLeadingZeroes, getCacheVersion, getTimeRangeStart } from '../../common/AreoFunctions';
 import { useSelector } from 'react-redux';
 import { selectPirep } from '../../../../store/layers/LayerControl';
 import { useEffect, useState } from 'react';
@@ -42,9 +38,7 @@ const PirepLayer = () => {
   };
 
   const layerStatus = useSelector(selectPirep);
-  const [cacheVersion, setCacheVersion] = useState(
-    getCacheVersion(cacheUpdateInterval),
-  );
+  const [cacheVersion, setCacheVersion] = useState(getCacheVersion(cacheUpdateInterval));
 
   useEffect(() => {
     console.log(layerStatus);
@@ -147,20 +141,8 @@ const PirepLayer = () => {
         className: 'pirep-icon',
         html: ReactDOMServer.renderToString(
           <>
-            <Image
-              src={iconUrl1}
-              className="pirep-left-icon"
-              alt={''}
-              width={16}
-              height={16}
-            />
-            <Image
-              src={iconUrl2}
-              className="pirep-right-icon"
-              alt={''}
-              width={16}
-              height={16}
-            />
+            <Image src={iconUrl1} className="pirep-left-icon" alt={''} width={16} height={16} />
+            <Image src={iconUrl2} className="pirep-right-icon" alt={''} width={16} height={16} />
             <span className={spanClass}>{flightLevel}</span>
           </>,
         ),
@@ -175,19 +157,11 @@ const PirepLayer = () => {
 
   const pointToLayer = (feature: GeoJSON.Feature, latlng: LatLng): L.Layer => {
     let pirepMarker: L.Layer;
-    if (
-      feature.properties.tbint1 !== null &&
-      feature.properties.icgint1 !== null
-    ) {
+    if (feature.properties.tbint1 !== null && feature.properties.icgint1 !== null) {
       const tbIconUrl1 = getTbIconUrl(feature.properties.tbint1);
       const icgIconUrl1 = getIcgIconUrl(feature.properties.icgint1);
       if (filters.Type.All || (filters.Type.Icing && filters.Type.Turbulence)) {
-        pirepMarker = getBothMarkers(
-          latlng,
-          tbIconUrl1,
-          icgIconUrl1,
-          feature.properties.fltlvl,
-        );
+        pirepMarker = getBothMarkers(latlng, tbIconUrl1, icgIconUrl1, feature.properties.fltlvl);
       } else if (filters.Type.Icing) {
         pirepMarker = getMarker(latlng, icgIconUrl1, feature.properties.fltlvl);
       } else if (filters.Type.Turbulence) {
@@ -199,10 +173,7 @@ const PirepLayer = () => {
     } else if (feature.properties.icgint1 !== null) {
       const icgIconUrl = getIcgIconUrl(feature.properties.icgint1);
       pirepMarker = getMarker(latlng, icgIconUrl, feature.properties.fltlvl);
-    } else if (
-      feature.properties.tbint1 === null &&
-      feature.properties.icgint1 === null
-    ) {
+    } else if (feature.properties.tbint1 === null && feature.properties.icgint1 === null) {
       let iconUrl = '/icons/pirep/weather-sky-icon-black.png';
       if (feature.properties.aireptype === 'Urgent PIREP') {
         iconUrl = '/icons/pirep/weather-sky-icon-red.png';
@@ -215,10 +186,14 @@ const PirepLayer = () => {
     return pirepMarker;
   };
 
-  const clientFilter = (
-    features: GeoJSON.Feature[],
-    observationTime: Date,
-  ): GeoJSON.Feature[] => {
+  const selectUrgentMarker4Cluster = (layers) => {
+    const urgentMarkers = layers.filter((layer) => {
+      return layer.feature.properties.aireptype === 'Urgent PIREP';
+    });
+    return urgentMarkers.length > 0 ? urgentMarkers[0] : undefined;
+  };
+
+  const clientFilter = (features: GeoJSON.Feature[], observationTime: Date): GeoJSON.Feature[] => {
     setJsonData({ type: 'FeatureCollection', features: features } as any);
     const results = features.filter((feature) => {
       const start = new Date(feature.properties.obstime);
@@ -230,9 +205,15 @@ const PirepLayer = () => {
       if (!inTime) {
         return false;
       }
+      if (layerState.urgentOnly.checked) {
+        if (feature.properties.aireptype !== 'Urgent PIREP') {
+          return false;
+        }
+      }
       const inAltitudeRange =
-        layerState.altitude.valueMin <= feature.properties.fltlvl &&
-        feature.properties.fltlvl <= layerState.altitude.valueMax;
+        (layerState.altitude.valueMin <= feature.properties.fltlvl &&
+          feature.properties.fltlvl <= layerState.altitude.valueMax) ||
+        feature.properties.fltlvl == 0;
 
       if (!inAltitudeRange) {
         return false;
@@ -240,25 +221,16 @@ const PirepLayer = () => {
       if (layerState.all.checked) {
         return true;
       }
-      if (
-        layerState.urgentOnly.checked &&
-        feature.properties.aireptype === 'Urgent PIREP'
-      ) {
-        return true;
+      if (!layerState.icing.checked && feature.properties.icgint1 !== null) {
+        return false;
       }
-      if (layerState.icing.checked && feature.properties.icgint1 !== null) {
-        return true;
+      if (!layerState.turbulence.checked && feature.properties.tbint1 !== null) {
+        return false;
       }
-      if (layerState.turbulence.checked && feature.properties.tbint1 !== null) {
-        return true;
+      if (!layerState.weatherSky.checked && feature.properties.tbint1 === null && feature.properties.icgint1 === null) {
+        return false;
       }
-      if (
-        layerState.weatherSky.checked &&
-        feature.properties.tbint1 !== null &&
-        feature.properties.icgint1 !== null
-      ) {
-        return true;
-      }
+      return true;
     });
     return results;
   };
@@ -300,6 +272,7 @@ const PirepLayer = () => {
         ]}
         pointToLayer={pointToLayer}
         isClusteredMarker={true}
+        selectClusterMarker={selectUrgentMarker4Cluster}
         markerPane={'pirep'}
         serverFilter={`obstime AFTER ${getTimeRangeStart().toISOString()}`}
         clientFilter={clientFilter}

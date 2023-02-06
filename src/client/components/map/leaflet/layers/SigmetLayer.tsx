@@ -53,10 +53,7 @@ const SigmetLayer = () => {
     return label;
   };
 
-  const clientFilter = (
-    features: GeoJSON.Feature[],
-    observationTime: Date,
-  ): GeoJSON.Feature[] => {
+  const clientFilter = (features: GeoJSON.Feature[], observationTime: Date): GeoJSON.Feature[] => {
     setJsonData({ type: 'FeatureCollection', features: features } as any);
     const results = features.filter((feature) => {
       const start = new Date(feature.properties.validtimefrom);
@@ -68,22 +65,13 @@ const SigmetLayer = () => {
       if (layerState.all.checked) {
         return true;
       }
-      if (
-        layerState.convection.checked &&
-        feature.properties.hazard === 'CONVECTIVE'
-      ) {
+      if (layerState.convection.checked && feature.properties.hazard === 'CONVECTIVE') {
         return true;
       }
-      if (
-        layerState.turbulence.checked &&
-        feature.properties.hazard === 'TURB'
-      ) {
+      if (layerState.turbulence.checked && feature.properties.hazard === 'TURB') {
         return true;
       }
-      if (
-        layerState.airframeIcing.checked &&
-        feature.properties.hazard === 'ICING'
-      ) {
+      if (layerState.airframeIcing.checked && feature.properties.hazard === 'ICING') {
         return true;
       }
       if (layerState.dust.checked && feature.properties.hazard === 'IFR') {
@@ -94,9 +82,7 @@ const SigmetLayer = () => {
       }
       if (
         layerState.other.checked &&
-        ['CONVECTIVE', 'TURB', 'ICING', 'IFR', 'ASH'].includes(
-          feature.properties.hazard,
-        ) === false
+        ['CONVECTIVE', 'TURB', 'ICING', 'IFR', 'ASH'].includes(feature.properties.hazard) === false
       ) {
         return true;
       }
@@ -124,6 +110,7 @@ const SigmetLayer = () => {
       style={gairmetStyle}
       getLabel={getLabel}
       clientFilter={clientFilter}
+      layerStateSelector={selectSigmet}
     ></WFSLayer>
   );
 };

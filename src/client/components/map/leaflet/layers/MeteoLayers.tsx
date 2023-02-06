@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import LayerControl, {
-  GroupedLayer,
-  ILayerObj,
-} from '../layer-control/MeteoLayerControl';
-import WFSLayer from './WFSLayer';
+import LayerControl, { GroupedLayer } from '../layer-control/MeteoLayerControl';
 import { LayerGroup, useMapEvents } from 'react-leaflet';
-import L, { CRS, LatLng } from 'leaflet';
+import L, { LatLng } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
 import { useContext, useEffect, useRef, useState } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
@@ -26,35 +22,22 @@ import PirepLayer from './PirepLayer';
 import PIREPPopup from '../popups/PIREPPopup';
 import 'leaflet-responsive-popup';
 import 'leaflet-responsive-popup/leaflet.responsive.popup.css';
-import WMSLayer from './WMSLayer';
 import MetarsLayer from './MetarsLayer';
-import TimeDimensionLayer from './TimeDimensionLayer';
-import MarkerClusterGroup from './MarkerClusterGroup';
-import Image from 'next/image';
 import MetarsPopup from '../popups/MetarsPopup';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  selectMetar,
-  setMetar,
-  selectPirep,
-  setPirep,
-} from '../../../../store/layers/LayerControl';
+import { useSelector } from 'react-redux';
+import { selectMetar } from '../../../../store/layers/LayerControl';
 import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
-import axios from 'axios';
 import { MetarMarkerTypes } from '../../common/AreoConstants';
 import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
 import { InLayerControl } from '../layer-control/MeteoLayerControl';
+import axios from 'axios';
 
 const maxLayers = 6;
 
-const MeteoLayers = ({ layerControlCollapsed }) => {
-  const dispatch = useDispatch();
-
+const MeteoLayers = () => {
   const layers = useMeteoLayersContext();
-  const wmsLayerRef = useRef(null);
   const debugLayerGroupRef = useRef(null);
   const metarLayerStatus = useSelector(selectMetar);
-  const pirepLayerStatus = useSelector(selectPirep);
   const personalMinimums = useSelector(selectPersonalMinimums);
   const [airportData, setAirportData] = useState();
   useEffect(() => {
@@ -90,12 +73,10 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           data.data.features.forEach((feature) => {
             if (!feature.properties.name) return;
             if (feature.properties.faaid) {
-              airports.faaid[feature.properties.faaid] =
-                feature.properties.name;
+              airports.faaid[feature.properties.faaid] = feature.properties.name;
             }
             if (feature.properties.icaoid) {
-              airports.icaoid[feature.properties.icaoid] =
-                feature.properties.name;
+              airports.icaoid[feature.properties.icaoid] = feature.properties.name;
             }
           });
           setAirportData(airports as any);
@@ -136,11 +117,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         useWidePopup = true;
         break;
       case 'conv_outlook':
-        popup = (
-          <ConvectiveOutlookPopup
-            feature={layer.feature}
-          ></ConvectiveOutlookPopup>
-        );
+        popup = <ConvectiveOutlookPopup feature={layer.feature}></ConvectiveOutlookPopup>;
         useWidePopup = true;
         break;
       case 'pirep':
@@ -148,9 +125,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         useWidePopup = true;
         break;
       case 'metar':
-        if (
-          metarLayerStatus.markerType === MetarMarkerTypes.ceilingHeight.value
-        ) {
+        if (metarLayerStatus.markerType === MetarMarkerTypes.ceilingHeight.value) {
           offsetX = 25;
         }
         popup = (
@@ -163,12 +138,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         useWidePopup = true;
         break;
       default:
-        popup = (
-          <GeneralPopup
-            feature={layer.feature}
-            title={`${layerName} properties`}
-          ></GeneralPopup>
-        );
+        popup = <GeneralPopup feature={layer.feature} title={`${layerName} properties`}></GeneralPopup>;
         useWidePopup = false;
     }
     const popupContent = ReactDOMServer.renderToString(popup);
@@ -204,10 +174,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
           if (features.length >= maxLayers) {
             return;
           }
-          if (
-            l.feature.geometry.type === 'Point' ||
-            l.feature.geometry.type === 'MultiPoint'
-          ) {
+          if (l.feature.geometry.type === 'Point' || l.feature.geometry.type === 'MultiPoint') {
             if (
               clickedBBox.latMin < l.feature.geometry.coordinates[1] &&
               l.feature.geometry.coordinates[1] < clickedBBox.latMax &&
@@ -216,9 +183,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
             ) {
               features.push(l);
             }
-          } else if (
-            booleanPointInPolygon([e.latlng.lng, e.latlng.lat], l.toGeoJSON())
-          ) {
+          } else if (booleanPointInPolygon([e.latlng.lng, e.latlng.lat], l.toGeoJSON())) {
             features.push(l);
           }
         });
@@ -273,15 +238,9 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
       } else {
         L.responsivePopup({ offset: [10, 19] })
           .setLatLng(e.latlng)
-          .setContent(
-            ReactDOMServer.renderToString(
-              <FeatureSelector features={features}></FeatureSelector>,
-            ),
-          )
+          .setContent(ReactDOMServer.renderToString(<FeatureSelector features={features}></FeatureSelector>))
           .openOn(map);
-        const selectorFeatureNodes = document.getElementsByClassName(
-          'feature-selector-item',
-        );
+        const selectorFeatureNodes = document.getElementsByClassName('feature-selector-item');
         for (let i = 0; i < selectorFeatureNodes.length; i++) {
           selectorFeatureNodes[i].addEventListener('click', (ee) => {
             map.closePopup();
@@ -320,10 +279,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
 
   return (
     <div className="route__layer">
-      <LayerControl
-        position="topright"
-        collapsed={layerControlCollapsed}
-      ></LayerControl>
+      <LayerControl position="topright"></LayerControl>
       <GroupedLayer
         checked
         name="Station Markers"
@@ -374,7 +330,7 @@ const MeteoLayers = ({ layerControlCollapsed }) => {
         group="Map Layers"
         order={4}
         addLayerToStore={(layer) => {
-          meteoLayers.convection = layer;
+          meteoLayers.convectiveOutlooks = layer;
         }}
       >
         <ConvectiveOutlookLayer></ConvectiveOutlookLayer>

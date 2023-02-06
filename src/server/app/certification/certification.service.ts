@@ -16,9 +16,7 @@ export class CertificationService {
     repoCertification.description = dto.description;
 
     try {
-      const newCertification = await this.certificationRepository.save(
-        repoCertification,
-      );
+      const newCertification = await this.certificationRepository.save(repoCertification);
       return newCertification;
     } catch (err: any) {
       console.log(err.message);

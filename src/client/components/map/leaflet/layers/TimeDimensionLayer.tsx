@@ -15,10 +15,7 @@ import { CRS, WMSOptions } from 'leaflet';
 import L from 'leaflet';
 import { useEffect } from 'react';
 
-interface TimeDimensionLayerProps
-  extends WMSOptions,
-    LayerGroupProps,
-    PathProps {
+interface TimeDimensionLayerProps extends WMSOptions, LayerGroupProps, PathProps {
   url: string;
   options: {
     transparent: boolean;
@@ -33,10 +30,7 @@ interface TimeDimensionLayerProps
   layer: string;
 }
 
-const useTimeDimensionLayerElement = createElementHook<
-  L.TimeDimension.Layer.WMS,
-  TimeDimensionLayerProps
->(
+const useTimeDimensionLayerElement = createElementHook<L.TimeDimension.Layer.WMS, TimeDimensionLayerProps>(
   function createWMSLayer({ url, options }, ctx) {
     const wmsLayer = L.tileLayer.wms(url, options);
 
@@ -64,12 +58,8 @@ const TimeDimensionLayer = (props) => {
     L.TimeDimension.Layer.WMS.include({
       _getCapabilitiesUrl: function () {
         let url = this._baseLayer.getURL();
-        if (this._getCapabilitiesAlternateUrl)
-          url = this._getCapabilitiesAlternateUrl;
-        if (
-          this._baseLayer.options.subdomains &&
-          this._baseLayer.options.subdomains.length > 0
-        ) {
+        if (this._getCapabilitiesAlternateUrl) url = this._getCapabilitiesAlternateUrl;
+        if (this._baseLayer.options.subdomains && this._baseLayer.options.subdomains.length > 0) {
           url = url.replace('{s}', this._baseLayer.options.subdomains[0]);
         }
         const params = L.extend({}, this._getCapabilitiesParams, {

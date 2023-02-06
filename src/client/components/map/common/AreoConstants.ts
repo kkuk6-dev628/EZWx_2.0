@@ -63,8 +63,8 @@ export const MetarSkyValuesToString = {
 };
 
 // timestamp in seconds
-export const cacheStartTime = Math.floor(
-  new Date('2023-01-24T21:00:00.000+08:00').getTime() / 1000,
-);
+export const cacheStartTime = Math.floor(new Date('2023-01-24T21:00:00.000+08:00').getTime() / 1000);
 
 export const timeSliderInterval = 5 * 60 * 1000; // in millisecond
+
+export const windIconLimit = { windSpeed: 20, windGust: 25 };

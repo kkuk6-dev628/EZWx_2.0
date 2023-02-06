@@ -1,17 +1,11 @@
 import { Divider, Typography } from '@material-ui/core';
 import BasePopupFrame from './BasePopupFrame';
-import {
-  convertTimeFormat,
-  getAltitudeString,
-} from '../../common/AreoFunctions';
+import { convertTimeFormat, getAltitudeString } from '../../common/AreoFunctions';
 
 const SigmetPopup = ({ feature }) => {
   let title = 'G_AIRMET';
   let base;
-  if (
-    isNaN(parseInt(feature.properties.altitudelow)) ||
-    feature.properties.altitudelow == '0'
-  ) {
+  if (isNaN(parseInt(feature.properties.altitudelow)) || feature.properties.altitudelow == '0') {
     base = 'Surface';
   } else {
     base = getAltitudeString(feature.properties.altitudelow, false);

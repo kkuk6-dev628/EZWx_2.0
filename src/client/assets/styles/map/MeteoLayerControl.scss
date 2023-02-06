@@ -22,6 +22,14 @@
       font-weight: 600;
     }
   }
+  .btn-close{
+    position: absolute;
+    font-size: 18px;
+    color: white;
+    right: 8px;
+    top: 4px;
+    cursor: pointer;
+  }
   &-contents{
     margin: 8px 2px;
   }
@@ -29,6 +37,12 @@
     color: var(--color-white);
     & .MuiAccordionSummary-root{
       min-height: var(--layer-control-item-height);
+    }
+    .flight-category-filters{
+      display: contents;
+      label{
+        margin-left: 0px;
+      }
     }
   }
   .MuiPaper-elevation1{
@@ -58,12 +72,6 @@
     }
   }
 
-  .MuiFormGroup-root{
-    .PrivateSwitchBase-root-1{
-      padding: 4px!important;
-    }
-  }
-  
   .MuiFormControlLabel-root{
     height: 24px;
   }
@@ -77,15 +85,13 @@
     color: var(--color-white);
     // padding: 4px!important;
   }
-
+  .MuiIconButton-root{
+    margin:2px 4px 2px 4px;
+  }
   .MuiCheckbox-colorPrimary{
     color: var(--color-white);
     padding: 0;
-    // padding-right: 9px;
-    margin:9px;
-    margin-bottom: 2px;
-    margin-top: 2px;
-    border: 0px;
+    border: 0;
 
     .MuiSvgIcon-root{
       height: 18px;

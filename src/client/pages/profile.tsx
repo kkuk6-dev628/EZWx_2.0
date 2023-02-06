@@ -168,21 +168,14 @@ function profile({ setIsShowModal }: Props) {
 
   return (
     <div className="profile">
-      {showChangePasswordMOdal && (
-        <ChangePasswordModal setIsShowModal={setShowChangePasswordModal} />
-      )}
+      {showChangePasswordMOdal && <ChangePasswordModal setIsShowModal={setShowChangePasswordModal} />}
       <div className="container">
         <div className="profile__wrp">
           <div className="profile__left">
             <div className="profile__left__top profile__left__card">
               <div className="profile__lft__top__wrp">
                 <div className="profile__left__img">
-                  <Image
-                    height={50}
-                    width={50}
-                    src="/images/sunny.png"
-                    alt="profile"
-                  />
+                  <Image height={50} width={50} src="/images/sunny.png" alt="profile" />
                 </div>
                 <h3 className="profile__name">{userInfo.displayName}</h3>
               </div>
@@ -201,12 +194,8 @@ function profile({ setIsShowModal }: Props) {
               </div>
             </div>
             <div className="profile__left__btm profile__left__card">
-              <h3 className="profile__left__btm__txt">
-                Trial membership (Expired)
-              </h3>
-              <h3 className="profile__left__btm__txt">
-                Expired on Nov 12, 2022
-              </h3>
+              <h3 className="profile__left__btm__txt">Trial membership (Expired)</h3>
+              <h3 className="profile__left__btm__txt">Expired on Nov 12, 2022</h3>
               <div className="profile__left__btn__area">
                 <button className="profile__left__btn">Join</button>
               </div>
@@ -225,18 +214,12 @@ function profile({ setIsShowModal }: Props) {
                       type="email"
                       {...register('email')}
                       id="email"
-                      className={`csuinp__input ${
-                        errors.email ? 'csuinp__input--error' : ''
-                      }`}
+                      className={`csuinp__input ${errors.email ? 'csuinp__input--error' : ''}`}
                       placeholder="Email for Verification"
                       value={userInfo.email ?? ''}
                       readOnly
                     />
-                    {errors.email && (
-                      <p className="csuinp__error__msg">
-                        {errors.email.message}
-                      </p>
-                    )}
+                    {errors.email && <p className="csuinp__error__msg">{errors.email.message}</p>}
                   </div>
                 </div>
               </div>
@@ -250,19 +233,13 @@ function profile({ setIsShowModal }: Props) {
                       type="text"
                       {...register('firstname')}
                       id="firstname"
-                      className={`csuinp__input ${
-                        errors.firstname ? 'csuinp__input--error' : ''
-                      }`}
+                      className={`csuinp__input ${errors.firstname ? 'csuinp__input--error' : ''}`}
                       placeholder="First Name"
                       value={userInfo.firstname ?? ''}
                       defaultValue={userInfo.firstname}
                       onChange={(e) => handleInfoChange(e, 'firstname')}
                     />
-                    {errors.firstname && (
-                      <p className="csuinp__error__msg">
-                        {errors.firstname.message}
-                      </p>
-                    )}
+                    {errors.firstname && <p className="csuinp__error__msg">{errors.firstname.message}</p>}
                   </div>
                 </div>
               </div>
@@ -276,27 +253,18 @@ function profile({ setIsShowModal }: Props) {
                       type="text"
                       {...register('lastname')}
                       id="lastname"
-                      className={`csuinp__input ${
-                        errors.lastname ? 'csuinp__input--error' : ''
-                      }`}
+                      className={`csuinp__input ${errors.lastname ? 'csuinp__input--error' : ''}`}
                       placeholder="Last Name"
                       value={userInfo.lastname ?? ''}
                       onChange={(e) => handleInfoChange(e, 'lastname')}
                     />
-                    {errors.lastname && (
-                      <p className="csuinp__error__msg">
-                        {errors.lastname.message}
-                      </p>
-                    )}
+                    {errors.lastname && <p className="csuinp__error__msg">{errors.lastname.message}</p>}
                   </div>
                 </div>
               </div>
               <div className="csuinp">
                 <div className="csuinp__ipt__wrp">
-                  <label
-                    htmlFor="displayname"
-                    className="csuinp__lbl csuinp__lbl--opt"
-                  >
+                  <label htmlFor="displayname" className="csuinp__lbl csuinp__lbl--opt">
                     Display Name
                   </label>
                   <div className="csuinp__wrp__two">
@@ -304,9 +272,7 @@ function profile({ setIsShowModal }: Props) {
                       type="text"
                       {...register('displayName')}
                       id="displayname"
-                      className={`csuinp__input ${
-                        errors.displayName ? 'csuinp__input--error' : ''
-                      }`}
+                      className={`csuinp__input ${errors.displayName ? 'csuinp__input--error' : ''}`}
                       value={userInfo.displayName ?? ''}
                       onChange={(e) => handleInfoChange(e, 'displayName')}
                     />
@@ -315,10 +281,7 @@ function profile({ setIsShowModal }: Props) {
               </div>
               <div className="csuinp">
                 <div className="csuinp__ipt__wrp">
-                  <label
-                    htmlFor="email"
-                    className="csuinp__lbl csuinp__lbl--opt"
-                  >
+                  <label htmlFor="email" className="csuinp__lbl csuinp__lbl--opt">
                     Alternate Email
                   </label>
                   <div className="csuinp__wrp__two">
@@ -326,9 +289,7 @@ function profile({ setIsShowModal }: Props) {
                       type="text"
                       {...register('alternateEmail')}
                       id="alternateEmail"
-                      className={`csuinp__input ${
-                        errors.alternateEmail ? 'csuinp__input--error' : ''
-                      }`}
+                      className={`csuinp__input ${errors.alternateEmail ? 'csuinp__input--error' : ''}`}
                       value={userInfo.alternateEmail ?? ''}
                       onChange={(e) => handleInfoChange(e, 'alternateEmail')}
                     />
@@ -337,10 +298,7 @@ function profile({ setIsShowModal }: Props) {
               </div>
               <div className="csuinp">
                 <div className="csuinp__ipt__wrp">
-                  <label
-                    htmlFor="address1"
-                    className="csuinp__lbl csuinp__lbl--opt"
-                  >
+                  <label htmlFor="address1" className="csuinp__lbl csuinp__lbl--opt">
                     Address 1
                   </label>
                   <div className="csuinp__wrp__two">
@@ -348,9 +306,7 @@ function profile({ setIsShowModal }: Props) {
                       type="text"
                       {...register('address1')}
                       id="address1"
-                      className={`csuinp__input ${
-                        errors.address1 ? 'csuinp__input--error' : ''
-                      }`}
+                      className={`csuinp__input ${errors.address1 ? 'csuinp__input--error' : ''}`}
                       value={userInfo.address1 ?? ''}
                       onChange={(e) => handleInfoChange(e, 'address1')}
                     />
@@ -359,10 +315,7 @@ function profile({ setIsShowModal }: Props) {
               </div>
               <div className="csuinp">
                 <div className="csuinp__ipt__wrp">
-                  <label
-                    htmlFor="address2"
-                    className="csuinp__lbl csuinp__lbl--opt"
-                  >
+                  <label htmlFor="address2" className="csuinp__lbl csuinp__lbl--opt">
                     Address 2
                   </label>
                   <div className="csuinp__wrp__two">
@@ -370,9 +323,7 @@ function profile({ setIsShowModal }: Props) {
                       type="text"
                       {...register('address2')}
                       id="address2"
-                      className={`csuinp__input ${
-                        errors.lastname ? 'csuinp__input--error' : ''
-                      }`}
+                      className={`csuinp__input ${errors.lastname ? 'csuinp__input--error' : ''}`}
                       value={userInfo.address2 ?? ''}
                       onChange={(e) => handleInfoChange(e, 'address2')}
                     />
@@ -381,10 +332,7 @@ function profile({ setIsShowModal }: Props) {
               </div>
               <div className="csuinp">
                 <div className="csuinp__ipt__wrp">
-                  <label
-                    htmlFor="city"
-                    className="csuinp__lbl csuinp__lbl--opt"
-                  >
+                  <label htmlFor="city" className="csuinp__lbl csuinp__lbl--opt">
                     City
                   </label>
                   <div className="csuinp__wrp__two">
@@ -392,9 +340,7 @@ function profile({ setIsShowModal }: Props) {
                       type="text"
                       {...register('city')}
                       id="city"
-                      className={`csuinp__input ${
-                        errors.lastname ? 'csuinp__input--error' : ''
-                      }`}
+                      className={`csuinp__input ${errors.lastname ? 'csuinp__input--error' : ''}`}
                       value={userInfo.city ?? ''}
                       onChange={(e) => handleInfoChange(e, 'city')}
                     />
@@ -531,9 +477,7 @@ function profile({ setIsShowModal }: Props) {
                       type="text"
                       {...register('zip')}
                       id="zip"
-                      className={`csuinp__input ${
-                        errors.lastname ? 'csuinp__input--error' : ''
-                      }`}
+                      className={`csuinp__input ${errors.lastname ? 'csuinp__input--error' : ''}`}
                       value={userInfo.zip ?? ''}
                       onChange={(e) => handleInfoChange(e, 'zip')}
                     />
@@ -575,9 +519,7 @@ function profile({ setIsShowModal }: Props) {
                       type="phone"
                       {...register('phone')}
                       id="phone"
-                      className={`csuinp__input ${
-                        errors.phone ? 'csuinp__input--error' : ''
-                      }`}
+                      className={`csuinp__input ${errors.phone ? 'csuinp__input--error' : ''}`}
                       value={userInfo.phone ?? ''}
                       onChange={(e) => handleInfoChange(e, 'phone')}
                     />
@@ -611,34 +553,19 @@ function profile({ setIsShowModal }: Props) {
                           styles={{
                             control: (baseStyles, state) => ({
                               ...baseStyles,
-                              borderColor: errors.certifications
-                                ? '#dc3545'
-                                : state.isFocused
-                                ? '#886ab5'
-                                : '#E5E5E5',
+                              borderColor: errors.certifications ? '#dc3545' : state.isFocused ? '#886ab5' : '#E5E5E5',
                             }),
                           }}
                           closeMenuOnSelect={false}
-                          getOptionLabel={(option: { description: string }) =>
-                            option?.description
-                          }
-                          getOptionValue={(option: { name: string }) =>
-                            option?.name
-                          }
+                          getOptionLabel={(option: { description: string }) => option?.description}
+                          getOptionValue={(option: { name: string }) => option?.name}
                           className=" csuinp__input--select"
-                          options={
-                            certificationsOptions.length > 0 &&
-                            certificationsOptions
-                          }
+                          options={certificationsOptions.length > 0 && certificationsOptions}
                           components={animatedComponents}
                         />
                       )}
                     />
-                    {errors.certifications && (
-                      <p className="csuinp__error__msg">
-                        {errors.certifications.message}
-                      </p>
-                    )}
+                    {errors.certifications && <p className="csuinp__error__msg">{errors.certifications.message}</p>}
                   </div>
                 </div>
               </div>
@@ -659,11 +586,7 @@ function profile({ setIsShowModal }: Props) {
                       className="react-switch"
                       id="material-switch"
                     />
-                    <label
-                      onClick={() => handleChange(item.id)}
-                      className="modal__label text"
-                      htmlFor={item.id}
-                    >
+                    <label onClick={() => handleChange(item.id)} className="modal__label text" htmlFor={item.id}>
                       {item.name}
                     </label>
                   </div>

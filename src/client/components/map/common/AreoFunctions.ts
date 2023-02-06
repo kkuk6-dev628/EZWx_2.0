@@ -1,22 +1,9 @@
-import {
-  PersonalMinimumItem,
-  PersonalMinimums,
-} from './../../../store/user/UserSettings';
-import {
-  cacheStartTime,
-  MetarMarkerTypes,
-  MetarSkyValuesToString,
-  WeatherCausings,
-} from './AreoConstants';
+import { PersonalMinimumItem, PersonalMinimums } from './../../../store/user/UserSettings';
+import { cacheStartTime, MetarMarkerTypes, MetarSkyValuesToString, WeatherCausings } from './AreoConstants';
 import geojson2svg, { Renderer } from 'geojson-to-svg';
 import { SkyCondition } from './Interfaces';
 
-export const getAltitudeString = (
-  value: string,
-  isHundred = true,
-  fzlbase?: string,
-  fzltop?: string,
-): string => {
+export const getAltitudeString = (value: string, isHundred = true, fzlbase?: string, fzltop?: string): string => {
   if (value === 'SFC' || value == '0') {
     return 'Surface';
   } else if (value === 'FZL') {
@@ -86,20 +73,12 @@ export const simpleTimeOnlyFormat = (time: Date) => {
 };
 
 export const getThumbnail = (feature, style) => {
-  const svgString = geojson2svg()
-    .styles({ Polygon: style })
-    .data(feature)
-    .render();
+  const svgString = geojson2svg().styles({ Polygon: style }).data(feature).render();
   return svgString;
 };
 
-export const getBBoxFromPointZoom = (
-  pixelDelta: number,
-  latlng: any,
-  zoom: number,
-): any => {
-  const latlngDelta =
-    (pixelDelta * Math.cos((Math.PI * latlng.lat) / 180)) / Math.pow(2, zoom);
+export const getBBoxFromPointZoom = (pixelDelta: number, latlng: any, zoom: number): any => {
+  const latlngDelta = (pixelDelta * Math.cos((Math.PI * latlng.lat) / 180)) / Math.pow(2, zoom);
   return {
     latMin: latlng.lat - latlngDelta / 2,
     latMax: latlng.lat + latlngDelta / 2,
@@ -162,25 +141,16 @@ export const diffMinutes = (date1: Date, date2: Date) => {
   return Math.abs(Math.round(diff));
 };
 
-export const getMetarVisibilityCategory = (
-  visibility: number,
-  personalMinimums: PersonalMinimums,
-): any[] => {
+export const getMetarVisibilityCategory = (visibility: number, personalMinimums: PersonalMinimums): any[] => {
   if (visibility === null || !isFinite(visibility)) {
     return [];
   }
   let visibilityMinimum = personalMinimums.VFR;
   if (visibility < personalMinimums.IFR.visibility) {
     visibilityMinimum = personalMinimums.LIFR;
-  } else if (
-    visibility >= personalMinimums.IFR.visibility &&
-    visibility < personalMinimums.MVFR.visibility
-  ) {
+  } else if (visibility >= personalMinimums.IFR.visibility && visibility < personalMinimums.MVFR.visibility) {
     visibilityMinimum = personalMinimums.IFR;
-  } else if (
-    visibility >= personalMinimums.MVFR.visibility &&
-    visibility <= personalMinimums.VFR.visibility
-  ) {
+  } else if (visibility >= personalMinimums.MVFR.visibility && visibility <= personalMinimums.VFR.visibility) {
     visibilityMinimum = personalMinimums.MVFR;
   } else if (visibility > personalMinimums.VFR.visibility) {
     visibilityMinimum = personalMinimums.VFR;
@@ -358,25 +328,16 @@ export const visibilityMileToFraction = (mile: number): string => {
   return fraction;
 };
 
-export const getMetarCeilingCategory = (
-  ceiling: number,
-  personalMinimums: PersonalMinimums,
-): any[] => {
+export const getMetarCeilingCategory = (ceiling: number, personalMinimums: PersonalMinimums): any[] => {
   if (ceiling === null || !isFinite(ceiling)) {
     return [undefined, '#000', Infinity];
   }
   let ceilingMinimum = personalMinimums.VFR;
   if (ceiling < personalMinimums.IFR.ceiling) {
     ceilingMinimum = personalMinimums.LIFR;
-  } else if (
-    ceiling >= personalMinimums.IFR.ceiling &&
-    ceiling < personalMinimums.MVFR.ceiling
-  ) {
+  } else if (ceiling >= personalMinimums.IFR.ceiling && ceiling < personalMinimums.MVFR.ceiling) {
     ceilingMinimum = personalMinimums.IFR;
-  } else if (
-    ceiling >= personalMinimums.MVFR.ceiling &&
-    ceiling <= personalMinimums.VFR.ceiling
-  ) {
+  } else if (ceiling >= personalMinimums.MVFR.ceiling && ceiling <= personalMinimums.VFR.ceiling) {
     ceilingMinimum = personalMinimums.MVFR;
   } else if (ceiling > personalMinimums.VFR.ceiling) {
     ceilingMinimum = personalMinimums.VFR;
@@ -385,15 +346,9 @@ export const getMetarCeilingCategory = (
   return [ceilingMinimum.cat, ceilingMinimum.color];
 };
 
-export const getLowestCeiling = (
-  skyConditions: SkyCondition[],
-): SkyCondition => {
+export const getLowestCeiling = (skyConditions: SkyCondition[]): SkyCondition => {
   skyConditions = skyConditions.filter((skyCondition) => {
-    return (
-      skyCondition.skyCover === 'OVC' ||
-      skyCondition.skyCover === 'OVX' ||
-      skyCondition.skyCover === 'BKN'
-    );
+    return skyCondition.skyCover === 'OVC' || skyCondition.skyCover === 'OVX' || skyCondition.skyCover === 'BKN';
   });
   if (skyConditions && skyConditions.length > 0) {
     const skyCondition = skyConditions.reduce(function (acc, loc) {
@@ -414,10 +369,7 @@ export const getSkyConditions = (feature: GeoJSON.Feature): SkyCondition[] => {
           cloudBase: feature.properties.vert_vis_ft,
         });
       } else {
-        if (
-          feature.properties[`sky_cover_${i}`] === 'CLR' &&
-          feature.properties.auto == null
-        ) {
+        if (feature.properties[`sky_cover_${i}`] === 'CLR' && feature.properties.auto == null) {
           skyConditions.push({
             skyCover: 'SKC',
             cloudBase: feature.properties[`cloud_base_ft_agl_${i}`],
@@ -1141,6 +1093,42 @@ export const getMetarDecodedWxString = (wxString: string): string => {
       break;
     case 'IC':
       result = 'Ice cystals';
+      break;
+    case 'IC DRSN':
+      result = 'Ice crystals and drifting snow';
+      break;
+    case 'VCSH DRSN':
+      result = 'Showers in the vicinity and drifting snow';
+      break;
+    case 'FZFG UP':
+      result = 'Unknown precipitation and freezing fog';
+      break;
+    case '-FZDZ BR':
+      result = 'Light freezing drizzle and mist';
+      break;
+    case 'FZDZ BR':
+      result = 'Moderate freezing drizzle and mist';
+      break;
+    case '+FZDZ BR':
+      result = 'Heavy freezing drizzle and mist';
+      break;
+    case '-FZDZ FZFG':
+      result = 'Light freezing drizzle and freezing fog';
+      break;
+    case 'FZDZ FZFG':
+      result = 'Moderate freezing drizzle and freezing fog';
+      break;
+    case '+FZDZ FZFG':
+      result = 'Heavy freezing drizzle and freezing fog';
+      break;
+    case '-TSPL':
+      result = 'Thunderstorms and light ice pellets';
+      break;
+    case 'TSPL':
+      result = 'Thunderstorms and moderate ice pellets';
+      break;
+    case '+TSPL':
+      result = 'Thunderstorms and heavy ice pellets';
       break;
   }
   return result;
