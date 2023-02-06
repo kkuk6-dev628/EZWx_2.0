@@ -94,7 +94,7 @@
     "sass": "^1.57.1",
     "styled-components": "^5.3.6",
     "suncalc": "^1.9.0",
-    "swiper": "^8.4.7",
+    "swiper": "^9.0.2",
     "ts-morph": "^17.0.1",
     "tsimportlib": "^0.0.3",
     "typeorm": "^0.3.11"
