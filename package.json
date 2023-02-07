@@ -112,7 +112,7 @@
     "@types/leaflet": "^1.9.0",
     "@types/leaflet-responsive-popup": "^0.6.1",
     "@types/lodash.groupby": "^4.6.7",
-    "@types/node": "^18.11.18",
+    "@types/node": "^18.11.19",
     "@types/passport-google-oauth20": "^2.0.11",
     "@types/passport-jwt": "^3.0.8",
     "@types/passport-local": "^1.0.34",
