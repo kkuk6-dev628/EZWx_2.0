@@ -6,11 +6,7 @@ import { useLayerControlContext } from './layerControlContext';
 import { useMap } from 'react-leaflet';
 
 export interface OrderedLayerProps {
-  checked?: boolean;
-  name: string;
-  group: string;
-  pickable?: boolean;
-  order: number;
+  checked: boolean;
   addLayerToStore?: (groupedLayer: Layer) => any;
   children: ReactNode[] | ReactNode;
 }

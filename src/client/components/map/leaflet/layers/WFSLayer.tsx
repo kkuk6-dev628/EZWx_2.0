@@ -9,7 +9,6 @@ import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { generateHash } from '../../common/AreoFunctions';
 import GeoJSON, { FeatureCollection } from 'geojson';
 import { AppState } from '../../../../store/store';
-import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
 
 interface WFSLayerProps {
   url: string;
@@ -18,6 +17,7 @@ interface WFSLayerProps {
   typeName: string;
   propertyNames?: string[];
   enableBBoxQuery?: boolean;
+  geometryColumn?: string;
   interactive?: boolean;
   showLabelZoom?: number;
   getLabel?: (feature: GeoJSON.Feature) => string;
@@ -47,6 +47,7 @@ const WFSLayer = React.forwardRef(
       typeName,
       propertyNames,
       enableBBoxQuery,
+      geometryColumn,
       interactive = true,
       showLabelZoom = 5,
       getLabel,
@@ -70,8 +71,6 @@ const WFSLayer = React.forwardRef(
     const [displayedData, setDisplayedData] = useState<FeatureCollection>(emptyGeoJson);
 
     const [geoJsonKey, setGeoJsonKey] = useState(12034512);
-
-    const meteoLayerControl = useMeteoLayersContext();
 
     useEffect(() => {
       const newKey = generateHash(JSON.stringify(displayedData));
@@ -160,10 +159,11 @@ const WFSLayer = React.forwardRef(
         params.cql_filter = filter;
       }
       if (enableBBoxQuery) {
+        const geom = geometryColumn || 'wkb_geometry';
         if (params.cql_filter) {
-          params.cql_filter += ` AND BBOX(wkb_geometry, ${map.getBounds().toBBoxString()})`;
+          params.cql_filter += ` AND BBOX(${geom}, ${map.getBounds().toBBoxString()})`;
         } else {
-          params.cql_filter = `BBOX(wkb_geometry, ${map.getBounds().toBBoxString()})`;
+          params.cql_filter = `BBOX(${geom}, ${map.getBounds().toBBoxString()})`;
         }
       }
       params.outputFormat = 'application/json';

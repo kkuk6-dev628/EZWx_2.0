@@ -32,18 +32,12 @@ import {
 } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import { MetarMarkerTypes } from '../../common/AreoConstants';
+import { MetarMarkerTypes, POSITION_CLASSES } from '../../common/AreoConstants';
 import Image from 'next/image';
 import Slider from '@mui/material/Slider';
 import { useMeteoLayersContext } from './MeteoLayerControlContext';
 import { jsonClone } from '../../../utils/ObjectUtil';
-
-const POSITION_CLASSES: { [key: string]: string } = {
-  bottomleft: 'leaflet-bottom leaflet-left',
-  bottomright: 'leaflet-bottom leaflet-right',
-  topleft: 'leaflet-top leaflet-left',
-  topright: 'leaflet-top leaflet-right',
-};
+import RangeSlider from '../../../shared/RangeSlider';
 
 interface IProps {
   children?: ReactElement[];
@@ -276,7 +270,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                 </AccordionSummary>
                 <AccordionDetails>
                   <RadioGroup
-                    defaultValue={layerStatus.metarState.markerType}
+                    value={layerStatus.metarState.markerType}
                     name="radio-buttons-group-metar"
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       map.closePopup();
@@ -301,6 +295,9 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
+                              if (layerStatus.metarState.markerType !== MetarMarkerTypes.flightCategory.value) {
+                                return;
+                              }
                               const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
                               cloned.flightCategory.all.checked = true;
                               cloned.flightCategory.vfr.checked = true;
@@ -323,6 +320,9 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
+                              if (layerStatus.metarState.markerType !== MetarMarkerTypes.flightCategory.value) {
+                                return;
+                              }
                               const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
                               cloned.flightCategory.vfr.checked = !layerStatus.metarState.flightCategory.vfr.checked;
                               cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
@@ -345,6 +345,9 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
+                              if (layerStatus.metarState.markerType !== MetarMarkerTypes.flightCategory.value) {
+                                return;
+                              }
                               const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
                               cloned.flightCategory.mvfr.checked = !layerStatus.metarState.flightCategory.mvfr.checked;
                               cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
@@ -367,6 +370,9 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
+                              if (layerStatus.metarState.markerType !== MetarMarkerTypes.flightCategory.value) {
+                                return;
+                              }
                               const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
                               cloned.flightCategory.ifr.checked = !layerStatus.metarState.flightCategory.ifr.checked;
                               cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
@@ -389,6 +395,9 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
+                              if (layerStatus.metarState.markerType !== MetarMarkerTypes.flightCategory.value) {
+                                return;
+                              }
                               const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
                               cloned.flightCategory.lifr.checked = !layerStatus.metarState.flightCategory.lifr.checked;
                               cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
@@ -1140,6 +1149,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                                 const cloned = jsonClone(layerStatus.pirepState) as PirepLayerState;
                                 cloned.altitude.valueMin = cloned.altitude.min;
                                 cloned.altitude.valueMax = cloned.altitude.max;
+                                cloned.altitude.all = true;
                                 dispatch(setPirep(cloned));
                               }}
                             />
@@ -1149,13 +1159,17 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                       </div>
                     </div>
                     <div className="slider">
-                      <Slider
+                      <RangeSlider
                         getAriaLabel={() => 'Altitude range'}
                         min={layerStatus.pirepState.altitude.min}
                         max={layerStatus.pirepState.altitude.max}
-                        step={2}
+                        step={5}
                         value={[layerStatus.pirepState.altitude.valueMin, layerStatus.pirepState.altitude.valueMax]}
+                        mindistance={20}
                         onChange={(_e: Event, newValues: number[]) => {
+                          if (!Array.isArray(newValues)) {
+                            return;
+                          }
                           const cloned = jsonClone(layerStatus.pirepState) as PirepLayerState;
                           cloned.altitude.valueMin = newValues[0];
                           cloned.altitude.valueMax = newValues[1];

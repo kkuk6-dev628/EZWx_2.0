@@ -1,4 +1,3 @@
-import { ILayerObj } from './LayerControl';
 import { createContext, useContext } from 'react';
 import { Layer } from 'leaflet';
 

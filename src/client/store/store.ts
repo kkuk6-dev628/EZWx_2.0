@@ -1,3 +1,4 @@
+import BaseMapLayerControlSlice from './layers/BaseMapLayerControl';
 import UserSettingsSlice from './user/UserSettings';
 import { LayerControlSlice } from './layers/LayerControl';
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
@@ -16,6 +17,7 @@ const makeStore = () =>
       [authSlice.name]: authSlice.reducer,
       [LayerControlSlice.name]: LayerControlSlice.reducer,
       [UserSettingsSlice.name]: UserSettingsSlice.reducer,
+      [BaseMapLayerControlSlice.name]: BaseMapLayerControlSlice.reducer,
     },
     devTools: process.env.NODE_ENV !== 'production',
     middleware: (getDefaultMiddlewares) => getDefaultMiddlewares().concat(apiSlice.middleware),

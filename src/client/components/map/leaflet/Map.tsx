@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
+import { MapContainer, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import styles from './Map.module.css';
@@ -17,28 +17,26 @@ import {
   SvgThreeDot,
 } from '../../utils/SvgIcons';
 import ReactDOMServer from 'react-dom/server';
-import LayerControl, { GroupedLayer } from './layer-control/LayerControl';
 import { useRouter } from 'next/router';
 import Route from '../../shared/Route';
 import CollapsibleBar from '../../shared/CollapsibleBar';
 import DateSliderModal from '../../shared/DateSliderModal';
 import MeteoLayers from './layers/MeteoLayers';
 import './layers/CacheTileLayer';
-import WFSLayer from './layers/WFSLayer';
-import Slider from '@mui/material/Slider';
 import { useDispatch } from 'react-redux';
 import { selectLayerControlShow, setLayerControlShow } from '../../../store/layers/LayerControl';
 import { useSelector } from 'react-redux';
+import BaseMapLayers from './layers/BaseMapLayers';
+import { selectBaseMapLayerControlShow, setBaseMapLayerControlShow } from '../../../store/layers/BaseMapLayerControl';
 
 function LeafletMap() {
   const { pathname } = useRouter();
   const [isShowTabs, setIsShowTabs] = useState(false);
   const [isShowDateModal, setIsShowDateModal] = useState(false);
   const [isShowModal, setIsShowModal] = useState(false);
-  const [layerControlCollapsed, setLayerControlCollapsed] = useState(true);
-  const [baseMapControlCollapsed, setBaseMapControlCollapsed] = useState(true);
   const dispatch = useDispatch();
   const meteoLayerControlShow = useSelector(selectLayerControlShow);
+  const baseMapLayerControlShow = useSelector(selectBaseMapLayerControlShow);
 
   useEffect(() => {
     if (pathname === '/try-ezwxbrief') {
@@ -49,12 +47,12 @@ function LeafletMap() {
   const handler = (id: string) => {
     switch (id) {
       case 'layer':
-        setBaseMapControlCollapsed(true);
         dispatch(setLayerControlShow(!meteoLayerControlShow));
+        dispatch(setBaseMapLayerControlShow(false));
         break;
       case 'basemap':
         dispatch(setLayerControlShow(false));
-        setBaseMapControlCollapsed(!baseMapControlCollapsed);
+        dispatch(setBaseMapLayerControlShow(!baseMapLayerControlShow));
         break;
       case 'route':
         setIsShowModal(true);
@@ -138,66 +136,7 @@ function LeafletMap() {
         // preferCanvas={true}
         renderer={L.canvas()}
       >
-        <LayerControl
-          position="topright"
-          collapsed={baseMapControlCollapsed}
-          exclusive={true}
-          defaultLayer="Street"
-          exclusiveSkipLayers={['U.S. States']}
-        >
-          <GroupedLayer checked name="U.S. States" group="Base Admin" pickable={false} order={0}>
-            <WFSLayer
-              url="http://3.95.80.120:8080/geoserver/topp/ows"
-              maxFeatures={256}
-              typeName="topp:states"
-              interactive={false}
-              style={() => {
-                return {
-                  fillOpacity: 0,
-                  weight: 1,
-                };
-              }}
-            ></WFSLayer>
-          </GroupedLayer>
-          <GroupedLayer checked name="Street" group="Base Maps" order={2}>
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              // @ts-ignore
-              useCache={false}
-            />
-          </GroupedLayer>
-          <GroupedLayer checked name="Topo" group="Base Maps" order={3}>
-            <TileLayer
-              url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
-              // @ts-ignore
-              useCache={false}
-            />
-          </GroupedLayer>
-          <GroupedLayer checked name="Terrain" group="Base Maps" order={4}>
-            <TileLayer
-              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
-              // @ts-ignore
-              useCache={false}
-            />
-          </GroupedLayer>
-          <GroupedLayer checked name="Dark" group="Base Maps" order={5}>
-            <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-              // @ts-ignore
-              subdomains="abcd"
-              // @ts-ignore
-              useCache={false}
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            />
-          </GroupedLayer>
-          <GroupedLayer checked name="Satellite" group="Base Maps" order={6}>
-            <TileLayer
-              url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
-              // @ts-ignore
-              useCache={false}
-            />
-          </GroupedLayer>
-        </LayerControl>
+        <BaseMapLayers></BaseMapLayers>
         <MeteoLayers></MeteoLayers>
         <ZoomControl
           position="topright"

@@ -835,46 +835,6 @@ const NbmMarkersLayer = () => {
     }
     setFilteredData({ type: 'FeatureCollection', features: features } as any);
     return features;
-    let indexedFeatures = indexedData;
-    if (!indexedFeatures) {
-      indexedFeatures = buildIndexedData(features);
-    }
-    if (!indexedFeatures) return [];
-    const filteredFeatures = {};
-    const obsTime = new Date(observationTime).getTime();
-    const startIndex = Math.floor((obsTime - 75 * 60 * 1000) / timeSliderInterval);
-    const endIndex = Math.floor(obsTime / timeSliderInterval);
-    for (let index = startIndex; index < endIndex; index++) {
-      const iData = indexedFeatures[index] as GeoJSON.Feature[];
-      if (iData) {
-        iData.map((feature) => {
-          if (layerStatus.flightCategory.all.checked === false) {
-            if (!layerStatus.flightCategory.vfr.checked && feature.properties.flight_category === 'VFR') {
-              return;
-            }
-            if (!layerStatus.flightCategory.mvfr.checked && feature.properties.flight_category === 'MVFR') {
-              return;
-            }
-            if (!layerStatus.flightCategory.ifr.checked && feature.properties.flight_category === 'IFR') {
-              return;
-            }
-            if (!layerStatus.flightCategory.lifr.checked && feature.properties.flight_category === 'LIFR') {
-              return;
-            }
-          }
-          if (filteredFeatures[feature.properties.station_id]) {
-            const prevFeature = filteredFeatures[feature.properties.station_id];
-            if (new Date(prevFeature.properties.observation_time) < new Date(feature.properties.observation_time)) {
-              filteredFeatures[feature.properties.station_id] = feature;
-            }
-          } else {
-            filteredFeatures[feature.properties.station_id] = feature;
-          }
-        });
-      }
-    }
-    const result = Object.values(filteredFeatures);
-    return result as any;
   };
 
   return (

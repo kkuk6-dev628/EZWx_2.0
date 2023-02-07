@@ -1,3 +1,10 @@
+// timestamp in seconds
+export const cacheStartTime = Math.floor(new Date('2023-01-24T21:00:00.000+08:00').getTime() / 1000);
+
+export const timeSliderInterval = 5 * 60 * 1000; // in millisecond
+
+export const windIconLimit = { windSpeed: 20, windGust: 25 };
+
 export const WeatherCausings = {
   PCPN: 'precipitation',
   BR: 'mist',
@@ -62,9 +69,9 @@ export const MetarSkyValuesToString = {
   OVX: 'Indefinite ceiling',
 };
 
-// timestamp in seconds
-export const cacheStartTime = Math.floor(new Date('2023-01-24T21:00:00.000+08:00').getTime() / 1000);
-
-export const timeSliderInterval = 5 * 60 * 1000; // in millisecond
-
-export const windIconLimit = { windSpeed: 20, windGust: 25 };
+export const POSITION_CLASSES: { [key: string]: string } = {
+  bottomleft: 'leaflet-bottom leaflet-left',
+  bottomright: 'leaflet-bottom leaflet-right',
+  topleft: 'leaflet-top leaflet-left',
+  topright: 'leaflet-top leaflet-right',
+};

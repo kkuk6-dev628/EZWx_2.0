@@ -837,7 +837,10 @@ const MetarsLayer = () => {
       const iData = indexedFeatures[index] as GeoJSON.Feature[];
       if (iData) {
         iData.map((feature) => {
-          if (layerStatus.flightCategory.all.checked === false) {
+          if (
+            layerStatus.markerType === MetarMarkerTypes.flightCategory.value &&
+            layerStatus.flightCategory.all.checked === false
+          ) {
             if (!layerStatus.flightCategory.vfr.checked && feature.properties.flight_category === 'VFR') {
               return;
             }
