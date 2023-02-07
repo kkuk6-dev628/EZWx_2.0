@@ -4,9 +4,12 @@ import { TileLayer } from 'react-leaflet';
 import { useBaseMapLayersContext } from '../layer-control/BaseMapLayerControlContext';
 import WFSLayer from './WFSLayer';
 import BaseMapLayerControl from '../layer-control/BaseMapLayerControl';
+import { useSelector } from 'react-redux';
+import { selectBaseMapLayerControl } from '../../../../store/layers/BaseMapLayerControl';
 
 const BaseMapLayers = () => {
   const baseMapLayers = useBaseMapLayersContext();
+  const baseMapLayerStatus = useSelector(selectBaseMapLayerControl);
 
   // useEffect(() => {
   //   L.GridLayer.GridDebug = L.GridLayer.extend({
@@ -31,7 +34,7 @@ const BaseMapLayers = () => {
     <div className="route__layer">
       <BaseMapLayerControl position="topright"></BaseMapLayerControl>
       <GroupedLayer
-        checked
+        checked={baseMapLayerStatus.usProvincesState.checked}
         addLayerToStore={(layer) => {
           baseMapLayers.usProvinces = layer;
         }}
@@ -50,7 +53,7 @@ const BaseMapLayers = () => {
         ></WFSLayer>
       </GroupedLayer>
       <GroupedLayer
-        checked
+        checked={baseMapLayerStatus.canadianProvincesState.checked}
         addLayerToStore={(layer) => {
           baseMapLayers.canadianProvinces = layer;
         }}
@@ -72,7 +75,7 @@ const BaseMapLayers = () => {
         ></WFSLayer>
       </GroupedLayer>
       <GroupedLayer
-        checked={false}
+        checked={baseMapLayerStatus.countryWarningAreaState.checked}
         addLayerToStore={(layer) => {
           baseMapLayers.countryWarningAreas = layer;
         }}
@@ -94,7 +97,7 @@ const BaseMapLayers = () => {
         ></WFSLayer>
       </GroupedLayer>
       <GroupedLayer
-        checked
+        checked={baseMapLayerStatus.streetState.checked}
         addLayerToStore={(layer) => {
           baseMapLayers.street = layer;
         }}
@@ -106,7 +109,7 @@ const BaseMapLayers = () => {
         />
       </GroupedLayer>
       <GroupedLayer
-        checked={false}
+        checked={baseMapLayerStatus.topoState.checked}
         addLayerToStore={(layer) => {
           baseMapLayers.topo = layer;
         }}
@@ -118,7 +121,7 @@ const BaseMapLayers = () => {
         />
       </GroupedLayer>
       <GroupedLayer
-        checked={false}
+        checked={baseMapLayerStatus.terrainState.checked}
         addLayerToStore={(layer) => {
           baseMapLayers.terrain = layer;
         }}
@@ -130,7 +133,7 @@ const BaseMapLayers = () => {
         />
       </GroupedLayer>
       <GroupedLayer
-        checked={false}
+        checked={baseMapLayerStatus.darkState.checked}
         addLayerToStore={(layer) => {
           baseMapLayers.dark = layer;
         }}
@@ -145,7 +148,7 @@ const BaseMapLayers = () => {
         />
       </GroupedLayer>
       <GroupedLayer
-        checked={false}
+        checked={baseMapLayerStatus.satelliteState.checked}
         addLayerToStore={(layer) => {
           baseMapLayers.satellite = layer;
         }}

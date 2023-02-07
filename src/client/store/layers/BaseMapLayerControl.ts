@@ -30,7 +30,7 @@ const initialState: BaseMapLayerControlState = {
   },
   countryWarningAreaState: {
     checked: false,
-    name: 'Country Warning Area',
+    name: 'County Warning Area',
     opacity: 1,
     expanded: false,
   },
