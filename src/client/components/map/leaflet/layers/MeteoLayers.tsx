@@ -187,7 +187,10 @@ const MeteoLayers = () => {
             ) {
               features.push(l);
             }
-          } else if (booleanPointInPolygon([e.latlng.lng, e.latlng.lat], l.toGeoJSON())) {
+          } else if (
+            (l.feature.geometry.type === 'Polygon' || l.feature.geometry.type === 'MultiPolygon') &&
+            booleanPointInPolygon([e.latlng.lng, e.latlng.lat], l.toGeoJSON())
+          ) {
             features.push(l);
           }
         });
