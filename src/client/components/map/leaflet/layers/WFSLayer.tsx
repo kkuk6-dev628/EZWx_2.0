@@ -3,12 +3,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useMapEvents, GeoJSON as GeoJSONLayer } from 'react-leaflet';
 import L, { LatLng, Layer, PathOptions } from 'leaflet';
 import axios from 'axios';
-import MarkerClusterGroup from './MarkerClusterGroup';
+import MarkerClusterGroup from '../react-layers/MarkerClusterGroup';
 import { useSelector } from 'react-redux';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { generateHash } from '../../common/AreoFunctions';
 import GeoJSON, { FeatureCollection } from 'geojson';
 import { AppState } from '../../../../store/store';
+import MarkerDeclutterGroup from '../react-layers/MarkerDeclutterGroup';
 
 interface WFSLayerProps {
   url: string;
@@ -230,9 +231,24 @@ const WFSLayer = React.forwardRef(
               }
               return marker.getIcon();
             }}
+            getPositionFunction={(cluster) => {
+              const children = cluster.getAllChildMarkers();
+              let marker;
+              if (selectClusterMarker) {
+                marker = selectClusterMarker(children);
+              }
+              if (!marker) {
+                marker = children.sort((a: any, b: any) => {
+                  return a._leaflet_id > b._leaflet_id ? 1 : -1;
+                })[0];
+              }
+              return marker.getLatLng();
+            }}
+            singleMarkerMode={true}
             zoomToBoundsOnClick={false}
             showCoverageOnHover={false}
             spiderfyOnMaxZoom={false}
+            removeOutsideVisibleBounds={true}
             maxClusterRadius={maxClusterRadius}
             clusterPane={markerPane ? markerPane : undefined}
           >

@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { createPathComponent } from '@react-leaflet/core';
 import L from 'leaflet';
-import { useMap } from 'react-leaflet';
 
-require('leaflet.markercluster');
+import '../plugins/Leaflet.MarkerCluster';
 
 const MarkerClusterGroup = createPathComponent(({ children: _c, ...props }, ctx) => {
   const clusterProps = {};
