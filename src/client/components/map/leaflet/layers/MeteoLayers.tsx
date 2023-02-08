@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import MeteoLayerControl, { GroupedLayer } from '../layer-control/MeteoLayerControl';
 import { LayerGroup, useMapEvents } from 'react-leaflet';
-import L, { LatLng } from 'leaflet';
+import L from 'leaflet';
 import GairmetLayer from './GairmetLayer';
 import { useContext, useEffect, useRef, useState } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
@@ -89,7 +89,7 @@ const MeteoLayers = () => {
       });
   };
 
-  const showPopup = (layer: L.GeoJSON, latlng: LatLng): void => {
+  const showPopup = (layer: L.GeoJSON, latlng: L.LatLng): void => {
     if (typeof layer.setStyle === 'function') {
       layer.setStyle({
         weight: 8,
@@ -165,9 +165,9 @@ const MeteoLayers = () => {
       if (debugLayerGroupRef.current) {
         debugLayerGroupRef.current.clearLayers();
       }
-      Object.values(layers).forEach((layer) => {
-        if (layer.pickable === false) return;
-        if (layer.checked === false) return;
+      Object.values(layers).forEach((layer: L.Path) => {
+        if (layer.options.interactive === false) return;
+        if (map.hasLayer(layer) === false) return;
         //@ts-ignore
         if (layer.resetStyle) layer.resetStyle();
         if (features.length >= maxLayers) {

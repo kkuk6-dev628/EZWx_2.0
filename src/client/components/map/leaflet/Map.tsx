@@ -22,7 +22,7 @@ import Route from '../../shared/Route';
 import CollapsibleBar from '../../shared/CollapsibleBar';
 import DateSliderModal from '../../shared/DateSliderModal';
 import MeteoLayers from './layers/MeteoLayers';
-import './layers/CacheTileLayer';
+import './plugins/CacheTileLayer';
 import { useDispatch } from 'react-redux';
 import { selectLayerControlShow, setLayerControlShow } from '../../../store/layers/LayerControl';
 import { useSelector } from 'react-redux';
