@@ -33,6 +33,7 @@ import { InLayerControl } from '../layer-control/MeteoLayerControl';
 import axios from 'axios';
 import NbmMarkersLayer from './NbmMarkersLayer';
 import { InBaseLayerControl } from '../layer-control/BaseMapLayerControl';
+import RadarLayer from './RadarLayer';
 
 const maxLayers = 6;
 
@@ -287,6 +288,7 @@ const MeteoLayers = () => {
   return (
     <div className="route__layer">
       <MeteoLayerControl position="topright"></MeteoLayerControl>
+      <RadarLayer></RadarLayer>
       <GroupedLayer
         checked
         addLayerToStore={(layer) => {
