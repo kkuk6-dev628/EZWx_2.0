@@ -85,7 +85,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
     clonedBaseMapLayerStatus.usProvincesState.checked = false;
     clonedBaseMapLayerStatus.countryWarningAreaState.checked = false;
     hideLayer(baseMapLayers.usProvinces);
-    hideLayer(baseMapLayers.countryWarningAreas);
+    hideLayer(baseMapLayers.countyWarningAreas);
     return clonedBaseMapLayerStatus;
   };
 
@@ -192,8 +192,8 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
                       cloned.countryWarningAreaState.checked = !baseMapLayerStatus.countryWarningAreaState.checked;
                       dispatch(setBaseMapLayerControl(cloned));
                       cloned.countryWarningAreaState.checked
-                        ? showLayer(baseMapLayers.countryWarningAreas)
-                        : hideLayer(baseMapLayers.countryWarningAreas);
+                        ? showLayer(baseMapLayers.countyWarningAreas)
+                        : hideLayer(baseMapLayers.countyWarningAreas);
                     }}
                   />
                 }

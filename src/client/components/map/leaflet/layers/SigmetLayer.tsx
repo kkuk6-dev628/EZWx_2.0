@@ -2,6 +2,7 @@ import { PathOptions } from 'leaflet';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectSigmet } from '../../../../store/layers/LayerControl';
+import { db } from '../../../caching/dexieDb';
 import WFSLayer from './WFSLayer';
 
 const SigmetLayer = () => {
@@ -111,6 +112,11 @@ const SigmetLayer = () => {
       getLabel={getLabel}
       clientFilter={clientFilter}
       layerStateSelector={selectSigmet}
+      readDb={() => db.sigmet.toArray()}
+      writeDb={(features) => {
+        db.sigmet.clear();
+        db.sigmet.bulkAdd(features);
+      }}
     ></WFSLayer>
   );
 };

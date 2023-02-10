@@ -92,25 +92,25 @@
     }
 
     // cache first for fingerprinted resources
-    if (request.url.match(/(\?|&)v=/gi)) {
-      event.respondWith(
-        caches.match(request).then(function (response) {
-          return (
-            response ||
-            fetch(request)
-              .then(function (response) {
-                addToCache(request, response);
-                return response || serveOfflineImage(request);
-              })
-              .catch(function () {
-                return serveOfflineImage(request);
-              })
-          );
-        }),
-      );
+    // if (request.url.match(/(\?|&)v=/gi)) {
+    //   event.respondWith(
+    //     caches.match(request).then(function (response) {
+    //       return (
+    //         response ||
+    //         fetch(request)
+    //           .then(function (response) {
+    //             addToCache(request, response);
+    //             return response || serveOfflineImage(request);
+    //           })
+    //           .catch(function () {
+    //             return serveOfflineImage(request);
+    //           })
+    //       );
+    //     }),
+    //   );
 
-      return;
-    }
+    //   return;
+    // }
 
     // network first for non-fingerprinted resources
     event.respondWith(

@@ -1,5 +1,6 @@
 import { PathOptions } from 'leaflet';
 import { selectIntlSigmet } from '../../../../store/layers/LayerControl';
+import { db } from '../../../caching/dexieDb';
 import WFSLayer from './WFSLayer';
 
 const IntlSigmetLayer = () => {
@@ -48,6 +49,11 @@ const IntlSigmetLayer = () => {
       getLabel={getLabel}
       clientFilter={clientFilter}
       layerStateSelector={selectIntlSigmet}
+      readDb={() => db.intlSigmet.toArray()}
+      writeDb={(features) => {
+        db.intlSigmet.clear();
+        db.intlSigmet.bulkAdd(features);
+      }}
     ></WFSLayer>
   );
 };

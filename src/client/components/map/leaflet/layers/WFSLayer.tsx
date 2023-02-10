@@ -9,7 +9,8 @@ import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { generateHash } from '../../common/AreoFunctions';
 import GeoJSON, { FeatureCollection } from 'geojson';
 import { AppState } from '../../../../store/store';
-import MarkerDeclutterGroup from '../react-layers/MarkerDeclutterGroup';
+import { useLiveQuery } from 'dexie-react-hooks';
+import Dexie from 'dexie';
 
 interface WFSLayerProps {
   url: string;
@@ -28,6 +29,8 @@ interface WFSLayerProps {
   clientFilter?: (features: GeoJSON.Feature[], obsTime: Date) => GeoJSON.Feature[];
   isClusteredMarker?: boolean;
   selectClusterMarker?: (layers: Layer[]) => Layer;
+  readDb: () => any;
+  writeDb: (features: GeoJSON.Feature[]) => void;
   markerPane?: string;
   maxClusterRadius?: number;
   layerStateSelector?: (state: AppState) => any;
@@ -58,6 +61,8 @@ const WFSLayer = React.forwardRef(
       clientFilter,
       isClusteredMarker = false,
       selectClusterMarker,
+      readDb,
+      writeDb,
       markerPane,
       maxClusterRadius = 30,
       layerStateSelector,
@@ -74,11 +79,12 @@ const WFSLayer = React.forwardRef(
     const [geoJsonKey, setGeoJsonKey] = useState(12034512);
 
     useEffect(() => {
-      const newKey = generateHash(JSON.stringify(displayedData));
+      const newKey = Date.now();
       setGeoJsonKey(newKey);
     }, [displayedData]);
 
     useEffect(() => {
+      if (!geoJSON) return;
       if (clientFilter && geoJSON.features.length > 0) {
         const filteredFeatures = clientFilter(geoJSON.features, new Date(observationTime));
         setDisplayedData({
@@ -95,6 +101,7 @@ const WFSLayer = React.forwardRef(
       layerState = useSelector(layerStateSelector);
     }
     useEffect(() => {
+      if (!geoJSON) return;
       if (layerState && layerState.checked === false) return;
       if (clientFilter && geoJSON.features.length > 0) {
         const filteredFeatures = clientFilter(geoJSON.features, new Date(observationTime));
@@ -134,7 +141,17 @@ const WFSLayer = React.forwardRef(
     });
     const ref = useRef(null);
     useEffect(() => {
-      initData.features.length == 0 ? fetchGeoJSON() : null;
+      if (initData.features.length == 0) {
+        readDb().then((cachedFeatures) => {
+          if (cachedFeatures && cachedFeatures.length > 0) {
+            setGeoJSON({
+              type: 'FeatureCollection',
+              features: cachedFeatures,
+            });
+          }
+        });
+        fetchGeoJSON();
+      }
     }, []);
 
     let lastZoom: number;
@@ -184,8 +201,9 @@ const WFSLayer = React.forwardRef(
           if (typeof data.data === 'string') {
             console.log(typeName + ': Invalid json data!', data.data);
           } else {
+            // if (ref.current && map.hasLayer(ref.current)) map.removeLayer(ref.current);
+            writeDb(data.data.features);
             setGeoJSON(data.data);
-            map?.removeLayer(ref.current);
           }
         })
         .catch((reason) => {
@@ -252,7 +270,7 @@ const WFSLayer = React.forwardRef(
             maxClusterRadius={maxClusterRadius}
             clusterPane={markerPane ? markerPane : undefined}
           >
-            {geoJSON != null && (
+            {displayedData != null && (
               <GeoJSONLayer
                 ref={ref}
                 data={displayedData}
@@ -267,7 +285,7 @@ const WFSLayer = React.forwardRef(
             )}
           </MarkerClusterGroup>
         )}
-        {!isClusteredMarker && geoJSON != null && (
+        {!isClusteredMarker && displayedData != null && (
           <GeoJSONLayer
             key={geoJsonKey}
             ref={ref}

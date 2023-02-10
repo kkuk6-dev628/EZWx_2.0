@@ -6,6 +6,7 @@ import WFSLayer from './WFSLayer';
 import BaseMapLayerControl from '../layer-control/BaseMapLayerControl';
 import { useSelector } from 'react-redux';
 import { selectBaseMapLayerControl } from '../../../../store/layers/BaseMapLayerControl';
+import { db } from '../../../caching/dexieDb';
 
 const BaseMapLayers = () => {
   const baseMapLayers = useBaseMapLayersContext();
@@ -50,6 +51,11 @@ const BaseMapLayers = () => {
               weight: 1,
             };
           }}
+          readDb={() => db.usProvinces.toArray()}
+          writeDb={(features) => {
+            db.usProvinces.clear();
+            db.usProvinces.bulkAdd(features);
+          }}
         ></WFSLayer>
       </GroupedLayer>
       <GroupedLayer
@@ -72,12 +78,17 @@ const BaseMapLayers = () => {
           getLabel={(feature) => {
             return feature.properties.NAME;
           }}
+          readDb={() => db.usProvinces.toArray()}
+          writeDb={(features) => {
+            db.canadianProvinces.clear();
+            db.canadianProvinces.bulkAdd(features);
+          }}
         ></WFSLayer>
       </GroupedLayer>
       <GroupedLayer
         checked={baseMapLayerStatus.countryWarningAreaState.checked}
         addLayerToStore={(layer) => {
-          baseMapLayers.countryWarningAreas = layer;
+          baseMapLayers.countyWarningAreas = layer;
         }}
       >
         <WFSLayer
@@ -85,7 +96,7 @@ const BaseMapLayers = () => {
           maxFeatures={256}
           typeName="EZWxBrief:county_warning_areas"
           interactive={false}
-          enableBBoxQuery={true}
+          enableBBoxQuery={false}
           geometryColumn="the_geom"
           style={() => {
             return {
@@ -93,6 +104,21 @@ const BaseMapLayers = () => {
               weight: 1,
               color: '#ff69',
             };
+          }}
+          readDb={() => db.usProvinces.toArray()}
+          writeDb={(features) => {
+            db.countyWarningAreas.clear();
+            const chunkSize = 2;
+            const chunkedAdd = () => {
+              if (features.length === 0) return;
+              db.countyWarningAreas
+                .bulkAdd(features.splice(0, chunkSize))
+                .catch((error) => console.log(error))
+                .finally(() => {
+                  chunkedAdd();
+                });
+            };
+            chunkedAdd();
           }}
         ></WFSLayer>
       </GroupedLayer>

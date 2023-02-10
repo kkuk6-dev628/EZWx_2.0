@@ -19,11 +19,8 @@ import { useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
 import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
 import { MetarMarkerTypes, timeSliderInterval, windIconLimit } from '../../common/AreoConstants';
-import axios from 'axios';
-import { feature } from '@turf/helpers';
-import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
-
-const defaultServerFilter = `observation_time DURING ${getQueryTime(new Date())}`;
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../../../caching/dexieDb';
 
 const cacheUpdateInterval = 75; // 75 minutes
 
@@ -920,7 +917,22 @@ const MetarsLayer = () => {
         maxClusterRadius={clusterRadius}
         initData={filteredData}
         layerStateSelector={selectMetar}
-        cacheVersion={cacheVersion}
+        readDb={() => db.metars.toArray()}
+        writeDb={(features) => {
+          db.metars.clear();
+          const chunkSize = 400;
+          const chunkedAdd = () => {
+            if (features.length === 0) return;
+            db.metars
+              .bulkAdd(features.splice(0, chunkSize))
+              .catch((error) => console.log(error))
+              .finally(() => {
+                chunkedAdd();
+              });
+          };
+          chunkedAdd();
+        }}
+        // cacheVersion={cacheVersion}
       ></WFSLayer>
     </Pane>
   );

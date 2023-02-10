@@ -22,6 +22,7 @@ import { MetarMarkerTypes, timeSliderInterval, windIconLimit } from '../../commo
 import axios from 'axios';
 import { feature } from '@turf/helpers';
 import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
+import { db } from '../../../caching/dexieDb';
 
 const defaultServerFilter = `observation_time DURING ${getQueryTime(new Date())}`;
 
@@ -855,6 +856,11 @@ const NbmMarkersLayer = () => {
         initData={filteredData}
         layerStateSelector={selectMetar}
         cacheVersion={cacheVersion}
+        readDb={() => db.nbmStations.toArray()}
+        writeDb={(features) => {
+          db.nbmStations.clear();
+          db.nbmStations.bulkAdd(features);
+        }}
       ></WFSLayer>
     </Pane>
   );

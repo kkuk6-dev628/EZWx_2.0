@@ -2,6 +2,7 @@ import { PathOptions } from 'leaflet';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCwa } from '../../../../store/layers/LayerControl';
+import { db } from '../../../caching/dexieDb';
 import WFSLayer from './WFSLayer';
 
 const CWALayer = () => {
@@ -112,6 +113,11 @@ const CWALayer = () => {
       getLabel={getLabel}
       clientFilter={clientFilter}
       layerStateSelector={selectCwa}
+      readDb={() => db.cwa.toArray()}
+      writeDb={(features) => {
+        db.cwa.clear();
+        db.cwa.bulkAdd(features);
+      }}
     ></WFSLayer>
   );
 };

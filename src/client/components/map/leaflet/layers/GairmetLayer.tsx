@@ -2,6 +2,7 @@ import { PathOptions } from 'leaflet';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectGairmet } from '../../../../store/layers/LayerControl';
+import { db } from '../../../caching/dexieDb';
 import { addLeadingZeroes } from '../../common/AreoFunctions';
 import WFSLayer from './WFSLayer';
 
@@ -174,6 +175,11 @@ const GairmetLayer = () => {
       getLabel={getLabel}
       clientFilter={clientFilter}
       layerStateSelector={selectGairmet}
+      readDb={() => db.gairmet.toArray()}
+      writeDb={(features) => {
+        db.gairmet.clear();
+        db.gairmet.bulkAdd(features).catch((error) => console.log(error));
+      }}
     ></WFSLayer>
   );
 };

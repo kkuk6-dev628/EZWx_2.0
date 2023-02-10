@@ -7,6 +7,8 @@ import { addLeadingZeroes, getCacheVersion, getTimeRangeStart } from '../../comm
 import { useSelector } from 'react-redux';
 import { selectPirep } from '../../../../store/layers/LayerControl';
 import { useEffect, useState } from 'react';
+import { db } from '../../../caching/dexieDb';
+import { useLiveQuery } from 'dexie-react-hooks';
 
 const cacheUpdateInterval = 75; // 75 minutes
 
@@ -41,7 +43,7 @@ const PirepLayer = () => {
   const [cacheVersion, setCacheVersion] = useState(getCacheVersion(cacheUpdateInterval));
 
   useEffect(() => {
-    console.log(layerStatus);
+    // console.log(layerStatus);
     const v = getCacheVersion(cacheUpdateInterval);
     if (v !== cacheVersion) {
       setCacheVersion(v);
@@ -277,7 +279,22 @@ const PirepLayer = () => {
         serverFilter={`obstime AFTER ${getTimeRangeStart().toISOString()}`}
         clientFilter={clientFilter}
         layerStateSelector={selectPirep}
-        cacheVersion={cacheVersion}
+        // cacheVersion={cacheVersion}
+        readDb={() => db.pireps.toArray()}
+        writeDb={(features) => {
+          db.pireps.clear();
+          const chunkSize = 200;
+          const chunkedAdd = () => {
+            if (features.length === 0) return;
+            db.pireps
+              .bulkAdd(features.splice(0, chunkSize))
+              .catch((error) => console.log(error))
+              .finally(() => {
+                chunkedAdd();
+              });
+          };
+          chunkedAdd();
+        }}
       ></WFSLayer>
     </Pane>
   );

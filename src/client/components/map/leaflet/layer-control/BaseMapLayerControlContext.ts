@@ -4,7 +4,7 @@ import { Layer } from 'leaflet';
 export interface BaseMapLayers {
   usProvinces: Layer;
   canadianProvinces: Layer;
-  countryWarningAreas: Layer;
+  countyWarningAreas: Layer;
   street: Layer;
   topo: Layer;
   terrain: Layer;
