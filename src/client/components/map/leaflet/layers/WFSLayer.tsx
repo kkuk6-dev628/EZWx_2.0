@@ -201,7 +201,7 @@ const WFSLayer = React.forwardRef(
           if (typeof data.data === 'string') {
             console.log(typeName + ': Invalid json data!', data.data);
           } else {
-            // if (ref.current && map.hasLayer(ref.current)) map.removeLayer(ref.current);
+            if (ref.current && map.hasLayer(ref.current)) map.removeLayer(ref.current);
             writeDb(data.data.features);
             setGeoJSON(data.data);
           }

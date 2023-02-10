@@ -109,12 +109,14 @@ const BaseMapLayers = () => {
           writeDb={(features) => {
             db.countyWarningAreas.clear();
             const chunkSize = 2;
+            let i = 0;
             const chunkedAdd = () => {
-              if (features.length === 0) return;
+              if (features.length <= i) return;
               db.countyWarningAreas
-                .bulkAdd(features.splice(0, chunkSize))
+                .bulkAdd(features.slice(i, i + chunkSize))
                 .catch((error) => console.log(error))
                 .finally(() => {
+                  i += chunkSize;
                   chunkedAdd();
                 });
             };
