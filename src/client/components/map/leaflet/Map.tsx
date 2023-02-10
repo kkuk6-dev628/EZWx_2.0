@@ -28,6 +28,7 @@ import { selectLayerControlShow, setLayerControlShow } from '../../../store/laye
 import { useSelector } from 'react-redux';
 import BaseMapLayers from './layers/BaseMapLayers';
 import { selectBaseMapLayerControlShow, setBaseMapLayerControlShow } from '../../../store/layers/BaseMapLayerControl';
+import MapSearch from '../../shared/MapSearch';
 
 function LeafletMap() {
   const { pathname } = useRouter();
@@ -138,6 +139,7 @@ function LeafletMap() {
       >
         <BaseMapLayers></BaseMapLayers>
         <MeteoLayers></MeteoLayers>
+        <MapSearch />
         <ZoomControl
           position="topright"
           zoomInText={ReactDOMServer.renderToString(<SvgRoundPlus></SvgRoundPlus>)}
