@@ -29,12 +29,15 @@ import { useSelector } from 'react-redux';
 import BaseMapLayers from './layers/BaseMapLayers';
 import { selectBaseMapLayerControlShow, setBaseMapLayerControlShow } from '../../../store/layers/BaseMapLayerControl';
 import MapSearch from '../../shared/MapSearch';
+import MapSideButtons from '../../shared/MapSideButtons';
+import { Drawer } from '@mui/material';
 
 function LeafletMap() {
   const { pathname } = useRouter();
   const [isShowTabs, setIsShowTabs] = useState(false);
   const [isShowDateModal, setIsShowDateModal] = useState(false);
   const [isShowModal, setIsShowModal] = useState(false);
+  const [userSettingDrawer, setUserSettingDrawer] = useState(false)
   const dispatch = useDispatch();
   const meteoLayerControlShow = useSelector(selectLayerControlShow);
   const baseMapLayerControlShow = useSelector(selectBaseMapLayerControlShow);
@@ -145,7 +148,13 @@ function LeafletMap() {
           zoomInText={ReactDOMServer.renderToString(<SvgRoundPlus></SvgRoundPlus>)}
           zoomOutText={ReactDOMServer.renderToString(<SvgRoundMinus></SvgRoundMinus>)}
         />
+        <MapSideButtons openUserSettingDrawer={() => setUserSettingDrawer(true)} />
       </MapContainer>
+      <Drawer open={userSettingDrawer} anchor="right" onClose={() => setUserSettingDrawer(false)}>
+
+        <button onClick={() => setUserSettingDrawer(false)}>Close</button>
+
+      </Drawer>
       {isShowTabs && <MapTabs tabMenus={tabMenus} />}
       {isShowModal && <Route setIsShowModal={setIsShowModal} />}
       {isShowDateModal && <DateSliderModal setIsShowDateModal={setIsShowDateModal} />}
