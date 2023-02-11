@@ -98,7 +98,7 @@
     "swiper": "^9.0.2",
     "ts-morph": "^17.0.1",
     "tsimportlib": "^0.0.3",
-    "typeorm": "^0.3.11"
+    "typeorm": "^0.3.12"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
