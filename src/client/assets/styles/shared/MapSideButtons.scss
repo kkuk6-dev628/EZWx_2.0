@@ -1,0 +1,28 @@
+.pos_relative {
+  position: relative;
+
+  .map__btns__container {
+    position: absolute;
+    right: 0;
+    bottom: -327px;
+    z-index: 999;
+    display: flex;
+    margin-right: 10px;
+    flex-direction: column;
+
+    .user__action__btns {
+      background-color: var(--color-white);
+      margin: 5px 0px;
+      color: var(--color-primary);
+      border-radius: 24%;
+      padding: 5px;
+      height: 36px;
+      width: 36px;
+      font-size: 2em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+  }
+}
