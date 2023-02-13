@@ -24,6 +24,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
         <div className="drawer__sticky__header">
           <div className="drawer__header">
             <div className="drawer__title">Settings</div>
+            <RxCross2 />
             <div className="drawer__description">Units, Aircraft & Personal Minimums
             </div>
 
@@ -91,6 +92,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
             {isShowPersonalMinimumSettings ? <AiOutlineMinus style={{ color: 'purple' }} /> : <AiOutlinePlus />}
             <span className='collapse__title'>Personal Minimums</span>
           </div>
+          <Collapse in={isShowPersonalMinimumSettings} timeout="auto" >
+            <hr />
+          </Collapse>
         </div>
 
       </div>

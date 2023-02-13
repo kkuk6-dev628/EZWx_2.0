@@ -6,6 +6,9 @@
   width: 350px;
   .drawer__sticky__header {
     color: var(--color-white);
+    position: sticky;
+    top: 0;
+    z-index: 2;
     // font-family: var(--font-other);
     .drawer__header {
       padding: 20px 24px;
@@ -85,7 +88,6 @@
           }
         }
       }
-
     }
   }
 }
