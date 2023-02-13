@@ -37,7 +37,7 @@ function LeafletMap() {
   const [isShowTabs, setIsShowTabs] = useState(false);
   const [isShowDateModal, setIsShowDateModal] = useState(false);
   const [isShowModal, setIsShowModal] = useState(false);
-  const [userSettingDrawer, setUserSettingDrawer] = useState(false)
+  const [userSettingDrawer, setUserSettingDrawer] = useState(false);
   const dispatch = useDispatch();
   const meteoLayerControlShow = useSelector(selectLayerControlShow);
   const baseMapLayerControlShow = useSelector(selectBaseMapLayerControlShow);
@@ -151,9 +151,7 @@ function LeafletMap() {
         <MapSideButtons openUserSettingDrawer={() => setUserSettingDrawer(true)} />
       </MapContainer>
       <Drawer open={userSettingDrawer} anchor="right" onClose={() => setUserSettingDrawer(false)}>
-
         <button onClick={() => setUserSettingDrawer(false)}>Close</button>
-
       </Drawer>
       {isShowTabs && <MapTabs tabMenus={tabMenus} />}
       {isShowModal && <Route setIsShowModal={setIsShowModal} />}

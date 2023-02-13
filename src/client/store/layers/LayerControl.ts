@@ -25,6 +25,13 @@ export interface MetarLayerState extends LayerState {
   };
 }
 
+export interface RadarLayerState extends LayerState {
+  baseReflectivity: SublayerState;
+  compositeReflectivity: SublayerState;
+  echoTopHeight: SublayerState;
+  forecastRadar: SublayerState;
+}
+
 export interface SigmetsLayerState extends LayerState {
   all: SublayerState;
   convection: SublayerState;
@@ -79,7 +86,7 @@ export interface CwaLayerState extends LayerState {
 export interface LayerControlState {
   show: boolean;
   metarState: MetarLayerState;
-  radarState: LayerState;
+  radarState: RadarLayerState;
   sigmetState: SigmetsLayerState;
   gairmetState: GairmetLayerState;
   pirepState: PirepLayerState;
@@ -108,6 +115,22 @@ const initialState: LayerControlState = {
     checked: false,
     opacity: 1,
     name: 'Radar',
+    baseReflectivity: {
+      checked: true,
+      name: '0.5\u00B0 base reflectivity',
+    },
+    compositeReflectivity: {
+      checked: false,
+      name: 'Composite reflectivity',
+    },
+    echoTopHeight: {
+      checked: false,
+      name: 'Echo top height',
+    },
+    forecastRadar: {
+      checked: true,
+      name: 'Forecast radar',
+    },
   },
   sigmetState: {
     checked: true,
