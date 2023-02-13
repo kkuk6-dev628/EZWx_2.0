@@ -508,33 +508,12 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.radarState) as RadarLayerState;
                           cloned.checked = true;
                           cloned.baseReflectivity.checked = true;
-                          cloned.compositeReflectivity.checked = false;
                           cloned.echoTopHeight.checked = false;
                           dispatch(setRadar(cloned));
                         }}
                       />
                     }
                     label={layerStatus.radarState.baseReflectivity.name}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={layerStatus.radarState.compositeReflectivity.checked}
-                        icon={<CircleUnchecked />}
-                        checkedIcon={<CircleCheckedFilled />}
-                        name="checkedB"
-                        color="primary"
-                        onClick={(_e) => {
-                          const cloned = jsonClone(layerStatus.radarState) as RadarLayerState;
-                          cloned.checked = true;
-                          cloned.baseReflectivity.checked = false;
-                          cloned.compositeReflectivity.checked = true;
-                          cloned.echoTopHeight.checked = false;
-                          dispatch(setRadar(cloned));
-                        }}
-                      />
-                    }
-                    label={layerStatus.radarState.compositeReflectivity.name}
                   />
                   <FormControlLabel
                     control={
@@ -548,7 +527,6 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                           const cloned = jsonClone(layerStatus.radarState) as RadarLayerState;
                           cloned.checked = true;
                           cloned.baseReflectivity.checked = false;
-                          cloned.compositeReflectivity.checked = false;
                           cloned.echoTopHeight.checked = true;
                           dispatch(setRadar(cloned));
                         }}

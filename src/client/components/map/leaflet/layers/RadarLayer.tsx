@@ -21,20 +21,6 @@ interface RadarLayers {
     45: L.TileLayer.WMS;
     50: L.TileLayer.WMS;
   };
-  // Composite reflectivity
-  compositeReflectivity: {
-    0: L.TileLayer.WMS;
-    5: L.TileLayer.WMS;
-    10: L.TileLayer.WMS;
-    15: L.TileLayer.WMS;
-    20: L.TileLayer.WMS;
-    25: L.TileLayer.WMS;
-    30: L.TileLayer.WMS;
-    35: L.TileLayer.WMS;
-    40: L.TileLayer.WMS;
-    45: L.TileLayer.WMS;
-    50: L.TileLayer.WMS;
-  };
   // Echo top heights
   echoTopHeight: {
     0: L.TileLayer.WMS;
@@ -70,9 +56,6 @@ export function useRadarLayersContext() {
 }
 const baseReflectivityUrl = 'https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0q.cgi';
 const baseReflectivityLayer = 'nexrad-n0q-900913';
-
-const compositeReflectivityUrl = 'https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/hsr.cgi';
-const compositeReflectivityLayer = 'q2-hsr-900913';
 
 const echoTopHeightsUrl = 'https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/eet.cgi';
 const echoTopHeightsLayer = 'nexrad-eet-900913';
@@ -157,85 +140,6 @@ const RadarLayer = () => {
         format: 'image/png',
         transparent: true,
         opacity: 0.575,
-      }),
-    };
-    radarLayers.compositeReflectivity = {
-      0: L.tileLayer.wms(compositeReflectivityUrl, {
-        layers: compositeReflectivityLayer,
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-        crs: L.CRS.EPSG4326,
-      }),
-      5: L.tileLayer.wms(compositeReflectivityUrl, {
-        layers: compositeReflectivityLayer + '-m05m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-        crs: L.CRS.EPSG4326,
-      }),
-      10: L.tileLayer.wms(compositeReflectivityUrl, {
-        layers: compositeReflectivityLayer + '-m10m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-        crs: L.CRS.EPSG4326,
-      }),
-      15: L.tileLayer.wms(compositeReflectivityUrl, {
-        layers: compositeReflectivityLayer + '-m15m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-        crs: L.CRS.EPSG4326,
-      }),
-      20: L.tileLayer.wms(compositeReflectivityUrl, {
-        layers: compositeReflectivityLayer + '-m20m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-        crs: L.CRS.EPSG4326,
-      }),
-      25: L.tileLayer.wms(compositeReflectivityUrl, {
-        layers: compositeReflectivityLayer + '-m25m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-        crs: L.CRS.EPSG4326,
-      }),
-      30: L.tileLayer.wms(compositeReflectivityUrl, {
-        layers: compositeReflectivityLayer + '-m30m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-        crs: L.CRS.EPSG4326,
-      }),
-      35: L.tileLayer.wms(compositeReflectivityUrl, {
-        layers: compositeReflectivityLayer + '-m35m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-        crs: L.CRS.EPSG4326,
-      }),
-      40: L.tileLayer.wms(compositeReflectivityUrl, {
-        layers: compositeReflectivityLayer + '-m40m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-        crs: L.CRS.EPSG4326,
-      }),
-      45: L.tileLayer.wms(compositeReflectivityUrl, {
-        layers: compositeReflectivityLayer + '-m45m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-        crs: L.CRS.EPSG4326,
-      }),
-      50: L.tileLayer.wms(compositeReflectivityUrl, {
-        layers: compositeReflectivityLayer + '-m50m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-        crs: L.CRS.EPSG4326,
       }),
     };
     radarLayers.echoTopHeight = {
@@ -338,7 +242,6 @@ const RadarLayer = () => {
 
   useEffect(() => {
     hideLayers(Object.values(radarLayers.baseReflectivity));
-    hideLayers(Object.values(radarLayers.compositeReflectivity));
     hideLayers(Object.values(radarLayers.echoTopHeight));
     hideLayers(radarLayers.forecast);
     if (!radarLayerState.checked) {
@@ -350,8 +253,6 @@ const RadarLayer = () => {
     if (differenceMinutes <= 0) {
       if (radarLayerState.baseReflectivity.checked) {
         showLayer(radarLayers.baseReflectivity[layerName]);
-      } else if (radarLayerState.compositeReflectivity.checked) {
-        showLayer(radarLayers.compositeReflectivity[layerName]);
       } else if (radarLayerState.echoTopHeight.checked) {
         showLayer(radarLayers.echoTopHeight[layerName]);
       }
@@ -361,7 +262,6 @@ const RadarLayer = () => {
   }, [
     radarLayerState.checked,
     radarLayerState.baseReflectivity.checked,
-    radarLayerState.compositeReflectivity.checked,
     radarLayerState.echoTopHeight.checked,
     radarLayerState.forecastRadar.checked,
     observationTime,
@@ -370,7 +270,6 @@ const RadarLayer = () => {
   useEffect(() => {
     const opacity = radarLayerState.opacity / 100;
     Object.values(radarLayers.baseReflectivity).forEach((layer) => layer.setOpacity(opacity));
-    Object.values(radarLayers.compositeReflectivity).forEach((layer) => layer.setOpacity(opacity));
     Object.values(radarLayers.echoTopHeight).forEach((layer) => layer.setOpacity(opacity));
     radarLayers.forecast.forEach((layer) => layer.setOpacity(opacity));
   }, [radarLayerState.opacity]);
@@ -400,7 +299,6 @@ const RadarLayer = () => {
 
   const hideAllTime = () => {
     Object.values(radarLayers.baseReflectivity).forEach((layer) => layer.setOpacity(0));
-    Object.values(radarLayers.compositeReflectivity).forEach((layer) => layer.setOpacity(0));
     Object.values(radarLayers.echoTopHeight).forEach((layer) => layer.setOpacity(0));
     radarLayers.forecast.forEach((layer) => layer.setOpacity(0));
   };

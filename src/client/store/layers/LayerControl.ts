@@ -27,7 +27,6 @@ export interface MetarLayerState extends LayerState {
 
 export interface RadarLayerState extends LayerState {
   baseReflectivity: SublayerState;
-  compositeReflectivity: SublayerState;
   echoTopHeight: SublayerState;
   forecastRadar: SublayerState;
 }
@@ -118,10 +117,6 @@ const initialState: LayerControlState = {
     baseReflectivity: {
       checked: true,
       name: '0.5\u00B0 base reflectivity',
-    },
-    compositeReflectivity: {
-      checked: false,
-      name: 'Composite reflectivity',
     },
     echoTopHeight: {
       checked: false,
