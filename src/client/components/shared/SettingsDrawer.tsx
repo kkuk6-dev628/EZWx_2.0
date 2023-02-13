@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Collapse, Drawer } from '@mui/material';
 import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { RxCross2 } from 'react-icons/rx';
+import { SettingFieldLabel, ToggleButton, ToggleFieldWrapper } from '../settings-drawer';
 
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;
@@ -35,7 +36,6 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
 
         <div className="drawer__body">
 
-
           <div onClick={() => setIsShowGeneralSettings(!isShowGeneralSettings)} className="collapsed__title__container">
             {isShowGeneralSettings ? <AiOutlineMinus /> : <AiOutlinePlus />}
             <span className='collapse__title'>General Settings</span>
@@ -44,30 +44,49 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
             <div className="collapsed__container">
 
               <div className='input__fields__container'>
-                <div className="text__container">
-                  <div className="field__title">Home Airport</div>
-                  <div className="field__description">default home airport</div>
-                </div>
+                <SettingFieldLabel title="Home Airport" description='default home airport' />
+
                 <div className="input__container">
                   <input type="text" placeholder='Select Airport...' />
                   <RxCross2 />
                 </div>
               </div>
 
-              <div className='button__fields__container'>
-                <div className="text__container">
-                  <div className="field__title">Temperature</div>
-                  <div className="field__description">default temperature units</div>
-                </div>
+              <ToggleFieldWrapper >
+                <SettingFieldLabel title="Temperature" description='default temperature units' />
+                <ToggleButton label1='Fahrenheit' label2='Celsius' checked={false} onChange={(e) => { console.log('e', e) }} />
+              </ToggleFieldWrapper>
 
-              </div>
+              <ToggleFieldWrapper >
+                <SettingFieldLabel title="Time Display" description='default time display setting' />
+                <ToggleButton label1='Local' label2='Zulu' checked={false} onChange={(e) => { console.log('e', e) }} />
+              </ToggleFieldWrapper>
+
+              <ToggleFieldWrapper >
+                <SettingFieldLabel title="Wind Speed" description='default wind speed units' />
+                <ToggleButton label1='Miles Per Hour' label2='Knots' checked={false} onChange={(e) => { console.log('e', e) }} />
+              </ToggleFieldWrapper>
+
+              <ToggleFieldWrapper >
+                <SettingFieldLabel title="Distance" description='default distance units' />
+                <ToggleButton label1='Kilometers' label2='Nautical Miles' checked={false} onChange={(e) => { console.log('e', e) }} />
+              </ToggleFieldWrapper>
+
+              <ToggleFieldWrapper >
+                <SettingFieldLabel title="Visibility" description='default visibility units' />
+                <ToggleButton label1='Meters' label2='Statute Miles' checked={false} onChange={(e) => { console.log('e', e) }} />
+              </ToggleFieldWrapper>
 
             </div>
           </Collapse>
+
           <div onClick={() => setIsShowAirCraftSettings(!isShowAirCraftSettings)} className="collapsed__title__container">
             {isShowAirCraftSettings ? <AiOutlineMinus /> : <AiOutlinePlus />}
             <span className='collapse__title'>AirCraft Settings</span>
           </div>
+          <Collapse in={isShowAirCraftSettings} timeout="auto" >
+          </Collapse>
+
           <div onClick={() => setIsShowPersonalMinimumSettings(!isShowPersonalMinimumSettings)} className="collapsed__title__container">
             {isShowPersonalMinimumSettings ? <AiOutlineMinus style={{ color: 'purple' }} /> : <AiOutlinePlus />}
             <span className='collapse__title'>Personal Minimums</span>

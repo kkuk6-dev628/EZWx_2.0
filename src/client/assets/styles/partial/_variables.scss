@@ -3,8 +3,13 @@
 :root {
   --font-main: 'Roboto', sans-serif;
   --font-other: 'Roboto', 'Helvetica Neue', Helvetica, Arial;
+  --font-family-sans-serif: 'Roboto', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --color-primary: #3f0c69;
   --color-secondary: #791dc6;
+  --color-primary-highlight: #3c1d76;
+  --color-yellow: #ffc241;
+  --color-yellow-highlight: #ffb61b;
   --color-gray: #707173;
   --color-dark: #000;
   --color-white: #fff;
