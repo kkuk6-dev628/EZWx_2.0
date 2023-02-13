@@ -29,6 +29,7 @@ import {
   MetarLayerState,
   setLayerControlShow,
   SigmetsLayerState,
+  RadarLayerState,
 } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
@@ -141,6 +142,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
   const getLayerControlStateWithAllClosed = (): LayerControlState => {
     const cloned = JSON.parse(JSON.stringify(layerStatus));
     cloned.metarState.expanded = false;
+    cloned.radarState.expanded = false;
     cloned.sigmetState.expanded = false;
     cloned.gairmetState.expanded = false;
     cloned.pirepState.expanded = false;
@@ -460,30 +462,144 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                 </AccordionDetails>
               </Accordion>
             </div>
-            <div className="layer-control-item" style={{ marginLeft: 12, paddingLeft: 4 }}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={layerStatus.radarState.checked}
-                    icon={<CircleUnchecked />}
-                    checkedIcon={<CircleCheckedFilled />}
-                    name="checkedB"
-                    color="primary"
-                    onClick={(_e) => {
-                      dispatch(
-                        setRadar({
-                          ...layerStatus.radarState,
-                          checked: !layerStatus.radarState.checked,
-                        }),
-                      );
-                      layerStatus.radarState.checked
-                        ? showLayer(meteoLayers.radar, layerStatus.radarState.name)
-                        : hideLayer(meteoLayers.radar, layerStatus.radarState.name);
-                    }}
+            <div className="layer-control-item">
+              <Accordion key={`cwa-layer`} expanded={layerStatus.radarState.expanded}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                  IconButtonProps={{
+                    onClick: () => {
+                      const clonedLayerControlState = getLayerControlStateWithAllClosed();
+                      clonedLayerControlState.radarState.expanded = !layerStatus.radarState.expanded;
+                      dispatch(setLayerControl(clonedLayerControlState));
+                    },
+                  }}
+                >
+                  <FormControlLabel
+                    label={layerStatus.radarState.name}
+                    control={
+                      <Checkbox
+                        checked={layerStatus.radarState.checked}
+                        style={{ pointerEvents: 'none' }}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.radarState) as CwaLayerState;
+                          cloned.checked = !layerStatus.radarState.checked;
+                          dispatch(setRadar(cloned));
+                        }}
+                      />
+                    }
                   />
-                }
-                label={layerStatus.radarState.name}
-              />
+                </AccordionSummary>
+                <AccordionDetails style={{ display: 'flex', flexDirection: 'column' }}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerStatus.radarState.baseReflectivity.checked}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.radarState) as RadarLayerState;
+                          cloned.checked = true;
+                          cloned.baseReflectivity.checked = true;
+                          cloned.compositeReflectivity.checked = false;
+                          cloned.echoTopHeight.checked = false;
+                          dispatch(setRadar(cloned));
+                        }}
+                      />
+                    }
+                    label={layerStatus.radarState.baseReflectivity.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerStatus.radarState.compositeReflectivity.checked}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.radarState) as RadarLayerState;
+                          cloned.checked = true;
+                          cloned.baseReflectivity.checked = false;
+                          cloned.compositeReflectivity.checked = true;
+                          cloned.echoTopHeight.checked = false;
+                          dispatch(setRadar(cloned));
+                        }}
+                      />
+                    }
+                    label={layerStatus.radarState.compositeReflectivity.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerStatus.radarState.echoTopHeight.checked}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.radarState) as RadarLayerState;
+                          cloned.checked = true;
+                          cloned.baseReflectivity.checked = false;
+                          cloned.compositeReflectivity.checked = false;
+                          cloned.echoTopHeight.checked = true;
+                          dispatch(setRadar(cloned));
+                        }}
+                      />
+                    }
+                    label={layerStatus.radarState.echoTopHeight.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerStatus.radarState.forecastRadar.checked}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerStatus.radarState) as RadarLayerState;
+                          cloned.forecastRadar.checked = !layerStatus.radarState.forecastRadar.checked;
+                          cloned.forecastRadar.checked ? (cloned.checked = cloned.forecastRadar.checked) : null;
+                          dispatch(setRadar(cloned));
+                        }}
+                      />
+                    }
+                    label={layerStatus.radarState.forecastRadar.name}
+                  />
+                  <div className="pirep-slider">
+                    <div className="title">
+                      <div className="label">Opacity</div>
+                    </div>
+                    <div className="slider">
+                      <Slider
+                        getAriaLabel={() => 'Opacity range'}
+                        min={0}
+                        max={100}
+                        step={5}
+                        value={layerStatus.radarState.opacity}
+                        valueLabelDisplay="on"
+                        marks={[
+                          { value: 0, label: 0 },
+                          { value: 100, label: 100 },
+                        ]}
+                        onChange={(e: Event, newValue: number) => {
+                          const cloned = jsonClone(layerStatus.radarState) as RadarLayerState;
+                          cloned.opacity = newValue;
+                          dispatch(setRadar(cloned));
+                        }}
+                      />
+                    </div>
+                  </div>
+                </AccordionDetails>
+              </Accordion>
             </div>
             <div className="layer-control-item">
               <Accordion key={`sigmet-layer`} expanded={layerStatus.sigmetState.expanded}>

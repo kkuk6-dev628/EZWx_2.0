@@ -47,7 +47,7 @@
     }
   }
   .MuiPaper-elevation1{
-    color: var(--color-white);
+    color: var(--color-white)!important;
     box-shadow: none;
     background-color: var(--color-primary);
     p{
@@ -55,6 +55,9 @@
       // font-size: 13px;
       font-weight: 600;
     }
+  }
+  .MuiSlider-markLabel{
+    color: var(--color-white)!important;
   }
 
   .MuiAccordionSummary-expandIcon{

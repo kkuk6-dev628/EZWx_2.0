@@ -97,7 +97,7 @@ const initialState: LayerControlState = {
   show: false,
   metarState: {
     checked: true,
-    opacity: 1,
+    opacity: 100,
     expanded: false,
     markerType: 'flightCategory',
     usePersonalMinimums: false,
@@ -113,7 +113,7 @@ const initialState: LayerControlState = {
   radarState: {
     expanded: false,
     checked: false,
-    opacity: 1,
+    opacity: 100,
     name: 'Radar',
     baseReflectivity: {
       checked: true,
@@ -134,7 +134,7 @@ const initialState: LayerControlState = {
   },
   sigmetState: {
     checked: true,
-    opacity: 1,
+    opacity: 100,
     name: 'SIGMETs',
     expanded: false,
     all: { name: 'All', checked: true },
@@ -149,7 +149,7 @@ const initialState: LayerControlState = {
   },
   gairmetState: {
     checked: true,
-    opacity: 1,
+    opacity: 100,
     name: 'G-AIRMETs',
     expanded: false,
     all: { name: 'All', checked: true },
@@ -164,7 +164,7 @@ const initialState: LayerControlState = {
   },
   pirepState: {
     checked: true,
-    opacity: 1,
+    opacity: 100,
     name: 'Pilot Weather Reports',
     expanded: false,
     urgentOnly: { name: 'Urgent Only', checked: false },
@@ -186,7 +186,7 @@ const initialState: LayerControlState = {
   cwaState: {
     name: 'Center Weather Advisories',
     checked: true,
-    opacity: 1,
+    opacity: 100,
     expanded: false,
     all: { name: 'All', checked: true },
     airframeIcing: { name: 'Airframe Icing', checked: true },
