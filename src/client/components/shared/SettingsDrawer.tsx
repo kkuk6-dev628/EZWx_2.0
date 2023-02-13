@@ -14,17 +14,19 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const [isShowAirCraftSettings, setIsShowAirCraftSettings] = useState(false)
   const [isShowPersonalMinimumSettings, setIsShowPersonalMinimumSettings] = useState(false)
 
+  const closeDrawer = () => { setIsShowSettingsDrawer(false) }
+
   return (
     <Drawer
       anchor={'right'}
       open={isShowSettingsDrawer}
-      onClose={() => setIsShowSettingsDrawer(false)}
+      onClose={closeDrawer}
     >
       <div className='drawer__container'>
         <div className="drawer__sticky__header">
           <div className="drawer__header">
             <div className="drawer__title">Settings</div>
-            <RxCross2 />
+            <RxCross2 onClick={closeDrawer} className='close__icon' />
             <div className="drawer__description">Units, Aircraft & Personal Minimums
             </div>
 
