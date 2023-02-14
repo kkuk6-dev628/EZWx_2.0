@@ -62,6 +62,7 @@ const echoTopHeightsLayer = 'nexrad-eet-900913';
 
 const forecastRadarUrl = 'https://mesonet.agron.iastate.edu/cgi-bin/wms/hrrr/refd.cgi';
 const forecastRadarLayer = 'refd_';
+const forecastMinute = 18 * 60;
 
 const getAbsoluteMinutes = (time: number): number => {
   return Math.floor(time / 60 / 1000);
@@ -211,22 +212,10 @@ const RadarLayer = () => {
       }),
     };
     radarLayers.forecast = [];
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i <= forecastMinute; i += 15) {
       radarLayers.forecast.push(
         L.tileLayer.wms(forecastRadarUrl, {
-          layers: forecastRadarLayer + addLeadingZeroes(`${i}15`, 4),
-          format: 'image/png',
-          transparent: true,
-          opacity: 0.575,
-        }),
-        L.tileLayer.wms(forecastRadarUrl, {
-          layers: forecastRadarLayer + addLeadingZeroes(`${i}30`, 4),
-          format: 'image/png',
-          transparent: true,
-          opacity: 0.575,
-        }),
-        L.tileLayer.wms(forecastRadarUrl, {
-          layers: forecastRadarLayer + addLeadingZeroes(`${i}45`, 4),
+          layers: forecastRadarLayer + addLeadingZeroes(i, 4),
           format: 'image/png',
           transparent: true,
           opacity: 0.575,
@@ -256,7 +245,7 @@ const RadarLayer = () => {
       } else if (radarLayerState.echoTopHeight.checked) {
         showLayer(radarLayers.echoTopHeight[layerName]);
       }
-    } else if (differenceMinutes < 18 * 60 && radarLayerState.forecastRadar.checked) {
+    } else if (differenceMinutes < forecastMinute && radarLayerState.forecastRadar.checked) {
       showLayer(radarLayers.forecast[layerName]);
     }
   }, [
@@ -319,7 +308,7 @@ const RadarLayer = () => {
       const layerName = Math.floor(diff / 5) * 5;
       return layerName;
     } else {
-      if (differenceMinutes > 18 * 60) {
+      if (differenceMinutes > forecastMinute) {
         return null;
       }
       const layerName = Math.floor(differenceMinutes / 15);
