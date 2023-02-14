@@ -4,41 +4,18 @@ import { useSelector } from 'react-redux';
 import { selectRadar } from '../../../../store/layers/LayerControl';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { addLeadingZeroes } from '../../common/AreoFunctions';
+import WMS from '../plugins/leaflet.wms';
 
 interface RadarLayers {
   radarContainer: L.LayerGroup;
   // 0.5° base reflectivity
-  baseReflectivity: {
-    0: L.TileLayer.WMS;
-    5: L.TileLayer.WMS;
-    10: L.TileLayer.WMS;
-    15: L.TileLayer.WMS;
-    20: L.TileLayer.WMS;
-    25: L.TileLayer.WMS;
-    30: L.TileLayer.WMS;
-    35: L.TileLayer.WMS;
-    40: L.TileLayer.WMS;
-    45: L.TileLayer.WMS;
-    50: L.TileLayer.WMS;
-  };
+  baseReflectivity: (typeof WMS.Layer)[];
   // Echo top heights
-  echoTopHeight: {
-    0: L.TileLayer.WMS;
-    5: L.TileLayer.WMS;
-    10: L.TileLayer.WMS;
-    15: L.TileLayer.WMS;
-    20: L.TileLayer.WMS;
-    25: L.TileLayer.WMS;
-    30: L.TileLayer.WMS;
-    35: L.TileLayer.WMS;
-    40: L.TileLayer.WMS;
-    45: L.TileLayer.WMS;
-    50: L.TileLayer.WMS;
-  };
+  echoTopHeight: (typeof WMS.Layer)[];
   // Forecasts radar
   // Forecasts are available every 15 minutes between initialization and forecast hour 18.
   // Totally 72 layers will be exists.
-  forecast: L.TileLayer.WMS[];
+  forecast: (typeof WMS.Layer)[];
 }
 
 const RadarLayersContext = createContext<RadarLayers>({} as any);
@@ -75,164 +52,70 @@ const RadarLayer = () => {
   const observationTime = useSelector(selectObsTime);
 
   useEffect(() => {
-    radarLayers.baseReflectivity = {
-      0: L.tileLayer.wms(baseReflectivityUrl, {
-        layers: baseReflectivityLayer,
-        format: 'image/png',
+    radarLayers.baseReflectivity = [
+      WMS.layer(baseReflectivityUrl, baseReflectivityLayer, {
         transparent: true,
-        opacity: 0.575,
-      }),
-      5: L.tileLayer.wms(baseReflectivityUrl, {
-        layers: baseReflectivityLayer + '-m05m',
         format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      10: L.tileLayer.wms(baseReflectivityUrl, {
-        layers: baseReflectivityLayer + '-m10m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      15: L.tileLayer.wms(baseReflectivityUrl, {
-        layers: baseReflectivityLayer + '-m15m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      20: L.tileLayer.wms(baseReflectivityUrl, {
-        layers: baseReflectivityLayer + '-m20m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      25: L.tileLayer.wms(baseReflectivityUrl, {
-        layers: baseReflectivityLayer + '-m25m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      30: L.tileLayer.wms(baseReflectivityUrl, {
-        layers: baseReflectivityLayer + '-m30m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      35: L.tileLayer.wms(baseReflectivityUrl, {
-        layers: baseReflectivityLayer + '-m35m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      40: L.tileLayer.wms(baseReflectivityUrl, {
-        layers: baseReflectivityLayer + '-m40m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      45: L.tileLayer.wms(baseReflectivityUrl, {
-        layers: baseReflectivityLayer + '-m45m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      50: L.tileLayer.wms(baseReflectivityUrl, {
-        layers: baseReflectivityLayer + '-m50m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-    };
-    radarLayers.echoTopHeight = {
-      0: L.tileLayer.wms(echoTopHeightsUrl, {
-        layers: echoTopHeightsLayer,
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      5: L.tileLayer.wms(echoTopHeightsUrl, {
-        layers: echoTopHeightsLayer + '-m05m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      10: L.tileLayer.wms(echoTopHeightsUrl, {
-        layers: echoTopHeightsLayer + '-m10m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      15: L.tileLayer.wms(echoTopHeightsUrl, {
-        layers: echoTopHeightsLayer + '-m15m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      20: L.tileLayer.wms(echoTopHeightsUrl, {
-        layers: echoTopHeightsLayer + '-m20m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      25: L.tileLayer.wms(echoTopHeightsUrl, {
-        layers: echoTopHeightsLayer + '-m25m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      30: L.tileLayer.wms(echoTopHeightsUrl, {
-        layers: echoTopHeightsLayer + '-m30m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      35: L.tileLayer.wms(echoTopHeightsUrl, {
-        layers: echoTopHeightsLayer + '-m35m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      40: L.tileLayer.wms(echoTopHeightsUrl, {
-        layers: echoTopHeightsLayer + '-m40m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      45: L.tileLayer.wms(echoTopHeightsUrl, {
-        layers: echoTopHeightsLayer + '-m45m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-      50: L.tileLayer.wms(echoTopHeightsUrl, {
-        layers: echoTopHeightsLayer + '-m50m',
-        format: 'image/png',
-        transparent: true,
-        opacity: 0.575,
-      }),
-    };
-    radarLayers.forecast = [];
-    for (let i = 0; i <= forecastMinute; i += 15) {
-      radarLayers.forecast.push(
-        L.tileLayer.wms(forecastRadarUrl, {
-          layers: forecastRadarLayer + addLeadingZeroes(i, 4),
-          format: 'image/png',
+        tiled: false,
+        identify: false,
+      }).addTo(map),
+    ];
+    for (let m = 5; m <= 50; m += 5) {
+      const layerName = `${baseReflectivityLayer}-m${addLeadingZeroes(m, 2)}m`;
+      radarLayers.baseReflectivity.push(
+        WMS.layer(baseReflectivityUrl, layerName, {
           transparent: true,
-          opacity: 0.575,
-        }),
+          format: 'image/png',
+          tiled: false,
+          identify: false,
+        })
+          .setOpacity(0)
+          .addTo(map),
       );
     }
 
-    // Object.values(radarLayers.baseReflectivity).forEach((wmsLayer) => wmsLayer.setOpacity(1).addTo(map));
-    // Object.values(radarLayers.compositeReflectivity).forEach((wmsLayer) => wmsLayer.setOpacity(0).addTo(map));
-    // Object.values(radarLayers.echoTopHeight).forEach((wmsLayer) => wmsLayer.setOpacity(0).addTo(map));
-    // radarLayers.forecast.forEach((wmsLayer) => wmsLayer.setOpacity(0).addTo(map));
+    radarLayers.echoTopHeight = [
+      WMS.layer(echoTopHeightsUrl, echoTopHeightsLayer, {
+        transparent: true,
+        format: 'image/png',
+        tiled: false,
+        identify: false,
+      }).addTo(map),
+    ];
+    for (let m = 5; m <= 50; m += 5) {
+      const layerName = `${echoTopHeightsLayer}-m${addLeadingZeroes(m, 2)}m`;
+      radarLayers.echoTopHeight.push(
+        WMS.layer(echoTopHeightsUrl, layerName, {
+          transparent: true,
+          format: 'image/png',
+          tiled: false,
+          identify: false,
+        })
+          .setOpacity(0)
+          .addTo(map),
+      );
+    }
+
+    radarLayers.forecast = [];
+    for (let m = 0; m <= forecastMinute; m += 15) {
+      const layerName = `${forecastRadarLayer}${addLeadingZeroes(m, 4)}`;
+      radarLayers.forecast.push(
+        WMS.layer(forecastRadarUrl, layerName, {
+          transparent: true,
+          format: 'image/png',
+          tiled: false,
+          identify: false,
+        })
+          .setOpacity(0)
+          .addTo(map),
+      );
+    }
   }, []);
 
   useEffect(() => {
-    hideLayers(Object.values(radarLayers.baseReflectivity));
-    hideLayers(Object.values(radarLayers.echoTopHeight));
-    hideLayers(radarLayers.forecast);
+    radarLayers.baseReflectivity.forEach((layer) => layer.setOpacity(0));
+    radarLayers.echoTopHeight.forEach((layer) => layer.setOpacity(0));
+    radarLayers.forecast.forEach((layer) => layer.setOpacity(0));
     if (!radarLayerState.checked) {
       return;
     }
@@ -241,12 +124,12 @@ const RadarLayer = () => {
     if (layerName === null) return;
     if (differenceMinutes <= 0) {
       if (radarLayerState.baseReflectivity.checked) {
-        showLayer(radarLayers.baseReflectivity[layerName]);
+        showLayer(radarLayers.baseReflectivity, layerName);
       } else if (radarLayerState.echoTopHeight.checked) {
-        showLayer(radarLayers.echoTopHeight[layerName]);
+        showLayer(radarLayers.echoTopHeight, layerName);
       }
     } else if (differenceMinutes < forecastMinute && radarLayerState.forecastRadar.checked) {
-      showLayer(radarLayers.forecast[layerName]);
+      showLayer(radarLayers.forecast, layerName);
     }
   }, [
     radarLayerState.checked,
@@ -254,42 +137,13 @@ const RadarLayer = () => {
     radarLayerState.echoTopHeight.checked,
     radarLayerState.forecastRadar.checked,
     observationTime,
+    radarLayerState.opacity,
   ]);
 
-  useEffect(() => {
+  const showLayer = (layers: (typeof WMS.Layer)[], layerIndex: number) => {
+    if (!layers[layerIndex]) return;
     const opacity = radarLayerState.opacity / 100;
-    Object.values(radarLayers.baseReflectivity).forEach((layer) => layer.setOpacity(opacity));
-    Object.values(radarLayers.echoTopHeight).forEach((layer) => layer.setOpacity(opacity));
-    radarLayers.forecast.forEach((layer) => layer.setOpacity(opacity));
-  }, [radarLayerState.opacity]);
-
-  const showLayer = (layer: L.TileLayer.WMS) => {
-    if (!layer) return;
-    if (!map.hasLayer(layer)) map.addLayer(layer);
-  };
-
-  const showLayers = (layers: L.TileLayer.WMS[]) => {
-    layers.forEach((layer) => {
-      if (!layer) return;
-      if (!map.hasLayer(layer)) {
-        map.addLayer(layer);
-      }
-    });
-  };
-
-  const hideLayers = (layers: L.TileLayer.WMS[]) => {
-    layers.forEach((layer) => {
-      if (!layer) return;
-      if (map.hasLayer(layer)) {
-        map.removeLayer(layer);
-      }
-    });
-  };
-
-  const hideAllTime = () => {
-    Object.values(radarLayers.baseReflectivity).forEach((layer) => layer.setOpacity(0));
-    Object.values(radarLayers.echoTopHeight).forEach((layer) => layer.setOpacity(0));
-    radarLayers.forecast.forEach((layer) => layer.setOpacity(0));
+    layers[layerIndex].setOpacity(opacity);
   };
 
   const getTimeDifference = () => {
@@ -300,12 +154,9 @@ const RadarLayer = () => {
 
   const getTimeLayerName = () => {
     const differenceMinutes = getTimeDifference();
-    if (differenceMinutes <= 0) {
-      if (differenceMinutes < -50) {
-        return null;
-      }
+    if (differenceMinutes <= 0 && differenceMinutes >= -50) {
       const diff = Math.abs(differenceMinutes);
-      const layerName = Math.floor(diff / 5) * 5;
+      const layerName = Math.floor(diff / 5);
       return layerName;
     } else {
       if (differenceMinutes > forecastMinute) {

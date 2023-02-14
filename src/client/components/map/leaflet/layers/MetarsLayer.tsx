@@ -917,22 +917,27 @@ const MetarsLayer = () => {
         maxClusterRadius={clusterRadius}
         initData={filteredData}
         layerStateSelector={selectMetar}
-        readDb={() => db.metars.toArray()}
+        readDb={() => {
+          performance.mark('metar_db_done');
+          const data = db.metars.toArray();
+          return data;
+        }}
         writeDb={(features) => {
           db.metars.clear();
-          const chunkSize = 400;
-          let i = 0;
-          const chunkedAdd = () => {
-            if (features.length <= i) return;
-            db.metars
-              .bulkAdd(features.slice(i, i + chunkSize))
-              .catch((error) => console.log(error))
-              .finally(() => {
-                i += chunkSize;
-                chunkedAdd();
-              });
-          };
-          chunkedAdd();
+          db.metars.add({ id: 1, json: JSON.stringify(features) });
+          // const chunkSize = 400;
+          // let i = 0;
+          // const chunkedAdd = () => {
+          //   if (features.length <= i) return;
+          //   db.metars
+          //     .bulkAdd(features.slice(i, i + chunkSize))
+          //     .catch((error) => console.log(error))
+          //     .finally(() => {
+          //       i += chunkSize;
+          //       chunkedAdd();
+          //     });
+          // };
+          // chunkedAdd();
         }}
         // cacheVersion={cacheVersion}
       ></WFSLayer>

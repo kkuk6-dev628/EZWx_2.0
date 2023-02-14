@@ -2,7 +2,7 @@ import Dexie, { Table } from 'dexie';
 
 export class EzwxBriefDexie extends Dexie {
   // We just tell the typing system this is the case
-  metars!: Table<GeoJSON.Feature>;
+  metars!: Table<{ id?: number; json: string }>;
   pireps!: Table<GeoJSON.Feature>;
   convectiveOutlook!: Table<GeoJSON.Feature>;
   cwa!: Table<GeoJSON.Feature>;
@@ -17,7 +17,7 @@ export class EzwxBriefDexie extends Dexie {
   constructor() {
     super('EzwxBriefDexie');
     this.version(2).stores({
-      metars: 'id',
+      metars: '++id',
       pireps: 'id',
       convectiveOutlook: 'id',
       cwa: 'id',

@@ -80,6 +80,16 @@ const WFSLayer = React.forwardRef(
 
     useEffect(() => {
       const newKey = Date.now();
+      typeName === 'EZWxBrief:metar' &&
+        console.log(
+          'updated key',
+          'old key:',
+          geoJsonKey,
+          'new key',
+          newKey,
+          'displayedData',
+          displayedData.features.length,
+        );
       setGeoJsonKey(newKey);
     }, [displayedData]);
 
@@ -142,15 +152,21 @@ const WFSLayer = React.forwardRef(
     const ref = useRef(null);
     useEffect(() => {
       if (initData.features.length == 0) {
-        readDb().then((cachedFeatures) => {
-          if (cachedFeatures && cachedFeatures.length > 0) {
-            setGeoJSON({
-              type: 'FeatureCollection',
-              features: cachedFeatures,
-            });
-          }
-        });
-        fetchGeoJSON();
+        if (typeName === 'EZWxBrief:metar') {
+          readDb().then((data) => {
+            try {
+              const cachedFeatures = JSON.parse(data[0].json);
+              if (cachedFeatures && cachedFeatures.length > 0) {
+                console.log('loaded metar db', new Date().toLocaleTimeString());
+                setGeoJSON({
+                  type: 'FeatureCollection',
+                  features: cachedFeatures,
+                });
+              }
+            } catch (e) {}
+          });
+        }
+        setTimeout(fetchGeoJSON, 100);
       }
     }, []);
 
@@ -233,7 +249,6 @@ const WFSLayer = React.forwardRef(
       <>
         {isClusteredMarker && (
           <MarkerClusterGroup
-            key={geoJsonKey}
             ref={wfsRef}
             // @ts-ignore
             iconCreateFunction={(cluster) => {
@@ -272,6 +287,7 @@ const WFSLayer = React.forwardRef(
           >
             {displayedData != null && (
               <GeoJSONLayer
+                key={geoJsonKey}
                 ref={ref}
                 data={displayedData}
                 // @ts-ignore

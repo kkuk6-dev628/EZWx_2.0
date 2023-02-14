@@ -16,8 +16,8 @@
     if (!(request.url.indexOf('http') === 0)) return;
     // for development disable caching javascript, next, webpack
     // if (response.headers.get('Content-Type').indexOf('javascript') !== -1) return;
-    if (request.url.indexOf('_next') !== -1) return;
-    if (request.url.indexOf('webpack') !== -1) return;
+    // if (request.url.indexOf('_next') !== -1) return;
+    // if (request.url.indexOf('webpack') !== -1) return;
 
     var copy = response.clone();
     caches.open(version).then(function (cache) {
@@ -68,13 +68,13 @@
       return;
     }
 
-    // For HTML requests, try the network first, fall back to the cache, finally the offline page
     if (
       request &&
       request.headers &&
       request.headers.get('Accept') &&
       request.headers.get('Accept').indexOf('text/html') !== -1
     ) {
+      // For HTML requests, try the network first, fall back to the cache, finally the offline page
       event.respondWith(
         fetch(request)
           .then(function (response) {
@@ -91,26 +91,30 @@
       return;
     }
 
-    // cache first for fingerprinted resources
-    // if (request.url.match(/(\?|&)v=/gi)) {
-    //   event.respondWith(
-    //     caches.match(request).then(function (response) {
-    //       return (
-    //         response ||
-    //         fetch(request)
-    //           .then(function (response) {
-    //             addToCache(request, response);
-    //             return response || serveOfflineImage(request);
-    //           })
-    //           .catch(function () {
-    //             return serveOfflineImage(request);
-    //           })
-    //       );
-    //     }),
-    //   );
+    // cache first for next images and tile images
+    if (
+      request.url.indexOf('_next/image') !== -1 ||
+      request.headers.get('Accept').indexOf('image/jpeg') !== -1 ||
+      request.headers.get('Accept').indexOf('image/png') !== -1
+    ) {
+      event.respondWith(
+        caches.match(request).then(function (response) {
+          return (
+            response ||
+            fetch(request)
+              .then(function (response) {
+                addToCache(request, response);
+                return response || serveOfflineImage(request);
+              })
+              .catch(function () {
+                return serveOfflineImage(request);
+              })
+          );
+        }),
+      );
 
-    //   return;
-    // }
+      return;
+    }
 
     // network first for non-fingerprinted resources
     event.respondWith(
