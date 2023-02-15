@@ -143,7 +143,7 @@ L.TileLayer.include({
           // Serve tile from cached data
           //console.log('Tile is cached: ', tileUrl);
           tile.onload = L.bind(this._tileOnLoad, this, done, tile);
-          tile.src = url;
+          tile.src = tileUrl;
         }.bind(this),
       );
   },
