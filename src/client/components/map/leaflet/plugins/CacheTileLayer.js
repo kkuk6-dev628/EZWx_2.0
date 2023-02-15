@@ -138,12 +138,14 @@ L.TileLayer.include({
           }
         }.bind(this),
       )
-      .catch(function (error) {
-        // Serve tile from cached data
-        //console.log('Tile is cached: ', tileUrl);
-        tile.onload = L.bind(this._tileOnLoad, this, done, tile);
-        tile.src = url;
-      });
+      .catch(
+        function (error) {
+          // Serve tile from cached data
+          //console.log('Tile is cached: ', tileUrl);
+          tile.onload = L.bind(this._tileOnLoad, this, done, tile);
+          tile.src = url;
+        }.bind(this),
+      );
   },
 
   _onCacheMiss: function (tile, tileUrl, done) {
