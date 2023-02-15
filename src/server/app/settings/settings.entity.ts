@@ -1,10 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
+import { Column,OneToOne, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {User} from '../user/user.entity'
 @Entity()
 export class UserSettings {
   @PrimaryGeneratedColumn()
   id: number;
-
   @Column()
   default_home_airport: string;
   @Column()
@@ -27,35 +26,63 @@ export class UserSettings {
   //Personal Minimums Fields
 
   @Column()
-  ceiling_at_departure: number;
+  ceiling_at_departure_min: number;
+  @Column()
+  ceiling_at_departure_max: number;
 
   @Column()
-  surface_visibility_at_departure: number;
+  surface_visibility_at_departure_min: number;
+  @Column()
+  surface_visibility_at_departure_max: number;
 
   @Column()
-  crosswinds_at_departure_airport: number;
+  crosswinds_at_departure_airport_min: number;
+  @Column()
+  crosswinds_at_departure_airport_max: number;
 
   @Column()
-  ceiling_along_route: number;
+  ceiling_along_route_min: number;
+  @Column()
+  ceiling_along_route_max: number;
 
   @Column()
-  surface_visibility_along_route: number;
+  surface_visibility_along_route_min: number;
+  @Column()
+  surface_visibility_along_route_max: number;
 
   @Column()
-  en_route_icing_probability: number;
+  en_route_icing_probability_min: string;
+  @Column()
+  en_route_icing_probability_max: string;
 
   @Column()
-  en_route_turbulence_intensity: number;
+  en_route_turbulence_intensity_min: number;
 
   @Column()
-  en_route_convective_potential: number;
+  en_route_turbulence_intensity_max: number;
 
   @Column()
-  ceiling_at_destination: number;
+  en_route_convective_potential_min: number;
+  @Column()
+  en_route_convective_potential_max: number;
 
   @Column()
-  surface_visibility_at_destination: number;
+  ceiling_at_destination_min: number;
+  @Column()
+  ceiling_at_destination_max: number;
 
   @Column()
-  crosswinds_at_destination_airport: number;
+  surface_visibility_at_destination_min: number;
+  @Column()
+  surface_visibility_at_destination_max: number;
+
+  @Column()
+  crosswinds_at_destination_airport_min: number;
+  @Column()
+  crosswinds_at_destination_airport_max: number;
+
+  @Column()
+  // @OneToOne(()=>User,(user)=>user.userSettings )
+  user_id:number
+
 }

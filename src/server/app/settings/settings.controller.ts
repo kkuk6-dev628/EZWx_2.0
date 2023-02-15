@@ -1,19 +1,21 @@
 import { SettingsService } from './settings.service';
-import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Post } from '@nestjs/common';
+import { CreateUserSettingsDto } from './dto/create_settings_dto';
 
 @Controller('settings')
 export class SettingsController {
 
   constructor (private settingService: SettingsService) {}
 
-  @Get('/') 
-  getAllSettings(){
-    return this.settingService.getAllSettings();
+  @Get(':id') 
+  find(@Param('id') id: string){
+    return this.settingService.find(+id);
   } 
 
   @Post('/add')
   @HttpCode(200)
-  addUserSettings(@Body() settingsData){
-    return {data:settingsData};
+  create(@Body() createUserSettingsDto:CreateUserSettingsDto){
+    return this.settingService.create(createUserSettingsDto)
   }
+  
 }
