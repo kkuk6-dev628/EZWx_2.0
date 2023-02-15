@@ -32,7 +32,7 @@
     "@emotion/styled": "^11.10.5",
     "@material-ui/core": "latest",
     "@material-ui/icons": "latest",
-    "@mui/material": "^5.11.8",
+    "@mui/material": "^5.11.9",
     "@nestjs/common": "^9.3.3",
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.3.3",
