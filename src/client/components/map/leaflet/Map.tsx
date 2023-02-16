@@ -30,6 +30,7 @@ import { selectBaseMapLayerControlShow, setBaseMapLayerControlShow } from '../..
 import MapSearch from '../../shared/MapSearch';
 import MapSideButtons from '../../shared/MapSideButtons';
 import { Drawer } from '@mui/material';
+import { useGetAirportQuery } from '../../../store/airports/airportApi';
 
 function LeafletMap() {
   const { pathname } = useRouter();
@@ -40,6 +41,7 @@ function LeafletMap() {
   const dispatch = useDispatch();
   const meteoLayerControlShow = useSelector(selectLayerControlShow);
   const baseMapLayerControlShow = useSelector(selectBaseMapLayerControlShow);
+  const { isLoading, data: airports } = useGetAirportQuery("");
 
   useEffect(() => {
     if (pathname === '/try-ezwxbrief') {

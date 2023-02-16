@@ -7,11 +7,13 @@ import ObsIntervalSlice from './time-slider/ObsIntervalSlice';
 import { createWrapper } from 'next-redux-wrapper';
 import authSlice from './auth/authSlice';
 import { apiSlice } from './api/apiSlice';
+import { airportApi } from './airports/airportApi';
 
 const makeStore = () =>
   configureStore({
     reducer: {
       [ObsIntervalSlice.name]: ObsIntervalSlice.reducer,
+      [airportApi.reducerPath]: airportApi.reducer,
       [ObsTimeSlice.name]: ObsTimeSlice.reducer,
       [apiSlice.reducerPath]: apiSlice.reducer,
       [authSlice.name]: authSlice.reducer,
@@ -20,7 +22,8 @@ const makeStore = () =>
       [BaseMapLayerControlSlice.name]: BaseMapLayerControlSlice.reducer,
     },
     devTools: process.env.NODE_ENV !== 'production',
-    middleware: (getDefaultMiddlewares) => getDefaultMiddlewares().concat(apiSlice.middleware),
+    middleware: (getDefaultMiddlewares) =>
+      getDefaultMiddlewares().concat(apiSlice.middleware).concat(airportApi.middleware),
   });
 
 export type AppStore = ReturnType<typeof makeStore>;
