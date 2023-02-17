@@ -17,8 +17,6 @@
     max-width: 344px;
   }
 
-
-
   button {
     cursor: pointer;
   }
@@ -43,7 +41,6 @@
     font-size: 18px;
     line-height: 20px;
     color: var(--color-white);
-
   }
 
   &__tabs {
@@ -58,7 +55,7 @@
     font-size: 24px;
     color: var(--color-primary);
     padding: 14px 4px;
-    border-right: 1px solid #C4C4C4;
+    border-right: 1px solid #c4c4c4;
 
     @media (max-width: 1024px) {
       padding: 10px 4px;
@@ -100,10 +97,32 @@
   }
 
   &__input {
-    border: 1px solid #C4C4C4;
+    border: 1px solid #c4c4c4;
     border-radius: 4px;
     padding: 16px 12px;
 
+    &__suggestions__container {
+      position: relative;
+      top: -8px;
+      left: 0;
+      transition: all 4s ease-in-out 1s;
+    }
+    &__suggestions__content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 99;
+      background: white;
+      min-width: 100%;
+      min-height: 100px;
+      max-height: 300%;
+      overflow-y: auto;
+      scrollbar-width: 1px;
+      border: 0.5px solid white;
+      display: flex;
+      flex-direction: column;
+      transition: all 4s ease-in-out 1s;
+    }
     @media (max-width: 460px) {
       padding: 10px 8px;
       font-size: 12px;
@@ -125,7 +144,7 @@
   &__numin {
     display: flex;
     position: relative;
-    border: 1px solid #C4C4C4;
+    border: 1px solid #c4c4c4;
     border-radius: 20px;
     height: 40px;
     width: 144px;
@@ -136,7 +155,7 @@
   &__lft {
     position: absolute;
     left: 0;
-    border: 1.5px solid #3F0C69;
+    border: 1.5px solid #3f0c69;
     width: 30px;
     height: 30px;
     border-radius: 50%;
@@ -150,7 +169,7 @@
 
   &__rgt {
     position: absolute;
-    border: 1.5px solid #3F0C69;
+    border: 1.5px solid #3f0c69;
     right: 0;
     width: 30px;
     height: 30px;
@@ -172,7 +191,6 @@
     text-align: center;
     border: none;
 
-
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;
@@ -186,7 +204,6 @@
 
   &__icon--mi {
     font-size: 24px;
-
   }
 
   &__btn__grp {
@@ -198,7 +215,7 @@
   }
 
   &__btn--btm {
-    background: #3F0C69;
+    background: #3f0c69;
     border-radius: 22px;
     font-weight: 400;
     font-size: 20px;
@@ -212,7 +229,6 @@
       width: 140px;
       font-size: 12px;
     }
-
   }
 
   &__txt {
@@ -227,7 +243,7 @@
 }
 
 .react-switch {
-  border: 2px solid #C4C4C4;
+  border: 2px solid #c4c4c4;
   margin-top: 10px;
 }
 
@@ -237,5 +253,32 @@
 }
 
 .react-switch-handle {
-  background-color: #3F0C69 !important;
+  background-color: #3f0c69 !important;
+}
+
+.input__container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  input {
+    flex-grow: 1;
+  }
+}
+
+.input__loading {
+  position: absolute;
+  right: 0;
+  width: 25px;
+  padding: 2px;
+  font-weight: 600;
+  cursor: pointer;
+  height: 25px;
+}
+
+.list__item {
+  padding: 10px;
+  &:hover {
+    background-color: gray;
+    cursor: pointer;
+  }
 }

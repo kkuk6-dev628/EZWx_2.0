@@ -1,68 +1,69 @@
-@import "./partial/base";
-@import "./partial/typography";
-@import "./partial/variables";
-@import "leaflet";
+@import './partial/base';
+@import './partial/typography';
+@import './partial/variables';
+@import 'leaflet';
 /*------ Layout ------*/
 //Header
-@import "./layout/Header.scss";
-
+@import './layout/Header.scss';
 
 //footer
-@import "./layout/Footer.scss";
+@import './layout/Footer.scss';
 
 /*------  Shared Components ------*/
-@import "./shared/FlexiblePricing.scss";
-@import "./shared/MapTabs.scss";
-@import "./shared/MapSearch.scss";
-@import "./shared/MapSideButtons.scss";
-@import "./shared/Route.scss";
-@import "./shared//CollapsibleBar.scss";
-@import "./shared/DateSliderModal.scss";
-@import "./shared/DateSlider.scss";
-@import "./shared/ProfileModal.scss";
-@import "./shared/ChangePasswordModal.scss";
-
+@import './shared/FlexiblePricing.scss';
+@import './shared/MapTabs.scss';
+@import './shared/MapSearch.scss';
+@import './shared/MapSideButtons.scss';
+@import './shared/Route.scss';
+@import './shared//CollapsibleBar.scss';
+@import './shared/DateSliderModal.scss';
+@import './shared/DateSlider.scss';
+@import './shared/ProfileModal.scss';
+@import './shared/ChangePasswordModal.scss';
 
 /*-------------- Pages -------------*/
 
 //Home
-@import "./pages/home/HomeHero.scss";
-@import "./pages/home/HomeAbout.scss";
-@import "./pages/signin.scss";
-@import "./pages/signup.scss";
-
+@import './pages/home/HomeHero.scss';
+@import './pages/home/HomeAbout.scss';
+@import './pages/signin.scss';
+@import './pages/signup.scss';
 
 //pricing
-@import "./pages/Pricing.scss";
+@import './pages/Pricing.scss';
 
 //imagery
-@import "./pages/Imagery.scss";
+@import './pages/Imagery.scss';
 
 // map
-@import "./map/WeatherIcons.scss";
-@import "./map/Leaflet.scss";
-@import "./map/MeteoLayerControl.scss";
+@import './map/WeatherIcons.scss';
+@import './map/Leaflet.scss';
+@import './map/MeteoLayerControl.scss';
+
+// common
+@import './common/AutoComleteInput.scss';
 
 //Profile
-@import "./pages/Profile.scss";
+@import './pages/Profile.scss';
 
 //swiper slider override
-.swiper-button-next:after, .swiper-button-prev:after{
+.swiper-button-next:after,
+.swiper-button-prev:after {
   display: none;
 }
 
-.swiper-button-next, .swiper-button-prev{
+.swiper-button-next,
+.swiper-button-prev {
   display: none;
   background-repeat: no-repeat;
-  height: 20px!important;
-  width: 20px!important;
+  height: 20px !important;
+  width: 20px !important;
 }
 
-.swiper-button-next{
+.swiper-button-next {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3e%3cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3e%3c/svg%3e");
-  
 }
 
-.swiper-button-prev{
+.swiper-button-prev {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3e%3cpath d='M5.25 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3e%3c/svg%3e");
 }

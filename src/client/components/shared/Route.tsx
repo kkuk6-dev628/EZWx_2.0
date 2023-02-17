@@ -4,16 +4,61 @@ import { BsBookmarkPlus } from 'react-icons/bs';
 import { AiOutlineMinus } from 'react-icons/ai';
 import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
 import Switch from 'react-switch';
+import { AutoCompleteInput } from '../common/AutoCompleteInput';
 //i pass setIsShowModal as a prop to the modal component
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
 }
 
+const regex1 = /[a-z]/g;
+const DEPARTURE = 'departure';
+const DEPARTURE_SUGGESTION = 'departureSuggestion';
+const ROUTE_OF_FLIGHT = 'routeOfFlight';
+const ROUTE_OF_FLIGHT_SUGGESTION = 'routeOfFlightSuggestion';
+const DESTINATION = 'destination';
+const DESTINATION_SUGGESTION = 'destinationSuggestion';
+
+type FormData = {
+  departure: string;
+  departureSuggestion: boolean;
+  routeOfFlight: string;
+  routeOfFlightSuggestion: boolean;
+  destination: string;
+  destinationSuggestion: boolean;
+};
+
 function Route({ setIsShowModal }: Props) {
   const [checked, setChecked] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
+    departure: '',
+    departureSuggestion: false,
+    routeOfFlight: '',
+    routeOfFlightSuggestion: false,
+    destination: '',
+    destinationSuggestion: false,
+  });
+
   const handleChange = (nextChecked) => {
     setChecked(nextChecked);
   };
+
+  const handleAutoComplete = (name: string, val: string) => {
+    setFormData({
+      ...formData,
+      [name]: val.replace(regex1, (match) => match.toUpperCase()),
+      [name + 'Suggestion']: true,
+    });
+  };
+
+  const handleCloseSuggestion = () => {
+    setFormData((prev) => ({
+      ...prev,
+      departureSuggestion: false,
+      routeOfFlightSuggestion: false,
+      destinationSuggestion: false,
+    }));
+  };
+
   return (
     <div className="modal">
       <div className="modal__wrp">
@@ -48,20 +93,41 @@ function Route({ setIsShowModal }: Props) {
                 <label htmlFor="route-name" className="modal__label text">
                   Departure*
                 </label>
-                <input type="text" className="modal__input" id="route-name" placeholder="ICAO or FAA" />
+                <AutoCompleteInput
+                  name={DEPARTURE}
+                  value={formData[DEPARTURE]}
+                  handleAutoComplete={handleAutoComplete}
+                  handleCloseSuggestion={handleCloseSuggestion}
+                  showSuggestion={formData[DEPARTURE_SUGGESTION]}
+                />
               </div>
+
               <div className="modal__input__grp">
                 <label htmlFor="route-flight" className="modal__label text">
                   Route of Flight
                 </label>
-                <input type="text" className="modal__input" id="route-flight" placeholder="ICAO or FAA" />
+                <AutoCompleteInput
+                  name={ROUTE_OF_FLIGHT}
+                  value={formData[ROUTE_OF_FLIGHT]}
+                  showSuggestion={formData[ROUTE_OF_FLIGHT_SUGGESTION]}
+                  handleAutoComplete={handleAutoComplete}
+                  handleCloseSuggestion={handleCloseSuggestion}
+                />
               </div>
+
               <div className="modal__input__grp">
                 <label htmlFor="route-destination" className="modal__label text">
                   Destination*
                 </label>
-                <input type="text" className="modal__input" id="route-destination" placeholder="ICAO or FAA" />
+                <AutoCompleteInput
+                  name={DESTINATION}
+                  value={formData[DESTINATION]}
+                  handleAutoComplete={handleAutoComplete}
+                  handleCloseSuggestion={handleCloseSuggestion}
+                  showSuggestion={formData[DESTINATION_SUGGESTION]}
+                />
               </div>
+
               <div className="modal__swd">
                 <div className="modal__numin__area">
                   <label htmlFor="route-numin" className="modal__label text">
