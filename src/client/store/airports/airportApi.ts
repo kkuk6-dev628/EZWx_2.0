@@ -10,7 +10,7 @@ function getUrl(): any {
   url.searchParams.set('typeName', 'EZWxBrief:airport');
   url.searchParams.set('version', '1.0.0');
   url.searchParams.set('srsName', 'EPSG:4326');
-  url.searchParams.set('propertyName', 'icaoid,name,faaid');
+  url.searchParams.set('propertyName', 'icaoid,name,faaid,geometry');
   url.searchParams.set('cql_filter', 'faaid is not null');
   url.searchParams.set('outputFormat', 'application/json');
   url.searchParams.set('v', '1');
