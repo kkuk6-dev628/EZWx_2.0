@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AiOutlineClose, AiOutlineCloseCircle } from 'react-icons/ai';
 import { BsBookmarkPlus } from 'react-icons/bs';
 import { AiOutlineMinus } from 'react-icons/ai';
 import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
 import Switch from 'react-switch';
-import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
-import { useGetAirportQuery } from '../../store/airports/airportApi';
 import { AutoCompleteInput } from '../common/AutoCompleteInput';
 //i pass setIsShowModal as a prop to the modal component
 interface Props {
