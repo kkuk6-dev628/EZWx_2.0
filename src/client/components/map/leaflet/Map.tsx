@@ -41,7 +41,7 @@ function LeafletMap() {
   const dispatch = useDispatch();
   const meteoLayerControlShow = useSelector(selectLayerControlShow);
   const baseMapLayerControlShow = useSelector(selectBaseMapLayerControlShow);
-  const { isLoading, data: airports } = useGetAirportQuery("");
+  const { isLoading, data: airports } = useGetAirportQuery('');
 
   useEffect(() => {
     if (pathname === '/try-ezwxbrief') {

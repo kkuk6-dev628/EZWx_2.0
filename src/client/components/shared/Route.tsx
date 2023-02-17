@@ -12,14 +12,13 @@ interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
 }
 
-
 const regex1 = /[a-z]/g;
-const DEPARTURE: string = 'departure';
-const DEPARTURE_SUGGESTION: string = 'departureSuggestion';
-const ROUTE_OF_FLIGHT: string = 'routeOfFlight';
-const ROUTE_OF_FLIGHT_SUGGESTION: string = 'routeOfFlightSuggestion';
-const DESTINATION: string = 'destination';
-const DESTINATION_SUGGESTION: string = 'destinationSuggestion';
+const DEPARTURE = 'departure';
+const DEPARTURE_SUGGESTION = 'departureSuggestion';
+const ROUTE_OF_FLIGHT = 'routeOfFlight';
+const ROUTE_OF_FLIGHT_SUGGESTION = 'routeOfFlightSuggestion';
+const DESTINATION = 'destination';
+const DESTINATION_SUGGESTION = 'destinationSuggestion';
 
 type FormData = {
   departure: string;
@@ -28,26 +27,30 @@ type FormData = {
   routeOfFlightSuggestion: boolean;
   destination: string;
   destinationSuggestion: boolean;
-}
-
+};
 
 function Route({ setIsShowModal }: Props) {
   const [checked, setChecked] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    departure: '', departureSuggestion: false,
-    routeOfFlight: '', routeOfFlightSuggestion: false,
-    destination: '', destinationSuggestion: false,
-  })
-  // const [airportData, setAirportData] = useState([])
-
+    departure: '',
+    departureSuggestion: false,
+    routeOfFlight: '',
+    routeOfFlightSuggestion: false,
+    destination: '',
+    destinationSuggestion: false,
+  });
 
   const handleChange = (nextChecked) => {
     setChecked(nextChecked);
   };
 
   const handleAutoComplete = (name: string, val: string) => {
-    setFormData({ ...formData, [name]: val.replace(regex1, (match) => match.toUpperCase()), [name + "Suggestion"]: true })
-  }
+    setFormData({
+      ...formData,
+      [name]: val.replace(regex1, (match) => match.toUpperCase()),
+      [name + 'Suggestion']: true,
+    });
+  };
 
   const handleCloseSuggestion = () => {
     setFormData((prev) => ({
@@ -55,10 +58,8 @@ function Route({ setIsShowModal }: Props) {
       departureSuggestion: false,
       routeOfFlightSuggestion: false,
       destinationSuggestion: false,
-    }))
-  }
-
-
+    }));
+  };
 
   return (
     <div className="modal">
@@ -90,7 +91,6 @@ function Route({ setIsShowModal }: Props) {
               </button>
             </div>
             <form action="" className="modal__form">
-
               <div className="modal__input__grp">
                 <label htmlFor="route-name" className="modal__label text">
                   Departure*
@@ -98,8 +98,10 @@ function Route({ setIsShowModal }: Props) {
                 <AutoCompleteInput
                   name={DEPARTURE}
                   value={formData[DEPARTURE]}
-                  handleAutoComplete={handleAutoComplete} handleCloseSuggestion={handleCloseSuggestion}
-                  showSuggestion={formData[DEPARTURE_SUGGESTION]} />
+                  handleAutoComplete={handleAutoComplete}
+                  handleCloseSuggestion={handleCloseSuggestion}
+                  showSuggestion={formData[DEPARTURE_SUGGESTION]}
+                />
               </div>
 
               <div className="modal__input__grp">
@@ -110,7 +112,8 @@ function Route({ setIsShowModal }: Props) {
                   name={ROUTE_OF_FLIGHT}
                   value={formData[ROUTE_OF_FLIGHT]}
                   showSuggestion={formData[ROUTE_OF_FLIGHT_SUGGESTION]}
-                  handleAutoComplete={handleAutoComplete} handleCloseSuggestion={handleCloseSuggestion}
+                  handleAutoComplete={handleAutoComplete}
+                  handleCloseSuggestion={handleCloseSuggestion}
                 />
               </div>
 
@@ -123,7 +126,8 @@ function Route({ setIsShowModal }: Props) {
                   value={formData[DESTINATION]}
                   handleAutoComplete={handleAutoComplete}
                   handleCloseSuggestion={handleCloseSuggestion}
-                  showSuggestion={formData[DESTINATION_SUGGESTION]} />
+                  showSuggestion={formData[DESTINATION_SUGGESTION]}
+                />
               </div>
 
               <div className="modal__swd">
@@ -171,8 +175,8 @@ function Route({ setIsShowModal }: Props) {
             <p className="modal__txt">* Required field</p>
           </div>
         </div>
-      </div >
-    </div >
+      </div>
+    </div>
   );
 }
 
