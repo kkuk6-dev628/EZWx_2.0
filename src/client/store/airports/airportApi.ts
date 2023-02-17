@@ -16,6 +16,22 @@ function getUrl(): any {
   url.searchParams.set('v', '1');
   return url;
 }
+type Property = {
+  faaid: string | null;
+  icaoid: string | null;
+  name: string | null;
+};
+
+type Feature = {
+  geometry: any;
+  id: string;
+  properties: Property;
+  type: string;
+};
+
+type Response = {
+  features: Feature[];
+};
 
 export const airportApi = createApi({
   reducerPath: 'airportApi',
@@ -23,8 +39,7 @@ export const airportApi = createApi({
   endpoints: (builder) => ({
     getAirport: builder.query({
       query: () => ({ url: '', method: 'Get' }),
-      transformResponse: (response) => {
-        console.log('response', response);
+      transformResponse: (response: Response) => {
         return response?.features.reduce((acc, feature) => {
           if (feature.properties.name !== '') {
             if (feature.properties.faaid) {

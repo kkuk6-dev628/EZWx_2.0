@@ -4,33 +4,62 @@ import { BsBookmarkPlus } from 'react-icons/bs';
 import { AiOutlineMinus } from 'react-icons/ai';
 import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
 import Switch from 'react-switch';
-import { Autocomplete, CircularProgress, ClickAwayListener, TextField, Typography } from '@mui/material';
-import { useDispatch } from 'react-redux';
+import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
 import { useGetAirportQuery } from '../../store/airports/airportApi';
-import axios from 'axios';
+import { AutoCompleteInput } from '../common/AutoCompleteInput';
 //i pass setIsShowModal as a prop to the modal component
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
 }
 
+
 const regex1 = /[a-z]/g;
-// const regex = /[a-z]/\U$&/g;
+const DEPARTURE: string = 'departure';
+const DEPARTURE_SUGGESTION: string = 'departureSuggestion';
+const ROUTE_OF_FLIGHT: string = 'routeOfFlight';
+const ROUTE_OF_FLIGHT_SUGGESTION: string = 'routeOfFlightSuggestion';
+const DESTINATION: string = 'destination';
+const DESTINATION_SUGGESTION: string = 'destinationSuggestion';
+
+type FormData = {
+  departure: string;
+  departureSuggestion: boolean;
+  routeOfFlight: string;
+  routeOfFlightSuggestion: boolean;
+  destination: string;
+  destinationSuggestion: boolean;
+}
 
 
 function Route({ setIsShowModal }: Props) {
   const [checked, setChecked] = useState(false);
-  const [departure, setDeparture] = useState('')
-  const [isDepartureActive, setIsDepartureActive] = useState(false)
-  const [airportData, setAirportData] = useState([])
-  const { isLoading, data: airports } = useGetAirportQuery("");
+  const [formData, setFormData] = useState<FormData>({
+    departure: '', departureSuggestion: false,
+    routeOfFlight: '', routeOfFlightSuggestion: false,
+    destination: '', destinationSuggestion: false,
+  })
+  // const [airportData, setAirportData] = useState([])
 
-  console.log('abc', airports, isLoading)
 
   const handleChange = (nextChecked) => {
     setChecked(nextChecked);
   };
 
-  const closeAllSuggestionBox = () => { console.log('Close') }
+  const handleAutoComplete = (name: string, val: string) => {
+    setFormData({ ...formData, [name]: val.replace(regex1, (match) => match.toUpperCase()), [name + "Suggestion"]: true })
+  }
+
+  const handleCloseSuggestion = () => {
+    setFormData((prev) => ({
+      ...prev,
+      departureSuggestion: false,
+      routeOfFlightSuggestion: false,
+      destinationSuggestion: false,
+    }))
+  }
+
+
+
   return (
     <div className="modal">
       <div className="modal__wrp">
@@ -61,47 +90,42 @@ function Route({ setIsShowModal }: Props) {
               </button>
             </div>
             <form action="" className="modal__form">
+
               <div className="modal__input__grp">
                 <label htmlFor="route-name" className="modal__label text">
                   Departure*
                 </label>
-                <input type="text"
-                  onFocus={() => setIsDepartureActive(true)}
-                  onBlur={() => setIsDepartureActive(false)}
-                  value={departure}
-                  onChange={(e) => setDeparture(
-                    e.target.value.replace(regex1, (match) => match.toUpperCase()))}
-                  className="modal__input" id="route-name" placeholder="ICAO or FAA" />
-
-                {(departure.length > 1 && airports != undefined) ? (
-                  <ClickAwayListener onClickAway={closeAllSuggestionBox} >
-
-                    <div className="modal__input__suggestions__container">
-                      <div className="modal__input__suggestions__content">
-                        {airports
-                          .filter((obj) => (obj.key.includes(departure)))
-                          .map((obj) =>
-                            (<h3>{obj.key + " - " + obj.name}</h3>)
-                          )}
-                      </div>
-                    </div>
-                  </ClickAwayListener>)
-                  : isLoading ? <CircularProgress /> : <Typography>No Record</Typography>}
-
-
+                <AutoCompleteInput
+                  name={DEPARTURE}
+                  value={formData[DEPARTURE]}
+                  handleAutoComplete={handleAutoComplete} handleCloseSuggestion={handleCloseSuggestion}
+                  showSuggestion={formData[DEPARTURE_SUGGESTION]} />
               </div>
+
               <div className="modal__input__grp">
                 <label htmlFor="route-flight" className="modal__label text">
                   Route of Flight
                 </label>
-                <input type="text" className="modal__input" id="route-flight" placeholder="ICAO or FAA" />
+                <AutoCompleteInput
+                  name={ROUTE_OF_FLIGHT}
+                  value={formData[ROUTE_OF_FLIGHT]}
+                  showSuggestion={formData[ROUTE_OF_FLIGHT_SUGGESTION]}
+                  handleAutoComplete={handleAutoComplete} handleCloseSuggestion={handleCloseSuggestion}
+                />
               </div>
+
               <div className="modal__input__grp">
                 <label htmlFor="route-destination" className="modal__label text">
                   Destination*
                 </label>
-                <input type="text" className="modal__input" id="route-destination" placeholder="ICAO or FAA" />
+                <AutoCompleteInput
+                  name={DESTINATION}
+                  value={formData[DESTINATION]}
+                  handleAutoComplete={handleAutoComplete}
+                  handleCloseSuggestion={handleCloseSuggestion}
+                  showSuggestion={formData[DESTINATION_SUGGESTION]} />
               </div>
+
               <div className="modal__swd">
                 <div className="modal__numin__area">
                   <label htmlFor="route-numin" className="modal__label text">
