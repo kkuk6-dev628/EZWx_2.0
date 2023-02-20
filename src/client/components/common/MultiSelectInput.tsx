@@ -14,31 +14,110 @@ interface airportObj {
   key: string;
 }
 const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) => {
-  const { isLoading, data: airports } = useGetAirportQuery('');
-
-  const renderItem = (name: string, val: string) => {
-    return airports
-      .filter((obj: airportObj) => obj.key.includes(val))
-      .map((obj: airportObj, ind: number) => {
-        const title: string = obj.key + ' - ' + obj.name;
-        return (
-          <span
-            onClick={() => {
-              handleAutoComplete(name, [...selectedValues, obj.key]);
-              setShowSuggestion(false);
-              setInputValue('');
-            }}
-            className="list__item"
-            key={ind}
-          >
-            {title}
-          </span>
-        );
-      });
-  };
-
   const [inputValue, setInputValue] = useState('');
   const [showSuggestion, setShowSuggestion] = useState(false);
+  const [currentFocus, setCurrentFocus] = useState(0);
+  const inputRef = React.useRef(null);
+  const parentRef = React.useRef(null);
+
+  const { isLoading, data: airports } = useGetAirportQuery('');
+
+  // React.useEffect(() => {
+  //   const input = inputRef.current;
+  //   input.addEventListener('keydown', handleKeyDown);
+
+  //   return () => {
+  //     input.removeEventListener('keydown', handleKeyDown);
+  //   };
+  // }, [currentFocus, airports, showSuggestion, inputValue]);
+
+  const renderItem = (name: string, val: string) => {
+    try {
+      return airports
+        .filter((obj: airportObj) => obj.key.includes(val))
+        .map((obj: airportObj, ind: number) => {
+          const title: string = obj.key + ' - ' + obj.name;
+          return (
+            <span
+              onClick={() => {
+                handleAutoComplete(name, [...selectedValues, obj.key]);
+                setShowSuggestion(false);
+                setInputValue('');
+              }}
+              id={obj.key}
+              className={ind === currentFocus ? 'list__item   focused' : 'list__item'}
+              key={obj.key + ind}
+            >
+              {title}
+            </span>
+          );
+        });
+    } catch (error) {
+      console.error('Render item error', error);
+      return [];
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    try {
+      switch (e.key) {
+        case 'ArrowDown':
+          if (showSuggestion) {
+            if (renderItem(name, inputValue).length - 1 > currentFocus) {
+              setCurrentFocus((prev) => prev + 1);
+              scrollToFocusItem();
+            }
+          } else {
+            setShowSuggestion(true);
+          }
+          break;
+        case 'ArrowUp':
+          if (currentFocus > 0) {
+            setCurrentFocus((prev) => prev - 1);
+            scrollToFocusItem();
+          } else {
+            handleClose();
+          }
+          break;
+        case 'Enter':
+          const filteredResult = renderItem(name, inputValue);
+          if (filteredResult.length > 0 && currentFocus + 1 <= filteredResult.length && inputValue !== '') {
+            handleAutoComplete(name, [...selectedValues, filteredResult[currentFocus].props.id]);
+            setInputValue('');
+          }
+
+          break;
+        default:
+      }
+    } catch (error) {
+      console.info('handleKeyDown error', error);
+    }
+  };
+
+  const handleClose = () => {
+    setShowSuggestion(false);
+    setCurrentFocus(0);
+  };
+
+  const scrollToFocusItem = () => {
+    const focusedItem = document.querySelector('.focused');
+    const parentBounds = parentRef.current.getBoundingClientRect();
+    const itemBounds = focusedItem.getBoundingClientRect();
+    const topOffset = itemBounds.top - parentBounds.top;
+    const bottomOffset = itemBounds.bottom - parentBounds.bottom;
+    if (topOffset < 50) {
+      parentRef.current.scrollBy(0, topOffset - 40);
+    }
+    if (bottomOffset > -50) {
+      parentRef.current.scrollBy(0, bottomOffset + 40);
+    }
+  };
+
+  const handleChange = ({ target: { name: _name, value: _value } }) => {
+    setInputValue(_value.replace(matchLowerCaseRegex, (match) => match.toUpperCase()));
+    setShowSuggestion(true);
+    setCurrentFocus(0);
+  };
 
   return (
     <>
@@ -63,11 +142,10 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
             type="text"
             value={inputValue}
             name={name}
-            onChange={({ target: { name: _name, value: _value } }) => {
-              setInputValue(_value.replace(matchLowerCaseRegex, (match) => match.toUpperCase()));
-              setShowSuggestion(true);
-            }}
+            ref={inputRef}
+            onChange={handleChange}
             id="route-name"
+            onKeyDown={handleKeyDown}
             placeholder="ENTER WAYPOINT IDS"
           />
         </div>
@@ -94,9 +172,11 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
         inputValue.length > 1 &&
         airports != undefined &&
         (renderItem(name, inputValue).length > 0 ? (
-          <ClickAwayListener onClickAway={() => setShowSuggestion(false)}>
+          <ClickAwayListener onClickAway={handleClose}>
             <div className="input__suggestions__container">
-              <div className="input__suggestions__content">{renderItem(name, inputValue)}</div>
+              <div ref={parentRef} className="input__suggestions__content">
+                {renderItem(name, inputValue)}
+              </div>
             </div>
           </ClickAwayListener>
         ) : (
