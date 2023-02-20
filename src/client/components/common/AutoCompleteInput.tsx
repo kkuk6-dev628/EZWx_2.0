@@ -1,5 +1,5 @@
 import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { useGetAirportQuery } from '../../store/airports/airportApi';
 interface Props {
@@ -15,26 +15,92 @@ interface airportObj {
   key: string;
 }
 const AutoCompleteInput = ({ value, name, showSuggestion, handleAutoComplete, handleCloseSuggestion }: Props) => {
+  const [currentFocus, setCurrentFocus] = useState(0);
+  const parentRef = useRef(null);
+
   const { isLoading, data: airports } = useGetAirportQuery('');
 
   const renderItem = (name: string, val: string) => {
-    return airports
-      .filter((obj: airportObj) => obj.key.includes(val))
-      .map((obj: airportObj, ind: number) => {
-        const title: string = obj.key + ' - ' + obj.name;
-        return (
-          <span
-            onClick={() => {
-              handleAutoComplete(name, title);
-              handleCloseSuggestion();
-            }}
-            className="list__item"
-            key={ind}
-          >
-            {title}
-          </span>
-        );
-      });
+    try {
+      if (isLoading) return [];
+      return airports
+        .filter((obj: airportObj) => obj.key.includes(val))
+        .map((obj: airportObj, ind: number) => {
+          const title: string = obj.key + ' - ' + obj.name;
+          return (
+            <span
+              onClick={() => {
+                handleAutoComplete(name, title);
+                handleCloseSuggestion();
+              }}
+              className={currentFocus === ind ? 'list__item focused' : 'list__item'}
+              key={ind}
+              id={title}
+            >
+              {title}
+            </span>
+          );
+        });
+    } catch (error) {
+      console.error('error', error);
+      return [];
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    try {
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          if (showSuggestion) {
+            if (renderItem(name, value).length - 1 > currentFocus) {
+              setCurrentFocus((prev) => prev + 1);
+              scrollToFocusItem();
+            }
+          } else {
+            handleAutoComplete(name, value);
+          }
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          if (currentFocus > 0) {
+            setCurrentFocus((prev) => prev - 1);
+            scrollToFocusItem();
+          } else {
+            handleCloseSuggestion();
+          }
+          break;
+        case 'Enter':
+          const filteredResult = renderItem(name, value);
+          if (filteredResult.length > 0 && currentFocus + 1 <= filteredResult.length && value !== '') {
+            handleAutoComplete(name, filteredResult[currentFocus].props.id);
+            handleCloseSuggestion();
+          }
+          break;
+        default:
+      }
+    } catch (error) {
+      console.info('handleKeyDown error', error);
+    }
+  };
+
+  const scrollToFocusItem = () => {
+    const focusedItem = document.querySelector('.focused');
+    const parentBounds = parentRef.current.getBoundingClientRect();
+    const itemBounds = focusedItem.getBoundingClientRect();
+    const topOffset = itemBounds.top - parentBounds.top;
+    const bottomOffset = itemBounds.bottom - parentBounds.bottom;
+    if (topOffset < 50) {
+      parentRef.current.scrollBy(0, topOffset - 40);
+    }
+    if (bottomOffset > -50) {
+      parentRef.current.scrollBy(0, bottomOffset + 40);
+    }
+  };
+
+  const handleChange = ({ target: { name: _name, value: _value } }) => {
+    handleAutoComplete(_name, _value);
+    setCurrentFocus(0);
   };
 
   return (
@@ -44,9 +110,8 @@ const AutoCompleteInput = ({ value, name, showSuggestion, handleAutoComplete, ha
           type="text"
           value={value}
           name={name}
-          onChange={({ target: { name: _name, value: _value } }) => {
-            handleAutoComplete(_name, _value);
-          }}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
           className="modal__input"
           id="route-name"
           placeholder="ICAO or FAA"
@@ -69,7 +134,9 @@ const AutoCompleteInput = ({ value, name, showSuggestion, handleAutoComplete, ha
         (renderItem(name, value).length > 0 ? (
           <ClickAwayListener onClickAway={handleCloseSuggestion}>
             <div className="input__suggestions__container">
-              <div className="input__suggestions__content">{renderItem(name, value)}</div>
+              <div ref={parentRef} className="input__suggestions__content">
+                {renderItem(name, value)}
+              </div>
             </div>
           </ClickAwayListener>
         ) : (

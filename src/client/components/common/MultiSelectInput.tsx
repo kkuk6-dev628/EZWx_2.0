@@ -1,5 +1,5 @@
 import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { useGetAirportQuery } from '../../store/airports/airportApi';
 import { matchLowerCaseRegex } from '../utils/RegexUtils';
@@ -17,22 +17,13 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
   const [inputValue, setInputValue] = useState('');
   const [showSuggestion, setShowSuggestion] = useState(false);
   const [currentFocus, setCurrentFocus] = useState(0);
-  const inputRef = React.useRef(null);
-  const parentRef = React.useRef(null);
+  const parentRef = useRef(null);
 
   const { isLoading, data: airports } = useGetAirportQuery('');
 
-  // React.useEffect(() => {
-  //   const input = inputRef.current;
-  //   input.addEventListener('keydown', handleKeyDown);
-
-  //   return () => {
-  //     input.removeEventListener('keydown', handleKeyDown);
-  //   };
-  // }, [currentFocus, airports, showSuggestion, inputValue]);
-
   const renderItem = (name: string, val: string) => {
     try {
+      if (isLoading) return [];
       return airports
         .filter((obj: airportObj) => obj.key.includes(val))
         .map((obj: airportObj, ind: number) => {
@@ -62,6 +53,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
     try {
       switch (e.key) {
         case 'ArrowDown':
+          e.preventDefault();
           if (showSuggestion) {
             if (renderItem(name, inputValue).length - 1 > currentFocus) {
               setCurrentFocus((prev) => prev + 1);
@@ -72,6 +64,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
           }
           break;
         case 'ArrowUp':
+          e.preventDefault();
           if (currentFocus > 0) {
             setCurrentFocus((prev) => prev - 1);
             scrollToFocusItem();
@@ -142,7 +135,6 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
             type="text"
             value={inputValue}
             name={name}
-            ref={inputRef}
             onChange={handleChange}
             id="route-name"
             onKeyDown={handleKeyDown}
