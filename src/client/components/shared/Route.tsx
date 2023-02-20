@@ -4,24 +4,23 @@ import { BsBookmarkPlus } from 'react-icons/bs';
 import { AiOutlineMinus } from 'react-icons/ai';
 import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
 import Switch from 'react-switch';
-import { AutoCompleteInput } from '../common/AutoCompleteInput';
+import { AutoCompleteInput, MultiSelectInput } from '../common/index';
+import { matchLowerCaseRegex } from '../utils/RegexUtils';
 //i pass setIsShowModal as a prop to the modal component
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
 }
 
-const regex1 = /[a-z]/g;
 const DEPARTURE = 'departure';
 const DEPARTURE_SUGGESTION = 'departureSuggestion';
 const ROUTE_OF_FLIGHT = 'routeOfFlight';
-const ROUTE_OF_FLIGHT_SUGGESTION = 'routeOfFlightSuggestion';
 const DESTINATION = 'destination';
 const DESTINATION_SUGGESTION = 'destinationSuggestion';
 
 type FormData = {
   departure: string;
   departureSuggestion: boolean;
-  routeOfFlight: string;
+  routeOfFlight: string[];
   routeOfFlightSuggestion: boolean;
   destination: string;
   destinationSuggestion: boolean;
@@ -32,7 +31,7 @@ function Route({ setIsShowModal }: Props) {
   const [formData, setFormData] = useState<FormData>({
     departure: '',
     departureSuggestion: false,
-    routeOfFlight: '',
+    routeOfFlight: [],
     routeOfFlightSuggestion: false,
     destination: '',
     destinationSuggestion: false,
@@ -45,8 +44,14 @@ function Route({ setIsShowModal }: Props) {
   const handleAutoComplete = (name: string, val: string) => {
     setFormData({
       ...formData,
-      [name]: val.replace(regex1, (match) => match.toUpperCase()),
+      [name]: val.replace(matchLowerCaseRegex, (match) => match.toUpperCase()),
       [name + 'Suggestion']: true,
+    });
+  };
+  const handleMultiSelectInsertion = (name: string, val: string[]) => {
+    setFormData({
+      ...formData,
+      [name]: val,
     });
   };
 
@@ -106,12 +111,10 @@ function Route({ setIsShowModal }: Props) {
                 <label htmlFor="route-flight" className="modal__label text">
                   Route of Flight
                 </label>
-                <AutoCompleteInput
+                <MultiSelectInput
                   name={ROUTE_OF_FLIGHT}
-                  value={formData[ROUTE_OF_FLIGHT]}
-                  showSuggestion={formData[ROUTE_OF_FLIGHT_SUGGESTION]}
-                  handleAutoComplete={handleAutoComplete}
-                  handleCloseSuggestion={handleCloseSuggestion}
+                  selectedValues={formData[ROUTE_OF_FLIGHT]}
+                  handleAutoComplete={handleMultiSelectInsertion}
                 />
               </div>
 
