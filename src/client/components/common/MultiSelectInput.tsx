@@ -24,7 +24,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
         return (
           <span
             onClick={() => {
-              handleAutoComplete(name, [...selectedValues, title]);
+              handleAutoComplete(name, [...selectedValues, obj.key]);
               setShowSuggestion(false);
               setInputValue('');
             }}
