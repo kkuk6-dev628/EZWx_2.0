@@ -1,5 +1,5 @@
 import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
-import React, { useRef, useState } from 'react';
+import React, { KeyboardEvent, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { useGetAirportQuery } from '../../store/airports/airportApi';
 interface Props {
@@ -47,7 +47,7 @@ const AutoCompleteInput = ({ value, name, showSuggestion, handleAutoComplete, ha
     }
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     try {
       switch (e.key) {
         case 'ArrowDown':
@@ -113,9 +113,9 @@ const AutoCompleteInput = ({ value, name, showSuggestion, handleAutoComplete, ha
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           className="modal__input"
-          id="route-name"
           placeholder="ICAO or FAA"
         />
+        <label htmlFor={name}></label>
         {isLoading && showSuggestion ? (
           <CircularProgress className="input__loading" size="sm" value={7} />
         ) : (

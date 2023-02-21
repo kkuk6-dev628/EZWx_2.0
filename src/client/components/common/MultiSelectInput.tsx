@@ -1,5 +1,5 @@
 import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
-import React, { useRef, useState } from 'react';
+import React, { KeyboardEvent, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { useGetAirportQuery } from '../../store/airports/airportApi';
 import { matchLowerCaseRegex } from '../utils/RegexUtils';
@@ -49,7 +49,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
     }
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     try {
       switch (e.key) {
         case 'ArrowDown':
