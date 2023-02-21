@@ -18,7 +18,9 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
   const [showSuggestion, setShowSuggestion] = useState(false);
   const [currentFocus, setCurrentFocus] = useState(0);
   const parentRef = useRef(null);
-
+  const dragElementsParentRef = useRef(null);
+  const dragItem = useRef();
+  const dragOverItem = useRef();
   const { isLoading, data: airports } = useGetAirportQuery('');
 
   const renderItem = (name: string, val: string) => {
@@ -47,6 +49,37 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
       console.error('Render item error', error);
       return [];
     }
+  };
+
+  const dragStart = (e, position) => {
+    dragItem.current = position;
+    console.log(e.target.innerHTML);
+  };
+
+  const dragEnter = (e, position) => {
+    dragOverItem.current = position;
+  };
+  const onTouchMove = (e, position) => {
+    // need to fix
+    console.log('e', e);
+    const box = dragElementsParentRef.current.children[position];
+    console.log('box?.className', box?.className);
+    console.log('box', box);
+    const touchLocation = e.targetTouches[0];
+
+    // assign box new coordinates based on the touch.
+    box.style.left = touchLocation.pageX + 'px';
+    box.style.top = touchLocation.pageY + 'px';
+  };
+
+  const drop = (e) => {
+    const copyListItems = [...selectedValues];
+    const dragItemContent = copyListItems[dragItem.current || 0];
+    copyListItems.splice(dragItem.current, 1);
+    copyListItems.splice(dragOverItem.current, 0, dragItemContent);
+    dragItem.current = null;
+    dragOverItem.current = null;
+    handleAutoComplete(name, copyListItems);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -115,9 +148,18 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
   return (
     <>
       <div className="multi__input__container">
-        <div className="multi_values__container">
-          {selectedValues.map((el) => (
-            <span>
+        <div className="multi_values__container" ref={dragElementsParentRef}>
+          {selectedValues.map((el, ind) => (
+            <span
+              draggable
+              onDragStart={(e) => dragStart(e, ind)}
+              onTouchStart={(e) => dragStart(e, ind)}
+              onDragEnter={(e) => dragEnter(e, ind)}
+              onTouchMove={(e) => onTouchMove(e, ind)}
+              onDragEnd={drop}
+              onTouchEnd={drop}
+              // style={{ touchAction: 'none' }}
+            >
               {el}
               <AiOutlineClose
                 className="close__btn"
