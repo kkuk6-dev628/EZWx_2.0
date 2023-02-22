@@ -34,6 +34,7 @@ import axios from 'axios';
 import NbmMarkersLayer from './NbmMarkersLayer';
 import { InBaseLayerControl } from '../layer-control/BaseMapLayerControl';
 import RadarLayer from './RadarLayer';
+import { StationMarkersLayer } from './StationMarkersLayer';
 
 const maxLayers = 6;
 
@@ -295,7 +296,7 @@ const MeteoLayers = () => {
           meteoLayers.metar = layer;
         }}
       >
-        <MetarsLayer></MetarsLayer>
+        <StationMarkersLayer />
       </GroupedLayer>
       {/* <GroupedLayer
         checked

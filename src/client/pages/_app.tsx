@@ -17,7 +17,7 @@ const App = ({ Component, ...rest }: AppProps) => {
   const { pageProps } = props;
 
   useEffect(() => {
-    serviceWorkerRegistration.register();
+    // serviceWorkerRegistration.register();
   }, []);
 
   useEffect(() => {

@@ -97,12 +97,19 @@ const RadarLayer = () => {
   }, []);
 
   useEffect(() => {
+    if (!radarLayerState.checked) {
+      radarLayers.baseReflectivity.forEach((baseReflectivity) => map.removeLayer(baseReflectivity.layer));
+      radarLayers.echoTopHeight.forEach((echoTopHeight) => map.removeLayer(echoTopHeight.layer));
+      radarLayers.forecast.forEach((forecast) => forecast.layer && map.removeLayer(forecast.layer));
+      return;
+    } else {
+      radarLayers.baseReflectivity.forEach((baseReflectivity) => map.addLayer(baseReflectivity.layer));
+      radarLayers.echoTopHeight.forEach((echoTopHeight) => map.addLayer(echoTopHeight.layer));
+      radarLayers.forecast.forEach((forecast) => forecast.layer && map.addLayer(forecast.layer));
+    }
     radarLayers.baseReflectivity.forEach((baseReflectivity) => baseReflectivity.layer.setOpacity(0));
     radarLayers.echoTopHeight.forEach((echoTopHeight) => echoTopHeight.layer.setOpacity(0));
     radarLayers.forecast.forEach((forecast) => forecast.layer?.setOpacity(0));
-    if (!radarLayerState.checked) {
-      return;
-    }
     const differenceMinutes = getTimeDifference();
     const opacity = radarLayerState.opacity / 100;
     let validRadar: Radar;
@@ -182,9 +189,7 @@ const RadarLayer = () => {
               tiled: false,
               identify: false,
             },
-          )
-            .setOpacity(0)
-            .addTo(map),
+          ).setOpacity(0),
         };
       });
       const url2 = `https://mesonet.agron.iastate.edu/data/gis/images/4326/USCOMP/eet_${i}.json`;
@@ -210,9 +215,7 @@ const RadarLayer = () => {
               tiled: false,
               identify: false,
             },
-          )
-            .setOpacity(0)
-            .addTo(map),
+          ).setOpacity(0),
         };
       });
     }
@@ -243,9 +246,7 @@ const RadarLayer = () => {
               tiled: false,
               identify: false,
             },
-          )
-            .setOpacity(0)
-            .addTo(map);
+          ).setOpacity(0);
         }
       });
     }
@@ -272,9 +273,7 @@ const RadarLayer = () => {
               tiled: false,
               identify: false,
             },
-          )
-            .setOpacity(0)
-            .addTo(map);
+          ).setOpacity(0);
         }
       });
     }

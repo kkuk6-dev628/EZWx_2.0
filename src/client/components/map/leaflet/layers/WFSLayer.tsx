@@ -10,6 +10,7 @@ import { generateHash } from '../../common/AreoFunctions';
 import GeoJSON, { FeatureCollection } from 'geojson';
 import { AppState } from '../../../../store/store';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { emptyGeoJson } from '../../common/AreoConstants';
 import Dexie from 'dexie';
 
 interface WFSLayerProps {
@@ -36,11 +37,6 @@ interface WFSLayerProps {
   layerStateSelector?: (state: AppState) => any;
   cacheVersion?: number;
 }
-
-const emptyGeoJson: FeatureCollection = {
-  type: 'FeatureCollection',
-  features: new Array<GeoJSON.Feature>(),
-};
 
 const WFSLayer = React.forwardRef(
   (
