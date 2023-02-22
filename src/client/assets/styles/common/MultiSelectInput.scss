@@ -1,50 +1,67 @@
-.auto_complete__input__container {
+.multi__input__container {
   position: relative;
   display: flex;
   align-items: center;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  font-size: 12px;
+  padding: 6px 5px;
   border: 1px solid #c4c4c4;
-  border-radius: 4px;
-  padding: 5px;
-  .auto__complete__input {
-    padding: 10px 12px;
-    flex-grow: 1;
-    padding-right: 32px;
-    text-overflow: ellipsis;
-    outline: none;
-    border: none;
+
+  .multi_values__container {
+    display: flex;
+    row-gap: 5px;
+    column-gap: 5px;
+    flex: 1;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: flex-start;
+    padding-right: 20px;
     @media (max-width: 460px) {
-      padding: 10px 8px;
       font-size: 12px;
     }
-  }
-  .auto__complete__label {
-    padding: 10px 12px;
-    flex-grow: 1;
-    text-overflow: ellipsis;
-    background-color: rgb(215, 200, 226);
-    padding-right: 40px;
-    font-weight: 450;
-    text-overflow: ellipsis;
-    border-radius: 8px;
 
-    @media (max-width: 460px) {
-      padding: 10px 8px;
-      font-size: 12px;
+    span {
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      background-color: rgb(215, 200, 226);
+      border: 2px solid var(--color-primary);
+      color: var(--color-primary);
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 5px;
+      .close__btn {
+        cursor: pointer;
+        margin-left: 5px;
+      }
+    }
+
+    input {
+      outline: none;
+      border-radius: 4px;
+      border: none;
+      flex-grow: 1;
+      display: inline-block;
+      padding: 8px 5px;
+      @media (max-width: 460px) {
+        font-size: 12px;
+      }
     }
   }
 }
 
-.auto__complete__icon {
+.multi__input__icon {
   position: absolute;
   right: 5px;
   top: auto;
+
   font-size: 16px;
   padding: 2px;
   font-weight: 600;
   cursor: pointer;
 }
-
-.auto__complete__loading {
+.multi__input__loading {
   height: 15px;
   width: 15px;
 }
@@ -63,6 +80,7 @@
   left: 0;
   transition: all 4s ease-in-out 1s;
 }
+
 .input__suggestions__content {
   position: absolute;
   top: 0;
