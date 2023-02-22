@@ -80,6 +80,7 @@ export const StationMarkersLayer = () => {
   useEffect(() => {
     loadFeaturesFromCache('metars', setMetars);
     loadFeaturesFromWeb(wfsUrl, 'EZWxBrief:metar', metarsProperties, 'metars', setMetars);
+    loadNbmStationMarkers();
   }, []);
 
   useEffect(() => {
@@ -187,6 +188,17 @@ export const StationMarkersLayer = () => {
       })
       .catch((reason) => {
         console.log(wfsTypeName, reason);
+      });
+  };
+
+  const loadNbmStationMarkers = () => {
+    axios
+      .get('/api/station-time/findAll')
+      .then((result) => {
+        console.log(result.data);
+      })
+      .catch((reason) => {
+        console.log(reason);
       });
   };
 

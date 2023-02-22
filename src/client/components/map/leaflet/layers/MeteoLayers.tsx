@@ -200,6 +200,15 @@ const MeteoLayers = () => {
       map.closePopup();
 
       if (features.length === 0) {
+        axios
+          .post('/api/asd', e.latlng)
+          .then((result) => {
+            console.log(result.data);
+          })
+          .catch((reason) => {
+            console.log(reason);
+          });
+
         // if (wmsLayerRef.current) {
         //   wmsLayerRef.current.source.getFeatureInfo(
         //     map.latLngToContainerPoint(e.latlng),
