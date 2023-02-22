@@ -10,6 +10,7 @@ import { generateHash } from '../../common/AreoFunctions';
 import GeoJSON, { FeatureCollection } from 'geojson';
 import { AppState } from '../../../../store/store';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { emptyGeoJson } from '../../common/AreoConstants';
 import Dexie from 'dexie';
 
 interface WFSLayerProps {
@@ -36,11 +37,6 @@ interface WFSLayerProps {
   layerStateSelector?: (state: AppState) => any;
   cacheVersion?: number;
 }
-
-const emptyGeoJson: FeatureCollection = {
-  type: 'FeatureCollection',
-  features: new Array<GeoJSON.Feature>(),
-};
 
 const WFSLayer = React.forwardRef(
   (
@@ -80,6 +76,8 @@ const WFSLayer = React.forwardRef(
 
     useEffect(() => {
       const newKey = Date.now();
+      typeName === 'EZWxBrief:metar' &&
+        console.log('updated key', 'diff:', geoJsonKey - newKey, 'displayedData', displayedData.features.length);
       setGeoJsonKey(newKey);
     }, [displayedData]);
 
@@ -233,7 +231,6 @@ const WFSLayer = React.forwardRef(
       <>
         {isClusteredMarker && (
           <MarkerClusterGroup
-            key={geoJsonKey}
             ref={wfsRef}
             // @ts-ignore
             iconCreateFunction={(cluster) => {
@@ -272,6 +269,7 @@ const WFSLayer = React.forwardRef(
           >
             {displayedData != null && (
               <GeoJSONLayer
+                key={geoJsonKey}
                 ref={ref}
                 data={displayedData}
                 // @ts-ignore

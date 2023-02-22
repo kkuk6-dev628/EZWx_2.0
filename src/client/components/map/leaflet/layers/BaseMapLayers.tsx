@@ -133,7 +133,7 @@ const BaseMapLayers = () => {
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           // @ts-ignore
-          useCache={false}
+          useCache={true}
         />
       </GroupedLayer>
       <GroupedLayer
@@ -145,7 +145,7 @@ const BaseMapLayers = () => {
         <TileLayer
           url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
           // @ts-ignore
-          useCache={false}
+          useCache={true}
         />
       </GroupedLayer>
       <GroupedLayer
@@ -157,7 +157,7 @@ const BaseMapLayers = () => {
         <TileLayer
           url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
           // @ts-ignore
-          useCache={false}
+          useCache={true}
         />
       </GroupedLayer>
       <GroupedLayer
@@ -171,7 +171,7 @@ const BaseMapLayers = () => {
           // @ts-ignore
           subdomains="abcd"
           // @ts-ignore
-          useCache={false}
+          useCache={true}
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
       </GroupedLayer>
@@ -184,7 +184,7 @@ const BaseMapLayers = () => {
         <TileLayer
           url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
           // @ts-ignore
-          useCache={false}
+          useCache={true}
         />
       </GroupedLayer>
     </div>

@@ -25,6 +25,12 @@ export interface MetarLayerState extends LayerState {
   };
 }
 
+export interface RadarLayerState extends LayerState {
+  baseReflectivity: SublayerState;
+  echoTopHeight: SublayerState;
+  forecastRadar: SublayerState;
+}
+
 export interface SigmetsLayerState extends LayerState {
   all: SublayerState;
   convection: SublayerState;
@@ -79,7 +85,7 @@ export interface CwaLayerState extends LayerState {
 export interface LayerControlState {
   show: boolean;
   metarState: MetarLayerState;
-  radarState: LayerState;
+  radarState: RadarLayerState;
   sigmetState: SigmetsLayerState;
   gairmetState: GairmetLayerState;
   pirepState: PirepLayerState;
@@ -90,7 +96,7 @@ const initialState: LayerControlState = {
   show: false,
   metarState: {
     checked: true,
-    opacity: 1,
+    opacity: 100,
     expanded: false,
     markerType: 'flightCategory',
     usePersonalMinimums: false,
@@ -106,12 +112,24 @@ const initialState: LayerControlState = {
   radarState: {
     expanded: false,
     checked: false,
-    opacity: 1,
+    opacity: 100,
     name: 'Radar',
+    baseReflectivity: {
+      checked: true,
+      name: '0.5\u00B0 base reflectivity',
+    },
+    echoTopHeight: {
+      checked: false,
+      name: 'Echo top height',
+    },
+    forecastRadar: {
+      checked: true,
+      name: 'Forecast radar',
+    },
   },
   sigmetState: {
     checked: true,
-    opacity: 1,
+    opacity: 100,
     name: 'SIGMETs',
     expanded: false,
     all: { name: 'All', checked: true },
@@ -126,7 +144,7 @@ const initialState: LayerControlState = {
   },
   gairmetState: {
     checked: true,
-    opacity: 1,
+    opacity: 100,
     name: 'G-AIRMETs',
     expanded: false,
     all: { name: 'All', checked: true },
@@ -141,7 +159,7 @@ const initialState: LayerControlState = {
   },
   pirepState: {
     checked: true,
-    opacity: 1,
+    opacity: 100,
     name: 'Pilot Weather Reports',
     expanded: false,
     urgentOnly: { name: 'Urgent Only', checked: false },
@@ -163,7 +181,7 @@ const initialState: LayerControlState = {
   cwaState: {
     name: 'Center Weather Advisories',
     checked: true,
-    opacity: 1,
+    opacity: 100,
     expanded: false,
     all: { name: 'All', checked: true },
     airframeIcing: { name: 'Airframe Icing', checked: true },

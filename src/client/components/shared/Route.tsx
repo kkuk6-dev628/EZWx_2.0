@@ -4,16 +4,47 @@ import { BsBookmarkPlus } from 'react-icons/bs';
 import { AiOutlineMinus } from 'react-icons/ai';
 import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
 import Switch from 'react-switch';
+import { AutoCompleteInput, MultiSelectInput } from '../common/index';
 //i pass setIsShowModal as a prop to the modal component
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
 }
 
+const DEPARTURE = 'departure';
+const ROUTE_OF_FLIGHT = 'routeOfFlight';
+const DESTINATION = 'destination';
+
+type FormData = {
+  departure: string;
+  routeOfFlight: string[];
+  destination: string;
+};
+
 function Route({ setIsShowModal }: Props) {
   const [checked, setChecked] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
+    departure: '',
+    routeOfFlight: [],
+    destination: '',
+  });
+
   const handleChange = (nextChecked) => {
     setChecked(nextChecked);
   };
+
+  const handleAutoComplete = (name: string, val: string) => {
+    setFormData({
+      ...formData,
+      [name]: val,
+    });
+  };
+  const handleMultiSelectInsertion = (name: string, val: string[]) => {
+    setFormData({
+      ...formData,
+      [name]: val,
+    });
+  };
+
   return (
     <div className="modal">
       <div className="modal__wrp">
@@ -48,20 +79,39 @@ function Route({ setIsShowModal }: Props) {
                 <label htmlFor="route-name" className="modal__label text">
                   Departure*
                 </label>
-                <input type="text" className="modal__input" id="route-name" placeholder="ICAO or FAA" />
+                <AutoCompleteInput
+                  name={DEPARTURE}
+                  selectedValue={formData[DEPARTURE]}
+                  handleAutoComplete={handleAutoComplete}
+                  // handleCloseSuggestion={handleCloseSuggestion}
+                  // showSuggestion={formData[DEPARTURE_SUGGESTION]}
+                />
               </div>
+
               <div className="modal__input__grp">
                 <label htmlFor="route-flight" className="modal__label text">
                   Route of Flight
                 </label>
-                <input type="text" className="modal__input" id="route-flight" placeholder="ICAO or FAA" />
+                <MultiSelectInput
+                  name={ROUTE_OF_FLIGHT}
+                  selectedValues={formData[ROUTE_OF_FLIGHT]}
+                  handleAutoComplete={handleMultiSelectInsertion}
+                />
               </div>
+
               <div className="modal__input__grp">
                 <label htmlFor="route-destination" className="modal__label text">
                   Destination*
                 </label>
-                <input type="text" className="modal__input" id="route-destination" placeholder="ICAO or FAA" />
+                <AutoCompleteInput
+                  name={DESTINATION}
+                  selectedValue={formData[DESTINATION]}
+                  handleAutoComplete={handleAutoComplete}
+                  // handleCloseSuggestion={handleCloseSuggestion}
+                  // showSuggestion={formData[DESTINATION_SUGGESTION]}
+                />
               </div>
+
               <div className="modal__swd">
                 <div className="modal__numin__area">
                   <label htmlFor="route-numin" className="modal__label text">

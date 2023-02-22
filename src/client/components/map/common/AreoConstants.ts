@@ -75,3 +75,8 @@ export const POSITION_CLASSES: { [key: string]: string } = {
   topleft: 'leaflet-top leaflet-left',
   topright: 'leaflet-top leaflet-right',
 };
+
+export const emptyGeoJson: GeoJSON.FeatureCollection = {
+  type: 'FeatureCollection',
+  features: new Array<GeoJSON.Feature>(),
+};

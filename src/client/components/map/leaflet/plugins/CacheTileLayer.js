@@ -110,32 +110,42 @@ L.TileLayer.include({
     });
 
     // Read the attachment as blob
-    this._db.getAttachment(data._id, 'tile').then(
-      function (blob) {
-        const url = URL.createObjectURL(blob);
+    this._db
+      .getAttachment(data._id, 'tile')
+      .then(
+        function (blob) {
+          const url = URL.createObjectURL(blob);
 
-        if (Date.now() > data.timestamp + this.options.cacheMaxAge && !this.options.useOnlyCache) {
-          // Tile is too old, try to refresh it
-          console.log('Tile is too old: ', tileUrl);
+          if (Date.now() > data.timestamp + this.options.cacheMaxAge && !this.options.useOnlyCache) {
+            // Tile is too old, try to refresh it
+            console.log('Tile is too old: ', tileUrl);
 
-          if (this.options.saveToCache) {
-            tile.onload = L.bind(this._saveTile, this, tile, tileUrl, data._revs_info[0].rev, done);
+            if (this.options.saveToCache) {
+              tile.onload = L.bind(this._saveTile, this, tile, tileUrl, data._revs_info[0].rev, done);
+            }
+            tile.crossOrigin = 'Anonymous';
+            tile.src = tileUrl;
+            tile.onerror = function (ev) {
+              // If the tile is too old but couldn't be fetched from the network,
+              //   serve the one still in cache.
+              this.src = url;
+            };
+          } else {
+            // Serve tile from cached data
+            //console.log('Tile is cached: ', tileUrl);
+            tile.onload = L.bind(this._tileOnLoad, this, done, tile);
+            tile.src = url;
           }
-          tile.crossOrigin = 'Anonymous';
-          tile.src = tileUrl;
-          tile.onerror = function (ev) {
-            // If the tile is too old but couldn't be fetched from the network,
-            //   serve the one still in cache.
-            this.src = url;
-          };
-        } else {
+        }.bind(this),
+      )
+      .catch(
+        function (error) {
           // Serve tile from cached data
           //console.log('Tile is cached: ', tileUrl);
           tile.onload = L.bind(this._tileOnLoad, this, done, tile);
-          tile.src = url;
-        }
-      }.bind(this),
-    );
+          tile.src = tileUrl;
+        }.bind(this),
+      );
   },
 
   _onCacheMiss: function (tile, tileUrl, done) {

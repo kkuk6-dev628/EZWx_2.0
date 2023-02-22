@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useEffect, useState } from 'react';
 import { MapContainer, ZoomControl } from 'react-leaflet';
-// import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import styles from './Map.module.css';
 import MapTabs from '../../shared/MapTabs';
@@ -37,7 +36,7 @@ function LeafletMap() {
   const [isShowTabs, setIsShowTabs] = useState(false);
   const [isShowDateModal, setIsShowDateModal] = useState(false);
   const [isShowModal, setIsShowModal] = useState(false);
-  const [userSettingDrawer, setIsShowSettingsDrawer] = useState(false)
+  const [userSettingDrawer, setIsShowSettingsDrawer] = useState(false);
   const dispatch = useDispatch();
   const meteoLayerControlShow = useSelector(selectLayerControlShow);
   const baseMapLayerControlShow = useSelector(selectBaseMapLayerControlShow);
@@ -152,8 +151,8 @@ function LeafletMap() {
       </MapContainer>
       <SettingsDrawer
         isShowSettingsDrawer={userSettingDrawer}
-        setIsShowSettingsDrawer={() => setIsShowSettingsDrawer(false)} />
-
+        setIsShowSettingsDrawer={() => setIsShowSettingsDrawer(false)}
+      />
 
       {isShowTabs && <MapTabs tabMenus={tabMenus} />}
       {isShowModal && <Route setIsShowModal={setIsShowModal} />}

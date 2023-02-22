@@ -21,7 +21,7 @@ const GairmetPopup = ({ feature }) => {
       dueto = 'Moderate turbulence';
       break;
     case 'LLWS':
-      title = `Low-level wind shear G-AIRMET`;
+      title = `Low-level Wind Shear G-AIRMET`;
       dueto = 'Nonconvective low-level wind shear below 2,000 feet AGL';
       break;
     case 'SFC_WND':
@@ -35,8 +35,8 @@ const GairmetPopup = ({ feature }) => {
         translateWeatherClausings(feature.properties.dueto);
       break;
     case 'MT_OBSC':
-      title = 'Mountains obscuration G-AIRMET';
-      dueto = 'Mountains obscured by ' + translateWeatherClausings(feature.properties.dueto);
+      title = 'Mountain Bbscuration G-AIRMET';
+      dueto = 'Mountain obscured by ' + translateWeatherClausings(feature.properties.dueto);
       break;
     case 'M_FZLVL':
       title = 'Multiple Freezing Level G-AIRMET';
@@ -52,7 +52,7 @@ const GairmetPopup = ({ feature }) => {
         <b>Issued:</b> {convertTimeFormat(feature.properties.issuetime)}
       </Typography>
       <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Lead time:</b> {feature.properties.forecast} hours
+        <b>Lead time:</b> {feature.properties.forecast === 0 ? 'Initial' : feature.properties.forecast + ' hours'}
       </Typography>
       {top && (
         <Typography variant="body2" style={{ margin: 3 }}>

@@ -269,7 +269,6 @@ const PirepLayer = () => {
           'tbfreq1',
           'icgint1',
           'icgtype1',
-          'brkaction',
           'rawob',
         ]}
         pointToLayer={pointToLayer}
