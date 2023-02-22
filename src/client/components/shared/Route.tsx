@@ -5,17 +5,14 @@ import { AiOutlineMinus } from 'react-icons/ai';
 import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
 import Switch from 'react-switch';
 import { AutoCompleteInput, MultiSelectInput } from '../common/index';
-import { matchLowerCaseRegex } from '../utils/RegexUtils';
 //i pass setIsShowModal as a prop to the modal component
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
 }
 
 const DEPARTURE = 'departure';
-const DEPARTURE_SUGGESTION = 'departureSuggestion';
 const ROUTE_OF_FLIGHT = 'routeOfFlight';
 const DESTINATION = 'destination';
-const DESTINATION_SUGGESTION = 'destinationSuggestion';
 
 type FormData = {
   departure: string;
@@ -39,7 +36,6 @@ function Route({ setIsShowModal }: Props) {
     setFormData({
       ...formData,
       [name]: val,
-      // [name + 'Suggestion']: true,
     });
   };
   const handleMultiSelectInsertion = (name: string, val: string[]) => {
@@ -48,15 +44,6 @@ function Route({ setIsShowModal }: Props) {
       [name]: val,
     });
   };
-
-  // const handleCloseSuggestion = () => {
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     departureSuggestion: false,
-  //     routeOfFlightSuggestion: false,
-  //     destinationSuggestion: false,
-  //   }));
-  // };
 
   return (
     <div className="modal">
