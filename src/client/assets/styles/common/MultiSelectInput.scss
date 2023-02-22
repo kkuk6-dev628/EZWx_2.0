@@ -5,7 +5,7 @@
   flex-direction: row;
   flex-wrap: nowrap;
   font-size: 12px;
-  padding: 10px 5px;
+  padding: 6px 5px;
   border: 1px solid #c4c4c4;
 
   .multi_values__container {
@@ -28,6 +28,7 @@
       background-color: rgb(215, 200, 226);
       border: 2px solid var(--color-primary);
       color: var(--color-primary);
+      font-size: 16px;
       font-weight: bold;
       border-radius: 5px;
       .close__btn {
@@ -42,7 +43,7 @@
       border: none;
       flex-grow: 1;
       display: inline-block;
-      padding: 5px;
+      padding: 8px 5px;
       @media (max-width: 460px) {
         font-size: 12px;
       }
@@ -50,14 +51,19 @@
   }
 }
 
-.multi__input__loading {
+.multi__input__icon {
   position: absolute;
   right: 5px;
   top: auto;
+
   font-size: 16px;
   padding: 2px;
   font-weight: 600;
   cursor: pointer;
+}
+.multi__input__loading {
+  height: 15px;
+  width: 15px;
 }
 
 .list__item {

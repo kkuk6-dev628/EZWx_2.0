@@ -72,7 +72,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
     box.style.top = touchLocation.pageY + 'px';
   };
 
-  const drop = (e) => {
+  const drop = () => {
     const copyListItems = [...selectedValues];
     const dragItemContent = copyListItems[dragItem.current || 0];
     copyListItems.splice(dragItem.current, 1);
@@ -186,11 +186,11 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
         </div>
 
         {isLoading && showSuggestion ? (
-          <CircularProgress className="multi__input__loading" size="sm" value={7} />
+          <CircularProgress className="multi__input__icon multi__input__loading" size="sm" value={7} />
         ) : (
           (selectedValues.length >= 1 || inputValue) && (
             <span
-              className="multi__input__loading"
+              className="multi__input__icon"
               onClick={() => {
                 setInputValue('');
                 handleAutoComplete(name, []);
