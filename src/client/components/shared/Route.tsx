@@ -19,22 +19,16 @@ const DESTINATION_SUGGESTION = 'destinationSuggestion';
 
 type FormData = {
   departure: string;
-  departureSuggestion: boolean;
   routeOfFlight: string[];
-  routeOfFlightSuggestion: boolean;
   destination: string;
-  destinationSuggestion: boolean;
 };
 
 function Route({ setIsShowModal }: Props) {
   const [checked, setChecked] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     departure: '',
-    departureSuggestion: false,
     routeOfFlight: [],
-    routeOfFlightSuggestion: false,
     destination: '',
-    destinationSuggestion: false,
   });
 
   const handleChange = (nextChecked) => {
@@ -44,8 +38,8 @@ function Route({ setIsShowModal }: Props) {
   const handleAutoComplete = (name: string, val: string) => {
     setFormData({
       ...formData,
-      [name]: val.replace(matchLowerCaseRegex, (match) => match.toUpperCase()),
-      [name + 'Suggestion']: true,
+      [name]: val,
+      // [name + 'Suggestion']: true,
     });
   };
   const handleMultiSelectInsertion = (name: string, val: string[]) => {
@@ -55,14 +49,14 @@ function Route({ setIsShowModal }: Props) {
     });
   };
 
-  const handleCloseSuggestion = () => {
-    setFormData((prev) => ({
-      ...prev,
-      departureSuggestion: false,
-      routeOfFlightSuggestion: false,
-      destinationSuggestion: false,
-    }));
-  };
+  // const handleCloseSuggestion = () => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     departureSuggestion: false,
+  //     routeOfFlightSuggestion: false,
+  //     destinationSuggestion: false,
+  //   }));
+  // };
 
   return (
     <div className="modal">
@@ -100,10 +94,10 @@ function Route({ setIsShowModal }: Props) {
                 </label>
                 <AutoCompleteInput
                   name={DEPARTURE}
-                  value={formData[DEPARTURE]}
+                  selectedValue={formData[DEPARTURE]}
                   handleAutoComplete={handleAutoComplete}
-                  handleCloseSuggestion={handleCloseSuggestion}
-                  showSuggestion={formData[DEPARTURE_SUGGESTION]}
+                  // handleCloseSuggestion={handleCloseSuggestion}
+                  // showSuggestion={formData[DEPARTURE_SUGGESTION]}
                 />
               </div>
 
@@ -124,10 +118,10 @@ function Route({ setIsShowModal }: Props) {
                 </label>
                 <AutoCompleteInput
                   name={DESTINATION}
-                  value={formData[DESTINATION]}
+                  selectedValue={formData[DESTINATION]}
                   handleAutoComplete={handleAutoComplete}
-                  handleCloseSuggestion={handleCloseSuggestion}
-                  showSuggestion={formData[DESTINATION_SUGGESTION]}
+                  // handleCloseSuggestion={handleCloseSuggestion}
+                  // showSuggestion={formData[DESTINATION_SUGGESTION]}
                 />
               </div>
 

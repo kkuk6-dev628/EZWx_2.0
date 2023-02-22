@@ -2,20 +2,21 @@ import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
 import React, { KeyboardEvent, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { useGetAirportQuery } from '../../store/airports/airportApi';
+import { matchLowerCaseRegex } from '../utils/RegexUtils';
 interface Props {
-  value: string;
+  selectedValue: string;
   name: string;
-  showSuggestion: boolean;
   handleAutoComplete: (name: string, value: string) => void;
-  handleCloseSuggestion: () => void;
 }
 
 interface airportObj {
   name: string;
   key: string;
 }
-const AutoCompleteInput = ({ value, name, showSuggestion, handleAutoComplete, handleCloseSuggestion }: Props) => {
+const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) => {
   const [currentFocus, setCurrentFocus] = useState(0);
+  const [value, setValue] = useState(selectedValue);
+  const [showSuggestion, setShowSuggestion] = useState(false);
   const parentRef = useRef(null);
 
   const { isLoading, data: airports } = useGetAirportQuery('');
@@ -31,7 +32,7 @@ const AutoCompleteInput = ({ value, name, showSuggestion, handleAutoComplete, ha
             <span
               onClick={() => {
                 handleAutoComplete(name, title);
-                handleCloseSuggestion();
+                setShowSuggestion(false);
               }}
               className={currentFocus === ind ? 'list__item focused' : 'list__item'}
               key={ind}
@@ -58,7 +59,7 @@ const AutoCompleteInput = ({ value, name, showSuggestion, handleAutoComplete, ha
               scrollToFocusItem();
             }
           } else {
-            handleAutoComplete(name, value);
+            setShowSuggestion(true);
           }
           break;
         case 'ArrowUp':
@@ -67,14 +68,14 @@ const AutoCompleteInput = ({ value, name, showSuggestion, handleAutoComplete, ha
             setCurrentFocus((prev) => prev - 1);
             scrollToFocusItem();
           } else {
-            handleCloseSuggestion();
+            setShowSuggestion(false);
           }
           break;
         case 'Enter':
           const filteredResult = renderItem(name, value);
           if (filteredResult.length > 0 && currentFocus + 1 <= filteredResult.length && value !== '') {
             handleAutoComplete(name, filteredResult[currentFocus].props.id);
-            handleCloseSuggestion();
+            setShowSuggestion(false);
           }
           break;
         default:
@@ -99,28 +100,39 @@ const AutoCompleteInput = ({ value, name, showSuggestion, handleAutoComplete, ha
   };
 
   const handleChange = ({ target: { name: _name, value: _value } }) => {
-    handleAutoComplete(_name, _value);
+    setValue(_value.replace(matchLowerCaseRegex, (match) => match.toUpperCase()));
+    setShowSuggestion(true);
     setCurrentFocus(0);
   };
 
+  const handleClose = () => {
+    handleAutoComplete(name, '');
+    setShowSuggestion(false);
+    setValue('');
+    setCurrentFocus(0);
+  };
+  console.log('selectedValue', selectedValue);
   return (
     <>
-      <div className="input__container">
-        <input
-          type="text"
-          value={value}
-          name={name}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          className="modal__input"
-          placeholder="ICAO or FAA"
-        />
-        <label htmlFor={name}></label>
-        {isLoading && showSuggestion ? (
-          <CircularProgress className="input__loading" size="sm" value={7} />
+      <div className="auto_complete__input__container">
+        {selectedValue ? (
+          <span className="auto__complete__label">{selectedValue}</span>
         ) : (
-          value && (
-            <span className="input__loading" onClick={() => handleAutoComplete(name, '')}>
+          <input
+            type="text"
+            value={value}
+            name={name}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            className="auto__complete__input"
+            placeholder="ICAO or FAA"
+          />
+        )}
+        {isLoading && showSuggestion ? (
+          <CircularProgress className="auto__complete__loading auto_complete_close_icon" size="sm" value={7} />
+        ) : (
+          (value || selectedValue) && (
+            <span className="auto__complete__icon" onClick={handleClose}>
               <AiOutlineClose />
             </span>
           )
@@ -132,7 +144,7 @@ const AutoCompleteInput = ({ value, name, showSuggestion, handleAutoComplete, ha
         value.length > 1 &&
         airports != undefined &&
         (renderItem(name, value).length > 0 ? (
-          <ClickAwayListener onClickAway={handleCloseSuggestion}>
+          <ClickAwayListener onClickAway={() => setShowSuggestion(false)}>
             <div className="input__suggestions__container">
               <div ref={parentRef} className="input__suggestions__content">
                 {renderItem(name, value)}

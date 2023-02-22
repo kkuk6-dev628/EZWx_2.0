@@ -1,21 +1,52 @@
-.input__container {
+.auto_complete__input__container {
   position: relative;
   display: flex;
   align-items: center;
-  input {
+  border: 1px solid #c4c4c4;
+  border-radius: 4px;
+  padding: 5px;
+  .auto__complete__input {
+    padding: 10px 12px;
     flex-grow: 1;
     padding-right: 32px;
+    text-overflow: ellipsis;
+    outline: none;
+    border: none;
+    @media (max-width: 460px) {
+      padding: 10px 8px;
+      font-size: 12px;
+    }
+  }
+  .auto__complete__label {
+    padding: 10px 12px;
+    flex-grow: 1;
+    text-overflow: ellipsis;
+    background-color: rgb(215, 200, 226);
+    padding-right: 40px;
+    font-weight: 450;
+    text-overflow: ellipsis;
+    border-radius: 8px;
+
+    @media (max-width: 460px) {
+      padding: 10px 8px;
+      font-size: 12px;
+    }
   }
 }
 
-.input__loading {
+.auto__complete__icon {
   position: absolute;
-  right: 0;
+  right: 5px;
   top: auto;
   font-size: 16px;
   padding: 2px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.auto__complete__loading {
+  height: 15px;
+  width: 15px;
 }
 
 .list__item {
@@ -51,16 +82,4 @@
 
 .focused {
   background-color: rgb(214, 209, 209);
-}
-
-.modal__input {
-  border: 1px solid #c4c4c4;
-  border-radius: 4px;
-  padding: 16px 12px;
-  text-overflow: ellipsis;
-
-  @media (max-width: 460px) {
-    padding: 10px 8px;
-    font-size: 12px;
-  }
 }
