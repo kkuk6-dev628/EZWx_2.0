@@ -1,34 +1,30 @@
-
-
-
-
 .input__container {
   position: relative;
   display: flex;
   align-items: center;
   input {
     flex-grow: 1;
+    padding-right: 32px;
   }
 }
 
 .input__loading {
   position: absolute;
   right: 0;
-  width: 25px;
+  top: auto;
+  font-size: 16px;
   padding: 2px;
   font-weight: 600;
   cursor: pointer;
-  height: 25px;
 }
 
 .list__item {
   padding: 10px;
   &:hover {
-    background-color:  rgb(214, 209, 209);;
+    background-color: rgb(214, 209, 209);
     cursor: pointer;
   }
 }
-
 
 .input__suggestions__container {
   position: relative;

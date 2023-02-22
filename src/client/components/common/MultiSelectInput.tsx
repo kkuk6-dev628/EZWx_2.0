@@ -114,6 +114,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
 
           break;
         default:
+          break;
       }
     } catch (error) {
       console.info('handleKeyDown error', error);
@@ -185,11 +186,11 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
         </div>
 
         {isLoading && showSuggestion ? (
-          <CircularProgress className="input__loading" size="sm" value={7} />
+          <CircularProgress className="multi__input__loading" size="sm" value={7} />
         ) : (
           (selectedValues.length >= 1 || inputValue) && (
             <span
-              className="input__loading"
+              className="multi__input__loading"
               onClick={() => {
                 setInputValue('');
                 handleAutoComplete(name, []);
