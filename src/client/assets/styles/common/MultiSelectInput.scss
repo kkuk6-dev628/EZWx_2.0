@@ -16,6 +16,7 @@
     flex-wrap: wrap;
     align-content: center;
     justify-content: flex-start;
+    padding-right: 20px;
     @media (max-width: 460px) {
       font-size: 12px;
     }
@@ -24,10 +25,14 @@
       padding: 5px;
       display: flex;
       align-items: center;
-      font-size: 20px;
-      background-color: #f5f5f5;
+      background-color: rgb(215, 200, 226);
+      border: 2px solid var(--color-primary);
+      color: var(--color-primary);
+      font-weight: bold;
+      border-radius: 5px;
       .close__btn {
         cursor: pointer;
+        margin-left: 5px;
       }
     }
 
@@ -45,21 +50,20 @@
   }
 }
 
-.input__loading {
+.multi__input__loading {
   position: absolute;
-  right: 0;
-  top: 5px;
-  width: 25px;
+  right: 5px;
+  top: auto;
+  font-size: 16px;
   padding: 2px;
   font-weight: 600;
   cursor: pointer;
-  height: 25px;
 }
 
 .list__item {
   padding: 10px;
   &:hover {
-    background-color:  rgb(214, 209, 209);;
+    background-color: rgb(214, 209, 209);
     cursor: pointer;
   }
 }
