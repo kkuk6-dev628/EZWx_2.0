@@ -1,0 +1,25 @@
+.radio__label__container {
+  display: flex;
+  flex-direction: column;
+  padding: 13px 5px;
+  font-family: var(--font-family-sans-serif);
+  row-gap: 15px;
+  text-align: center;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  flex-grow: 1;
+  box-shadow: 0 2px 6px 0 rgb(136 106 181 / 50%);
+  cursor: pointer;
+}
+.radio__label__container:hover {
+  opacity: 0.9;
+}
+.radio__label__container:focus {
+  box-shadow: 0 0 0 0.2rem rgb(154 128 192 / 50%);
+}
+.radio__label__title {
+  font-size: 14px;
+}
+.radio__label__description {
+  font-size: 10px;
+}

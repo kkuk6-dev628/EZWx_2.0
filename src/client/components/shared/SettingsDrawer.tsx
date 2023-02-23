@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { Collapse, Drawer } from '@mui/material';
 import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { RxCross2 } from 'react-icons/rx';
-import { SettingFieldLabel, ToggleButton, ToggleFieldWrapper } from '../settings-drawer';
+import {
+  InputFieldWrapper,
+  RadioButton,
+  SettingFieldLabel,
+  ToggleButton,
+  ToggleFieldWrapper,
+} from '../settings-drawer';
 
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;
@@ -13,6 +19,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const [isShowGeneralSettings, setIsShowGeneralSettings] = useState(false);
   const [isShowAirCraftSettings, setIsShowAirCraftSettings] = useState(false);
   const [isShowPersonalMinimumSettings, setIsShowPersonalMinimumSettings] = useState(false);
+  const [radio, setRadio] = useState('');
 
   const closeDrawer = () => {
     setIsShowSettingsDrawer(false);
@@ -38,20 +45,22 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
         </div>
 
         <div className="drawer__body">
+          {/* general Settings */}
+
           <div onClick={() => setIsShowGeneralSettings(!isShowGeneralSettings)} className="collapsed__title__container">
             {isShowGeneralSettings ? <AiOutlineMinus /> : <AiOutlinePlus />}
             <span className="collapse__title">General Settings</span>
           </div>
           <Collapse in={isShowGeneralSettings} timeout="auto">
             <div className="collapsed__container">
-              <div className="input__fields__container">
+              <InputFieldWrapper>
                 <SettingFieldLabel title="Home Airport" description="default home airport" />
 
                 <div className="input__container">
                   <input type="text" placeholder="Select Airport..." />
                   <RxCross2 />
                 </div>
-              </div>
+              </InputFieldWrapper>
 
               <ToggleFieldWrapper>
                 <SettingFieldLabel title="Temperature" description="default temperature units" />
@@ -115,6 +124,8 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
             </div>
           </Collapse>
 
+          {/* Aircraft settings */}
+
           <div
             onClick={() => setIsShowAirCraftSettings(!isShowAirCraftSettings)}
             className="collapsed__title__container"
@@ -122,7 +133,41 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
             {isShowAirCraftSettings ? <AiOutlineMinus /> : <AiOutlinePlus />}
             <span className="collapse__title">AirCraft Settings</span>
           </div>
-          <Collapse in={isShowAirCraftSettings} timeout="auto"></Collapse>
+          <Collapse in={isShowAirCraftSettings} timeout="auto">
+            <div className="collapsed__container">
+              <InputFieldWrapper>
+                <SettingFieldLabel title="Takeoff weight category" description="maximum takeoff weight category" />
+                <div className="input_radio_container">
+                  <RadioButton
+                    id="lightWeight"
+                    value={'light'}
+                    title="Light"
+                    selectedValue={radio}
+                    description={'(< 15,500 lbs)'}
+                    onChange={(e) => setRadio(e.target.value)}
+                  />
+                  <RadioButton
+                    id="mediumWeight"
+                    value="medium"
+                    title="Medium"
+                    selectedValue={radio}
+                    description={'(15,500 - 300,000 lbs)'}
+                    onChange={(e) => setRadio(e.target.value)}
+                  />
+                  <RadioButton
+                    id="heavyWeight"
+                    value="heavy"
+                    title="Heavy"
+                    selectedValue={radio}
+                    description={'(> 300,000 lbs)'}
+                    onChange={(e) => setRadio(e.target.value)}
+                  />
+                </div>
+              </InputFieldWrapper>
+            </div>
+          </Collapse>
+
+          {/* Personal Minimums settings  */}
 
           <div
             onClick={() => setIsShowPersonalMinimumSettings(!isShowPersonalMinimumSettings)}
