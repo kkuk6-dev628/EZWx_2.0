@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Collapse, Drawer } from '@mui/material';
 import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { RxCross2 } from 'react-icons/rx';
@@ -10,6 +10,7 @@ import {
   ToggleFieldWrapper,
 } from '../settings-drawer';
 import { StyledSlider } from './Slider';
+import RangeSlider from './RangeSlider';
 
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;
@@ -21,7 +22,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const [isShowAirCraftSettings, setIsShowAirCraftSettings] = useState(false);
   const [isShowPersonalMinimumSettings, setIsShowPersonalMinimumSettings] = useState(false);
   const [radio, setRadio] = useState('');
-
+  const [rangeSlider, setRangeSlider] = useState([2, 6]);
   const closeDrawer = () => {
     setIsShowSettingsDrawer(false);
   };
@@ -182,8 +183,287 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
             <span className="collapse__title">Personal Minimums</span>
           </div>
           <Collapse in={isShowPersonalMinimumSettings} timeout="auto">
-            <hr />
+            <div className="collapsed__container">
+              <InputFieldWrapper>
+                <SettingFieldLabel
+                  title="Ceiling at Departure"
+                  description="acceptable ceiling at departure airport (ft agl)"
+                />
+                <div className="range__slider">
+                  <RangeSlider
+                    // onChange={(e) => setRangeSlider(e.target.value)}
+                    mindistance={100}
+                    marks={[
+                      { label: '6000', value: 6000 },
+                      { label: '100', value: 100 },
+                    ]}
+                    max={6000}
+                    min={0}
+                    value={rangeSlider}
+                    track="normal"
+                    valueLabelDisplay="on"
+                    component={null}
+                    disableSwap
+                  />
+                </div>
+              </InputFieldWrapper>
+              <InputFieldWrapper>
+                <SettingFieldLabel
+                  title="Surface Visibility at Departure"
+                  description="acceptable surface visibility at departure airport (statute miles)"
+                />
+                <div className="range__slider">
+                  <RangeSlider
+                    // onChange={(e) => setRangeSlider(e.target.value)}
+                    mindistance={100}
+                    marks={[
+                      { label: '12', value: 12 },
+                      { label: '0', value: 0 },
+                    ]}
+                    max={12}
+                    min={0}
+                    value={rangeSlider}
+                    valueLabelDisplay="on"
+                    component={null}
+                    disableSwap
+                  />
+                </div>
+              </InputFieldWrapper>
+              <InputFieldWrapper>
+                <SettingFieldLabel
+                  title="Crosswinds at Departure Airport"
+                  description="acceptable crosswind at departure airport (knots)"
+                />
+                <div className="range__slider">
+                  <RangeSlider
+                    // onChange={(e) => setRangeSlider(e.target.value)}
+                    mindistance={100}
+                    marks={[
+                      { label: '35', value: 35 },
+                      { label: '0', value: 0 },
+                    ]}
+                    max={35}
+                    min={0}
+                    value={rangeSlider}
+                    valueLabelDisplay="on"
+                    component={null}
+                    disableSwap
+                  />
+                </div>
+              </InputFieldWrapper>
+
+              <InputFieldWrapper>
+                <SettingFieldLabel
+                  title="Ceiling Along Route"
+                  description="acceptable ceiling along proposed route (ft agl)"
+                />
+                <div className="range__slider">
+                  <RangeSlider
+                    // onChange={(e) => setRangeSlider(e.target.value)}
+                    mindistance={100}
+                    marks={[
+                      { label: '6000', value: 6000 },
+                      { label: '0', value: 0 },
+                    ]}
+                    max={6000}
+                    min={0}
+                    value={rangeSlider}
+                    valueLabelDisplay="on"
+                    component={null}
+                    disableSwap
+                  />
+                </div>
+              </InputFieldWrapper>
+
+              <InputFieldWrapper>
+                <SettingFieldLabel
+                  title="Surface Visibility Along Route"
+                  description="acceptable surface visibility along proposed route (statute miles)"
+                />
+                <div className="range__slider">
+                  <RangeSlider
+                    // onChange={(e) => setRangeSlider(e.target.value)}
+                    mindistance={100}
+                    marks={[
+                      { label: '12', value: 12 },
+                      { label: '0', value: 0 },
+                    ]}
+                    max={12}
+                    min={0}
+                    value={rangeSlider}
+                    valueLabelDisplay="on"
+                    component={null}
+                    disableSwap
+                  />
+                </div>
+              </InputFieldWrapper>
+
+              <InputFieldWrapper>
+                <SettingFieldLabel title="En Route Icing Probability" description="acceptable icing probabilty (%)" />
+                <div className="range__slider">
+                  <RangeSlider
+                    // onChange={(e) => setRangeSlider(e.target.value)}
+                    mindistance={100}
+                    marks={[
+                      { label: '12', value: 12 },
+                      { label: '0', value: 0 },
+                    ]}
+                    max={12}
+                    min={0}
+                    value={rangeSlider}
+                    valueLabelDisplay="on"
+                    component={null}
+                    disableSwap
+                  />
+                </div>
+              </InputFieldWrapper>
+
+              <InputFieldWrapper>
+                <SettingFieldLabel title="En Route Icing Probability" description="acceptable icing probabilty (%)" />
+                <div className="range__slider">
+                  <RangeSlider
+                    onChange={(e) => setRangeSlider(e.target.value)}
+                    mindistance={2}
+                    marks={[
+                      { label: 'Hvy', value: 8 },
+                      { label: 'Mod', value: 6 },
+                      { label: 'Lgt', value: 4 },
+                      { label: 'Trc', value: 2 },
+                      { label: 'None', value: 0 },
+                    ]}
+                    step={2}
+                    max={8}
+                    min={0}
+                    value={rangeSlider}
+                    valueLabelDisplay="off"
+                    component={null}
+                    disableSwap
+                  />
+                </div>
+              </InputFieldWrapper>
+
+              <InputFieldWrapper>
+                <SettingFieldLabel
+                  title="En Route Turbulence Intensity"
+                  description="acceptable turbulence intensity (edr * 100)"
+                />
+                <div className="range__slider">
+                  <RangeSlider
+                    // onChange={(e) => setRangeSlider(e.target.value)}
+                    mindistance={10}
+                    marks={[
+                      { label: '100', value: 100 },
+                      { label: '0', value: 0 },
+                    ]}
+                    max={100}
+                    min={0}
+                    value={rangeSlider}
+                    valueLabelDisplay="on"
+                    component={null}
+                    disableSwap
+                  />
+                </div>
+              </InputFieldWrapper>
+
+              <InputFieldWrapper>
+                <SettingFieldLabel
+                  title="En Route Convective Potential"
+                  description="acceptable convective potential"
+                />
+                <div className="range__slider">
+                  <RangeSlider
+                    onChange={(e) => setRangeSlider(e.target.value)}
+                    mindistance={2}
+                    marks={[
+                      { label: 'Vry Hi', value: 10 },
+                      { label: 'Hi', value: 8 },
+                      { label: 'M3d', value: 6 },
+                      { label: 'Lo', value: 4 },
+                      { label: 'Vry Lo', value: 2 },
+                      { label: 'None', value: 0 },
+                    ]}
+                    step={2}
+                    max={10}
+                    min={0}
+                    value={rangeSlider}
+                    valueLabelDisplay="off"
+                    component={null}
+                    disableSwap
+                  />
+                </div>
+              </InputFieldWrapper>
+
+              <InputFieldWrapper>
+                <SettingFieldLabel
+                  title="Ceiling at Destination"
+                  description="acceptable ceiling at destination airport (ft agl)"
+                />
+                <div className="range__slider">
+                  <RangeSlider
+                    // onChange={(e) => setRangeSlider(e.target.value)}
+                    mindistance={100}
+                    marks={[
+                      { label: '6000', value: 6000 },
+                      { label: '0', value: 0 },
+                    ]}
+                    max={6000}
+                    min={0}
+                    value={rangeSlider}
+                    valueLabelDisplay="on"
+                    component={null}
+                    disableSwap
+                  />
+                </div>
+              </InputFieldWrapper>
+
+              <InputFieldWrapper>
+                <SettingFieldLabel
+                  title="Surface Visibility at Destination"
+                  description="acceptable surface visibility at the destination airport (statute miles)"
+                />
+                <div className="range__slider">
+                  <RangeSlider
+                    onChange={(e) => setRangeSlider(e.target.value)}
+                    mindistance={1}
+                    marks={[
+                      { label: '12', value: 12 },
+                      { label: '0', value: 0 },
+                    ]}
+                    max={12}
+                    min={0}
+                    step={0.5}
+                    value={rangeSlider}
+                    valueLabelDisplay="on"
+                    component={null}
+                    disableSwap
+                  />
+                </div>
+              </InputFieldWrapper>
+              <InputFieldWrapper>
+                <SettingFieldLabel
+                  title="Crosswinds at Destination Airport"
+                  description="acceptable crosswind at destination airport (knots)"
+                />
+                <div className="range__slider">
+                  <RangeSlider
+                    // onChange={(e) => setRangeSlider(e.target.value)}
+                    mindistance={100}
+                    marks={[
+                      { label: '35', value: 35 },
+                      { label: '0', value: 0 },
+                    ]}
+                    max={35}
+                    min={0}
+                    value={rangeSlider}
+                    valueLabelDisplay="on"
+                    component={null}
+                    disableSwap
+                  />
+                </div>
+              </InputFieldWrapper>
+            </div>
           </Collapse>
+          <hr />
         </div>
       </div>
     </Drawer>
