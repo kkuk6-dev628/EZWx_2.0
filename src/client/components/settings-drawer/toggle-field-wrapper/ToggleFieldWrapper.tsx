@@ -1,13 +1,8 @@
-import React, { ReactNode } from 'react'
-import styles from './ToggleFieldWrapper.module.css'
+import React, { ReactNode } from 'react';
+import styles from './ToggleFieldWrapper.module.css';
 interface Props {
-  children: ReactNode
+  children: ReactNode;
 }
 export const ToggleFieldWrapper = ({ children }: Props) => {
-  return (
-
-    <div className={styles.button__fields__container}>
-      {children}
-    </div>
-  )
-}
+  return <div className={styles.button__fields__container}>{children}</div>;
+};

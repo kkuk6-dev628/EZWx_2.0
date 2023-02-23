@@ -1,5 +1,5 @@
-import React from 'react'
-import styles from './SettingFieldLabel.module.css'
+import React from 'react';
+import styles from './SettingFieldLabel.module.css';
 
 interface FieldProps {
   title: string;
@@ -12,5 +12,5 @@ export const SettingFieldLabel = ({ title, description }: FieldProps) => {
       <div className={styles.field__title}>{title}</div>
       <div className={styles.field__description}>{description}</div>
     </div>
-  )
-}
+  );
+};
