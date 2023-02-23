@@ -9,6 +9,7 @@ import {
   ToggleButton,
   ToggleFieldWrapper,
 } from '../settings-drawer';
+import { StyledSlider } from './Slider';
 
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;
@@ -163,6 +164,10 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     onChange={(e) => setRadio(e.target.value)}
                   />
                 </div>
+              </InputFieldWrapper>
+              <InputFieldWrapper>
+                <SettingFieldLabel title="True Airspeed" description="true airspeed for en route operations (knots)" />
+                <StyledSlider />
               </InputFieldWrapper>
             </div>
           </Collapse>
