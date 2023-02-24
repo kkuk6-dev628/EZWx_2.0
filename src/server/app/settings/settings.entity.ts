@@ -1,5 +1,4 @@
-import { Column,OneToOne, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import {User} from '../user/user.entity'
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class UserSettings {
   @PrimaryGeneratedColumn()
@@ -82,7 +81,5 @@ export class UserSettings {
   crosswinds_at_destination_airport_max: number;
 
   @Column()
-  // @OneToOne(()=>User,(user)=>user.userSettings )
-  user_id:number
-
+  user_id: number;
 }

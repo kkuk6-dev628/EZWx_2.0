@@ -2,7 +2,7 @@ import { UserSettings } from './settings.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateUserSettingsDto } from './dto/create_settings_dto';
+import { CreateUserSettingsDto, UpdateUserSettingsDto } from './dto/create_settings_dto';
 
 @Injectable()
 export class SettingsService {
@@ -15,7 +15,11 @@ export class SettingsService {
       id,
     });
   }
-  async create(dto: CreateUserSettingsDto) {
+  create(dto: CreateUserSettingsDto) {
+    return this.userSettingsRepository.create(dto);
+  }
+
+  async update(dto: UpdateUserSettingsDto) {
     return await this.userSettingsRepository.save(dto);
   }
 }
