@@ -1,5 +1,5 @@
 import { Certification } from '../certification/certification.entity';
-
+import {UserSettings} from '../settings/settings.entity'
 import {
   Entity,
   Column,
@@ -7,8 +7,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToMany,
+  OneToOne,
   Unique,
   JoinTable,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity()
@@ -76,4 +78,8 @@ export class User {
     name: 'user_certification',
   })
   certifications: Certification[];
+
+//   @OneToOne(()=>UserSettings, (UserSettings=>UserSettings.user_id))
+//  @JoinColumn()
+//   userSettings:UserSettings;
 }
