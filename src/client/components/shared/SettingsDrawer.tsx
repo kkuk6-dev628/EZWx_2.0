@@ -11,6 +11,8 @@ import {
 } from '../settings-drawer';
 import { StyledSlider } from './Slider';
 import RangeSlider from './RangeSlider';
+import { useSelector } from 'react-redux';
+import { selectSettings } from '../../store/user/UserSettings';
 
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;
@@ -18,13 +20,21 @@ interface Props {
 }
 
 const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props) => {
+  const settingsState = useSelector(selectSettings);
   const [isShowGeneralSettings, setIsShowGeneralSettings] = useState(false);
   const [isShowAirCraftSettings, setIsShowAirCraftSettings] = useState(false);
   const [isShowPersonalMinimumSettings, setIsShowPersonalMinimumSettings] = useState(false);
+
+  const [settings, setSettings] = useState(settingsState);
   const [radio, setRadio] = useState('');
   const [rangeSlider, setRangeSlider] = useState([2, 6]);
+  console.log('state', settingsState);
   const closeDrawer = () => {
     setIsShowSettingsDrawer(false);
+  };
+
+  const handleChange = (e) => {
+    console.log('e', e);
   };
 
   return (
@@ -59,7 +69,12 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 <SettingFieldLabel title="Home Airport" description="default home airport" />
 
                 <div className="input__container">
-                  <input type="text" placeholder="Select Airport..." />
+                  <input
+                    name="default_home_airport"
+                    value={settings.default_home_airport}
+                    type="text"
+                    placeholder="Select Airport..."
+                  />
                   <RxCross2 />
                 </div>
               </InputFieldWrapper>
