@@ -14,6 +14,7 @@ export const gisdbConfig: DataSourceOptions = {
   type: 'postgres',
   name: 'gisDB',
   url: process.env.GISDB_URL,
+  useUTC: true,
   entities: [StationTime],
 };
 

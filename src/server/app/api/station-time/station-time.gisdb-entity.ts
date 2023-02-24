@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('station_time')
+@Entity('forecast_hr_to_stations_table_map')
 export class StationTime {
   @PrimaryColumn()
   station_table_name: string;

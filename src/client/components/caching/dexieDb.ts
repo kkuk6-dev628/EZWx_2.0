@@ -27,7 +27,18 @@ export class EzwxBriefDexie extends Dexie {
       usProvinces: 'id',
       canadianProvinces: 'id',
       countyWarningAreas: 'id',
-      nbmStations: 'id',
+      station_1: '++id',
+      station_2: '++id',
+      station_3: '++id',
+      station_4: '++id',
+      station_5: '++id',
+      station_6: '++id',
+      station_7: '++id',
+      station_8: '++id',
+      station_9: '++id',
+      station_10: '++id',
+      station_11: '++id',
+      station_12: '++id',
     });
   }
 }

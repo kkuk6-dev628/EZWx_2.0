@@ -167,6 +167,10 @@ export const toTitleCase = (str) => {
     : null;
 };
 
+export const getAbsoluteHours = (date: string | Date | number) => {
+  return Math.floor(new Date(date).getTime() / 3600 / 1000);
+};
+
 export const visibilityMileToMeter = (mile: number): number => {
   let meter = 9999;
   switch (mile) {
