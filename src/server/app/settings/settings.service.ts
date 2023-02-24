@@ -15,9 +15,12 @@ export class SettingsService {
       id,
     });
   }
-  create(dto: CreateUserSettingsDto) {
-    return this.userSettingsRepository.create(dto);
-  }
+  async create(dto: CreateUserSettingsDto) {
+    const newUserSettings = this.userSettingsRepository.create(dto);
+      console.log('newUserSettings: ',newUserSettings);
+      return await this.userSettingsRepository.save(newUserSettings);
+    }
+
 
   async update(dto: UpdateUserSettingsDto) {
     return await this.userSettingsRepository.save(dto);
