@@ -9,7 +9,7 @@ import Image from 'next/image';
 import SunCalc from 'suncalc';
 
 import { selectMetar } from '../../../../store/layers/LayerControl';
-import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
+import { PersonalMinimums, selectPersonalMinimums } from '../../../../store/user/UserSettings';
 import { db } from '../../../caching/dexieDb';
 import { emptyGeoJson, MetarMarkerTypes, timeSliderInterval, windIconLimit } from '../../common/AreoConstants';
 import {
@@ -22,7 +22,6 @@ import {
   getWorstSkyCondition,
 } from '../../common/AreoFunctions';
 import MarkerClusterGroup from '../react-layers/MarkerClusterGroup';
-import { getFlightCategoryIconUrl } from './MetarsLayer';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 
 const wfsUrl = 'https://eztile4.ezwxbrief.com/geoserver/EZWxBrief/ows';
@@ -80,6 +79,67 @@ const nbmStationProperties = [
   'crosswind_runway_id',
   'crosswind_component_kt',
 ];
+
+export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): { iconUrl: string; ceiling: number } => {
+  const skyConditions = getSkyConditions(feature);
+  let sky: string, ceiling: number;
+  if (feature.properties.vert_vis_ft) {
+    sky = 'OVX';
+    ceiling = feature.properties.vert_vis_ft;
+  } else if (skyConditions.length > 0) {
+    const skyCondition = getLowestCeiling(skyConditions);
+    if (skyCondition) ceiling = skyCondition.cloudBase;
+    sky = getWorstSkyCondition(skyConditions);
+  }
+  let flightCategory = feature.properties.flight_category;
+  if (!flightCategory) {
+    flightCategory = 'Black';
+  }
+  let iconUrl = '/icons/metar/MISSING.png';
+  if (sky === 'CLR' && feature.properties.auto == null) {
+    sky = 'SKC';
+  }
+  if (flightCategory && sky) {
+    iconUrl = `/icons/metar/${flightCategory}-${sky}.png`;
+  }
+  return { iconUrl, ceiling };
+};
+
+export const getNbmFlightCategoryIconUrl = (feature: GeoJSON.Feature, personalMinimums: PersonalMinimums): string => {
+  const visibility = feature.properties.visibility;
+  const [catVis] = getMetarVisibilityCategory(visibility, personalMinimums);
+  const ceiling = feature.properties.ceiling;
+  const [catCeiling] = getMetarCeilingCategory(ceiling, personalMinimums);
+  const categories = Object.keys(personalMinimums);
+  const indexVis = categories.findIndex(catVis);
+  const indexCat = categories.findIndex(catCeiling);
+  let indexFinalCat: number;
+  if (indexCat > -1 && indexVis > -1) {
+    indexFinalCat = Math.min(indexCat, indexVis);
+  } else if (indexCat > -1) {
+    indexFinalCat = indexCat;
+  } else if (indexVis > -1) {
+    indexFinalCat = indexVis;
+  } else {
+    indexFinalCat = 0;
+  }
+  const finalCat = categories[indexFinalCat];
+  let skyCondition: string;
+  if (ceiling) {
+    skyCondition = ceiling >= 88 ? 'OVC' : 'BKN';
+  } else {
+    const skyCover = feature.properties.skycover;
+    if (skyCover < 6) {
+      skyCondition = 'SKC';
+    } else if (skyCover < 31) {
+      skyCondition = 'FEW';
+    } else {
+      skyCondition = 'SCT';
+    }
+  }
+  const iconUrl = `/icons/metar/${finalCat}-${skyCondition}.png`;
+  return iconUrl;
+};
 
 export const StationMarkersLayer = () => {
   const [metars, setMetars] = useState<GeoJSON.Feature[]>([]);
@@ -204,7 +264,7 @@ export const StationMarkersLayer = () => {
     wfsTypeName: string,
     propertyNames: string[],
     datasetName: string,
-    setFeaturesFunc: (features: GeoJSON.Feature[]) => void,
+    setFeaturesFunc?: (features: GeoJSON.Feature[]) => void,
   ) => {
     const params = {
       outputFormat: 'application/json',
@@ -226,7 +286,7 @@ export const StationMarkersLayer = () => {
           console.log(wfsTypeName + ': Invalid json data!', data.data);
         } else {
           storeFeaturesToCache(datasetName, data.data.features);
-          setFeaturesFunc(data.data.features);
+          if (setFeaturesFunc) setFeaturesFunc(data.data.features);
         }
       })
       .catch((reason) => {
@@ -347,25 +407,35 @@ export const StationMarkersLayer = () => {
           marker = getCeilingHeightMarker(feature, latlng);
           break;
         case MetarMarkerTypes.surfaceVisibility.value:
-          marker = getSurfaceVisibilityMarker(feature, latlng);
+          marker = getSurfaceVisibilityMarker(feature, latlng, feature.properties.visibility_statute_mi);
           break;
         case MetarMarkerTypes.surfaceWindSpeed.value:
-          marker = getSurfaceWindSpeedMarker(feature, latlng);
+          marker = getSurfaceWindSpeedMarker(feature, latlng, feature.properties.wind_speed_kt);
           break;
         case MetarMarkerTypes.surfaceWindBarbs.value:
-          marker = getSurfaceWindBarbsMarker(feature, latlng);
+          marker = getSurfaceWindBarbsMarker(
+            feature,
+            latlng,
+            feature.properties.wind_speed_kt,
+            feature.properties.wind_dir_degrees,
+          );
           break;
         case MetarMarkerTypes.surfaceWindGust.value:
-          marker = getSurfaceWindGustMarker(feature, latlng);
+          marker = getSurfaceWindGustMarker(feature, latlng, feature.properties.wind_gust_kt);
           break;
         case MetarMarkerTypes.surfaceTemperature.value:
           marker = getSurfaceTemperatureMarker(feature, latlng, feature.properties.temp_c);
           break;
         case MetarMarkerTypes.surfaceDewpoint.value:
-          marker = getSurfaceDewpointMarker(feature, latlng);
+          marker = getSurfaceDewpointMarker(feature, latlng, feature.properties.dewpoint_c);
           break;
         case MetarMarkerTypes.dewpointDepression.value:
-          marker = getDewpointDepressionMarker(feature, latlng);
+          marker = getDewpointDepressionMarker(
+            feature,
+            latlng,
+            feature.properties.temp_c,
+            feature.properties.dewpoint_c,
+          );
           break;
         case MetarMarkerTypes.weather.value:
           marker = getWeatherMarker(feature, latlng);
@@ -374,25 +444,44 @@ export const StationMarkersLayer = () => {
     } else {
       switch (layerState.markerType) {
         case MetarMarkerTypes.flightCategory.value:
+          marker = getFlightCatMarker(feature, latlng);
           break;
         case MetarMarkerTypes.ceilingHeight.value:
+          marker = getNbmCeilingHeightMarker(feature, latlng, feature.properties.ceiling, feature.properties.skycover);
           break;
         case MetarMarkerTypes.surfaceVisibility.value:
+          marker = getSurfaceVisibilityMarker(feature, latlng, feature.properties.visibility);
           break;
         case MetarMarkerTypes.surfaceWindSpeed.value:
+          marker = getSurfaceWindSpeedMarker(feature, latlng, feature.properties.wind_speed_kt);
           break;
         case MetarMarkerTypes.surfaceWindBarbs.value:
+          marker = getSurfaceWindBarbsMarker(
+            feature,
+            latlng,
+            feature.properties.wind_speed_kt,
+            feature.properties.wind_direction,
+          );
           break;
         case MetarMarkerTypes.surfaceWindGust.value:
+          marker = getSurfaceWindGustMarker(feature, latlng, feature.properties.wind_gust_kt);
           break;
         case MetarMarkerTypes.surfaceTemperature.value:
           marker = getSurfaceTemperatureMarker(feature, latlng, feature.properties.temperature_c);
           break;
         case MetarMarkerTypes.surfaceDewpoint.value:
+          marker = getSurfaceDewpointMarker(feature, latlng, feature.properties.dewpoint_c);
           break;
         case MetarMarkerTypes.dewpointDepression.value:
+          marker = getDewpointDepressionMarker(
+            feature,
+            latlng,
+            feature.properties.temperature_c,
+            feature.properties.dewpoint_c,
+          );
           break;
         case MetarMarkerTypes.weather.value:
+          marker = getWeatherMarker(feature, latlng);
           break;
       }
     }
@@ -403,7 +492,12 @@ export const StationMarkersLayer = () => {
   };
 
   const getFlightCatMarker = (feature: GeoJSON.Feature, latlng: LatLng): L.Marker => {
-    const { iconUrl } = getFlightCategoryIconUrl(feature);
+    let iconUrl: string;
+    if (isPast) {
+      iconUrl = getFlightCategoryIconUrl(feature).iconUrl;
+    } else {
+      iconUrl = getNbmFlightCategoryIconUrl(feature, personalMinimums);
+    }
 
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
@@ -461,8 +555,49 @@ export const StationMarkersLayer = () => {
     return metarMarker;
   };
 
-  const getSurfaceVisibilityMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
-    let visibility = feature.properties.visibility_statute_mi;
+  const getNbmCeilingHeightMarker = (
+    feature: GeoJSON.Feature,
+    latlng: LatLng,
+    ceilingHeight: number,
+    skyCover: number,
+  ) => {
+    const ceilingAmount = addLeadingZeroes(ceilingHeight / 100, 3);
+    const worstSkyCondition = skyCover >= 88 ? 'OVC' : 'BKN';
+    let iconUrl = '';
+    if (layerState.usePersonalMinimums) {
+    } else {
+      const [cat] = getMetarCeilingCategory(ceilingHeight, personalMinimums);
+      iconUrl = `/icons/metar/${cat}-${worstSkyCondition}.png`;
+    }
+    const metarMarker = L.marker(latlng, {
+      icon: new L.DivIcon({
+        className: 'metar-ceiling-icon',
+        html: ReactDOMServer.renderToString(
+          <>
+            <div style={{ display: 'inline', verticalAlign: -7, marginLeft: -4 }}>
+              <Image src={iconUrl} alt={''} width={20} height={20} />
+            </div>
+            <div
+              style={{
+                display: 'inline',
+                fontWeight: 'bold',
+                color: 'white',
+                verticalAlign: -2,
+              }}
+            >
+              {ceilingAmount}
+            </div>
+          </>,
+        ),
+        iconSize: [50, 20],
+        iconAnchor: [25, 10],
+      }),
+      pane: 'station-markers',
+    });
+    return metarMarker;
+  };
+
+  const getSurfaceVisibilityMarker = (feature: GeoJSON.Feature, latlng: LatLng, visibility: any) => {
     if (!visibility) return;
     const [category, _] = getMetarVisibilityCategory(visibility, personalMinimums);
     let iconUrl = '/icons/metar/MISSING.png';
@@ -506,9 +641,8 @@ export const StationMarkersLayer = () => {
     return metarMarker;
   };
 
-  const getSurfaceWindSpeedMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
-    const windSpeed = parseFloat(feature.properties.wind_speed_kt);
-    if (Number.isNaN(windSpeed)) return;
+  const getSurfaceWindSpeedMarker = (feature: GeoJSON.Feature, latlng: LatLng, windSpeed: number) => {
+    if (!windSpeed) return;
     let colorCode = 'black';
     if (windSpeed > 30) {
       colorCode = 'c10000';
@@ -543,9 +677,8 @@ export const StationMarkersLayer = () => {
     return metarMarker;
   };
 
-  const getSurfaceWindGustMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
-    const windGust = parseFloat(feature.properties.wind_gust_kt);
-    if (Number.isNaN(windGust)) return;
+  const getSurfaceWindGustMarker = (feature: GeoJSON.Feature, latlng: LatLng, windGust: number) => {
+    if (!windGust) return;
     let colorCode = 'black';
     if (windGust > 45) {
       colorCode = 'c10000';
@@ -630,9 +763,8 @@ export const StationMarkersLayer = () => {
     return metarMarker;
   };
 
-  const getSurfaceDewpointMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
-    let tempInCelcius = parseFloat(feature.properties.dewpoint_c);
-    if (Number.isNaN(tempInCelcius)) return;
+  const getSurfaceDewpointMarker = (feature: GeoJSON.Feature, latlng: LatLng, tempInCelcius: number) => {
+    if (!tempInCelcius) return;
     tempInCelcius = Math.round(tempInCelcius);
     // const tempInCelcius = Math.round((temperature - 32) * (5 / 9));
     let colorCode = 'black';
@@ -681,9 +813,12 @@ export const StationMarkersLayer = () => {
     return metarMarker;
   };
 
-  const getDewpointDepressionMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
-    const temperature = parseFloat(feature.properties.temp_c);
-    const dewpointTemperature = parseFloat(feature.properties.dewpoint_c);
+  const getDewpointDepressionMarker = (
+    feature: GeoJSON.Feature,
+    latlng: LatLng,
+    temperature: number,
+    dewpointTemperature: number,
+  ) => {
     // const useCelcius =
     //   $('#hdnUserTemperatureSetting').val().trim() === 'celsius' ? true : false;
     let dewpointDepression = temperature - dewpointTemperature;
@@ -732,9 +867,12 @@ export const StationMarkersLayer = () => {
     return metarMarker;
   };
 
-  const getSurfaceWindBarbsMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
-    let windSpeed = feature.properties.wind_speed_kt;
-    let windDirection = feature.properties.wind_dir_degrees;
+  const getSurfaceWindBarbsMarker = (
+    feature: GeoJSON.Feature,
+    latlng: LatLng,
+    windSpeed: number,
+    windDirection: number,
+  ) => {
     let iconUrl = '/icons/barbs/0-kt.png';
     let transformAngle = 'rotate(0deg)';
     if (isNaN(windSpeed)) {

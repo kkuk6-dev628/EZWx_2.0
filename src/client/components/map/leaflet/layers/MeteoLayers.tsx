@@ -31,7 +31,6 @@ import { MetarMarkerTypes } from '../../common/AreoConstants';
 import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
 import { InLayerControl } from '../layer-control/MeteoLayerControl';
 import axios from 'axios';
-import NbmMarkersLayer from './NbmMarkersLayer';
 import { InBaseLayerControl } from '../layer-control/BaseMapLayerControl';
 import RadarLayer from './RadarLayer';
 import { StationMarkersLayer } from './StationMarkersLayer';

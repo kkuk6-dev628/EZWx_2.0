@@ -21,33 +21,9 @@ import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
 import { MetarMarkerTypes, timeSliderInterval, windIconLimit } from '../../common/AreoConstants';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../../caching/dexieDb';
+import { getFlightCategoryIconUrl } from './StationMarkersLayer';
 
 const cacheUpdateInterval = 75; // 75 minutes
-
-export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): { iconUrl: string; ceiling: number } => {
-  const skyConditions = getSkyConditions(feature);
-  let sky: string, ceiling: number;
-  if (feature.properties.vert_vis_ft) {
-    sky = 'OVX';
-    ceiling = feature.properties.vert_vis_ft;
-  } else if (skyConditions.length > 0) {
-    const skyCondition = getLowestCeiling(skyConditions);
-    if (skyCondition) ceiling = skyCondition.cloudBase;
-    sky = getWorstSkyCondition(skyConditions);
-  }
-  let flightCategory = feature.properties.flight_category;
-  if (!flightCategory) {
-    flightCategory = 'Black';
-  }
-  let iconUrl = '/icons/metar/MISSING.png';
-  if (sky === 'CLR' && feature.properties.auto == null) {
-    sky = 'SKC';
-  }
-  if (flightCategory && sky) {
-    iconUrl = `/icons/metar/${flightCategory}-${sky}.png`;
-  }
-  return { iconUrl, ceiling };
-};
 
 const MetarsLayer = () => {
   const map = useMap();

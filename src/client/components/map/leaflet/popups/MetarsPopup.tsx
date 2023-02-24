@@ -13,7 +13,7 @@ import {
   visibilityMileToFraction,
   visibilityMileToMeter,
 } from '../../common/AreoFunctions';
-import { getFlightCategoryIconUrl } from '../layers/MetarsLayer';
+import { getFlightCategoryIconUrl } from '../layers/StationMarkersLayer';
 
 const MetarsPopup = ({
   layer,
