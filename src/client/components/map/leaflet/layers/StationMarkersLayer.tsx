@@ -78,6 +78,7 @@ const nbmStationProperties = [
   'cross_com',
   'valid_date',
   'geom',
+  'type',
 ];
 
 export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): { iconUrl: string; ceiling: number } => {
@@ -125,10 +126,10 @@ export const getNbmFlightCategoryIconUrl = (feature: GeoJSON.Feature, personalMi
   }
   const finalCat = indexFinalCat > -1 ? categories[indexFinalCat] : 'Black';
   let skyCondition: string;
+  const skyCover = feature.properties.skycov;
   if (ceiling) {
-    skyCondition = ceiling >= 88 ? 'OVC' : 'BKN';
+    skyCondition = skyCover >= 88 ? 'OVC' : 'BKN';
   } else {
-    const skyCover = feature.properties.skycov;
     if (skyCover < 6) {
       skyCondition = 'SKC';
     } else if (skyCover < 31) {
@@ -519,7 +520,7 @@ export const StationMarkersLayer = () => {
     if (!visibility) return;
     const [category] = getMetarVisibilityCategory(visibility, personalMinimums);
     let iconUrl = '/icons/metar/MISSING.png';
-    if (visibility === 0.25 && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
+    if (visibility === 0.25 && feature.properties.raw_text && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
       visibility = '<0.25';
     }
     if (visibility > 4) {
@@ -1144,6 +1145,7 @@ export const StationMarkersLayer = () => {
           key={renderedTime}
           ref={geojsonLayerRef}
           data={displayedGeojson}
+          visible={layerState.checked}
           simplifyRadius={clusterRadius}
           interactive={true}
           pointToLayer={pointToLayer}

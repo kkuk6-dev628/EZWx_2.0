@@ -273,6 +273,7 @@ const PirepLayer = () => {
         ref={geojsonLayerRef}
         data={displayedGeojson}
         simplifyRadius={30}
+        visible={layerState.checked}
         unSimplifyFilter={selectUrgentPirep}
         interactive={true}
         pointToLayer={pointToLayer}
