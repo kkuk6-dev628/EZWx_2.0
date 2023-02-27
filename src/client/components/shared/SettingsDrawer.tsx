@@ -13,6 +13,7 @@ import { StyledSlider } from './Slider';
 import RangeSlider from './RangeSlider';
 import { useSelector } from 'react-redux';
 import { selectSettings } from '../../store/user/UserSettings';
+import { useGetUserSettingsQuery } from '../../store/user/userSettingsApi';
 
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;
@@ -26,17 +27,21 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const [isShowPersonalMinimumSettings, setIsShowPersonalMinimumSettings] = useState(false);
 
   const [settings, setSettings] = useState(settingsState);
-  const [radio, setRadio] = useState('');
-  const [rangeSlider, setRangeSlider] = useState([2, 6]);
-  console.log('state', settingsState);
+
+  const { data, isLoading } = useGetUserSettingsQuery(3);
+  console.log('data,isLoading', data, isLoading);
+
   const closeDrawer = () => {
     setIsShowSettingsDrawer(false);
   };
 
   const handleChange = (e) => {
-    console.log('e', e);
+    setSettings({ ...settings, [e.target.name]: e.target.value });
   };
 
+  const handleToggle = (e) => {
+    setSettings({ ...settings, [e.target.name]: e.target.checked });
+  };
   return (
     <Drawer anchor={'right'} open={isShowSettingsDrawer} onClose={closeDrawer}>
       <div className="drawer__container">
@@ -67,11 +72,11 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
             <div className="collapsed__container">
               <InputFieldWrapper>
                 <SettingFieldLabel title="Home Airport" description="default home airport" />
-
                 <div className="input__container">
                   <input
                     name="default_home_airport"
                     value={settings.default_home_airport}
+                    onChange={handleChange}
                     type="text"
                     placeholder="Select Airport..."
                   />
@@ -84,10 +89,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 <ToggleButton
                   label1="Fahrenheit"
                   label2="Celsius"
-                  checked={false}
-                  onChange={(e) => {
-                    console.log('e', e);
-                  }}
+                  name="default_temperature_unit"
+                  checked={settings.default_temperature_unit}
+                  onChange={handleToggle}
                 />
               </ToggleFieldWrapper>
 
@@ -96,10 +100,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 <ToggleButton
                   label1="Local"
                   label2="Zulu"
-                  checked={false}
-                  onChange={(e) => {
-                    console.log('e', e);
-                  }}
+                  name="default_time_display_unit"
+                  checked={settings.default_time_display_unit}
+                  onChange={handleToggle}
                 />
               </ToggleFieldWrapper>
 
@@ -108,10 +111,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 <ToggleButton
                   label1="Miles Per Hour"
                   label2="Knots"
-                  checked={false}
-                  onChange={(e) => {
-                    console.log('e', e);
-                  }}
+                  name="default_wind_speed_unit"
+                  checked={settings.default_wind_speed_unit}
+                  onChange={handleToggle}
                 />
               </ToggleFieldWrapper>
 
@@ -120,10 +122,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 <ToggleButton
                   label1="Kilometers"
                   label2="Nautical Miles"
-                  checked={false}
-                  onChange={(e) => {
-                    console.log('e', e);
-                  }}
+                  name="default_distance_unit"
+                  checked={settings.default_distance_unit}
+                  onChange={handleToggle}
                 />
               </ToggleFieldWrapper>
 
@@ -132,10 +133,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 <ToggleButton
                   label1="Meters"
                   label2="Statute Miles"
-                  checked={false}
-                  onChange={(e) => {
-                    console.log('e', e);
-                  }}
+                  name="default_visibility_unit"
+                  checked={settings.default_visibility_unit}
+                  onChange={handleToggle}
                 />
               </ToggleFieldWrapper>
             </div>
@@ -159,31 +159,34 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     id="lightWeight"
                     value={'light'}
                     title="Light"
-                    selectedValue={radio}
+                    name="max_takeoff_weight_category"
+                    selectedValue={settings.max_takeoff_weight_category}
                     description={'(< 15,500 lbs)'}
-                    onChange={(e) => setRadio(e.target.value)}
+                    onChange={handleChange}
                   />
                   <RadioButton
                     id="mediumWeight"
                     value="medium"
                     title="Medium"
-                    selectedValue={radio}
+                    name="max_takeoff_weight_category"
+                    selectedValue={settings.max_takeoff_weight_category}
                     description={'(15,500 - 300,000 lbs)'}
-                    onChange={(e) => setRadio(e.target.value)}
+                    onChange={handleChange}
                   />
                   <RadioButton
                     id="heavyWeight"
                     value="heavy"
                     title="Heavy"
-                    selectedValue={radio}
+                    name="max_takeoff_weight_category"
+                    selectedValue={settings.max_takeoff_weight_category}
                     description={'(> 300,000 lbs)'}
-                    onChange={(e) => setRadio(e.target.value)}
+                    onChange={handleChange}
                   />
                 </div>
               </InputFieldWrapper>
               <InputFieldWrapper>
                 <SettingFieldLabel title="True Airspeed" description="true airspeed for en route operations (knots)" />
-                <StyledSlider />
+                <StyledSlider onChange={handleChange} name="true_airspeed" value={settings.true_airspeed} />
               </InputFieldWrapper>
             </div>
           </Collapse>
@@ -206,15 +209,16 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 />
                 <div className="range__slider">
                   <RangeSlider
-                    // onChange={(e) => setRangeSlider(e.target.value)}
+                    name="ceiling_at_departure"
+                    value={settings.ceiling_at_departure}
                     mindistance={100}
+                    onChange={handleChange}
                     marks={[
                       { label: '6000', value: 6000 },
                       { label: '100', value: 100 },
                     ]}
                     max={6000}
                     min={0}
-                    value={rangeSlider}
                     track="normal"
                     valueLabelDisplay="on"
                     component={null}
@@ -229,15 +233,16 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 />
                 <div className="range__slider">
                   <RangeSlider
-                    // onChange={(e) => setRangeSlider(e.target.value)}
-                    mindistance={100}
+                    name="surface_visibility_at_departure"
+                    value={settings.surface_visibility_at_departure}
+                    onChange={handleChange}
+                    mindistance={2}
                     marks={[
                       { label: '12', value: 12 },
                       { label: '0', value: 0 },
                     ]}
                     max={12}
                     min={0}
-                    value={rangeSlider}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap
@@ -251,15 +256,16 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 />
                 <div className="range__slider">
                   <RangeSlider
-                    // onChange={(e) => setRangeSlider(e.target.value)}
-                    mindistance={100}
+                    name="crosswinds_at_departure_airport"
+                    value={settings.crosswinds_at_departure_airport}
+                    onChange={handleChange}
+                    mindistance={5}
                     marks={[
                       { label: '35', value: 35 },
                       { label: '0', value: 0 },
                     ]}
                     max={35}
                     min={0}
-                    value={rangeSlider}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap
@@ -274,7 +280,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 />
                 <div className="range__slider">
                   <RangeSlider
-                    // onChange={(e) => setRangeSlider(e.target.value)}
+                    name="ceiling_along_route"
+                    value={settings.ceiling_along_route}
+                    onChange={handleChange}
                     mindistance={100}
                     marks={[
                       { label: '6000', value: 6000 },
@@ -282,7 +290,6 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     ]}
                     max={6000}
                     min={0}
-                    value={rangeSlider}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap
@@ -297,15 +304,16 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 />
                 <div className="range__slider">
                   <RangeSlider
-                    // onChange={(e) => setRangeSlider(e.target.value)}
-                    mindistance={100}
+                    name="surface_visibility_along_route"
+                    value={settings.surface_visibility_along_route}
+                    onChange={handleChange}
+                    mindistance={2}
                     marks={[
                       { label: '12', value: 12 },
                       { label: '0', value: 0 },
                     ]}
                     max={12}
                     min={0}
-                    value={rangeSlider}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap
@@ -317,18 +325,18 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 <SettingFieldLabel title="En Route Icing Probability" description="acceptable icing probabilty (%)" />
                 <div className="range__slider">
                   <RangeSlider
-                    // onChange={(e) => setRangeSlider(e.target.value)}
-                    mindistance={100}
+                    name="en_route_icing_probability"
+                    value={settings.en_route_icing_probability}
+                    onChange={handleChange}
+                    mindistance={2}
                     marks={[
                       { label: '12', value: 12 },
                       { label: '0', value: 0 },
                     ]}
                     max={12}
                     min={0}
-                    value={rangeSlider}
                     valueLabelDisplay="on"
                     component={null}
-                    disableSwap
                   />
                 </div>
               </InputFieldWrapper>
@@ -337,7 +345,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 <SettingFieldLabel title="En Route Icing Probability" description="acceptable icing probabilty (%)" />
                 <div className="range__slider">
                   <RangeSlider
-                    onChange={(e) => setRangeSlider(e.target.value)}
+                    name="en_route_icing_intensity"
+                    value={settings.en_route_icing_intensity}
+                    onChange={handleChange}
                     mindistance={2}
                     marks={[
                       { label: 'Hvy', value: 8 },
@@ -349,7 +359,6 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     step={2}
                     max={8}
                     min={0}
-                    value={rangeSlider}
                     valueLabelDisplay="off"
                     component={null}
                     disableSwap
@@ -364,7 +373,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 />
                 <div className="range__slider">
                   <RangeSlider
-                    // onChange={(e) => setRangeSlider(e.target.value)}
+                    name="en_route_turbulence_intensity"
+                    value={settings.en_route_turbulence_intensity}
+                    onChange={handleChange}
                     mindistance={10}
                     marks={[
                       { label: '100', value: 100 },
@@ -372,7 +383,6 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     ]}
                     max={100}
                     min={0}
-                    value={rangeSlider}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap
@@ -387,7 +397,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 />
                 <div className="range__slider">
                   <RangeSlider
-                    onChange={(e) => setRangeSlider(e.target.value)}
+                    name="en_route_convective_potential"
+                    value={settings.en_route_convective_potential}
+                    onChange={handleChange}
                     mindistance={2}
                     marks={[
                       { label: 'Vry Hi', value: 10 },
@@ -400,7 +412,6 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     step={2}
                     max={10}
                     min={0}
-                    value={rangeSlider}
                     valueLabelDisplay="off"
                     component={null}
                     disableSwap
@@ -415,7 +426,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 />
                 <div className="range__slider">
                   <RangeSlider
-                    // onChange={(e) => setRangeSlider(e.target.value)}
+                    name="ceiling_at_destination"
+                    value={settings.ceiling_at_destination}
+                    onChange={handleChange}
                     mindistance={100}
                     marks={[
                       { label: '6000', value: 6000 },
@@ -423,7 +436,6 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     ]}
                     max={6000}
                     min={0}
-                    value={rangeSlider}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap
@@ -438,7 +450,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 />
                 <div className="range__slider">
                   <RangeSlider
-                    onChange={(e) => setRangeSlider(e.target.value)}
+                    name="surface_visibility_at_destination"
+                    value={settings.surface_visibility_at_destination}
+                    onChange={handleChange}
                     mindistance={1}
                     marks={[
                       { label: '12', value: 12 },
@@ -447,7 +461,6 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     max={12}
                     min={0}
                     step={0.5}
-                    value={rangeSlider}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap
@@ -461,15 +474,16 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 />
                 <div className="range__slider">
                   <RangeSlider
-                    // onChange={(e) => setRangeSlider(e.target.value)}
-                    mindistance={100}
+                    name="crosswinds_at_destination_airport"
+                    value={settings.crosswinds_at_destination_airport}
+                    onChange={handleChange}
+                    mindistance={5}
                     marks={[
                       { label: '35', value: 35 },
                       { label: '0', value: 0 },
                     ]}
                     max={35}
                     min={0}
-                    value={rangeSlider}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap

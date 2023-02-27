@@ -7,9 +7,10 @@ interface ToggleProps {
   label2: string;
   checked: boolean;
   onChange: (e: InputEvent) => void;
+  name: string;
 }
 
-const ToggleButton = ({ label1, label2, checked, onChange }: ToggleProps) => {
+const ToggleButton = ({ label1, label2, checked, onChange, name }: ToggleProps) => {
   const [toggle, setToggle] = useState(checked);
 
   const handleToggle = (e: InputEvent) => {
@@ -19,7 +20,7 @@ const ToggleButton = ({ label1, label2, checked, onChange }: ToggleProps) => {
 
   return (
     <div className="toggle__container">
-      <input type="checkbox" id={label1} onChange={handleToggle} />
+      <input type="checkbox" id={label1} onChange={handleToggle} name={name} value="toggle_button" />
       <div className="toggle__labels">
         <label htmlFor={label1} className={styles.toggle__label1}>
           {label1}

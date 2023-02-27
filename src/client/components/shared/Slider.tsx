@@ -22,6 +22,16 @@ const SuccessSlider = styled(Slider)<SliderProps>(() => ({
   },
 }));
 
-export function StyledSlider({ min = 50, max = 500 }) {
-  return <SuccessSlider max={max} min={min} valueLabelDisplay="on" defaultValue={30} />;
+export function StyledSlider({ min = 50, max = 500, onChange, value, name }) {
+  return (
+    <SuccessSlider
+      max={max}
+      min={min}
+      valueLabelDisplay="on"
+      defaultValue={30}
+      onChange={onChange}
+      value={value}
+      name={name}
+    />
+  );
 }

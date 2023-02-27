@@ -11,16 +11,22 @@ export class SettingsService {
     private userSettingsRepository: Repository<UserSettings>,
   ) {}
   async find(id: any) {
-    return await this.userSettingsRepository.findOneBy({
-      id,
-    });
+    console.log('id', id);
+    try {
+      return await this.userSettingsRepository.findOne({
+        where: {
+          user_id: +id,
+        },
+      });
+    } catch (error) {
+      console.log('error', error);
+    }
   }
   async create(dto: CreateUserSettingsDto) {
     const newUserSettings = this.userSettingsRepository.create(dto);
-      console.log('newUserSettings: ',newUserSettings);
-      return await this.userSettingsRepository.save(newUserSettings);
-    }
-
+    console.log('newUserSettings: ', newUserSettings);
+    return await this.userSettingsRepository.save(newUserSettings);
+  }
 
   async update(dto: UpdateUserSettingsDto) {
     return await this.userSettingsRepository.save(dto);
