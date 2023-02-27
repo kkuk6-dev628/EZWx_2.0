@@ -4,10 +4,15 @@ import * as bcrypt from 'bcrypt';
 import { UserService } from '../user/user.service';
 import { TypeORMError } from 'typeorm';
 import { JwtAuthService } from './jwt/jwt-auth.service';
+import { SettingsService } from '../settings/settings.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService, private jwtService: JwtAuthService) {}
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtAuthService,
+    protected settingsService: SettingsService
+  ) {}
 
   async signup(dto: AuthSignupDto) {
     const hash = await bcrypt.hash(dto.password, 2);
@@ -20,10 +25,35 @@ export class AuthService {
         ...newDto,
       });
 
+
+      const userSettings = await this.settingsService.create({
+        user_id: user.id,
+        default_home_airport: '',
+        default_temperature_unit: "true",
+        default_time_display_unit: "true",
+        default_wind_speed_unit: "true",
+        default_distance_unit: "true",
+        default_visibility_unit: "true",
+        max_takeoff_weight_category: 'light',
+        true_airspeed: 2,
+        ceiling_at_departure: [0, 6000],
+        surface_visibility_at_departure: [0, 12],
+        crosswinds_at_departure_airport: [0, 35],
+        ceiling_along_route: [0, 6000],
+        surface_visibility_along_route: [0, 12],
+        en_route_icing_probability: ["0", "100"],
+        en_route_turbulence_intensity: [0, 100],
+        en_route_convective_potential: [0, 10],
+        ceiling_at_destination: [0, 600],
+        surface_visibility_at_destination: [0, 12],
+        crosswinds_at_destination_airport: [0, 35],
+      });
+
       const accessToken = await this.jwtService.login({
         id: user.id,
         email: user.email,
       });
+
 
       return {
         access_token: accessToken,

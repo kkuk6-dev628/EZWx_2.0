@@ -63,7 +63,7 @@ export class UpdateUserSettingsDto {
   surface_visibility_along_route: number[];
 
   en_route_icing_probability: string[];
-
+  en_route_icing_intensity:number[]
 
   en_route_turbulence_intensity: number[];
 

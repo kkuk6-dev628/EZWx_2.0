@@ -23,7 +23,7 @@ interface Props {
 
 const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props) => {
   const settingsState = useSelector(selectSettings);
-  const {id} = useSelector(selectAuth);
+  const { id } = useSelector(selectAuth);
   const [isShowGeneralSettings, setIsShowGeneralSettings] = useState(false);
   const [isShowAirCraftSettings, setIsShowAirCraftSettings] = useState(false);
   const [isShowPersonalMinimumSettings, setIsShowPersonalMinimumSettings] = useState(false);
@@ -49,7 +49,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   };
 
   const handleSaveSettings = () => {
-    updateUserSettings({...settings,user_id:id});
+    if (settings.id && id) updateUserSettings({ ...settings, user_id: id });
   };
 
   return (
