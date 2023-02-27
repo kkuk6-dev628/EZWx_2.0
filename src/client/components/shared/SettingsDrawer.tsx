@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Collapse, Drawer } from '@mui/material';
 import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { RxCross2 } from 'react-icons/rx';
@@ -13,7 +13,8 @@ import { StyledSlider } from './Slider';
 import RangeSlider from './RangeSlider';
 import { useSelector } from 'react-redux';
 import { selectSettings } from '../../store/user/UserSettings';
-import { useGetUserSettingsQuery } from '../../store/user/userSettingsApi';
+import { useGetUserSettingsQuery, useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
+import { selectAuth } from '../../store/auth/authSlice';
 
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;
@@ -22,14 +23,18 @@ interface Props {
 
 const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props) => {
   const settingsState = useSelector(selectSettings);
+  const {id} = useSelector(selectAuth);
   const [isShowGeneralSettings, setIsShowGeneralSettings] = useState(false);
   const [isShowAirCraftSettings, setIsShowAirCraftSettings] = useState(false);
   const [isShowPersonalMinimumSettings, setIsShowPersonalMinimumSettings] = useState(false);
 
   const [settings, setSettings] = useState(settingsState);
 
-  const { data, isLoading } = useGetUserSettingsQuery(3);
-  console.log('data,isLoading', data, isLoading);
+  useGetUserSettingsQuery(id);
+  const [updateUserSettings] = useUpdateUserSettingsMutation();
+  useEffect(() => {
+    if (settingsState) setSettings(settingsState);
+  }, [settingsState]);
 
   const closeDrawer = () => {
     setIsShowSettingsDrawer(false);
@@ -42,6 +47,11 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const handleToggle = (e) => {
     setSettings({ ...settings, [e.target.name]: e.target.checked });
   };
+
+  const handleSaveSettings = () => {
+    updateUserSettings({...settings,user_id:id});
+  };
+
   return (
     <Drawer anchor={'right'} open={isShowSettingsDrawer} onClose={closeDrawer}>
       <div className="drawer__container">
@@ -56,7 +66,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
               <button className="gray__background">Restore Settings</button>
             </div>
             <div className="button__container">
-              <button>Save Settings</button>
+              <button onClick={handleSaveSettings}>Save Settings</button>
             </div>
           </div>
         </div>

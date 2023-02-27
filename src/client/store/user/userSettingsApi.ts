@@ -12,16 +12,17 @@ const userSettingsApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
           console.log('result', result);
+          if(result.data)
           dispatch(setUserSettings({ ...result.data }));
         } catch (err) {
           console.error('Error: ', err);
         }
       },
     }),
-    updateUserSettings: builder.query({
+    updateUserSettings: builder.mutation({
       query: (data) => ({
         url: '/settings/update',
-        method: 'POST',
+        method: 'PUT',
         body: data,
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
@@ -37,4 +38,4 @@ const userSettingsApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetUserSettingsQuery, useUpdateUserSettingsQuery } = userSettingsApi;
+export const { useGetUserSettingsQuery, useUpdateUserSettingsMutation } = userSettingsApi;

@@ -55,7 +55,7 @@ export const UserSettingsSlice = createSlice({
   initialState,
   reducers: {
     setUserSettings: (state, action) => {
-      state = action.payload;
+      state.settings = action.payload;
     },
     setPersonalMinimums: (state, action) => {
       state.personalMinimumsState = action.payload;
