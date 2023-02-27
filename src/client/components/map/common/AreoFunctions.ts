@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { PersonalMinimumItem, PersonalMinimums } from './../../../store/user/UserSettings';
 import { cacheStartTime, MetarMarkerTypes, MetarSkyValuesToString, WeatherCausings } from './AreoConstants';
 import geojson2svg, { Renderer } from 'geojson-to-svg';
 import { SkyCondition } from './Interfaces';
+import RBush from 'rbush';
+import { LatLng, Map } from 'leaflet';
 
 export const getAltitudeString = (value: string, isHundred = true, fzlbase?: string, fzltop?: string): string => {
   if (value === 'SFC' || value == '0') {
@@ -77,14 +80,28 @@ export const getThumbnail = (feature, style) => {
   return svgString;
 };
 
-export const getBBoxFromPointZoom = (pixelDelta: number, latlng: any, zoom: number): any => {
-  const latlngDelta = (pixelDelta * Math.cos((Math.PI * latlng.lat) / 180)) / Math.pow(2, zoom);
-  return {
-    latMin: latlng.lat - latlngDelta / 2,
-    latMax: latlng.lat + latlngDelta / 2,
-    lngMin: latlng.lng - latlngDelta / 2,
-    lngMax: latlng.lng + latlngDelta / 2,
-  };
+export const simplifyPoints = (map: L.Map, features: GeoJSON.Feature[], radius: number): GeoJSON.Feature[] => {
+  if (!map) return [];
+  const results: GeoJSON.Feature[] = [];
+  const rbush = new RBush();
+  features.forEach((feature) => {
+    // @ts-ignore
+    const latlng = new LatLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+    if (map.getBounds().contains(latlng)) {
+      const layerPoint = map.latLngToLayerPoint(latlng);
+      const box = {
+        minX: layerPoint.x - radius,
+        minY: layerPoint.y - radius,
+        maxX: layerPoint.x + radius,
+        maxY: layerPoint.y + radius,
+      };
+      if (!rbush.collides(box)) {
+        rbush.insert(box);
+        results.push(feature);
+      }
+    }
+  });
+  return results;
 };
 
 export const createElementFromHTML = (htmlString) => {

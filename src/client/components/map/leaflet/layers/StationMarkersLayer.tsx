@@ -3,7 +3,7 @@ import axios from 'axios';
 import { LatLng } from 'leaflet';
 import { useEffect, useRef, useState } from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { GeoJSON as GeoJSONLayer, Pane, useMap } from 'react-leaflet';
+import { Pane, useMap } from 'react-leaflet';
 import { useSelector } from 'react-redux';
 import Image from 'next/image';
 import SunCalc from 'suncalc';
@@ -11,7 +11,7 @@ import SunCalc from 'suncalc';
 import { selectMetar } from '../../../../store/layers/LayerControl';
 import { PersonalMinimums, selectPersonalMinimums } from '../../../../store/user/UserSettings';
 import { db } from '../../../caching/dexieDb';
-import { emptyGeoJson, MetarMarkerTypes, timeSliderInterval, windIconLimit } from '../../common/AreoConstants';
+import { MetarMarkerTypes, timeSliderInterval, windIconLimit } from '../../common/AreoConstants';
 import {
   addLeadingZeroes,
   getAbsoluteHours,
@@ -21,8 +21,8 @@ import {
   getSkyConditions,
   getWorstSkyCondition,
 } from '../../common/AreoFunctions';
-import MarkerClusterGroup from '../react-layers/MarkerClusterGroup';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
+import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
 
 const wfsUrl = 'https://eztile4.ezwxbrief.com/geoserver/EZWxBrief/ows';
 
@@ -63,21 +63,22 @@ const metarsProperties = [
 ];
 
 const nbmStationProperties = [
-  'geom',
   'faaid',
   'icaoid',
-  'temperature_c',
-  'dewpoint_c',
-  'skycover',
-  'wind_speed_kt',
-  'wind_direction',
-  'wind_gust_kt',
-  'visibility',
-  'ceiling',
-  'lowest_cloud_base',
-  'predominant_weather',
-  'crosswind_runway_id',
-  'crosswind_component_kt',
+  'temp_c',
+  'dewp_c',
+  'skycov',
+  'w_speed',
+  'w_dir',
+  'w_gust',
+  'vis',
+  'ceil',
+  'l_cloud',
+  'pre_wea',
+  'cross_r_id',
+  'cross_com',
+  'valid_date',
+  'geom',
 ];
 
 export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): { iconUrl: string; ceiling: number } => {
@@ -106,29 +107,29 @@ export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): { iconUrl: s
 };
 
 export const getNbmFlightCategoryIconUrl = (feature: GeoJSON.Feature, personalMinimums: PersonalMinimums): string => {
-  const visibility = feature.properties.visibility;
+  const visibility = feature.properties.vis;
   const [catVis] = getMetarVisibilityCategory(visibility, personalMinimums);
-  const ceiling = feature.properties.ceiling;
+  const ceiling = feature.properties.ceil;
   const [catCeiling] = getMetarCeilingCategory(ceiling, personalMinimums);
   const categories = Object.keys(personalMinimums);
-  const indexVis = categories.findIndex(catVis);
-  const indexCat = categories.findIndex(catCeiling);
+  const indexVis = categories.indexOf(catVis);
+  const indexCeiling = categories.indexOf(catCeiling);
   let indexFinalCat: number;
-  if (indexCat > -1 && indexVis > -1) {
-    indexFinalCat = Math.min(indexCat, indexVis);
-  } else if (indexCat > -1) {
-    indexFinalCat = indexCat;
+  if (indexCeiling > -1 && indexVis > -1) {
+    indexFinalCat = Math.min(indexCeiling, indexVis);
+  } else if (indexCeiling > -1) {
+    indexFinalCat = -1;
   } else if (indexVis > -1) {
     indexFinalCat = indexVis;
   } else {
-    indexFinalCat = 0;
+    indexFinalCat = -1;
   }
-  const finalCat = categories[indexFinalCat];
+  const finalCat = indexFinalCat > -1 ? categories[indexFinalCat] : 'Black';
   let skyCondition: string;
   if (ceiling) {
     skyCondition = ceiling >= 88 ? 'OVC' : 'BKN';
   } else {
-    const skyCover = feature.properties.skycover;
+    const skyCover = feature.properties.skycov;
     if (skyCover < 6) {
       skyCondition = 'SKC';
     } else if (skyCover < 31) {
@@ -140,22 +141,21 @@ export const getNbmFlightCategoryIconUrl = (feature: GeoJSON.Feature, personalMi
   const iconUrl = `/icons/metar/${finalCat}-${skyCondition}.png`;
   return iconUrl;
 };
+const nbmStations = {};
 
 export const StationMarkersLayer = () => {
   const [metars, setMetars] = useState<GeoJSON.Feature[]>([]);
   const [stationTime, setStationTime] = useState<any[]>([]);
-  const [nbmStations, setNbmStations] = useState({} as any);
-  const [clusterRadius, setClusterRadius] = useState(50);
-  const [displayedData, setDisplayedData] = useState<GeoJSON.FeatureCollection>(emptyGeoJson);
+  const [clusterRadius, setClusterRadius] = useState(20);
   const layerState = useSelector(selectMetar);
   const personalMinimums = useSelector(selectPersonalMinimums);
-  const [renderedTime, setRenderedTime] = useState(Date.now());
   const [indexedData, setIndexedData] = useState();
   const observationTime = useSelector(selectObsTime);
   const [isPast, setIsPast] = useState(true);
+  const [renderedTime, setRenderedTime] = useState(Date.now());
 
   const geojsonLayerRef = useRef();
-  const markerClusterLayerRef = useRef();
+  const displayedDataRef = useRef();
 
   const map = useMap();
 
@@ -166,23 +166,10 @@ export const StationMarkersLayer = () => {
   }, []);
 
   useEffect(() => {
-    const newKey = Date.now();
-    setRenderedTime(newKey);
-  }, [displayedData]);
-
-  useEffect(() => {
     if (!metars) return;
     if (metars.length > 0) {
       const filteredFeatures = metarsFilter(metars, new Date(observationTime));
-      setDisplayedData({
-        type: 'FeatureCollection',
-        features: filteredFeatures,
-      });
-    } else {
-      setDisplayedData({
-        type: 'FeatureCollection',
-        features: metars,
-      });
+      setDisplayedData(filteredFeatures);
     }
   }, [metars]);
 
@@ -194,39 +181,29 @@ export const StationMarkersLayer = () => {
       setIsPast(false);
       if (stationTime.length > 0) {
         const validStation = stationTime.reduce((acc, cur) => {
-          const prevDiff = getAbsoluteHours(acc.valid_date) - obsHour;
-          const currDiff = getAbsoluteHours(cur.valid_date) - obsHour;
-          if (prevDiff > currDiff && currDiff >= 0) {
+          const prevDiff = Math.abs(getAbsoluteHours(acc.valid_date) - obsHour);
+          const currDiff = Math.abs(getAbsoluteHours(cur.valid_date) - obsHour);
+          if (prevDiff - currDiff > 0) {
             return cur;
           }
           return acc;
         });
-        setDisplayedData({
-          type: 'FeatureCollection',
-          features: nbmStations[validStation.station_table_name],
-        });
+        if (nbmStations[validStation.station_table_name]) {
+          setDisplayedData(nbmStations[validStation.station_table_name]);
+        }
       }
     } else {
       setIsPast(true);
       if (metars.length > 0) {
         const filteredFeatures = metarsFilter(metars, new Date(observationTime));
-        setDisplayedData({
-          type: 'FeatureCollection',
-          features: filteredFeatures,
-        });
+        setDisplayedData(filteredFeatures);
       }
     }
   }, [observationTime]);
 
   useEffect(() => {
-    if (metars.length > 0) {
-      const filteredFeatures = metarsFilter(metars, new Date(observationTime));
-      setDisplayedData({
-        type: 'FeatureCollection',
-        features: filteredFeatures,
-      });
-    }
-    layerState.markerType === MetarMarkerTypes.surfaceWindBarbs.value ? setClusterRadius(25) : setClusterRadius(50);
+    layerState.markerType === MetarMarkerTypes.surfaceWindBarbs.value ? setClusterRadius(20) : setClusterRadius(30);
+    setRenderedTime(Date.now());
   }, [
     layerState.markerType,
     layerState.flightCategory.all.checked,
@@ -235,6 +212,13 @@ export const StationMarkersLayer = () => {
     layerState.flightCategory.ifr.checked,
     layerState.flightCategory.lifr.checked,
   ]);
+
+  const setDisplayedData = (features: GeoJSON.Feature[]) => {
+    displayedDataRef.current = {
+      type: 'FeatureCollection',
+      features: features,
+    } as any;
+  };
 
   const loadFeaturesFromCache = (datasetName: string, setFeaturesFunc: (features: GeoJSON.Feature[]) => void) => {
     db[datasetName].toArray().then((features) => {
@@ -268,7 +252,7 @@ export const StationMarkersLayer = () => {
   ) => {
     const params = {
       outputFormat: 'application/json',
-      maxFeatures: 180000,
+      maxFeatures: 200000,
       request: 'GetFeature',
       service: 'WFS',
       typeName: wfsTypeName,
@@ -312,7 +296,7 @@ export const StationMarkersLayer = () => {
             });
             loadFeaturesFromWeb(
               wfsUrl,
-              `	EZWxBrief:nbm_${stationTime.station_table_name}`,
+              `EZWxBrief:${stationTime.station_table_name}`,
               nbmStationProperties,
               stationTime.station_table_name,
               (features) => {
@@ -328,9 +312,9 @@ export const StationMarkersLayer = () => {
   };
 
   const addNbmStation = (datasetName: string, features: GeoJSON.Feature[]) => {
-    const nbmStationsClone = { ...nbmStations };
-    nbmStationsClone[datasetName] = features;
-    setNbmStations(nbmStationsClone);
+    // const nbmStationsClone = { ...nbmStations };
+    nbmStations[datasetName] = features;
+    // setNbmStations(nbmStationsClone);
   };
 
   const buildIndexedData = (features: GeoJSON.Feature[]): any => {
@@ -447,41 +431,31 @@ export const StationMarkersLayer = () => {
           marker = getFlightCatMarker(feature, latlng);
           break;
         case MetarMarkerTypes.ceilingHeight.value:
-          marker = getNbmCeilingHeightMarker(feature, latlng, feature.properties.ceiling, feature.properties.skycover);
+          marker = getNbmCeilingHeightMarker(feature, latlng, feature.properties.ceil, feature.properties.skycov);
           break;
         case MetarMarkerTypes.surfaceVisibility.value:
-          marker = getSurfaceVisibilityMarker(feature, latlng, feature.properties.visibility);
+          marker = getSurfaceVisibilityMarker(feature, latlng, feature.properties.vis);
           break;
         case MetarMarkerTypes.surfaceWindSpeed.value:
-          marker = getSurfaceWindSpeedMarker(feature, latlng, feature.properties.wind_speed_kt);
+          marker = getSurfaceWindSpeedMarker(feature, latlng, feature.properties.w_speed);
           break;
         case MetarMarkerTypes.surfaceWindBarbs.value:
-          marker = getSurfaceWindBarbsMarker(
-            feature,
-            latlng,
-            feature.properties.wind_speed_kt,
-            feature.properties.wind_direction,
-          );
+          marker = getSurfaceWindBarbsMarker(feature, latlng, feature.properties.w_speed, feature.properties.w_dir);
           break;
         case MetarMarkerTypes.surfaceWindGust.value:
-          marker = getSurfaceWindGustMarker(feature, latlng, feature.properties.wind_gust_kt);
+          marker = getSurfaceWindGustMarker(feature, latlng, feature.properties.w_gust);
           break;
         case MetarMarkerTypes.surfaceTemperature.value:
-          marker = getSurfaceTemperatureMarker(feature, latlng, feature.properties.temperature_c);
+          marker = getSurfaceTemperatureMarker(feature, latlng, feature.properties.temp_c);
           break;
         case MetarMarkerTypes.surfaceDewpoint.value:
-          marker = getSurfaceDewpointMarker(feature, latlng, feature.properties.dewpoint_c);
+          marker = getSurfaceDewpointMarker(feature, latlng, feature.properties.dewp_c);
           break;
         case MetarMarkerTypes.dewpointDepression.value:
-          marker = getDewpointDepressionMarker(
-            feature,
-            latlng,
-            feature.properties.temperature_c,
-            feature.properties.dewpoint_c,
-          );
+          marker = getDewpointDepressionMarker(feature, latlng, feature.properties.temp_c, feature.properties.dewp_c);
           break;
         case MetarMarkerTypes.weather.value:
-          marker = getWeatherMarker(feature, latlng);
+          marker = getFlightCatMarker(feature, latlng);
           break;
       }
     }
@@ -561,6 +535,7 @@ export const StationMarkersLayer = () => {
     ceilingHeight: number,
     skyCover: number,
   ) => {
+    if (!ceilingHeight) return;
     const ceilingAmount = addLeadingZeroes(ceilingHeight / 100, 3);
     const worstSkyCondition = skyCover >= 88 ? 'OVC' : 'BKN';
     let iconUrl = '';
@@ -599,7 +574,7 @@ export const StationMarkersLayer = () => {
 
   const getSurfaceVisibilityMarker = (feature: GeoJSON.Feature, latlng: LatLng, visibility: any) => {
     if (!visibility) return;
-    const [category, _] = getMetarVisibilityCategory(visibility, personalMinimums);
+    const [category] = getMetarVisibilityCategory(visibility, personalMinimums);
     let iconUrl = '/icons/metar/MISSING.png';
     if (visibility === 0.25 && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
       visibility = '<0.25';
@@ -1221,42 +1196,17 @@ export const StationMarkersLayer = () => {
 
   return (
     <Pane name={'station-markers'} style={{ zIndex: 698 }}>
-      <MarkerClusterGroup
-        ref={markerClusterLayerRef}
-        // @ts-ignore
-        iconCreateFunction={(cluster) => {
-          const children = cluster.getAllChildMarkers();
-          const marker = children.sort((a: any, b: any) => {
-            return a._leaflet_id > b._leaflet_id ? 1 : -1;
-          })[0];
-          return marker.getIcon();
-        }}
-        getPositionFunction={(cluster) => {
-          const children = cluster.getAllChildMarkers();
-          const marker = children.sort((a: any, b: any) => {
-            return a._leaflet_id > b._leaflet_id ? 1 : -1;
-          })[0];
-          return marker.getLatLng();
-        }}
-        singleMarkerMode={true}
-        zoomToBoundsOnClick={false}
-        showCoverageOnHover={false}
-        spiderfyOnMaxZoom={false}
-        removeOutsideVisibleBounds={true}
-        maxClusterRadius={clusterRadius}
-        clusterPane="station-markers"
-      >
-        {displayedData != null && (
-          <GeoJSONLayer
-            key={renderedTime}
-            ref={geojsonLayerRef}
-            data={displayedData}
-            interactive={true}
-            pointToLayer={pointToLayer}
-            bubblingMouseEvents={true}
-          ></GeoJSONLayer>
-        )}
-      </MarkerClusterGroup>
+      {displayedDataRef.current != null && (
+        <SimplifiedMarkersLayer
+          key={renderedTime}
+          ref={geojsonLayerRef}
+          dataRef={displayedDataRef}
+          simplifyRadius={clusterRadius}
+          interactive={true}
+          pointToLayer={pointToLayer}
+          bubblingMouseEvents={true}
+        ></SimplifiedMarkersLayer>
+      )}
     </Pane>
   );
 };

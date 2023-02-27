@@ -80,3 +80,5 @@ export const emptyGeoJson: GeoJSON.FeatureCollection = {
   type: 'FeatureCollection',
   features: new Array<GeoJSON.Feature>(),
 };
+
+export const pickupRadiusPx = 30;

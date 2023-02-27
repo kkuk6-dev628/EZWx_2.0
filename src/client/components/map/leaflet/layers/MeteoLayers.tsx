@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import MeteoLayerControl, { GroupedLayer } from '../layer-control/MeteoLayerControl';
 import { LayerGroup, useMapEvents } from 'react-leaflet';
-import L from 'leaflet';
+import L, { LatLng, LeafletMouseEvent } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
 import { useContext, useEffect, useRef, useState } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
@@ -16,18 +16,16 @@ import CWAPopup from '../popups/CWAPopup';
 import ConvectiveOutlookLayer from './ConvectiveOutlookLayer';
 import ConvectiveOutlookPopup from '../popups/ConvectiveOutlookPopup';
 import IntlSigmetLayer from './IntlSigmetLayer';
-import { getBBoxFromPointZoom } from '../../common/AreoFunctions';
 import IntlSigmetPopup from '../popups/IntlSigmetPopup';
 import PirepLayer from './PirepLayer';
 import PIREPPopup from '../popups/PIREPPopup';
 import 'leaflet-responsive-popup';
 import 'leaflet-responsive-popup/leaflet.responsive.popup.css';
-import MetarsLayer from './MetarsLayer';
 import MetarsPopup from '../popups/MetarsPopup';
 import { useSelector } from 'react-redux';
 import { selectMetar } from '../../../../store/layers/LayerControl';
 import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
-import { MetarMarkerTypes } from '../../common/AreoConstants';
+import { MetarMarkerTypes, pickupRadiusPx } from '../../common/AreoConstants';
 import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
 import { InLayerControl } from '../layer-control/MeteoLayerControl';
 import axios from 'axios';
@@ -158,11 +156,10 @@ const MeteoLayers = () => {
   const inBaseLayerControl = useContext(InBaseLayerControl);
 
   const map = useMapEvents({
-    click: (e: any) => {
+    click: (e: LeafletMouseEvent) => {
       if (inLayerControl.value) return;
       if (inBaseLayerControl.value) return;
       const features = [];
-      const clickedBBox = getBBoxFromPointZoom(50, e.latlng, map.getZoom());
       if (debugLayerGroupRef.current) {
         debugLayerGroupRef.current.clearLayers();
       }
@@ -180,11 +177,14 @@ const MeteoLayers = () => {
             return;
           }
           if (l.feature.geometry.type === 'Point' || l.feature.geometry.type === 'MultiPoint') {
+            const featurePoint = map.latLngToLayerPoint(
+              new LatLng(l.feature.geometry.coordinates[1], l.feature.geometry.coordinates[0]),
+            );
             if (
-              clickedBBox.latMin < l.feature.geometry.coordinates[1] &&
-              l.feature.geometry.coordinates[1] < clickedBBox.latMax &&
-              clickedBBox.lngMin < l.feature.geometry.coordinates[0] &&
-              l.feature.geometry.coordinates[0] < clickedBBox.lngMax
+              e.layerPoint.x - pickupRadiusPx < featurePoint.x &&
+              e.layerPoint.y - pickupRadiusPx < featurePoint.y &&
+              e.layerPoint.x + pickupRadiusPx > featurePoint.x &&
+              e.layerPoint.y + pickupRadiusPx > featurePoint.y
             ) {
               features.push(l);
             }
