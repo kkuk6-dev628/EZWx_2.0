@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { PersonalMinimumItem, PersonalMinimums } from './../../../store/user/UserSettings';
-import { cacheStartTime, MetarMarkerTypes, MetarSkyValuesToString, WeatherCausings } from './AreoConstants';
-import geojson2svg, { Renderer } from 'geojson-to-svg';
+import { PersonalMinimums } from './../../../store/user/UserSettings';
+import { cacheStartTime, WeatherCausings } from './AreoConstants';
+import geojson2svg from 'geojson-to-svg';
 import { SkyCondition } from './Interfaces';
 import RBush from 'rbush';
-import { LatLng, Map } from 'leaflet';
+import { LatLng } from 'leaflet';
+import axios from 'axios';
+import { db } from '../../caching/dexieDb';
 
 export const getAltitudeString = (value: string, isHundred = true, fzlbase?: string, fzltop?: string): string => {
   if (value === 'SFC' || value == '0') {
@@ -80,7 +82,12 @@ export const getThumbnail = (feature, style) => {
   return svgString;
 };
 
-export const simplifyPoints = (map: L.Map, features: GeoJSON.Feature[], radius: number): GeoJSON.Feature[] => {
+export const simplifyPoints = (
+  map: L.Map,
+  features: GeoJSON.Feature[],
+  radius: number,
+  unSimplifyFilter?: (feature: GeoJSON.Feature) => boolean,
+): GeoJSON.Feature[] => {
   if (!map) return [];
   const results: GeoJSON.Feature[] = [];
   const rbush = new RBush();
@@ -95,7 +102,7 @@ export const simplifyPoints = (map: L.Map, features: GeoJSON.Feature[], radius: 
         maxX: layerPoint.x + radius,
         maxY: layerPoint.y + radius,
       };
-      if (!rbush.collides(box)) {
+      if ((unSimplifyFilter && unSimplifyFilter(feature)) || !rbush.collides(box)) {
         rbush.insert(box);
         results.push(feature);
       }
@@ -186,6 +193,64 @@ export const toTitleCase = (str) => {
 
 export const getAbsoluteHours = (date: string | Date | number) => {
   return Math.floor(new Date(date).getTime() / 3600 / 1000);
+};
+
+export const storeFeaturesToCache = (datasetName: string, features: GeoJSON.Feature[]) => {
+  db[datasetName].clear();
+  const chunkSize = 400;
+  let i = 0;
+  const chunkedAdd = () => {
+    if (features.length <= i) return;
+    db[datasetName]
+      .bulkAdd(features.slice(i, i + chunkSize))
+      .catch((error) => console.log(error))
+      .finally(() => {
+        i += chunkSize;
+        chunkedAdd();
+      });
+  };
+  chunkedAdd();
+};
+
+export const loadFeaturesFromCache = (datasetName: string, setFeaturesFunc: (features: GeoJSON.Feature[]) => void) => {
+  db[datasetName].toArray().then((features) => {
+    setFeaturesFunc(features);
+  });
+};
+
+export const loadFeaturesFromWeb = (
+  url: string,
+  wfsTypeName: string,
+  propertyNames: string[],
+  datasetName: string,
+  setFeaturesFunc?: (features: GeoJSON.Feature[]) => void,
+) => {
+  const params = {
+    outputFormat: 'application/json',
+    maxFeatures: 200000,
+    request: 'GetFeature',
+    service: 'WFS',
+    typeName: wfsTypeName,
+    version: '1.0.0',
+    srsName: 'EPSG:4326',
+    propertyName: propertyNames.join(','),
+  } as any;
+  axios
+    .get(url, {
+      params: params,
+      // signal: abortController ? abortController.signal : null,
+    })
+    .then((data) => {
+      if (typeof data.data === 'string') {
+        console.log(wfsTypeName + ': Invalid json data!', data.data);
+      } else {
+        storeFeaturesToCache(datasetName, data.data.features);
+        if (setFeaturesFunc) setFeaturesFunc(data.data.features);
+      }
+    })
+    .catch((reason) => {
+      console.log(wfsTypeName, reason);
+    });
 };
 
 export const visibilityMileToMeter = (mile: number): number => {

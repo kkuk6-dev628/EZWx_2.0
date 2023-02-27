@@ -3,7 +3,7 @@ import { GeoJSON as GeoJSONLayer, useMapEvents } from 'react-leaflet';
 import { emptyGeoJson } from '../../common/AreoConstants';
 import { simplifyPoints } from '../../common/AreoFunctions';
 
-export const SimplifiedMarkersLayer = forwardRef(({ dataRef, simplifyRadius, ...props }: any, ref) => {
+export const SimplifiedMarkersLayer = forwardRef(({ data, simplifyRadius, unSimplifyFilter, ...props }: any, ref) => {
   const [displayedData, setDisplayedData] = useState<GeoJSON.FeatureCollection>(emptyGeoJson);
   const [renderedTime, setRenderedTime] = useState(Date.now());
 
@@ -13,19 +13,24 @@ export const SimplifiedMarkersLayer = forwardRef(({ dataRef, simplifyRadius, ...
   }, [displayedData]);
 
   useEffect(() => {
-    setSimplifiedFeatures(dataRef.current);
-  }, [dataRef.current]);
+    setSimplifiedFeatures(data);
+  }, [data]);
 
   const map = useMapEvents({
     zoomend: () => {
-      setSimplifiedFeatures(dataRef.current);
+      setSimplifiedFeatures(data);
     },
     moveend: () => {
-      setSimplifiedFeatures(dataRef.current);
+      setSimplifiedFeatures(data);
     },
   });
   const setSimplifiedFeatures = (geojson: GeoJSON.FeatureCollection) => {
-    const simplifiedFeatures = simplifyPoints(map, geojson.features as GeoJSON.Feature[], simplifyRadius);
+    const simplifiedFeatures = simplifyPoints(
+      map,
+      geojson.features as GeoJSON.Feature[],
+      simplifyRadius,
+      unSimplifyFilter,
+    );
     setDisplayedData({
       type: 'FeatureCollection',
       features: simplifiedFeatures,

@@ -1,25 +1,57 @@
-import WFSLayer from './WFSLayer';
-import L, { FeatureGroup, LatLng, Layer } from 'leaflet';
+import L, { LatLng } from 'leaflet';
 import Image from 'next/image';
 import ReactDOMServer from 'react-dom/server';
 import { Pane, useMap } from 'react-leaflet';
-import { addLeadingZeroes, getCacheVersion, getTimeRangeStart } from '../../common/AreoFunctions';
+import { addLeadingZeroes, loadFeaturesFromCache, loadFeaturesFromWeb } from '../../common/AreoFunctions';
 import { useSelector } from 'react-redux';
 import { selectPirep } from '../../../../store/layers/LayerControl';
-import { useEffect, useState } from 'react';
-import { db } from '../../../caching/dexieDb';
-import { useLiveQuery } from 'dexie-react-hooks';
+import { useEffect, useRef, useState } from 'react';
+import { wfsUrl } from '../../common/AreoConstants';
+import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
+import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 
-const cacheUpdateInterval = 75; // 75 minutes
+const properties = [
+  'wkb_geometry',
+  'ogc_fid',
+  'icaoid',
+  'aireptype',
+  'obstime',
+  'actype',
+  'temp',
+  'wdir',
+  'wspd',
+  'cloudcvg1',
+  'cloudbas1',
+  'cloudtop1',
+  'cloudcvg2',
+  'cloudbas2',
+  'cloudtop2',
+  'wxstring',
+  'fltlvl',
+  'fltlvltype',
+  'tbint1',
+  'tbtype1',
+  'tbfreq1',
+  'icgint1',
+  'icgtype1',
+  'rawob',
+];
 
 const PirepLayer = () => {
-  const [jsonData, setJsonData] = useState();
+  const [pireps, setPireps] = useState<GeoJSON.Feature[]>([]);
   const layerState = useSelector(selectPirep);
-  const [renderedTime, setRenderedTime] = useState(Date.now());
+  const observationTime = useSelector(selectObsTime);
+  const [displayedGeojson, setDisplayedGeojson] = useState<GeoJSON.FeatureCollection>();
+  const geojsonLayerRef = useRef();
+
   useEffect(() => {
-    if (layerState.checked) {
-      setRenderedTime(Date.now());
-    }
+    loadFeaturesFromCache('pireps', setPireps);
+    loadFeaturesFromWeb(wfsUrl, 'EZWxBrief:pirep', properties, 'pireps', setPireps);
+  }, []);
+
+  useEffect(() => {
+    const filtered = clientFilter(pireps);
+    setDisplayedData(filtered);
   }, [
     layerState.all.checked,
     layerState.urgentOnly.checked,
@@ -29,7 +61,10 @@ const PirepLayer = () => {
     layerState.altitude.valueMin,
     layerState.altitude.valueMax,
     layerState.time.hours,
+    observationTime,
+    pireps,
   ]);
+
   const map = useMap();
   const filters = {
     Type: {
@@ -39,16 +74,12 @@ const PirepLayer = () => {
     },
   };
 
-  const layerStatus = useSelector(selectPirep);
-  const [cacheVersion, setCacheVersion] = useState(getCacheVersion(cacheUpdateInterval));
-
-  useEffect(() => {
-    // console.log(layerStatus);
-    const v = getCacheVersion(cacheUpdateInterval);
-    if (v !== cacheVersion) {
-      setCacheVersion(v);
-    }
-  }, [layerStatus.checked]);
+  const setDisplayedData = (features: GeoJSON.Feature[]) => {
+    setDisplayedGeojson({
+      type: 'FeatureCollection',
+      features: features,
+    });
+  };
 
   const getTbIconUrl = (intensity) => {
     let iconUrl = '/icons/pirep/negative-turb-icon.png';
@@ -83,6 +114,7 @@ const PirepLayer = () => {
     }
     return iconUrl;
   };
+
   const getIcgIconUrl = (intensity) => {
     let iconUrl = '/icons/pirep/negative-ice-icon.png';
     switch (intensity) {
@@ -135,6 +167,7 @@ const PirepLayer = () => {
     });
     return pirepMarker;
   };
+
   const getBothMarkers = (latlng, iconUrl1, iconUrl2, fltlvl) => {
     const flightLevel = fltlvl == 0 ? 'UNK' : addLeadingZeroes(fltlvl, 3);
     const spanClass = fltlvl == 0 ? 'pirep-unk-span' : 'pirep-span';
@@ -188,22 +221,19 @@ const PirepLayer = () => {
     return pirepMarker;
   };
 
-  const selectUrgentMarker4Cluster = (layers) => {
-    const urgentMarkers = layers.filter((layer) => {
-      return layer.feature.properties.aireptype === 'Urgent PIREP';
-    });
-    return urgentMarkers.length > 0 ? urgentMarkers[0] : undefined;
+  const selectUrgentPirep = (feature: GeoJSON.Feature) => {
+    return feature.properties.aireptype === 'Urgent PIREP';
   };
 
-  const clientFilter = (features: GeoJSON.Feature[], observationTime: Date): GeoJSON.Feature[] => {
-    setJsonData({ type: 'FeatureCollection', features: features } as any);
+  const clientFilter = (features: GeoJSON.Feature[]): GeoJSON.Feature[] => {
     const results = features.filter((feature) => {
+      const obsTimeObj = new Date(observationTime);
       const start = new Date(feature.properties.obstime);
       const end = new Date(feature.properties.obstime);
       end.setMinutes(end.getMinutes() + 75);
       end.setSeconds(0);
       end.setMilliseconds(0);
-      const inTime = start <= observationTime && observationTime < end;
+      const inTime = start <= obsTimeObj && obsTimeObj < end;
       if (!inTime) {
         return false;
       }
@@ -239,64 +269,15 @@ const PirepLayer = () => {
 
   return (
     <Pane name={'pirep'} style={{ zIndex: 699 }}>
-      <WFSLayer
-        key={renderedTime}
-        initData={jsonData}
-        url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
-        maxFeatures={10000}
-        typeName="EZWxBrief:pirep"
-        propertyNames={[
-          'wkb_geometry',
-          'ogc_fid',
-          'icaoid',
-          'aireptype',
-          'obstime',
-          'actype',
-          'temp',
-          'wdir',
-          'wspd',
-          'cloudcvg1',
-          'cloudbas1',
-          'cloudtop1',
-          'cloudcvg2',
-          'cloudbas2',
-          'cloudtop2',
-          'wxstring',
-          'fltlvl',
-          'fltlvltype',
-          'tbint1',
-          'tbtype1',
-          'tbfreq1',
-          'icgint1',
-          'icgtype1',
-          'rawob',
-        ]}
+      <SimplifiedMarkersLayer
+        ref={geojsonLayerRef}
+        data={displayedGeojson}
+        simplifyRadius={30}
+        unSimplifyFilter={selectUrgentPirep}
+        interactive={true}
         pointToLayer={pointToLayer}
-        isClusteredMarker={true}
-        selectClusterMarker={selectUrgentMarker4Cluster}
-        markerPane={'pirep'}
-        serverFilter={`obstime AFTER ${getTimeRangeStart().toISOString()}`}
-        clientFilter={clientFilter}
-        layerStateSelector={selectPirep}
-        // cacheVersion={cacheVersion}
-        readDb={() => db.pireps.toArray()}
-        writeDb={(features) => {
-          db.pireps.clear();
-          const chunkSize = 200;
-          let i = 0;
-          const chunkedAdd = () => {
-            if (features.length <= i) return;
-            db.pireps
-              .bulkAdd(features.slice(i, i + chunkSize))
-              .catch((error) => console.log(error))
-              .finally(() => {
-                i += chunkSize;
-                chunkedAdd();
-              });
-          };
-          chunkedAdd();
-        }}
-      ></WFSLayer>
+        bubblingMouseEvents={true}
+      ></SimplifiedMarkersLayer>
     </Pane>
   );
 };

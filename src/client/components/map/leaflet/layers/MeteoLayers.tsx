@@ -297,14 +297,6 @@ const MeteoLayers = () => {
       >
         <StationMarkersLayer />
       </GroupedLayer>
-      {/* <GroupedLayer
-        checked
-        addLayerToStore={(layer) => {
-          meteoLayers.nbmMarkers = layer;
-        }}
-      >
-        <NbmMarkersLayer></NbmMarkersLayer>
-      </GroupedLayer> */}
       <GroupedLayer
         checked
         addLayerToStore={(layer) => {

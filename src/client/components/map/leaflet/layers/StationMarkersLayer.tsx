@@ -10,8 +10,7 @@ import SunCalc from 'suncalc';
 
 import { selectMetar } from '../../../../store/layers/LayerControl';
 import { PersonalMinimums, selectPersonalMinimums } from '../../../../store/user/UserSettings';
-import { db } from '../../../caching/dexieDb';
-import { MetarMarkerTypes, timeSliderInterval, windIconLimit } from '../../common/AreoConstants';
+import { MetarMarkerTypes, timeSliderInterval, wfsUrl, windIconLimit } from '../../common/AreoConstants';
 import {
   addLeadingZeroes,
   getAbsoluteHours,
@@ -20,11 +19,11 @@ import {
   getMetarVisibilityCategory,
   getSkyConditions,
   getWorstSkyCondition,
+  loadFeaturesFromCache,
+  loadFeaturesFromWeb,
 } from '../../common/AreoFunctions';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
-
-const wfsUrl = 'https://eztile4.ezwxbrief.com/geoserver/EZWxBrief/ows';
 
 const metarsProperties = [
   'wkb_geometry',
@@ -145,6 +144,7 @@ const nbmStations = {};
 
 export const StationMarkersLayer = () => {
   const [metars, setMetars] = useState<GeoJSON.Feature[]>([]);
+  const [displayedGeojson, setDisplayedGeojson] = useState<GeoJSON.FeatureCollection>();
   const [stationTime, setStationTime] = useState<any[]>([]);
   const [clusterRadius, setClusterRadius] = useState(20);
   const layerState = useSelector(selectMetar);
@@ -155,7 +155,6 @@ export const StationMarkersLayer = () => {
   const [renderedTime, setRenderedTime] = useState(Date.now());
 
   const geojsonLayerRef = useRef();
-  const displayedDataRef = useRef();
 
   const map = useMap();
 
@@ -214,68 +213,10 @@ export const StationMarkersLayer = () => {
   ]);
 
   const setDisplayedData = (features: GeoJSON.Feature[]) => {
-    displayedDataRef.current = {
+    setDisplayedGeojson({
       type: 'FeatureCollection',
       features: features,
-    } as any;
-  };
-
-  const loadFeaturesFromCache = (datasetName: string, setFeaturesFunc: (features: GeoJSON.Feature[]) => void) => {
-    db[datasetName].toArray().then((features) => {
-      setFeaturesFunc(features);
     });
-  };
-
-  const storeFeaturesToCache = (datasetName: string, features: GeoJSON.Feature[]) => {
-    db[datasetName].clear();
-    const chunkSize = 400;
-    let i = 0;
-    const chunkedAdd = () => {
-      if (features.length <= i) return;
-      db[datasetName]
-        .bulkAdd(features.slice(i, i + chunkSize))
-        .catch((error) => console.log(error))
-        .finally(() => {
-          i += chunkSize;
-          chunkedAdd();
-        });
-    };
-    chunkedAdd();
-  };
-
-  const loadFeaturesFromWeb = (
-    url: string,
-    wfsTypeName: string,
-    propertyNames: string[],
-    datasetName: string,
-    setFeaturesFunc?: (features: GeoJSON.Feature[]) => void,
-  ) => {
-    const params = {
-      outputFormat: 'application/json',
-      maxFeatures: 200000,
-      request: 'GetFeature',
-      service: 'WFS',
-      typeName: wfsTypeName,
-      version: '1.0.0',
-      srsName: 'EPSG:4326',
-      propertyName: propertyNames.join(','),
-    } as any;
-    axios
-      .get(url, {
-        params: params,
-        // signal: abortController ? abortController.signal : null,
-      })
-      .then((data) => {
-        if (typeof data.data === 'string') {
-          console.log(wfsTypeName + ': Invalid json data!', data.data);
-        } else {
-          storeFeaturesToCache(datasetName, data.data.features);
-          if (setFeaturesFunc) setFeaturesFunc(data.data.features);
-        }
-      })
-      .catch((reason) => {
-        console.log(wfsTypeName, reason);
-      });
   };
 
   const loadNbmStationMarkers = () => {
@@ -332,7 +273,9 @@ export const StationMarkersLayer = () => {
   };
 
   const metarsFilter = (features: GeoJSON.Feature[], observationTime: Date): GeoJSON.Feature[] => {
-    if (observationTime.getTime() - Date.now() > 0) {
+    const obsHour = getAbsoluteHours(observationTime);
+    const currentHour = getAbsoluteHours(Date.now());
+    if (obsHour - currentHour > 0) {
       return [];
     }
     let indexedFeatures = indexedData;
@@ -1196,11 +1139,11 @@ export const StationMarkersLayer = () => {
 
   return (
     <Pane name={'station-markers'} style={{ zIndex: 698 }}>
-      {displayedDataRef.current != null && (
+      {displayedGeojson != null && (
         <SimplifiedMarkersLayer
           key={renderedTime}
           ref={geojsonLayerRef}
-          dataRef={displayedDataRef}
+          data={displayedGeojson}
           simplifyRadius={clusterRadius}
           interactive={true}
           pointToLayer={pointToLayer}
