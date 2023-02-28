@@ -78,7 +78,6 @@ const nbmStationProperties = [
   'cross_com',
   'valid_date',
   'geom',
-  'type',
 ];
 
 export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): { iconUrl: string; ceiling: number } => {

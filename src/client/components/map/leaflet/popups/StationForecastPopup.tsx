@@ -7,7 +7,6 @@ import {
   convertTimeFormat,
   getMetarCeilingCategory,
   getMetarVisibilityCategory,
-  getSkyConditions,
   toTitleCase,
   visibilityMileToFraction,
   visibilityMileToMeter,
@@ -94,7 +93,7 @@ const StationForecastPopup = ({
       <Typography variant="body2" style={{ margin: 3 }}>
         <b>Time: </b> {convertTimeFormat(feature.properties.valid_date)}
       </Typography>
-      {isFinite(ceiling) && (
+      {ceiling && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Ceiling: </b>
           <span style={{ color: ceilingColor }}>{ceiling} feet</span>
