@@ -1,4 +1,4 @@
-import { Column,OneToOne, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class DefaultSetting {
   @PrimaryGeneratedColumn()
@@ -84,5 +84,4 @@ export class DefaultSetting {
   crosswinds_at_destination_airport_min: number;
   @Column()
   crosswinds_at_destination_airport_max: number;
-
 }

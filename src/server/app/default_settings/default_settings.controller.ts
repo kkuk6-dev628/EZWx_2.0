@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { DefaultSettingsService } from './default_settings.service';
 import { CreateDefaultSettingDto } from './dto/create-default_setting.dto';
 

@@ -1,5 +1,5 @@
 import { SettingsService } from './settings.service';
-import { Body, Controller, Get, HttpCode, Param, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Post, Put } from '@nestjs/common';
 import { CreateUserSettingsDto, UpdateUserSettingsDto } from './dto/create_settings_dto';
 
 @Controller('settings')

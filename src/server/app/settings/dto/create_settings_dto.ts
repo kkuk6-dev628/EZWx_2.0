@@ -12,7 +12,6 @@ export class CreateUserSettingsDto {
 
   //Personal Minimums Fields
 
- 
   ceiling_at_departure_min: number;
   ceiling_at_departure_max: number;
 
@@ -49,7 +48,7 @@ export class CreateUserSettingsDto {
 
   crosswinds_at_destination_airport_min: number;
   crosswinds_at_destination_airport_max: number;
-   user_id: number;
+  user_id: number;
 }
 
 export class UpdateUserSettingsDto {
@@ -78,7 +77,7 @@ export class UpdateUserSettingsDto {
   surface_visibility_along_route: number[];
 
   en_route_icing_probability: number[];
-  en_route_icing_intensity:number[]
+  en_route_icing_intensity: number[];
 
   en_route_turbulence_intensity: number[];
 

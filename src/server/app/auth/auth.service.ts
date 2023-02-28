@@ -11,7 +11,7 @@ export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtAuthService,
-    protected settingsService: SettingsService
+    protected settingsService: SettingsService,
   ) {}
 
   async signup(dto: AuthSignupDto) {
@@ -25,8 +25,7 @@ export class AuthService {
         ...newDto,
       });
 
-
-      const userSettings = await this.settingsService.create({
+      await this.settingsService.create({
         user_id: user.id,
         default_home_airport: '',
         default_temperature_unit: true,
@@ -36,12 +35,12 @@ export class AuthService {
         default_visibility_unit: true,
         max_takeoff_weight_category: 'light',
         true_airspeed: 2,
-        ceiling_at_departure_min:0,
-        ceiling_at_departure_max:6000,
-        surface_visibility_at_departure_min:0,
-        surface_visibility_at_departure_max:12,
-        crosswinds_at_departure_airport_min:0,
-        crosswinds_at_departure_airport_max:35,
+        ceiling_at_departure_min: 0,
+        ceiling_at_departure_max: 6000,
+        surface_visibility_at_departure_min: 0,
+        surface_visibility_at_departure_max: 12,
+        crosswinds_at_departure_airport_min: 0,
+        crosswinds_at_departure_airport_max: 35,
         ceiling_along_route_min: 0,
         ceiling_along_route_max: 6000,
         surface_visibility_along_route_min: 0,
@@ -66,7 +65,6 @@ export class AuthService {
         id: user.id,
         email: user.email,
       });
-
 
       return {
         access_token: accessToken,

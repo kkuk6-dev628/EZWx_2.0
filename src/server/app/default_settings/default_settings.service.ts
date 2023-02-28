@@ -11,7 +11,7 @@ export class DefaultSettingsService {
     private defaultSettingRepository: Repository<DefaultSetting>,
   ) {}
   async create(createDefaultSettingDto: CreateDefaultSettingDto) {
-    return await this.defaultSettingRepository.save(createDefaultSettingDto) ;
+    return await this.defaultSettingRepository.save(createDefaultSettingDto);
   }
 
   // async findAll() {
@@ -19,8 +19,7 @@ export class DefaultSettingsService {
   // }
 
   async findOne(id: number) {
-    return await this.defaultSettingRepository.findOneBy({id})
-
+    return await this.defaultSettingRepository.findOneBy({ id });
   }
 
   // async update(id: number, updateDefaultSettingDto:any) {
@@ -28,8 +27,7 @@ export class DefaultSettingsService {
   // }
 
   async remove(id: number) {
-    const setting=await this.defaultSettingRepository.findOneBy({id})
-    return await this.defaultSettingRepository.remove(setting)
-
+    const setting = await this.defaultSettingRepository.findOneBy({ id });
+    return await this.defaultSettingRepository.remove(setting);
   }
 }

@@ -7,6 +7,6 @@ import { DefaultSetting } from './default_setting.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([DefaultSetting])],
   controllers: [DefaultSettingsController],
-  providers: [DefaultSettingsService]
+  providers: [DefaultSettingsService],
 })
 export class DefaultSettingsModule {}

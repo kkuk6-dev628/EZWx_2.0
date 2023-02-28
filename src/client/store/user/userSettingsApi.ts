@@ -12,8 +12,7 @@ const userSettingsApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
           console.log('result', result);
-          if(result.data)
-          dispatch(setUserSettings({ ...result.data }));
+          if (result.data) dispatch(setUserSettings({ ...result.data }));
         } catch (err) {
           console.error('Error: ', err);
         }
@@ -29,8 +28,7 @@ const userSettingsApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
           console.log('result', result);
-          if(result.data)
-          dispatch(setUserSettings({ ...result.data }));
+          if (result.data) dispatch(setUserSettings({ ...result.data }));
         } catch (err) {
           console.error('Error: ', err);
         }

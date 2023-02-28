@@ -8,7 +8,7 @@ import { SettingsModule } from '../settings/settings.module';
 
 @Module({
   controllers: [AuthController],
-  imports: [UserModule, PassportModule, JwtAuthModule,SettingsModule],
+  imports: [UserModule, PassportModule, JwtAuthModule, SettingsModule],
   providers: [AuthService],
 })
 export class AuthModule {}
