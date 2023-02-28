@@ -7,15 +7,15 @@ export class DefaultSetting {
   @Column()
   default_home_airport: string;
   @Column()
-  default_temperature_unit: string;
+  default_temperature_unit: boolean;
   @Column()
-  default_time_display_unit: string;
+  default_time_display_unit: boolean;
   @Column()
-  default_wind_speed_unit: string;
+  default_wind_speed_unit: boolean;
   @Column()
-  default_distance_unit: string;
+  default_distance_unit: boolean;
   @Column()
-  default_visibility_unit: string;
+  default_visibility_unit: boolean;
 
   //AirCraft Setting Fields
   @Column()
@@ -51,9 +51,13 @@ export class DefaultSetting {
   surface_visibility_along_route_max: number;
 
   @Column()
-  en_route_icing_probability_min: string;
+  en_route_icing_probability_min: number;
   @Column()
-  en_route_icing_probability_max: string;
+  en_route_icing_probability_max: number;
+  @Column()
+  en_route_icing_intensity_min: number;
+  @Column()
+  en_route_icing_intensity_max: number;
 
   @Column()
   en_route_turbulence_intensity_min: number;
