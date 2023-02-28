@@ -19,63 +19,17 @@ export class SettingsService {
       });
 
       if (res) {
-        const {
-          ceiling_at_departure_min,
-          ceiling_at_departure_max,
-          surface_visibility_at_departure_min,
-          surface_visibility_at_departure_max,
-          crosswinds_at_departure_airport_min,
-          crosswinds_at_departure_airport_max,
-          ceiling_along_route_min,
-          ceiling_along_route_max,
-          surface_visibility_along_route_min,
-          surface_visibility_along_route_max,
-          en_route_icing_probability_min,
-          en_route_icing_probability_max,
-          en_route_turbulence_intensity_min,
-          en_route_turbulence_intensity_max,
-          en_route_convective_potential_min,
-          en_route_convective_potential_max,
-          ceiling_at_destination_min,
-          ceiling_at_destination_max,
-          surface_visibility_at_destination_min,
-          surface_visibility_at_destination_max,
-          crosswinds_at_destination_airport_min,
-          crosswinds_at_destination_airport_max,
-          ...rest
-        } = res;
-
-        const modified_dto = {
-          ceiling_at_departure: [ceiling_at_departure_min, ceiling_at_departure_max],
-          surface_visibility_at_departure: [surface_visibility_at_departure_min, surface_visibility_at_departure_max],
-          crosswinds_at_departure_airport: [crosswinds_at_departure_airport_min, crosswinds_at_departure_airport_max],
-          ceiling_along_route: [ceiling_along_route_min, ceiling_along_route_max],
-          surface_visibility_along_route: [surface_visibility_along_route_min, surface_visibility_along_route_max],
-          en_route_icing_probability: [en_route_icing_probability_min, en_route_icing_probability_max],
-          en_route_turbulence_intensity: [en_route_turbulence_intensity_min, en_route_turbulence_intensity_max],
-          en_route_convective_potential: [en_route_convective_potential_min, en_route_convective_potential_max],
-          ceiling_at_destination: [ceiling_at_destination_min, ceiling_at_destination_max],
-          surface_visibility_at_destination: [
-            surface_visibility_at_destination_min,
-            surface_visibility_at_destination_max,
-          ],
-          crosswinds_at_destination_airport: [
-            crosswinds_at_destination_airport_min,
-            crosswinds_at_destination_airport_max,
-          ],
-        };
-
-        return { ...modified_dto, ...rest };
+        const modifiedData = getModifiedData(res)
+        return modifiedData;
       }
     } catch (error) {
       console.log('error', error);
     }
   }
   async create(dto: CreateUserSettingsDto) {
-      const newUserSettings = this.userSettingsRepository.create(dto);
-      console.log('newUserSettings: ', newUserSettings);
-      return await this.userSettingsRepository.save(newUserSettings);
-   
+    const newUserSettings = this.userSettingsRepository.create(dto);
+    console.log('newUserSettings: ', newUserSettings);
+    return await this.userSettingsRepository.save(newUserSettings);
   }
 
   async update(dto: UpdateUserSettingsDto) {
@@ -118,10 +72,62 @@ export class SettingsService {
         crosswinds_at_destination_airport_min: crosswinds_at_destination_airport[0],
         crosswinds_at_destination_airport_max: crosswinds_at_destination_airport[1],
       };
-
-      return await this.userSettingsRepository.save({ ...rest, ...modified_dto });
+       const res = await this.userSettingsRepository.save({ ...rest, ...modified_dto });
+       const modifiedData = getModifiedData(res);
+       return modifiedData;
     } catch (error) {
       console.log('error', error);
     }
   }
 }
+
+const getModifiedData = (data) => { 
+  const {
+    ceiling_at_departure_min,
+    ceiling_at_departure_max,
+    surface_visibility_at_departure_min,
+    surface_visibility_at_departure_max,
+    crosswinds_at_departure_airport_min,
+    crosswinds_at_departure_airport_max,
+    ceiling_along_route_min,
+    ceiling_along_route_max,
+    surface_visibility_along_route_min,
+    surface_visibility_along_route_max,
+    en_route_icing_probability_min,
+    en_route_icing_probability_max,
+    en_route_turbulence_intensity_min,
+    en_route_turbulence_intensity_max,
+    en_route_convective_potential_min,
+    en_route_convective_potential_max,
+    ceiling_at_destination_min,
+    ceiling_at_destination_max,
+    surface_visibility_at_destination_min,
+    surface_visibility_at_destination_max,
+    crosswinds_at_destination_airport_min,
+    crosswinds_at_destination_airport_max,
+    ...rest
+  } = data;
+
+  const modified_dto = {
+    ceiling_at_departure: [ceiling_at_departure_min, ceiling_at_departure_max],
+    surface_visibility_at_departure: [surface_visibility_at_departure_min, surface_visibility_at_departure_max],
+    crosswinds_at_departure_airport: [crosswinds_at_departure_airport_min, crosswinds_at_departure_airport_max],
+    ceiling_along_route: [ceiling_along_route_min, ceiling_along_route_max],
+    surface_visibility_along_route: [surface_visibility_along_route_min, surface_visibility_along_route_max],
+    en_route_icing_probability: [en_route_icing_probability_min, en_route_icing_probability_max],
+    en_route_turbulence_intensity: [en_route_turbulence_intensity_min, en_route_turbulence_intensity_max],
+    en_route_convective_potential: [en_route_convective_potential_min, en_route_convective_potential_max],
+    ceiling_at_destination: [ceiling_at_destination_min, ceiling_at_destination_max],
+    surface_visibility_at_destination: [
+      surface_visibility_at_destination_min,
+      surface_visibility_at_destination_max,
+    ],
+    crosswinds_at_destination_airport: [
+      crosswinds_at_destination_airport_min,
+      crosswinds_at_destination_airport_max,
+    ],
+  };
+
+  return { ...modified_dto, ...rest }
+
+ }
