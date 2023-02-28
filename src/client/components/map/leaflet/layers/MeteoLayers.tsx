@@ -32,6 +32,7 @@ import axios from 'axios';
 import { InBaseLayerControl } from '../layer-control/BaseMapLayerControl';
 import RadarLayer from './RadarLayer';
 import { StationMarkersLayer } from './StationMarkersLayer';
+import StationForecastPopup from '../popups/StationForecastPopup';
 
 const maxLayers = 6;
 
@@ -139,8 +140,19 @@ const MeteoLayers = () => {
         useWidePopup = true;
         break;
       default:
+        if (layerName.indexOf('station') === 0) {
+          popup = (
+            <StationForecastPopup
+              layer={layer as any}
+              airportsData={airportData}
+              personalMinimums={personalMinimums}
+            ></StationForecastPopup>
+          );
+          break;
+        }
         popup = <GeneralPopup feature={layer.feature} title={`${layerName} properties`}></GeneralPopup>;
         useWidePopup = false;
+        break;
     }
     const popupContent = ReactDOMServer.renderToString(popup);
     L.responsivePopup({
