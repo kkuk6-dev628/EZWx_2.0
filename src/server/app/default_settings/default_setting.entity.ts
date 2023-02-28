@@ -75,9 +75,9 @@ export class DefaultSetting {
   @Column()
   ceiling_at_destination_max: number;
 
-  @Column()
+  @Column({ type: 'decimal' })
   surface_visibility_at_destination_min: number;
-  @Column()
+  @Column({ type: 'decimal' })
   surface_visibility_at_destination_max: number;
 
   @Column()
