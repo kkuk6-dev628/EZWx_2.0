@@ -15,7 +15,7 @@ export const gisdbConfig: DataSourceOptions = {
   name: 'gisDB',
   url: process.env.GISDB_URL,
   useUTC: true,
-  entities: [StationTime],
+  entities: [__dirname + '/**/*.gisdb-entity{.ts,.js}'],
 };
 
 const source = new DataSource(typeOrmConfig);
