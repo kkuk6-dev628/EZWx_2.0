@@ -3,7 +3,7 @@
 import BasePopupFrame from './BasePopupFrame';
 import L from 'leaflet';
 import { Divider } from '@material-ui/core';
-import { addLeadingZeroes, getThumbnail, simpleTimeOnlyFormat } from '../../common/AreoFunctions';
+import { addLeadingZeroes, convertTimeFormat, getThumbnail, simpleTimeOnlyFormat } from '../../common/AreoFunctions';
 import { feature } from '@turf/helpers';
 
 interface FeatureSelectorProps {
@@ -184,6 +184,15 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
             case 'metar':
               text = getMetarText(layer.feature);
             default:
+              if (layerName.indexOf('station') === 0) {
+                const validDate = new Date(layer.feature.properties.valid_date);
+                text = `EZForecast: ${
+                  layer.feature.properties.icaoid ? layer.feature.properties.icaoid : layer.feature.properties.faaid
+                } ${simpleTimeOnlyFormat(validDate)} ${validDate.toLocaleString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                })}`;
+              }
               break;
           }
           return (
