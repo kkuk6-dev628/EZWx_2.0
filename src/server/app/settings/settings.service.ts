@@ -15,11 +15,16 @@ export class SettingsService {
   ) {}
   async find(user_id: number) {
     try {
-      let res: any = await this.userSettingsRepository.findOne({
-        where: {
-          user_id,
-        },
-      });
+      let res;
+      try {
+        res = await this.userSettingsRepository.findOne({
+          where: {
+            user_id,
+          },
+        });
+      } catch {
+        console.log('No user Account');
+      }
 
       if (!res) {
         res = await this.defaultSettingsRepository
