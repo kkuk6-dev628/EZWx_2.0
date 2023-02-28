@@ -19,7 +19,7 @@ export class DefaultSettingsService {
   // }
 
   async findOne(id: number) {
-    return await this.defaultSettingRepository.findOneBy({ id });
+    return await this.defaultSettingRepository.findOne({ where: { id } });
   }
 
   // async update(id: number, updateDefaultSettingDto:any) {

@@ -49,7 +49,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   };
 
   const handleSaveSettings = () => {
-    if (settings.id && id) updateUserSettings({ ...settings, user_id: id });
+    if (id) updateUserSettings({ ...settings, user_id: id });
   };
 
   return (
@@ -228,7 +228,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                       { label: '100', value: 100 },
                     ]}
                     max={6000}
-                    min={0}
+                    min={100}
                     track="normal"
                     valueLabelDisplay="on"
                     component={null}
@@ -249,10 +249,10 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     mindistance={2}
                     marks={[
                       { label: '12', value: 12 },
-                      { label: '0', value: 0 },
+                      { label: '0', value: 2 },
                     ]}
                     max={12}
-                    min={0}
+                    min={2}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap
@@ -272,10 +272,10 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     mindistance={5}
                     marks={[
                       { label: '35', value: 35 },
-                      { label: '0', value: 0 },
+                      { label: '0', value: 3 },
                     ]}
                     max={35}
-                    min={0}
+                    min={3}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap
@@ -296,10 +296,10 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     mindistance={100}
                     marks={[
                       { label: '6000', value: 6000 },
-                      { label: '0', value: 0 },
+                      { label: '0', value: 100 },
                     ]}
                     max={6000}
-                    min={0}
+                    min={100}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap
@@ -320,10 +320,10 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     mindistance={2}
                     marks={[
                       { label: '12', value: 12 },
-                      { label: '0', value: 0 },
+                      { label: '0', value: 2 },
                     ]}
                     max={12}
-                    min={0}
+                    min={2}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap
@@ -341,10 +341,10 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     mindistance={2}
                     marks={[
                       { label: '12', value: 12 },
-                      { label: '0', value: 0 },
+                      { label: '0', value: 2 },
                     ]}
                     max={12}
-                    min={0}
+                    min={2}
                     valueLabelDisplay="on"
                     component={null}
                   />
@@ -360,15 +360,15 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     onChange={handleChange}
                     mindistance={2}
                     marks={[
-                      { label: 'Hvy', value: 8 },
-                      { label: 'Mod', value: 6 },
-                      { label: 'Lgt', value: 4 },
-                      { label: 'Trc', value: 2 },
-                      { label: 'None', value: 0 },
+                      { label: 'Hvy', value: 10 },
+                      { label: 'Mod', value: 8 },
+                      { label: 'Lgt', value: 6 },
+                      { label: 'Trc', value: 4 },
+                      { label: 'None', value: 2 },
                     ]}
                     step={2}
-                    max={8}
-                    min={0}
+                    max={10}
+                    min={2}
                     valueLabelDisplay="off"
                     component={null}
                     disableSwap
@@ -389,10 +389,10 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     mindistance={10}
                     marks={[
                       { label: '100', value: 100 },
-                      { label: '0', value: 0 },
+                      { label: '0', value: 5 },
                     ]}
                     max={100}
-                    min={0}
+                    min={5}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap
@@ -412,16 +412,16 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     onChange={handleChange}
                     mindistance={2}
                     marks={[
-                      { label: 'Vry Hi', value: 10 },
-                      { label: 'Hi', value: 8 },
-                      { label: 'M3d', value: 6 },
-                      { label: 'Lo', value: 4 },
-                      { label: 'Vry Lo', value: 2 },
-                      { label: 'None', value: 0 },
+                      { label: 'Vry Hi', value: 12 },
+                      { label: 'Hi', value: 10 },
+                      { label: 'M3d', value: 8 },
+                      { label: 'Lo', value: 6 },
+                      { label: 'Vry Lo', value: 4 },
+                      { label: 'None', value: 2 },
                     ]}
                     step={2}
-                    max={10}
-                    min={0}
+                    max={12}
+                    min={2}
                     valueLabelDisplay="off"
                     component={null}
                     disableSwap
@@ -442,10 +442,10 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     mindistance={100}
                     marks={[
                       { label: '6000', value: 6000 },
-                      { label: '0', value: 0 },
+                      { label: '0', value: 100 },
                     ]}
                     max={6000}
-                    min={0}
+                    min={100}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap
@@ -466,10 +466,10 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     mindistance={1}
                     marks={[
                       { label: '12', value: 12 },
-                      { label: '0', value: 0 },
+                      { label: '0', value: 2 },
                     ]}
                     max={12}
-                    min={0}
+                    min={2}
                     step={0.5}
                     valueLabelDisplay="on"
                     component={null}
@@ -490,10 +490,10 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     mindistance={5}
                     marks={[
                       { label: '35', value: 35 },
-                      { label: '0', value: 0 },
+                      { label: '0', value: 3 },
                     ]}
                     max={35}
-                    min={0}
+                    min={3}
                     valueLabelDisplay="on"
                     component={null}
                     disableSwap

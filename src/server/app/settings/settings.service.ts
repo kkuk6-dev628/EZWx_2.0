@@ -1,3 +1,4 @@
+import { DefaultSetting } from './../default_settings/default_setting.entity';
 import { UserSettings } from './settings.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,19 +10,26 @@ export class SettingsService {
   constructor(
     @InjectRepository(UserSettings)
     private userSettingsRepository: Repository<UserSettings>,
+    @InjectRepository(DefaultSetting)
+    private defaultSettingsRepository: Repository<DefaultSetting>,
   ) {}
-  async find(user_id: any) {
+  async find(user_id: number) {
     try {
-      const res = await this.userSettingsRepository.findOne({
+      let res: any = await this.userSettingsRepository.findOne({
         where: {
           user_id,
         },
       });
 
-      if (res) {
-        const modifiedData = getModifiedData(res);
-        return modifiedData;
+      if (!res) {
+        res = await this.defaultSettingsRepository
+          .createQueryBuilder('default_setting')
+          .orderBy('default_setting.id', 'ASC')
+          .getOne();
       }
+      const { id, ...rest } = res;
+      const modifiedData = getModifiedData(rest);
+      return modifiedData;
     } catch (error) {
       console.log('error', error);
     }
@@ -74,8 +82,15 @@ export class SettingsService {
         surface_visibility_at_destination_max: surface_visibility_at_destination[1],
         crosswinds_at_destination_airport_min: crosswinds_at_destination_airport[0],
         crosswinds_at_destination_airport_max: crosswinds_at_destination_airport[1],
+        ...rest,
       };
-      const res = await this.userSettingsRepository.save({ ...rest, ...modified_dto });
+      let res = await this.userSettingsRepository.findOne({ where: { user_id: dto.user_id } });
+      if (res) {
+        res = await this.userSettingsRepository.save(modified_dto);
+      } else {
+        const settings = this.userSettingsRepository.create(modified_dto);
+        res = await this.userSettingsRepository.save(settings);
+      }
       const modifiedData = getModifiedData(res);
       return modifiedData;
     } catch (error) {
