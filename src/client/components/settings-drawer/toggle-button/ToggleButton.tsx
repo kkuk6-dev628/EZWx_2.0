@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import styles from './ToggleButton.module.css';
 type InputEvent = ChangeEvent<HTMLInputElement>;
 
@@ -12,6 +12,10 @@ interface ToggleProps {
 
 const ToggleButton = ({ label1, label2, checked, onChange, name }: ToggleProps) => {
   const [toggle, setToggle] = useState(checked);
+useEffect(() => {
+  setToggle(checked)
+
+}, [checked])
 
   const handleToggle = (e: InputEvent) => {
     setToggle(!toggle);
