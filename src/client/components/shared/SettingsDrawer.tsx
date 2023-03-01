@@ -34,8 +34,6 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
 
   useGetUserSettingsQuery(id);
   const [updateUserSettings, { isLoading, isSuccess }] = useUpdateUserSettingsMutation();
-  console.log('isLoading', isLoading);
-  console.log('isLoading', isSuccess);
   useEffect(() => {
     if (settingsState) setSettings(settingsState);
   }, [settingsState]);
@@ -50,7 +48,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
 
   const closeDrawer = () => {
     setSettings(settingsState);
-    setIsShowSaveSettingModal(false)
+    setIsShowSaveSettingModal(false);
     setIsShowSettingsDrawer(false);
   };
 
