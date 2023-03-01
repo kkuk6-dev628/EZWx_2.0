@@ -1,0 +1,22 @@
+.button__primary {
+  padding: 8px 18px;
+  text-align: center;
+  background-color: var(--color-primary);
+  border: none;
+  height: 36.44px;
+  border-radius: 4px;
+  color: white;
+  font-family: var(--font-family-sans-serif);
+  cursor: pointer;
+  &:hover {
+    background-color: var(--color-primary-highlight);
+  }
+  box-shadow: 0 2px 6px 0 rgb(136 106 181 / 50%);
+}
+.gray__background {
+  background-color: #868e96 !important;
+  box-shadow: 0 2px 6px 0 rgb(134 142 150 / 50%) !important;
+  &:hover {
+    opacity: 0.9 !important;
+  }
+}
