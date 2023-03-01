@@ -1,5 +1,4 @@
 import { Certification } from '../certification/certification.entity';
-
 import {
   Entity,
   Column,
@@ -76,4 +75,8 @@ export class User {
     name: 'user_certification',
   })
   certifications: Certification[];
+
+  //   @OneToOne(()=>UserSettings, (UserSettings=>UserSettings.user_id))
+  //  @JoinColumn()
+  //   userSettings:UserSettings;
 }

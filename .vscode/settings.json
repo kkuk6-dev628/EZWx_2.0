@@ -6,4 +6,10 @@
   "workbench.tree.indent": 16,
   "workbench.tree.renderIndentGuides": "always",
   "editor.tabSize": 2,
+  "html.completion.attributeDefaultValue": "doublequotes",
+  "prettier.jsxSingleQuote": false,
+  "prettier.singleQuote": false,
+  "javascript.preferences.quoteStyle": "doublequotes",
+  "typescript.preferences.quoteStyle": "doublequotes",
+  "yaml.format.singleQuote": false,
 }
