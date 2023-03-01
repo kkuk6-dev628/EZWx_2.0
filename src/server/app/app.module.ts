@@ -11,7 +11,6 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { typeOrmConfig } from 'ormconfig';
 import { CertificationModule } from './certification/certification.module';
-import { StationTime } from './api/station-time/station-time.gisdb-entity';
 @Module({
   imports: [
     ConfigModule.forRoot({

@@ -52,13 +52,13 @@ export class AuthService {
       },
     });
 
-    console.log('user is ', user.displayName);
+    console.log('user is ', user ? user.displayName : 'none');
 
-    if (!user) throw new ForbiddenException('email or password incorrect');
+    if (!user) throw new ForbiddenException('email incorrect');
 
     const pwMatches = await bcrypt.compare(dto.password, user.hash);
 
-    if (!pwMatches) throw new ForbiddenException('email or password incorrect');
+    if (!pwMatches) throw new ForbiddenException('password incorrect');
 
     const accessToken = await this.jwtService.login({
       id: user.id,
