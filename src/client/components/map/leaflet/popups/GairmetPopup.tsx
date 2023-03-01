@@ -35,7 +35,7 @@ const GairmetPopup = ({ feature }) => {
         translateWeatherClausings(feature.properties.dueto);
       break;
     case 'MT_OBSC':
-      title = 'Mountain Bbscuration G-AIRMET';
+      title = 'Mountain Obscuration  G-AIRMET';
       dueto = 'Mountain obscured by ' + translateWeatherClausings(feature.properties.dueto);
       break;
     case 'M_FZLVL':
@@ -52,7 +52,7 @@ const GairmetPopup = ({ feature }) => {
         <b>Issued:</b> {convertTimeFormat(feature.properties.issuetime)}
       </Typography>
       <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Lead time:</b> {feature.properties.forecast === 0 ? 'Initial' : feature.properties.forecast + ' hours'}
+        <b>Lead time:</b> {feature.properties.forecast == 0 ? 'Initial' : feature.properties.forecast + ' hours'}
       </Typography>
       {top && (
         <Typography variant="body2" style={{ margin: 3 }}>

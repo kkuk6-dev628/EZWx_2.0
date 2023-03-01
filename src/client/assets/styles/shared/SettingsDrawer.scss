@@ -110,96 +110,96 @@
       }
     }
   }
+  .input_radio_container {
+    display: flex;
+    border: 1px solid white;
+    overflow: hidden;
+    border-radius: 5px;
+    margin: 0.5rem 0;
+  }
+
+  .css-nnid7-MuiSlider-valueLabel {
+    background-color: transparent !important;
+    padding: 0 !important;
+    font-size: 0.8rem !important;
+    top: 0 !important;
+    color: gray !important;
+  }
+
+  .range__slider {
+    margin: 0;
+    .MuiSlider-valueLabel {
+      background: transparent;
+      top: 2px;
+    }
+    .MuiSlider-track {
+      color: var(--color-secondary);
+      background-color: var(--color-primary);
+      height: 16px;
+    }
+    .MuiSlider-thumb {
+      background-color: white;
+      height: 24px;
+      border-radius: 4px;
+      width: 15px;
+    }
+    .MuiSlider-rail {
+      background-color: var(--color-primary);
+      height: 16px;
+      border-radius: 2px;
+    }
+    .min-distance {
+      span[data-index='0'] .MuiSlider-valueLabelCircle {
+        ::after {
+          content: '-';
+        }
+      }
+      span[data-index='1'] .MuiSlider-valueLabelCircle {
+        ::before {
+          content: '-';
+        }
+      }
+      &.margin-0 {
+        span[data-index='0'] .MuiSlider-valueLabelCircle {
+          margin-right: 0;
+        }
+        span[data-index='1'] .MuiSlider-valueLabelCircle {
+          margin-left: 0;
+        }
+      }
+      &.margin-10 {
+        span[data-index='0'] .MuiSlider-valueLabelCircle {
+          margin-right: 5px;
+        }
+        span[data-index='1'] .MuiSlider-valueLabelCircle {
+          margin-left: 5px;
+        }
+      }
+      &.margin-20 {
+        span[data-index='0'] .MuiSlider-valueLabelCircle {
+          margin-right: 10px;
+        }
+        span[data-index='1'] .MuiSlider-valueLabelCircle {
+          margin-left: 10px;
+        }
+      }
+      &.margin-36 {
+        span[data-index='0'] .MuiSlider-valueLabelCircle {
+          margin-right: 18px;
+        }
+        span[data-index='1'] .MuiSlider-valueLabelCircle {
+          margin-left: 18px;
+        }
+      }
+      &.margin-40 {
+        span[data-index='0'] .MuiSlider-valueLabelCircle {
+          margin-right: 20px;
+        }
+        span[data-index='1'] .MuiSlider-valueLabelCircle {
+          margin-left: 20px;
+        }
+      }
+    }
+  }
 }
 
-.input_radio_container {
-  display: flex;
-  border: 1px solid white;
-  overflow: hidden;
-  border-radius: 5px;
-  margin: 0.5rem 0;
-}
-
-.css-nnid7-MuiSlider-valueLabel {
-  background-color: transparent !important;
-  padding: 0 !important;
-  font-size: 0.8rem !important;
-  top: 0 !important;
-  color: gray !important;
-}
-
-.range__slider {
-  margin: 0;
-  .MuiSlider-valueLabel {
-    background: transparent;
-    top: 2px;
-  }
-  .MuiSlider-track {
-    color: var(--color-secondary);
-    background-color: var(--color-primary);
-    height: 16px;
-  }
-  .MuiSlider-thumb {
-    background-color: white;
-    height: 24px;
-    border-radius: 4px;
-    width: 15px;
-  }
-  .MuiSlider-rail {
-    background-color: var(--color-primary);
-    height: 16px;
-    border-radius: 2px;
-  }
-  .min-distance {
-    span[data-index='0'] .MuiSlider-valueLabelCircle {
-      ::after {
-        content: '-';
-      }
-    }
-    span[data-index='1'] .MuiSlider-valueLabelCircle {
-      ::before {
-        content: '-';
-      }
-    }
-    &.margin-0 {
-      span[data-index='0'] .MuiSlider-valueLabelCircle {
-        margin-right: 0;
-      }
-      span[data-index='1'] .MuiSlider-valueLabelCircle {
-        margin-left: 0;
-      }
-    }
-    &.margin-10 {
-      span[data-index='0'] .MuiSlider-valueLabelCircle {
-        margin-right: 5px;
-      }
-      span[data-index='1'] .MuiSlider-valueLabelCircle {
-        margin-left: 5px;
-      }
-    }
-    &.margin-20 {
-      span[data-index='0'] .MuiSlider-valueLabelCircle {
-        margin-right: 10px;
-      }
-      span[data-index='1'] .MuiSlider-valueLabelCircle {
-        margin-left: 10px;
-      }
-    }
-    &.margin-36 {
-      span[data-index='0'] .MuiSlider-valueLabelCircle {
-        margin-right: 18px;
-      }
-      span[data-index='1'] .MuiSlider-valueLabelCircle {
-        margin-left: 18px;
-      }
-    }
-    &.margin-40 {
-      span[data-index='0'] .MuiSlider-valueLabelCircle {
-        margin-right: 20px;
-      }
-      span[data-index='1'] .MuiSlider-valueLabelCircle {
-        margin-left: 20px;
-      }
-    }
-  }
-}
