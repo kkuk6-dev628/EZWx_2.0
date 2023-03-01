@@ -4,6 +4,7 @@ import { PersonalMinimums } from '../../../../store/user/UserSettings';
 import { MetarSkyValuesToString } from '../../common/AreoConstants';
 import {
   addLeadingZeroes,
+  calcRelativeHumidity,
   convertTimeFormat,
   getMetarCeilingCategory,
   getMetarVisibilityCategory,
@@ -169,7 +170,7 @@ const StationForecastPopup = ({
       {feature.properties.temp_c != null && feature.properties.dewp_c != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Relative humidity: </b>
-          <span>{Math.round((feature.properties.temp_c / feature.properties.dewp_c) * 100)} %</span>
+          <span>{Math.round(calcRelativeHumidity(feature.properties.temp_c, feature.properties.dewp_c))} %</span>
         </Typography>
       )}
     </>

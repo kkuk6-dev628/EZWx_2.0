@@ -160,6 +160,26 @@ export const getQueryTime = (time: Date): string => {
   return start.toISOString() + '/' + time.toISOString();
 };
 
+/**
+ * Gets the relative humidity in percent from temperature and dewpoint in celsius.
+ * @param {number} temperature in celsius
+ * @param {number} dewpoint in celsius
+ * @returns {number} in percent
+ */
+export const calcRelativeHumidity = (temperature: number, dewpoint: number): number => {
+  const temp_k = temperature + 273.15;
+  const dewp_k = dewpoint + 273.15;
+  const Rv = 461,
+    T0 = 273.15,
+    e0 = 0.6113,
+    L = 2.5e6;
+  const es = e0 * Math.exp((L / Rv) * (1 / T0 - 1 / temp_k));
+  const e = e0 * Math.exp((L / Rv) * (1 / T0 - 1 / dewp_k));
+  let rh = (e / es) * 100;
+  if (rh > 100) rh = 100;
+  return rh;
+};
+
 export const diffMinutes = (date1: Date, date2: Date) => {
   const diff = (date1.getTime() - date2.getTime()) / (60 * 1000);
   return Math.abs(Math.round(diff));
