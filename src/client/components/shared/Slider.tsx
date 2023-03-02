@@ -19,6 +19,13 @@ const SuccessSlider = styled(Slider)<SliderProps>(() => ({
     '&.Mui-active': {
       boxShadow: `0px 0px 0px 0.1px white}`,
     },
+    '&.MuiSlider-valueLabel': {
+      backgroundColor: 'transparent',
+      padding: '0',
+      fontSize: '0.8rem',
+      top: '0',
+      color: 'gray',
+    },
   },
 }));
 
