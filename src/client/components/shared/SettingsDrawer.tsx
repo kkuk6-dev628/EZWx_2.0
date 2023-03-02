@@ -58,7 +58,6 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
       closeDrawer();
     }
   };
-
   const closeDrawer = () => {
     setSettings(settingsState);
     setIsShowSaveSettingModal(false);
@@ -76,7 +75,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const handleSaveSettings = async (isCloseDrawer = false) => {
     if (id) {
       await updateUserSettings({ ...settings, user_id: id });
-      if (isCloseDrawer) closeDrawer();
+      if (isCloseDrawer) {
+        setIsShowSettingsDrawer(false);
+      }
     }
   };
 
@@ -384,7 +385,11 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
               </InputFieldWrapper>
 
               <InputFieldWrapper>
-                <SettingFieldLabel title="En Route Icing Probability" description="acceptable icing probabilty (%)" />
+                <SettingFieldLabel
+                  title="En Route Icing Intensity"
+                  description="acceptable icing intensity
+"
+                />
                 <div className="range__slider">
                   <RangeSlider
                     name="en_route_icing_intensity"

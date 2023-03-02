@@ -1,14 +1,13 @@
 import React from 'react';
 import styles from './RadioButton.module.css';
 const RadioButton = ({ title, description, name = 'maximum-weight-category', id, value, selectedValue, onChange }) => {
-  const checked = value === selectedValue;
   return (
     <label
       htmlFor={id}
       className={styles.radio__label__container}
       style={{
-        backgroundColor: checked && '#ffc241',
-        color: checked && 'black',
+        backgroundColor: value === selectedValue && '#ffc241',
+        color: value === selectedValue && 'black',
       }}
     >
       <span className={styles.radio__label__title}>{title}</span>
@@ -19,7 +18,7 @@ const RadioButton = ({ title, description, name = 'maximum-weight-category', id,
         type="radio"
         id={id}
         value={value}
-        checked={checked}
+        checked={value === selectedValue}
         style={{ display: 'none' }}
       />
     </label>
