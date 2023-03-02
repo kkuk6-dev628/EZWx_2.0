@@ -37,12 +37,16 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const [settings, setSettings] = useState(settingsState);
 
   useGetUserSettingsQuery(id);
-  const [updateUserSettings, { isLoading, isSuccess }] = useUpdateUserSettingsMutation();
-  const [restoreSettings] = useRestoreSettingsMutation();
+  const [updateUserSettings, { isLoading:isUpdating, isSuccess }] = useUpdateUserSettingsMutation();
+  const [restoreSettings, { isLoading: isRestoring }] = useRestoreSettingsMutation();
 
   useEffect(() => {
     if (settingsState) setSettings(settingsState);
   }, [settingsState]);
+  
+  useEffect(() => {
+    if (!isRestoring) setIsShowRestoreSettingModal(false);
+  }, [isRestoring]);
 
   const handleCloseDrawer = () => {
     if (JSON.stringify(settings) !== JSON.stringify(settingsState)) {
@@ -69,6 +73,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const handleSaveSettings = () => {
     if (id) updateUserSettings({ ...settings, user_id: id });
   };
+
   return (
     <Drawer anchor={'right'} open={isShowSettingsDrawer} onClose={handleCloseDrawer}>
       <div className="drawer__container">
