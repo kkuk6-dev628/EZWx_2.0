@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Collapse, Drawer } from '@mui/material';
+import { CircularProgress, Collapse, Drawer } from '@mui/material';
 import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { RxCross2 } from 'react-icons/rx';
 import {
@@ -13,8 +13,13 @@ import { StyledSlider } from './Slider';
 import RangeSlider from './RangeSlider';
 import { useSelector } from 'react-redux';
 import { selectSettings } from '../../store/user/UserSettings';
-import { useGetUserSettingsQuery, useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
+import {
+  useGetUserSettingsQuery,
+  useRestoreSettingsMutation,
+  useUpdateUserSettingsMutation,
+} from '../../store/user/userSettingsApi';
 import { selectAuth } from '../../store/auth/authSlice';
+import { Modal, PrimaryButton, SecondaryButton } from '../common';
 
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;
@@ -27,16 +32,35 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const [isShowGeneralSettings, setIsShowGeneralSettings] = useState(false);
   const [isShowAirCraftSettings, setIsShowAirCraftSettings] = useState(false);
   const [isShowPersonalMinimumSettings, setIsShowPersonalMinimumSettings] = useState(false);
-
+  const [isShowRestoreSettingModal, setIsShowRestoreSettingModal] = useState(false);
+  const [isShowSaveSettingModal, setIsShowSaveSettingModal] = useState(false);
   const [settings, setSettings] = useState(settingsState);
 
   useGetUserSettingsQuery(id);
-  const [updateUserSettings] = useUpdateUserSettingsMutation();
+  const [updateUserSettings, { isLoading: isUpdating, isSuccess }] = useUpdateUserSettingsMutation();
+  const [restoreSettings, { isLoading: isRestoring }] = useRestoreSettingsMutation();
+
   useEffect(() => {
     if (settingsState) setSettings(settingsState);
   }, [settingsState]);
 
+  useEffect(() => {
+    if (!isRestoring || isUpdating) {
+      setIsShowSaveSettingModal(false);
+      setIsShowRestoreSettingModal(false);
+    }
+  }, [isRestoring, isUpdating]);
+
+  const handleCloseDrawer = () => {
+    if (JSON.stringify(settings) !== JSON.stringify(settingsState)) {
+      setIsShowSaveSettingModal(true);
+    } else {
+      closeDrawer();
+    }
+  };
   const closeDrawer = () => {
+    setSettings(settingsState);
+    setIsShowSaveSettingModal(false);
     setIsShowSettingsDrawer(false);
   };
 
@@ -48,25 +72,34 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
     setSettings({ ...settings, [e.target.name]: e.target.checked });
   };
 
-  const handleSaveSettings = () => {
-    if (id) updateUserSettings({ ...settings, user_id: id });
+  const handleSaveSettings = async (isCloseDrawer = false) => {
+    if (id) {
+      await updateUserSettings({ ...settings, user_id: id });
+      if (isCloseDrawer) {
+        setIsShowSettingsDrawer(false);
+      }
+    }
   };
 
   return (
-    <Drawer anchor={'right'} open={isShowSettingsDrawer} onClose={closeDrawer}>
+    <Drawer anchor={'right'} open={isShowSettingsDrawer} onClose={handleCloseDrawer}>
       <div className="drawer__container">
         <div className="drawer__sticky__header">
           <div className="drawer__header">
             <div className="drawer__title">Settings</div>
-            <RxCross2 onClick={closeDrawer} className="close__icon" />
+            <RxCross2 onClick={handleCloseDrawer} className="close__icon" />
             <div className="drawer__description">Units, Aircraft & Personal Minimums</div>
           </div>
           <div className="drawer__action__buttons">
             <div className="button__container ">
-              <button className="gray__background">Restore Settings</button>
+              <button className="gray__background" onClick={() => setIsShowRestoreSettingModal(true)}>
+                Restore Settings
+              </button>
             </div>
             <div className="button__container">
-              <button onClick={handleSaveSettings}>Save Settings</button>
+              <button onClick={() => handleSaveSettings(false)}>
+                Save Settings {isUpdating && <CircularProgress size={10} sx={{ color: 'white' }} />}
+              </button>
             </div>
           </div>
         </div>
@@ -90,7 +123,10 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     type="text"
                     placeholder="Select Airport..."
                   />
-                  <RxCross2 />
+                  <RxCross2
+                    className="cancel__icon__button"
+                    onClick={() => handleChange({ target: { name: 'default_home_airport', value: '' } })}
+                  />
                 </div>
               </InputFieldWrapper>
 
@@ -352,7 +388,11 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
               </InputFieldWrapper>
 
               <InputFieldWrapper>
-                <SettingFieldLabel title="En Route Icing Probability" description="acceptable icing probabilty (%)" />
+                <SettingFieldLabel
+                  title="En Route Icing Intensity"
+                  description="acceptable icing intensity
+"
+                />
                 <div className="range__slider">
                   <RangeSlider
                     name="en_route_icing_intensity"
@@ -505,6 +545,30 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
           <hr />
         </div>
       </div>
+      <Modal
+        open={isShowRestoreSettingModal}
+        handleClose={() => setIsShowRestoreSettingModal(false)}
+        title="Restore settings confirmation"
+        description="Are you sure you want to restore these settings back to the factory default?"
+        footer={
+          <>
+            <PrimaryButton text="Cancel" onClick={() => setIsShowRestoreSettingModal(false)} isLoading={false} />
+            <SecondaryButton text="Restore Settings" onClick={() => restoreSettings(id)} isLoading={isRestoring} />
+          </>
+        }
+      />
+      <Modal
+        open={isShowSaveSettingModal}
+        handleClose={() => setIsShowSaveSettingModal(false)}
+        title="Some changes have not been saved!"
+        description="You have changes to your settings that have not been saved. Do you want to save these changes?"
+        footer={
+          <>
+            <SecondaryButton onClick={closeDrawer} text="Abandon and close" isLoading={false} />
+            <PrimaryButton text="Save and close" onClick={() => handleSaveSettings(true)} isLoading={isUpdating} />
+          </>
+        }
+      />
     </Drawer>
   );
 };

@@ -91,12 +91,42 @@ export class SettingsService {
       };
       let res = await this.userSettingsRepository.findOne({ where: { user_id: dto.user_id } });
       if (res) {
-        res = await this.userSettingsRepository.save(modified_dto);
+        res = await this.userSettingsRepository.save({ id: res.id, ...modified_dto });
       } else {
         const settings = this.userSettingsRepository.create(modified_dto);
         res = await this.userSettingsRepository.save(settings);
       }
-      const modifiedData = getModifiedData(res);
+      const { id, ...userSettings } = res;
+      const modifiedData = getModifiedData(userSettings);
+      return modifiedData;
+    } catch (error) {
+      console.log('error', error);
+    }
+  }
+
+  async restore(user_id: number) {
+    try {
+      let res;
+      try {
+        res = await this.userSettingsRepository.findOne({
+          where: {
+            user_id,
+          },
+        });
+      } catch {
+        console.log('No user Account');
+      }
+
+      if (!res) {
+        return null;
+      }
+      const { id: defaultSettingId, ...defaultSettings } = await this.defaultSettingsRepository
+        .createQueryBuilder('default_setting')
+        .orderBy('default_setting.id', 'ASC')
+        .getOne();
+      res = await this.userSettingsRepository.save({ id: res.id, user_id, ...defaultSettings });
+      const { id, ...rest } = res;
+      const modifiedData = getModifiedData(rest);
       return modifiedData;
     } catch (error) {
       console.log('error', error);

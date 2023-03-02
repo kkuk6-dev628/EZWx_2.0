@@ -1,0 +1,50 @@
+.dialog__modal {
+  .dialog__box {
+    position: absolute;
+    background: white;
+    top: 30%;
+    left: 30%;
+    min-width: 300px;
+    max-width: 500px;
+    // min-height: 300px;
+    box-shadow: 24;
+    padding: 0;
+    border: none;
+    outline: none;
+    overflow: hidden;
+    border-radius: 5px;
+    &__heading__container {
+      background: var(--color-primary);
+      color: var(--color-white);
+      font-family: var(--font-family-sans-serif);
+      display: flex;
+      justify-content: space-between;
+      padding: 9px 15px;
+      h4{
+        color: var(--color-white);
+      font-family: var(--font-family-sans-serif);
+      }
+      .icon__button{
+        cursor: pointer;
+      }
+    }
+    &__body{
+        padding:20px;
+        font-size: 13px;
+        font-family: var(--font-family-sans-serif);
+    }
+    &__footer{
+      display: flex;
+      justify-content:flex-end;
+      padding:20px;
+      column-gap: 5px;
+    }
+  }
+  @media (max-width: 460px) {
+    .dialog__box {
+      top: 30%;
+      left: 5%;
+      max-width: 90%;
+    }
+  }
+}

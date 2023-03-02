@@ -11,6 +11,7 @@
 
 /*------  Shared Components ------*/
 @import "./shared/SettingsDrawer.scss";
+@import "./shared/Modal.scss";
 @import "./shared/FlexiblePricing.scss";
 @import "./shared/MapTabs.scss";
 @import "./shared/MapSearch.scss";
@@ -45,6 +46,7 @@
 // common
 @import './common/AutoComleteInput.scss';
 @import './common/MultiSelectInput.scss';
+@import './common/Button.scss';
 
 //Profile
 @import './pages/Profile.scss';

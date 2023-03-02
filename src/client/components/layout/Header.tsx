@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import ProfileModal from '../shared/ProfileModal';
+import SettingsDrawer from '../shared/SettingsDrawer';
 import { SvgDropDown, SvgMenuBurger, SvgProfile, SvgRoundClose, SvgSave, SvgSetting, SvgWarn } from '../utils/SvgIcons';
 
 const links = [
@@ -101,6 +102,8 @@ export default function Header() {
   const [isShowProfileModal, setIsShowProfileModal] = useState(false);
   const [activeResponsiveMenu, setActiveResponsiveMenu] = useState(false);
   const [isUserLoginUser, setIsUserLoginUser] = useState(false);
+  const [userSettingDrawer, setIsShowSettingsDrawer] = useState(false);
+
   useEffect(() => {
     if (pathname === '/try-ezwxbrief' || pathname === '/imagery') {
       setMapMenu(true);
@@ -220,7 +223,10 @@ export default function Header() {
                   <button className="header__rgt__btn header__rgt__btn--icon btn">
                     <SvgSave />
                   </button>
-                  <button className="header__rgt__btn header__rgt__btn--icon btn">
+                  <button
+                    className="header__rgt__btn header__rgt__btn--icon btn"
+                    onClick={() => setIsShowSettingsDrawer(true)}
+                  >
                     <SvgSetting />
                   </button>
                   <button onClick={handleProfileModal} className="header__rgt__btn header__rgt__btn--icon btn">
@@ -236,6 +242,10 @@ export default function Header() {
             </div>
           </div>
         </div>
+        <SettingsDrawer
+          isShowSettingsDrawer={userSettingDrawer}
+          setIsShowSettingsDrawer={() => setIsShowSettingsDrawer(false)}
+        />
         {isShowProfileModal && (
           <ProfileModal setIsUserLoginUser={setIsUserLoginUser} handleProfileModal={handleProfileModal} />
         )}
