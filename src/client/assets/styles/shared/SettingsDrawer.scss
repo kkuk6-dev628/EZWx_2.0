@@ -96,7 +96,7 @@
         border: 1px solid #e6e6e6;
         border-radius: 2px;
         margin-top: 8px;
-        .cancel__icon__button{
+        .cancel__icon__button {
           cursor: pointer;
         }
 
@@ -113,7 +113,6 @@
       }
     }
   }
-<<<<<<< HEAD
 }
 
 .input_radio_container {
@@ -139,22 +138,6 @@
     height: 24px;
     border-radius: 4px;
     width: 15px;
-=======
-  .input_radio_container {
-    display: flex;
-    border: 1px solid white;
-    overflow: hidden;
-    border-radius: 5px;
-    margin: 0.5rem 0;
->>>>>>> d216d2f466e282623f6f4c5f3eb55f99b7d5ffbf
-  }
-
-  .css-nnid7-MuiSlider-valueLabel {
-    background-color: transparent !important;
-    padding: 0 !important;
-    font-size: 0.8rem !important;
-    top: 0 !important;
-    color: gray !important;
   }
 
   .range__slider {
@@ -233,4 +216,3 @@
     }
   }
 }
-
