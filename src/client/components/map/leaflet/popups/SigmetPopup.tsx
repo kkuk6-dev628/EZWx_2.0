@@ -2,7 +2,7 @@ import { Divider, Typography } from '@material-ui/core';
 import BasePopupFrame from './BasePopupFrame';
 import { convertTimeFormat, getAltitudeString } from '../../common/AreoFunctions';
 
-const SigmetPopup = ({ feature }) => {
+const SigmetPopup = ({ feature, userSettings }) => {
   let title = 'G_AIRMET';
   let base;
   if (isNaN(parseInt(feature.properties.altitudelow)) || feature.properties.altitudelow == '0') {
@@ -41,10 +41,10 @@ const SigmetPopup = ({ feature }) => {
   return (
     <BasePopupFrame title={title}>
       <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Valid:</b> {convertTimeFormat(feature.properties.validtimefrom)}
+        <b>Valid:</b> {convertTimeFormat(feature.properties.validtimefrom, userSettings.default_time_display_unit)}
       </Typography>
       <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Through:</b> {convertTimeFormat(feature.properties.validtimeto)}
+        <b>Through:</b> {convertTimeFormat(feature.properties.validtimeto, userSettings.default_time_display_unit)}
       </Typography>
       {top && (
         <Typography variant="body2" style={{ margin: 3 }}>

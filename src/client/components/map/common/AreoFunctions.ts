@@ -45,36 +45,62 @@ export const translateWeatherClausings = (dueto: string): string => {
     .replace(/,(?=[^,]+$)/, ' and');
 };
 
-export const convertTimeFormat = (time: string) => {
+export const convertTimeFormat = (time: string, useLocalTime: boolean) => {
   const dateObj = new Date(time);
-  return `${dateObj.toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })} ${dateObj.toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    timeZoneName: 'short',
-  })}`;
+  if (useLocalTime) {
+    return `${dateObj.toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    })} ${dateObj.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZoneName: 'short',
+    })}`;
+  } else {
+    return `${dateObj.toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'UTC',
+    })} ${dateObj.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZoneName: 'short',
+      timeZone: 'UTC',
+    })}`;
+  }
 };
 
-export const simpleTimeFormat = (time: Date) => {
+export const simpleTimeFormat = (time: Date, useLocalTime: boolean) => {
   return `${time.toLocaleDateString('en-US', {
     day: '2-digit',
     month: 'short',
+    timeZone: !useLocalTime ? 'UTC' : undefined,
   })} ${time.toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
     timeZoneName: 'short',
+    timeZone: !useLocalTime ? 'UTC' : undefined,
   })}`;
 };
 
-export const simpleTimeOnlyFormat = (time: Date) => {
-  return `${time.getUTCHours() < 10 ? '0' : ''}${time.getUTCHours()}${
-    time.getUTCMinutes() < 10 ? '0' : ''
-  }${time.getUTCMinutes()}Z`;
+export const simpleTimeOnlyFormat = (time: Date, useLocalTime: boolean) => {
+  if (useLocalTime) {
+    return time.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZoneName: 'short',
+    });
+  } else {
+    return `${time.getUTCHours() < 10 ? '0' : ''}${time.getUTCHours()}${
+      time.getUTCMinutes() < 10 ? '0' : ''
+    }${time.getUTCMinutes()}Z`;
+  }
 };
 
 export const getThumbnail = (feature, style) => {
@@ -178,6 +204,22 @@ export const calcRelativeHumidity = (temperature: number, dewpoint: number): num
   let rh = (e / es) * 100;
   if (rh > 100) rh = 100;
   return rh;
+};
+
+export const getAirportNameById = (id: string, airportsData: any[]): string => {
+  if (airportsData) return;
+  let airport = airportsData.find((item) => {
+    return item.key === id;
+  });
+  if (!airport) {
+    airport = airportsData.find((item) => {
+      return item.key === id.slice(1);
+    });
+  }
+  if (airport) {
+    return airport.name;
+  }
+  return null;
 };
 
 export const diffMinutes = (date1: Date, date2: Date) => {

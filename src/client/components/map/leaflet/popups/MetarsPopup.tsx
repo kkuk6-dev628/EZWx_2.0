@@ -1,10 +1,12 @@
 import { Divider, Typography } from '@material-ui/core';
 import Image from 'next/image';
-import { PersonalMinimums } from '../../../../store/user/UserSettings';
+import { useSelector } from 'react-redux';
+import { PersonalMinimums, selectSettings } from '../../../../store/user/UserSettings';
 import { MetarSkyValuesToString } from '../../common/AreoConstants';
 import {
   addLeadingZeroes,
   convertTimeFormat,
+  getAirportNameById,
   getMetarCeilingCategory,
   getMetarDecodedWxString,
   getMetarVisibilityCategory,
@@ -19,10 +21,12 @@ const MetarsPopup = ({
   layer,
   personalMinimums,
   airportsData,
+  userSettings,
 }: {
   layer: L.Marker;
   personalMinimums: PersonalMinimums;
   airportsData: any;
+  userSettings: any;
 }) => {
   const feature = layer.feature;
   const skyConditions = getSkyConditions(layer.feature);
@@ -33,12 +37,7 @@ const MetarsPopup = ({
     return a.cloudBase > b.cloudBase ? 1 : -1;
   });
   const weatherString = getMetarDecodedWxString(feature.properties.wx_string);
-  let airportName = airportsData.icaoid[feature.properties.station_id]
-    ? toTitleCase(airportsData.icaoid[feature.properties.station_id])
-    : null;
-  if (!airportName) {
-    airportName = toTitleCase(airportsData.faaid[feature.properties.station_id.slice(1)]);
-  }
+  const airportName = toTitleCase(getAirportNameById(feature.properties.station_id, airportsData));
   let vimi = feature.properties.visibility_statute_mi;
   if (vimi >= 4) {
     vimi = Math.ceil(vimi);
@@ -63,7 +62,7 @@ const MetarsPopup = ({
         </Typography>
       )}
       <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Time: </b> {convertTimeFormat(feature.properties.observation_time)}
+        <b>Time: </b> {convertTimeFormat(feature.properties.observation_time, userSettings.default_time_display_unit)}
       </Typography>
       {isFinite(ceiling) && (
         <Typography variant="body2" style={{ margin: 3 }}>

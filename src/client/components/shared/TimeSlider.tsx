@@ -103,7 +103,7 @@ function TimeSlider({
   };
   console.log(date);
 
-  const hnadelSetDate = (index, limit, childIndex) => {
+  const handleSetDate = (index, limit, childIndex) => {
     //index and limit is 0 then it will be current date
     if (index === 0 && limit === 0) {
       const newDate = new DateObject(date);
@@ -166,7 +166,7 @@ function TimeSlider({
                             </span>
                           }
                         >
-                          <span key={i} onClick={() => hnadelSetDate(index * step, 24, 11)} className="collps__dot">
+                          <span key={i} onClick={() => handleSetDate(index * step, 24, 11)} className="collps__dot">
                             &nbsp;
                           </span>
                         </Tippy>
@@ -201,7 +201,7 @@ function TimeSlider({
                               </span>
                             }
                           >
-                            <span key={i} onClick={() => hnadelSetDate(index * step, 0, 11)} className="collps__dot">
+                            <span key={i} onClick={() => handleSetDate(index * step, 0, 11)} className="collps__dot">
                               &nbsp;
                             </span>
                           </Tippy>
@@ -222,7 +222,7 @@ function TimeSlider({
                               </span>
                             }
                           >
-                            <span key={i} onClick={() => hnadelSetDate(index * step, 0, 11)} className="collps__dot">
+                            <span key={i} onClick={() => handleSetDate(index * step, 0, 11)} className="collps__dot">
                               &nbsp;
                             </span>
                           </Tippy>
@@ -257,7 +257,7 @@ function TimeSlider({
                             </span>
                           }
                         >
-                          <span key={i} onClick={() => hnadelSetDate(index * step, -24, 11)} className="collps__dot">
+                          <span key={i} onClick={() => handleSetDate(index * step, -24, 11)} className="collps__dot">
                             &nbsp;
                           </span>
                         </Tippy>
@@ -291,7 +291,7 @@ function TimeSlider({
                             </span>
                           }
                         >
-                          <span key={i} onClick={() => hnadelSetDate(index * step, -48, 11)} className="collps__dot">
+                          <span key={i} onClick={() => handleSetDate(index * step, -48, 11)} className="collps__dot">
                             &nbsp;
                           </span>
                         </Tippy>
@@ -329,7 +329,7 @@ function TimeSlider({
                             </span>
                           }
                         >
-                          <span key={i} onClick={() => hnadelSetDate(index * step, 24, i)} className="collps__dot">
+                          <span key={i} onClick={() => handleSetDate(index * step, 24, i)} className="collps__dot">
                             &nbsp;
                           </span>
                         </Tippy>
@@ -364,7 +364,7 @@ function TimeSlider({
                               </span>
                             }
                           >
-                            <span key={i} onClick={() => hnadelSetDate(index * step, 0, i)} className="collps__dot">
+                            <span key={i} onClick={() => handleSetDate(index * step, 0, i)} className="collps__dot">
                               &nbsp;
                             </span>
                           </Tippy>
@@ -385,7 +385,7 @@ function TimeSlider({
                               </span>
                             }
                           >
-                            <span key={i} onClick={() => hnadelSetDate(index * step, 0, i)} className="collps__dot">
+                            <span key={i} onClick={() => handleSetDate(index * step, 0, i)} className="collps__dot">
                               &nbsp;
                             </span>
                           </Tippy>
@@ -420,7 +420,7 @@ function TimeSlider({
                             </span>
                           }
                         >
-                          <span key={i} onClick={() => hnadelSetDate(index * step, 0, i)} className="collps__dot">
+                          <span key={i} onClick={() => handleSetDate(index * step, 0, i)} className="collps__dot">
                             &nbsp;
                           </span>
                         </Tippy>
@@ -454,7 +454,7 @@ function TimeSlider({
                             </span>
                           }
                         >
-                          <span key={i} onClick={() => hnadelSetDate(index * step, 0, i)} className="collps__dot">
+                          <span key={i} onClick={() => handleSetDate(index * step, 0, i)} className="collps__dot">
                             &nbsp;
                           </span>
                         </Tippy>

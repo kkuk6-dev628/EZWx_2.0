@@ -47,7 +47,7 @@ const turbulenceFrequencyTranslations = {
   OCNL: 'Occasional',
 };
 
-const PIREPPopup = ({ feature }) => {
+const PIREPPopup = ({ feature, userSettings }) => {
   const useCelsus = true;
   const useKnote = true;
 
@@ -63,7 +63,7 @@ const PIREPPopup = ({ feature }) => {
       </Typography>
       <Divider />
       <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Time:</b> {convertTimeFormat(feature.properties.obstime)}
+        <b>Time:</b> {convertTimeFormat(feature.properties.obstime, userSettings.default_time_display_unit)}
       </Typography>
       {feature.properties.fltlvl && feature.properties.fltlvl !== '000' ? (
         <Typography variant="body2" style={{ margin: 3 }}>

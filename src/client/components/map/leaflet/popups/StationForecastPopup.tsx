@@ -1,11 +1,13 @@
 import { Divider, Typography } from '@material-ui/core';
 import Image from 'next/image';
-import { PersonalMinimums } from '../../../../store/user/UserSettings';
+import { useSelector } from 'react-redux';
+import { PersonalMinimums, selectSettings } from '../../../../store/user/UserSettings';
 import { MetarSkyValuesToString } from '../../common/AreoConstants';
 import {
   addLeadingZeroes,
   calcRelativeHumidity,
   convertTimeFormat,
+  getAirportNameById,
   getMetarCeilingCategory,
   getMetarVisibilityCategory,
   toTitleCase,
@@ -18,10 +20,12 @@ const StationForecastPopup = ({
   layer,
   personalMinimums,
   airportsData,
+  userSettings,
 }: {
   layer: L.Marker;
   personalMinimums: PersonalMinimums;
   airportsData: any;
+  userSettings: any;
 }) => {
   const feature = layer.feature;
   const iconUrl = getNbmFlightCategoryIconUrl(layer.feature, personalMinimums);
@@ -60,12 +64,7 @@ const StationForecastPopup = ({
   const skyConditionsAsc = skyConditions.sort((a, b) => {
     return a.cloudBase > b.cloudBase ? 1 : -1;
   });
-  let airportName = airportsData.icaoid[feature.properties.icaoid]
-    ? toTitleCase(airportsData.icaoid[feature.properties.icaoid])
-    : null;
-  if (!airportName) {
-    airportName = toTitleCase(airportsData.faaid[feature.properties.faaid]);
-  }
+  const airportName = toTitleCase(getAirportNameById(feature.properties.station_id, airportsData));
   let vimi = feature.properties.vis;
   if (vimi >= 4) {
     vimi = Math.ceil(vimi);
@@ -92,7 +91,7 @@ const StationForecastPopup = ({
         </Typography>
       )}
       <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Time: </b> {convertTimeFormat(feature.properties.valid_date)}
+        <b>Time: </b> {convertTimeFormat(feature.properties.valid_date, userSettings.default_time_display_unit)}
       </Typography>
       {ceiling && (
         <Typography variant="body2" style={{ margin: 3 }}>
