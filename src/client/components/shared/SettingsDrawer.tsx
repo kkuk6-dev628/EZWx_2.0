@@ -123,7 +123,10 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     type="text"
                     placeholder="Select Airport..."
                   />
-                  <RxCross2 />
+                  <RxCross2
+                    className="cancel__icon__button"
+                    onClick={() => handleChange({ target: { name: 'default_home_airport', value: '' } })}
+                  />
                 </div>
               </InputFieldWrapper>
 
