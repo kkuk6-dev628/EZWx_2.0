@@ -216,3 +216,30 @@
     }
   }
 }
+
+.setting__drawer__slider {
+  width: 100%;
+  color: var(--color-primary);
+  height: 14px;
+  border-radius: 3px;
+  .MuiSlider-thumb {
+    border-radius: 1px;
+    background-color: white;
+    height: 24px;
+    width: 15px;
+    border: 1px solid whitesmoke;
+    &:hover &:focus .Mui-focusVisible {
+      box-shadow: 0px 0px 0px 0.1px white;
+    }
+    .Mui-active {
+      box-shadow: 0px 0px 0px 0.1px white;
+    }
+  }
+  .MuiSlider-valueLabel {
+    background-color: transparent;
+    padding: 0;
+    font-size: 0.8rem;
+    top: 0;
+    color: gray;
+  }
+}
