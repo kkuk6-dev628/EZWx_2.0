@@ -91,12 +91,13 @@ export class SettingsService {
       };
       let res = await this.userSettingsRepository.findOne({ where: { user_id: dto.user_id } });
       if (res) {
-        res = await this.userSettingsRepository.save(modified_dto);
+        res = await this.userSettingsRepository.save({ id: res.id, ...modified_dto });
       } else {
         const settings = this.userSettingsRepository.create(modified_dto);
         res = await this.userSettingsRepository.save(settings);
       }
-      const modifiedData = getModifiedData(res);
+      let { id, ...userSettings } = res;
+      const modifiedData = getModifiedData(userSettings);
       return modifiedData;
     } catch (error) {
       console.log('error', error);
