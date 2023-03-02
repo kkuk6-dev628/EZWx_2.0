@@ -3,16 +3,18 @@
 import BasePopupFrame from './BasePopupFrame';
 import L from 'leaflet';
 import { Divider } from '@material-ui/core';
-import { addLeadingZeroes, convertTimeFormat, getThumbnail, simpleTimeOnlyFormat } from '../../common/AreoFunctions';
+import { addLeadingZeroes, getThumbnail, simpleTimeOnlyFormat } from '../../common/AreoFunctions';
 import { feature } from '@turf/helpers';
 
 interface FeatureSelectorProps {
   features: L.Layer[];
+  userSettings: any;
 }
-const FeatureSelector = ({ features }: FeatureSelectorProps) => {
+const FeatureSelector = ({ features, userSettings }: FeatureSelectorProps) => {
   const getMetarText = (feature: GeoJSON.Feature): string => {
     const text = `METAR: ${feature.properties.station_id} ${simpleTimeOnlyFormat(
       new Date(feature.properties.observation_time),
+      userSettings.default_time_display_unit,
     )}`;
     return text;
   };
@@ -188,10 +190,13 @@ const FeatureSelector = ({ features }: FeatureSelectorProps) => {
                 const validDate = new Date(layer.feature.properties.valid_date);
                 text = `EZForecast: ${
                   layer.feature.properties.icaoid ? layer.feature.properties.icaoid : layer.feature.properties.faaid
-                } ${simpleTimeOnlyFormat(validDate)} ${validDate.toLocaleString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                })}`;
+                } ${simpleTimeOnlyFormat(validDate, userSettings.default_time_display_unit)} ${validDate.toLocaleString(
+                  'en-US',
+                  {
+                    month: 'short',
+                    day: 'numeric',
+                  },
+                )}`;
               }
               break;
           }

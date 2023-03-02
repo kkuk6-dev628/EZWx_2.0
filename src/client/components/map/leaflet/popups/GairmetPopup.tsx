@@ -2,7 +2,7 @@ import { Typography } from '@material-ui/core';
 import BasePopupFrame from './BasePopupFrame';
 import { getAltitudeString, translateWeatherClausings, convertTimeFormat } from '../../common/AreoFunctions';
 
-const GairmetPopup = ({ feature }) => {
+const GairmetPopup = ({ feature, userSettings }) => {
   let title = 'G-AIRMET';
   let dueto = 'Moderate';
   const top = getAltitudeString(feature.properties.top, true, feature.properties.fzlbase, feature.properties.fzltop);
@@ -35,7 +35,7 @@ const GairmetPopup = ({ feature }) => {
         translateWeatherClausings(feature.properties.dueto);
       break;
     case 'MT_OBSC':
-      title = 'Mountain Bbscuration G-AIRMET';
+      title = 'Mountain Obscuration  G-AIRMET';
       dueto = 'Mountain obscured by ' + translateWeatherClausings(feature.properties.dueto);
       break;
     case 'M_FZLVL':
@@ -46,13 +46,13 @@ const GairmetPopup = ({ feature }) => {
   return (
     <BasePopupFrame title={title}>
       <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Valid:</b> {convertTimeFormat(feature.properties.validtime)}
+        <b>Valid:</b> {convertTimeFormat(feature.properties.validtime, userSettings.default_time_display_unit)}
       </Typography>
       <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Issued:</b> {convertTimeFormat(feature.properties.issuetime)}
+        <b>Issued:</b> {convertTimeFormat(feature.properties.issuetime, userSettings.default_time_display_unit)}
       </Typography>
       <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Lead time:</b> {feature.properties.forecast === 0 ? 'Initial' : feature.properties.forecast + ' hours'}
+        <b>Lead time:</b> {feature.properties.forecast == 0 ? 'Initial' : feature.properties.forecast + ' hours'}
       </Typography>
       {top && (
         <Typography variant="body2" style={{ margin: 3 }}>

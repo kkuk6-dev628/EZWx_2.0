@@ -6,10 +6,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setObsTime } from '../../store/time-slider/ObsTimeSlice';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { selectObsInterval, setObsInterval } from '../../store/time-slider/ObsIntervalSlice';
+import { selectSettings } from '../../store/user/UserSettings';
 
 function CollapsibleBar() {
   const dispatch = useDispatch();
   const obsInterval = useSelector(selectObsInterval);
+  const settingsState = useSelector(selectSettings);
 
   const valueToTime = (value: number): Date => {
     const origin = getTimeRangeStart();
@@ -26,28 +28,28 @@ function CollapsibleBar() {
   const marks = [
     {
       value: 0,
-      label: simpleTimeFormat(valueToTime(0)),
+      label: simpleTimeFormat(valueToTime(0), settingsState.default_time_display_unit),
     },
     {
       value: 12 * 12,
-      label: simpleTimeFormat(valueToTime(12 * 12)),
+      label: simpleTimeFormat(valueToTime(12 * 12), settingsState.default_time_display_unit),
     },
     {
       value: 36 * 12,
-      label: simpleTimeFormat(valueToTime(36 * 12)),
+      label: simpleTimeFormat(valueToTime(36 * 12), settingsState.default_time_display_unit),
     },
     {
       value: 60 * 12,
-      label: simpleTimeFormat(valueToTime(60 * 12)),
+      label: simpleTimeFormat(valueToTime(60 * 12), settingsState.default_time_display_unit),
     },
     {
       value: 84 * 12,
-      label: simpleTimeFormat(valueToTime(84 * 12)),
+      label: simpleTimeFormat(valueToTime(84 * 12), settingsState.default_time_display_unit),
     },
   ];
 
   function valuetext(value: number) {
-    return <div>{simpleTimeFormat(valueToTime(value))}</div>;
+    return <div>{simpleTimeFormat(valueToTime(value), settingsState.default_time_display_unit)}</div>;
   }
 
   const handleTimeChange = (time: Date) => {

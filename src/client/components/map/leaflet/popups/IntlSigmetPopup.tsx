@@ -19,7 +19,7 @@ const qualifiersTranslation = {
   FRQ: 'Frequent',
 };
 
-const IntlSigmetPopup = ({ feature }: { feature: any }) => {
+const IntlSigmetPopup = ({ feature, userSettings }: { feature: any; userSettings: any }) => {
   let title = hazardTranslation[feature.properties.hazard]
     ? `${qualifiersTranslation[feature.properties.qualifier]} ${hazardTranslation[feature.properties.hazard]}`
     : 'Other';
@@ -52,10 +52,10 @@ const IntlSigmetPopup = ({ feature }: { feature: any }) => {
         <b>Hazard:</b> {hazardTranslation[feature.properties.hazard]}
       </Typography>
       <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Valid:</b> {convertTimeFormat(feature.properties.validtimefrom)}
+        <b>Valid:</b> {convertTimeFormat(feature.properties.validtimefrom, userSettings.default_time_display_unit)}
       </Typography>
       <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Through:</b> {convertTimeFormat(feature.properties.validtimeto)}
+        <b>Through:</b> {convertTimeFormat(feature.properties.validtimeto, userSettings.default_time_display_unit)}
       </Typography>
       {top && (
         <Typography variant="body2" style={{ margin: 3 }}>

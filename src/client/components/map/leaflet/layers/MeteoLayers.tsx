@@ -24,7 +24,7 @@ import 'leaflet-responsive-popup/leaflet.responsive.popup.css';
 import MetarsPopup from '../popups/MetarsPopup';
 import { useSelector } from 'react-redux';
 import { selectMetar } from '../../../../store/layers/LayerControl';
-import { selectPersonalMinimums } from '../../../../store/user/UserSettings';
+import { selectPersonalMinimums, selectSettings } from '../../../../store/user/UserSettings';
 import { MetarMarkerTypes, pickupRadiusPx } from '../../common/AreoConstants';
 import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
 import { InLayerControl } from '../layer-control/MeteoLayerControl';
@@ -33,6 +33,7 @@ import { InBaseLayerControl } from '../layer-control/BaseMapLayerControl';
 import RadarLayer from './RadarLayer';
 import { StationMarkersLayer } from './StationMarkersLayer';
 import StationForecastPopup from '../popups/StationForecastPopup';
+import { useGetAirportQuery } from '../../../../store/airports/airportApi';
 
 const maxLayers = 6;
 
@@ -41,53 +42,47 @@ const MeteoLayers = () => {
   const debugLayerGroupRef = useRef(null);
   const metarLayerStatus = useSelector(selectMetar);
   const personalMinimums = useSelector(selectPersonalMinimums);
-  const [airportData, setAirportData] = useState();
-  useEffect(() => {
-    fetchAirports();
-  }, []);
+  const { isLoading, data: airportsData } = useGetAirportQuery('');
+  const settingsState = useSelector(selectSettings);
 
-  const fetchAirports = () => {
-    const params = {
-      maxFeatures: 14000,
-      request: 'GetFeature',
-      service: 'WFS',
-      typeName: 'EZWxBrief:airport',
-      version: '1.0.0',
-      srsName: 'EPSG:4326',
-      propertyName: 'icaoid,name,faaid',
-      cql_filter: 'faaid is not null',
-      outputFormat: 'application/json',
-      v: 1,
-    } as any;
-    // if (abortController) {
-    //   abortController.abort();
-    // }
-    // setAbortController(new AbortController());
-    axios
-      .get('https://eztile4.ezwxbrief.com/geoserver/EZWxBrief/ows', {
-        params: params,
-      })
-      .then((data) => {
-        if (typeof data.data === 'string') {
-          console.log('Aireport: Invalid json data!', data.data);
-        } else {
-          const airports = { icaoid: {}, faaid: {} };
-          data.data.features.forEach((feature) => {
-            if (!feature.properties.name) return;
-            if (feature.properties.faaid) {
-              airports.faaid[feature.properties.faaid] = feature.properties.name;
-            }
-            if (feature.properties.icaoid) {
-              airports.icaoid[feature.properties.icaoid] = feature.properties.name;
-            }
-          });
-          setAirportData(airports as any);
-        }
-      })
-      .catch((reason) => {
-        console.log('Aireport', reason);
-      });
-  };
+  // const fetchAirports = () => {
+  //   const params = {
+  //     maxFeatures: 14000,
+  //     request: 'GetFeature',
+  //     service: 'WFS',
+  //     typeName: 'EZWxBrief:airport',
+  //     version: '1.0.0',
+  //     srsName: 'EPSG:4326',
+  //     propertyName: 'icaoid,name,faaid',
+  //     cql_filter: 'faaid is not null',
+  //     outputFormat: 'application/json',
+  //     v: 1,
+  //   } as any;
+  //   axios
+  //     .get('https://eztile4.ezwxbrief.com/geoserver/EZWxBrief/ows', {
+  //       params: params,
+  //     })
+  //     .then((data) => {
+  //       if (typeof data.data === 'string') {
+  //         console.log('Aireport: Invalid json data!', data.data);
+  //       } else {
+  //         const airports = { icaoid: {}, faaid: {} };
+  //         data.data.features.forEach((feature) => {
+  //           if (!feature.properties.name) return;
+  //           if (feature.properties.faaid) {
+  //             airports.faaid[feature.properties.faaid] = feature.properties.name;
+  //           }
+  //           if (feature.properties.icaoid) {
+  //             airports.icaoid[feature.properties.icaoid] = feature.properties.name;
+  //           }
+  //         });
+  //         setAirportData(airports as any);
+  //       }
+  //     })
+  //     .catch((reason) => {
+  //       console.log('Aireport', reason);
+  //     });
+  // };
 
   const showPopup = (layer: L.GeoJSON, latlng: L.LatLng): void => {
     if (typeof layer.setStyle === 'function') {
@@ -103,27 +98,27 @@ const MeteoLayers = () => {
     let offsetX = 10;
     switch (layerName) {
       case 'gairmet':
-        popup = <GairmetPopup feature={layer.feature}></GairmetPopup>;
+        popup = <GairmetPopup feature={layer.feature} userSettings={settingsState}></GairmetPopup>;
         useWidePopup = false;
         break;
       case 'sigmet':
-        popup = <SigmetPopup feature={layer.feature}></SigmetPopup>;
+        popup = <SigmetPopup feature={layer.feature} userSettings={settingsState}></SigmetPopup>;
         useWidePopup = true;
         break;
       case 'intl_sigmet':
-        popup = <IntlSigmetPopup feature={layer.feature}></IntlSigmetPopup>;
+        popup = <IntlSigmetPopup feature={layer.feature} userSettings={settingsState}></IntlSigmetPopup>;
         useWidePopup = true;
         break;
       case 'cwa':
-        popup = <CWAPopup feature={layer.feature}></CWAPopup>;
+        popup = <CWAPopup feature={layer.feature} userSettings={settingsState}></CWAPopup>;
         useWidePopup = true;
         break;
       case 'conv_outlook':
-        popup = <ConvectiveOutlookPopup feature={layer.feature}></ConvectiveOutlookPopup>;
+        popup = <ConvectiveOutlookPopup feature={layer.feature} userSettings={settingsState}></ConvectiveOutlookPopup>;
         useWidePopup = true;
         break;
       case 'pirep':
-        popup = <PIREPPopup feature={layer.feature}></PIREPPopup>;
+        popup = <PIREPPopup feature={layer.feature} userSettings={settingsState}></PIREPPopup>;
         useWidePopup = true;
         break;
       case 'metar':
@@ -133,8 +128,9 @@ const MeteoLayers = () => {
         popup = (
           <MetarsPopup
             layer={layer as any}
-            airportsData={airportData}
+            airportsData={airportsData}
             personalMinimums={personalMinimums}
+            userSettings={settingsState}
           ></MetarsPopup>
         );
         useWidePopup = true;
@@ -144,8 +140,9 @@ const MeteoLayers = () => {
           popup = (
             <StationForecastPopup
               layer={layer as any}
-              airportsData={airportData}
+              airportsData={airportsData}
               personalMinimums={personalMinimums}
+              userSettings={settingsState}
             ></StationForecastPopup>
           );
           break;
@@ -211,54 +208,17 @@ const MeteoLayers = () => {
       map.closePopup();
 
       if (features.length === 0) {
-        // if (wmsLayerRef.current) {
-        //   wmsLayerRef.current.source.getFeatureInfo(
-        //     map.latLngToContainerPoint(e.latlng),
-        //     e.latlng,
-        //     ['EZWxBrief:2t_NBM', 'EZWxBrief:2t_test'],
-        //     (latlng: L.LatLng, result: string) => {
-        //       try {
-        //         const resultObj = JSON.parse(result);
-        //         resultObj.features.length > 0 &&
-        //           showPopup({ feature: resultObj.features[0] } as any, latlng);
-        //       } catch (e) {
-        //         console.error(result);
-        //       }
-        //     },
-        //   );
-        //   axios
-        //     .post('/api/asd', e.latlng)
-        //     .then((result) => {
-        //       Object.entries(result.data).map((entry) => {
-        //         const lnglat = entry[0].split(',');
-        //         if (
-        //           debugLayerGroupRef.current &&
-        //           debugLayerGroupRef.current.addLayer
-        //         ) {
-        //           const circleMarker = new L.CircleMarker(
-        //             [lnglat[1] as any, lnglat[0] as any],
-        //             { radius: 2 },
-        //           );
-        //           circleMarker.bindTooltip(`<h>${entry[1]}</h>`);
-        //           debugLayerGroupRef.current.addLayer(circleMarker);
-        //         }
-        //       });
-        //       showPopup(
-        //         { feature: { properties: result.data, id: 'temp' } } as any,
-        //         e.latlng,
-        //       );
-        //     })
-        //     .catch((reason) => {
-        //       console.log(reason);
-        //     });
-        // }
         return;
       } else if (features.length === 1) {
         showPopup(features[0], e.latlng);
       } else {
         L.responsivePopup({ offset: [10, 19] })
           .setLatLng(e.latlng)
-          .setContent(ReactDOMServer.renderToString(<FeatureSelector features={features}></FeatureSelector>))
+          .setContent(
+            ReactDOMServer.renderToString(
+              <FeatureSelector features={features} userSettings={settingsState}></FeatureSelector>,
+            ),
+          )
           .openOn(map);
         const selectorFeatureNodes = document.getElementsByClassName('feature-selector-item');
         for (let i = 0; i < selectorFeatureNodes.length; i++) {

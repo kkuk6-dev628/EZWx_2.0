@@ -2,7 +2,7 @@ import { Divider, Typography } from '@material-ui/core';
 import BasePopupFrame from './BasePopupFrame';
 import { convertTimeFormat, getAltitudeString } from '../../common/AreoFunctions';
 
-const CWAPopup = ({ feature }) => {
+const CWAPopup = ({ feature, userSettings }) => {
   let title = 'CWA';
   const base = getAltitudeString(feature.properties.base, false);
   const top = getAltitudeString(feature.properties.top, false);
@@ -34,10 +34,10 @@ const CWAPopup = ({ feature }) => {
         <b>CWSU:</b> {`${feature.properties.cwsu} [${feature.properties.name}]`}
       </Typography>
       <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Valid:</b> {convertTimeFormat(feature.properties.validtimefrom)}
+        <b>Valid:</b> {convertTimeFormat(feature.properties.validtimefrom, userSettings.default_time_display_unit)}
       </Typography>
       <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Through:</b> {convertTimeFormat(feature.properties.validtimeto)}
+        <b>Through:</b> {convertTimeFormat(feature.properties.validtimeto, userSettings.default_time_display_unit)}
       </Typography>
       {top && (
         <Typography variant="body2" style={{ margin: 3 }}>
