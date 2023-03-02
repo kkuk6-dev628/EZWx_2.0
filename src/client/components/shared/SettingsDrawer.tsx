@@ -13,7 +13,11 @@ import { StyledSlider } from './Slider';
 import RangeSlider from './RangeSlider';
 import { useSelector } from 'react-redux';
 import { selectSettings } from '../../store/user/UserSettings';
-import { useGetUserSettingsQuery, useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
+import {
+  useGetUserSettingsQuery,
+  useRestoreSettingsMutation,
+  useUpdateUserSettingsMutation,
+} from '../../store/user/userSettingsApi';
 import { selectAuth } from '../../store/auth/authSlice';
 import { Modal, PrimaryButton, SecondaryButton } from '../common';
 
@@ -34,6 +38,8 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
 
   useGetUserSettingsQuery(id);
   const [updateUserSettings, { isLoading, isSuccess }] = useUpdateUserSettingsMutation();
+  const [restoreSettings] = useRestoreSettingsMutation();
+ 
   useEffect(() => {
     if (settingsState) setSettings(settingsState);
   }, [settingsState]);
@@ -79,7 +85,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
               </button>
             </div>
             <div className="button__container">
-              <button onClick={() => setIsShowSaveSettingModal(true)}>
+              <button onClick={handleSaveSettings}>
                 Save Settings <CircularProgress size="medium" />
               </button>
             </div>
@@ -528,7 +534,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
         footer={
           <>
             <PrimaryButton text="Cancel" onClick={() => setIsShowRestoreSettingModal(false)} />
-            <SecondaryButton text="Restore Settings" />
+            <SecondaryButton text="Restore Settings" onClick={() => restoreSettings(id)} />
           </>
         }
       />
@@ -540,7 +546,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
         footer={
           <>
             <SecondaryButton onClick={closeDrawer} text="Abandon and close" />
-            <PrimaryButton text="Save and close" onclick={handleSaveSettings} />
+            <PrimaryButton text="Save and close" onClick={handleSaveSettings} />
           </>
         }
       />
