@@ -96,7 +96,7 @@ export class SettingsService {
         const settings = this.userSettingsRepository.create(modified_dto);
         res = await this.userSettingsRepository.save(settings);
       }
-      let { id, ...userSettings } = res;
+      const { id, ...userSettings } = res;
       const modifiedData = getModifiedData(userSettings);
       return modifiedData;
     } catch (error) {
