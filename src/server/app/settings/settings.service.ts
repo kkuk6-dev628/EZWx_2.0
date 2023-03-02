@@ -106,7 +106,6 @@ export class SettingsService {
   async restore(user_id: number) {
     try {
       let res;
-      console.log('user_id', user_id)
       try {
         res = await this.userSettingsRepository.findOne({
           where: {

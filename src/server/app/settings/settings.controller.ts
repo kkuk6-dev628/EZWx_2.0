@@ -6,7 +6,6 @@ import { CreateUserSettingsDto, UpdateUserSettingsDto } from './dto/create_setti
 export class SettingsController {
   constructor(private settingService: SettingsService) {}
 
-  
   @Get(':user_id')
   find(@Param('user_id') user_id: string) {
     return this.settingService.find(+user_id);

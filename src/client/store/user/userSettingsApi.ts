@@ -53,7 +53,7 @@ const userSettingsApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
           if (JSON.parse(JSON.stringify(result)).data) {
-            console.log('none')
+            console.log('none');
             toast.success('Settings Saved!', {
               position: 'top-right',
               duration: 3000,

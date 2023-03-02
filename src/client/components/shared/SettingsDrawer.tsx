@@ -39,7 +39,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   useGetUserSettingsQuery(id);
   const [updateUserSettings, { isLoading, isSuccess }] = useUpdateUserSettingsMutation();
   const [restoreSettings] = useRestoreSettingsMutation();
- 
+
   useEffect(() => {
     if (settingsState) setSettings(settingsState);
   }, [settingsState]);
