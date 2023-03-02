@@ -96,8 +96,8 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
               </button>
             </div>
             <div className="button__container">
-              <button onClick={handleSaveSettings}>
-                Save Settings <CircularProgress size="medium" />
+              <button onClick={() => handleSaveSettings(false)}>
+                Save Settings {isUpdating && <CircularProgress size={10} sx={{ color: 'white' }} />}
               </button>
             </div>
           </div>
@@ -544,8 +544,8 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
         description="Are you sure you want to restore these settings back to the factory default?"
         footer={
           <>
-            <PrimaryButton text="Cancel" onClick={() => setIsShowRestoreSettingModal(false)} />
-            <SecondaryButton text="Restore Settings" onClick={() => restoreSettings(id)} />
+            <PrimaryButton text="Cancel" onClick={() => setIsShowRestoreSettingModal(false)} isLoading={false} />
+            <SecondaryButton text="Restore Settings" onClick={() => restoreSettings(id)} isLoading={isRestoring} />
           </>
         }
       />
@@ -556,8 +556,8 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
         description="You have changes to your settings that have not been saved. Do you want to save these changes?"
         footer={
           <>
-            <SecondaryButton onClick={closeDrawer} text="Abandon and close" />
-            <PrimaryButton text="Save and close" onClick={() => handleSaveSettings(true)} />
+            <SecondaryButton onClick={closeDrawer} text="Abandon and close" isLoading={false} />
+            <PrimaryButton text="Save and close" onClick={() => handleSaveSettings(true)} isLoading={isUpdating} />
           </>
         }
       />
