@@ -37,16 +37,19 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const [settings, setSettings] = useState(settingsState);
 
   useGetUserSettingsQuery(id);
-  const [updateUserSettings, { isLoading:isUpdating, isSuccess }] = useUpdateUserSettingsMutation();
+  const [updateUserSettings, { isLoading: isUpdating, isSuccess }] = useUpdateUserSettingsMutation();
   const [restoreSettings, { isLoading: isRestoring }] = useRestoreSettingsMutation();
 
   useEffect(() => {
     if (settingsState) setSettings(settingsState);
   }, [settingsState]);
-  
+
   useEffect(() => {
-    if (!isRestoring) setIsShowRestoreSettingModal(false);
-  }, [isRestoring]);
+    if (!isRestoring || isUpdating) {
+      setIsShowSaveSettingModal(false);
+      setIsShowRestoreSettingModal(false);
+    }
+  }, [isRestoring, isUpdating]);
 
   const handleCloseDrawer = () => {
     if (JSON.stringify(settings) !== JSON.stringify(settingsState)) {
@@ -70,8 +73,11 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
     setSettings({ ...settings, [e.target.name]: e.target.checked });
   };
 
-  const handleSaveSettings = () => {
-    if (id) updateUserSettings({ ...settings, user_id: id });
+  const handleSaveSettings = async (isCloseDrawer = false) => {
+    if (id) {
+      await updateUserSettings({ ...settings, user_id: id });
+      if (isCloseDrawer) closeDrawer();
+    }
   };
 
   return (
@@ -551,7 +557,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
         footer={
           <>
             <SecondaryButton onClick={closeDrawer} text="Abandon and close" />
-            <PrimaryButton text="Save and close" onClick={handleSaveSettings} />
+            <PrimaryButton text="Save and close" onClick={() => handleSaveSettings(true)} />
           </>
         }
       />
