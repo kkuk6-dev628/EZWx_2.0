@@ -64,13 +64,7 @@ export const convertTimeFormat = (time: string, useLocalTime: boolean) => {
       month: 'short',
       year: 'numeric',
       timeZone: 'UTC',
-    })} ${dateObj.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      timeZoneName: 'short',
-      timeZone: 'UTC',
-    })}`;
+    })} ${simpleTimeOnlyFormat(dateObj, false)}`;
   }
 };
 
@@ -207,7 +201,7 @@ export const calcRelativeHumidity = (temperature: number, dewpoint: number): num
 };
 
 export const getAirportNameById = (id: string, airportsData: any[]): string => {
-  if (airportsData) return;
+  if (!airportsData) return;
   let airport = airportsData.find((item) => {
     return item.key === id;
   });

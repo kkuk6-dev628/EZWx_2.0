@@ -83,7 +83,7 @@ function signup() {
       return 'Password is required';
     }
 
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\da-zA-Z]).{6,}$/;
     return passwordRegex.test(value)
       ? true
       : 'Password must be at least 6 characters and contain at least one upper case (A-Z), one lower case (a-z), one number (0-9) and one special character (e.g. !@#$%^&*-,.)';
