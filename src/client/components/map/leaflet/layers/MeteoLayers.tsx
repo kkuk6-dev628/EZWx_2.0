@@ -33,7 +33,8 @@ import { InBaseLayerControl } from '../layer-control/BaseMapLayerControl';
 import RadarLayer from './RadarLayer';
 import { StationMarkersLayer } from './StationMarkersLayer';
 import StationForecastPopup from '../popups/StationForecastPopup';
-import { useGetAirportQuery } from '../../../../store/airports/airportApi';
+import { useGetAirportQuery } from '../../../../store/route/airportApi';
+import { useGetWaypointsQuery } from '../../../../store/route/waypointApi';
 
 const maxLayers = 6;
 
@@ -42,7 +43,8 @@ const MeteoLayers = () => {
   const debugLayerGroupRef = useRef(null);
   const metarLayerStatus = useSelector(selectMetar);
   const personalMinimums = useSelector(selectPersonalMinimums);
-  const { isLoading, data: airportsData } = useGetAirportQuery('');
+  const { data: airportsData } = useGetAirportQuery('');
+  const { data: waypointsData } = useGetWaypointsQuery('');
   const settingsState = useSelector(selectSettings);
 
   // const fetchAirports = () => {

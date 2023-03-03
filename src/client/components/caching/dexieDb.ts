@@ -27,6 +27,8 @@ export class EzwxBriefDexie extends Dexie {
       usProvinces: 'id',
       canadianProvinces: 'id',
       countyWarningAreas: 'id',
+      airports: '++id',
+      waypoints: '++id',
       station_1: '++id',
       station_2: '++id',
       station_3: '++id',

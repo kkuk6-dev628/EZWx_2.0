@@ -144,10 +144,10 @@ function LeafletMap() {
           zoomInText={ReactDOMServer.renderToString(<SvgRoundPlus></SvgRoundPlus>)}
           zoomOutText={ReactDOMServer.renderToString(<SvgRoundMinus></SvgRoundMinus>)}
         />
+        {isShowModal && <Route setIsShowModal={setIsShowModal} />}
       </MapContainer>
 
       {isShowTabs && <MapTabs tabMenus={tabMenus} />}
-      {isShowModal && <Route setIsShowModal={setIsShowModal} />}
       {isShowDateModal && <DateSliderModal setIsShowDateModal={setIsShowDateModal} />}
       <CollapsibleBar />
     </div>

@@ -1,21 +1,18 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
 import React, { KeyboardEvent, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
-import { useGetAirportQuery } from '../../store/airports/airportApi';
+import { RoutePoint, useGetAirportQuery } from '../../store/route/airportApi';
 import { matchLowerCaseRegex } from '../utils/RegexUtils';
 interface Props {
-  selectedValue: string;
+  selectedValue: RoutePoint;
   name: string;
-  handleAutoComplete: (name: string, value: string) => void;
+  handleAutoComplete: (name: string, value: RoutePoint) => void;
 }
 
-interface airportObj {
-  name: string;
-  key: string;
-}
 const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) => {
   const [currentFocus, setCurrentFocus] = useState(0);
-  const [value, setValue] = useState(selectedValue);
+  const [value, setValue] = useState(selectedValue ? selectedValue.key + '-' + selectedValue.name : '');
   const [showSuggestion, setShowSuggestion] = useState(false);
   const parentRef = useRef(null);
 
@@ -25,18 +22,20 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) =
     try {
       if (isLoading) return [];
       return airports
-        .filter((obj: airportObj) => obj.key.includes(val))
-        .map((obj: airportObj, ind: number) => {
+        .filter((obj: RoutePoint) => obj.key.includes(val))
+        .map((obj: RoutePoint, ind: number) => {
           const title: string = obj.key + ' - ' + obj.name;
           return (
             <span
               onClick={() => {
-                handleAutoComplete(name, title);
+                handleAutoComplete(name, obj);
                 setShowSuggestion(false);
               }}
               className={currentFocus === ind ? 'list__item focused' : 'list__item'}
               key={ind}
               id={title}
+              // @ts-ignore
+              obj={obj}
             >
               {title}
             </span>
@@ -74,7 +73,7 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) =
         case 'Enter':
           const filteredResult = renderItem(name, value);
           if (filteredResult.length > 0 && currentFocus + 1 <= filteredResult.length && value !== '') {
-            handleAutoComplete(name, filteredResult[currentFocus].props.id);
+            handleAutoComplete(name, filteredResult[currentFocus].props.obj);
             setShowSuggestion(false);
           }
           break;
@@ -106,17 +105,18 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) =
   };
 
   const handleClose = () => {
-    handleAutoComplete(name, '');
+    handleAutoComplete(name, null);
     setShowSuggestion(false);
     setValue('');
     setCurrentFocus(0);
   };
-  console.log('selectedValue', selectedValue);
   return (
     <>
       <div className="auto_complete__input__container">
         {selectedValue ? (
-          <span className="auto__complete__label">{selectedValue}</span>
+          <span className="auto__complete__label">
+            {selectedValue.key} - {selectedValue.name}
+          </span>
         ) : (
           <input
             type="text"

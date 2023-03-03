@@ -1,18 +1,16 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
 import React, { KeyboardEvent, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
-import { useGetAirportQuery } from '../../store/airports/airportApi';
+import { RoutePoint, useGetAirportQuery } from '../../store/route/airportApi';
+import { useGetWaypointsQuery } from '../../store/route/waypointApi';
 import { matchLowerCaseRegex } from '../utils/RegexUtils';
 interface Props {
   name: string;
-  handleAutoComplete: (name: string, value: string[]) => void;
-  selectedValues: string[];
+  handleAutoComplete: (name: string, value: RoutePoint[]) => void;
+  selectedValues: any[];
 }
 
-interface airportObj {
-  name: string;
-  key: string;
-}
 const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) => {
   const [inputValue, setInputValue] = useState('');
   const [showSuggestion, setShowSuggestion] = useState(false);
@@ -22,29 +20,36 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
   const dragItem = useRef();
   const dragOverItem = useRef();
   const { isLoading, data: airports } = useGetAirportQuery('');
+  const { isLoading: isLoadingWaypoints, data: waypoints } = useGetWaypointsQuery('');
 
   const renderItem = (name: string, val: string) => {
     try {
-      if (isLoading) return [];
-      return airports
-        .filter((obj: airportObj) => obj.key.includes(val))
-        .map((obj: airportObj, ind: number) => {
-          const title: string = obj.key + ' - ' + obj.name;
-          return (
-            <span
-              onClick={() => {
-                handleAutoComplete(name, [...selectedValues, obj.key]);
-                setShowSuggestion(false);
-                setInputValue('');
-              }}
-              id={obj.key}
-              className={ind === currentFocus ? 'list__item   focused' : 'list__item'}
-              key={obj.key + ind}
-            >
-              {title}
-            </span>
-          );
-        });
+      const filteredItems = [];
+      if (!isLoading) {
+        filteredItems.push(...airports.filter((obj: RoutePoint) => obj.key.includes(val)));
+      }
+      if (!isLoadingWaypoints) {
+        filteredItems.push(...waypoints.filter((item) => item.key.includes(val)));
+      }
+      return filteredItems.map((obj: RoutePoint, ind: number) => {
+        const title: string = obj.key + ' - ' + obj.name;
+        return (
+          <span
+            onClick={() => {
+              handleAutoComplete(name, [...selectedValues, obj]);
+              setShowSuggestion(false);
+              setInputValue('');
+            }}
+            id={obj.key}
+            // @ts-ignore
+            obj={obj}
+            className={ind === currentFocus ? 'list__item   focused' : 'list__item'}
+            key={obj.key + ind}
+          >
+            {title}
+          </span>
+        );
+      });
     } catch (error) {
       console.error('Render item error', error);
       return [];
@@ -53,7 +58,6 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
 
   const dragStart = (e, position) => {
     dragItem.current = position;
-    console.log(e.target.innerHTML);
   };
 
   const dragEnter = (e, position) => {
@@ -108,7 +112,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
         case 'Enter':
           const filteredResult = renderItem(name, inputValue);
           if (filteredResult.length > 0 && currentFocus + 1 <= filteredResult.length && inputValue !== '') {
-            handleAutoComplete(name, [...selectedValues, filteredResult[currentFocus].props.id]);
+            handleAutoComplete(name, [...selectedValues, filteredResult[currentFocus].props.obj]);
             setInputValue('');
           }
 
@@ -161,7 +165,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
               onTouchEnd={drop}
               // style={{ touchAction: 'none' }}
             >
-              {el}
+              {el.key}
               <AiOutlineClose
                 className="close__btn"
                 onClick={() =>

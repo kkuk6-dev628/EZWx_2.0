@@ -1,3 +1,4 @@
+import { FeatureCollection } from 'geojson';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const baseUrl = getUrl();
@@ -16,22 +17,13 @@ function getUrl(): any {
   url.searchParams.set('v', '1');
   return url;
 }
-type Property = {
-  faaid: string | null;
-  icaoid: string | null;
-  name: string | null;
-};
 
-type Feature = {
-  geometry: any;
-  id: string;
-  properties: Property;
+export interface RoutePoint {
+  key: string;
+  name: string;
   type: string;
-};
-
-type Response = {
-  features: Feature[];
-};
+  geom: GeoJSON.Point;
+}
 
 export const airportApi = createApi({
   reducerPath: 'airportApi',
@@ -39,14 +31,24 @@ export const airportApi = createApi({
   endpoints: (builder) => ({
     getAirport: builder.query({
       query: () => ({ url: '', method: 'Get' }),
-      transformResponse: (response: Response) => {
-        return response?.features.reduce((acc, feature) => {
+      transformResponse: (response: FeatureCollection) => {
+        return response?.features.reduce((acc: RoutePoint[], feature) => {
           if (feature.properties.name !== '') {
             if (feature.properties.faaid) {
-              acc.push({ key: feature.properties.faaid, name: feature.properties.name, property: 'faaid' });
+              acc.push({
+                key: feature.properties.faaid,
+                name: feature.properties.name,
+                type: 'faaid',
+                geom: feature.geometry as GeoJSON.Point,
+              });
             }
             if (feature.properties.icaoid) {
-              acc.push({ key: feature.properties.icaoid, name: feature.properties.name, property: 'icaoid' });
+              acc.push({
+                key: feature.properties.icaoid,
+                name: feature.properties.name,
+                type: 'icaoid',
+                geom: feature.geometry as GeoJSON.Point,
+              });
             }
           }
           return acc;

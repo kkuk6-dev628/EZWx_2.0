@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineClose, AiOutlineCloseCircle } from 'react-icons/ai';
 import { BsBookmarkPlus } from 'react-icons/bs';
 import { AiOutlineMinus } from 'react-icons/ai';
 import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
 import Switch from 'react-switch';
 import { AutoCompleteInput, MultiSelectInput } from '../common/index';
+import { RoutePoint } from '../../store/route/airportApi';
+import { useMap } from 'react-leaflet';
 //i pass setIsShowModal as a prop to the modal component
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
@@ -15,38 +17,60 @@ const ROUTE_OF_FLIGHT = 'routeOfFlight';
 const DESTINATION = 'destination';
 
 type FormData = {
-  departure: string;
-  routeOfFlight: string[];
-  destination: string;
+  departure: RoutePoint;
+  routeOfFlight: RoutePoint[];
+  destination: RoutePoint;
+  altitude: number;
+  useForecastWinds: boolean;
+};
+
+const emptyFormData: FormData = {
+  departure: null,
+  routeOfFlight: [],
+  destination: null,
+  altitude: 10000,
+  useForecastWinds: true,
 };
 
 function Route({ setIsShowModal }: Props) {
-  const [checked, setChecked] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
-    departure: '',
-    routeOfFlight: [],
-    destination: '',
-  });
+  const map = useMap();
+  const [formData, setFormData] = useState(emptyFormData);
+  const ref = useRef();
 
-  const handleChange = (nextChecked) => {
-    setChecked(nextChecked);
+  useEffect(() => {
+    L.DomEvent.disableClickPropagation(ref.current);
+    L.DomEvent.disableScrollPropagation(ref.current);
+    L.DomEvent.on(ref.current, 'mousemove contextmenu', L.DomEvent.stop);
+  }, []);
+
+  const handleUseForecastWindsChange = () => {
+    setFormData({ ...formData, useForecastWinds: !formData.useForecastWinds });
   };
 
-  const handleAutoComplete = (name: string, val: string) => {
+  const handleAutoComplete = (name: string, val: RoutePoint) => {
     setFormData({
       ...formData,
       [name]: val,
     });
   };
-  const handleMultiSelectInsertion = (name: string, val: string[]) => {
+  const handleMultiSelectInsertion = (name: string, val: RoutePoint[]) => {
     setFormData({
       ...formData,
       [name]: val,
     });
+  };
+  const handleClickOpenInMap = () => {
+    const coordinateList = [
+      formData.departure.geom.coordinates,
+      ...formData.routeOfFlight.map((item) => item.geom.coordinates),
+      formData.destination.geom.coordinates,
+    ];
+    const latlngs = L.GeoJSON.coordsToLatLngs(coordinateList);
+    const polyline = L.polyline(latlngs, { color: 'red' }).addTo(map);
   };
 
   return (
-    <div className="modal">
+    <div className="modal" ref={ref}>
       <div className="modal__wrp">
         <div className="modal__top">
           <p className="modal__top__text text">Enter/Edit/Delete route</p>
@@ -65,7 +89,13 @@ function Route({ setIsShowModal }: Props) {
                 <SvgLeftRight />
                 <p className="modal__tab__text text">Reverse</p>
               </button>
-              <button className="modal__tab" type="button">
+              <button
+                className="modal__tab"
+                type="button"
+                onClick={() => {
+                  setFormData(emptyFormData);
+                }}
+              >
                 <AiOutlineCloseCircle className="modal__icon" />
                 <p className="modal__tab__text text">Clear</p>
               </button>
@@ -118,11 +148,32 @@ function Route({ setIsShowModal }: Props) {
                     Altitude (MSL)*
                   </label>
                   <div className="modal__numin">
-                    <span className="modal__lft">
+                    <span
+                      className="modal__lft"
+                      onClick={() => {
+                        setFormData({ ...formData, altitude: formData.altitude - 1 });
+                      }}
+                    >
                       <AiOutlineMinus className="modal__icon--mi" />
                     </span>
-                    <input type="number" className="modal__input__num" id="route-numin" placeholder="0" />
-                    <span className="modal__rgt">+</span>
+                    <input
+                      type="number"
+                      className="modal__input__num"
+                      id="route-numin"
+                      value={formData.altitude}
+                      onChange={(e) => {
+                        setFormData({ ...formData, altitude: parseInt(e.currentTarget.value) });
+                      }}
+                      placeholder="0"
+                    />
+                    <span
+                      className="modal__rgt"
+                      onClick={() => {
+                        setFormData({ ...formData, altitude: formData.altitude + 1 });
+                      }}
+                    >
+                      +
+                    </span>
                   </div>
                 </div>
                 <div className="table__data">
@@ -130,8 +181,8 @@ function Route({ setIsShowModal }: Props) {
                     Use Forecast Winds
                   </label>
                   <Switch
-                    checked={checked}
-                    onChange={handleChange}
+                    checked={formData.useForecastWinds}
+                    onChange={handleUseForecastWindsChange}
                     onColor="#791DC6"
                     onHandleColor="#3F0C69"
                     offColor="#fff"
@@ -147,7 +198,7 @@ function Route({ setIsShowModal }: Props) {
               </div>
             </form>
             <div className="modal__btn__grp">
-              <button className="modal__btn--btm" type="button">
+              <button className="modal__btn--btm" type="button" onClick={handleClickOpenInMap}>
                 Open in Map
               </button>
               <button className="modal__btn--btm" type="button">
