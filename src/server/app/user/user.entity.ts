@@ -8,7 +8,9 @@ import {
   ManyToMany,
   Unique,
   JoinTable,
+  OneToMany,
 } from 'typeorm';
+import { Route } from '../api/route/route.entity';
 
 @Entity()
 @Unique(['email'])
@@ -75,6 +77,9 @@ export class User {
     name: 'user_certification',
   })
   certifications: Certification[];
+
+  @OneToMany(() => Route, (route) => route.user)
+  routes: Route[];
 
   //   @OneToOne(()=>UserSettings, (UserSettings=>UserSettings.user_id))
   //  @JoinColumn()
