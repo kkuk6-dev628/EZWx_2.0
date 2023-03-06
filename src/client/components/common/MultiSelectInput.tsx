@@ -2,7 +2,8 @@
 import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
 import React, { KeyboardEvent, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
-import { RoutePoint, useGetAirportQuery } from '../../store/route/airportApi';
+import { RoutePoint } from '../../interfaces/routeInterfaces';
+import { useGetAirportQuery } from '../../store/route/airportApi';
 import { useGetWaypointsQuery } from '../../store/route/waypointApi';
 import { matchLowerCaseRegex } from '../utils/RegexUtils';
 interface Props {
@@ -163,6 +164,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
               onTouchMove={(e) => onTouchMove(e, ind)}
               onDragEnd={drop}
               onTouchEnd={drop}
+              key={'route-of-flight-' + el.key + ind}
               // style={{ touchAction: 'none' }}
             >
               {el.key}

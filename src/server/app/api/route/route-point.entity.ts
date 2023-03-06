@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { RouteOfFlight } from './route-of-flight.entity';
 import { Route } from './route.entity';
 
 @Entity('route_points')
@@ -13,7 +14,15 @@ export class RoutePoint {
   type: string;
 
   @Column()
-  order: number;
+  name: string;
+
+  @Column({
+    transformer: {
+      from: (value: string) => JSON.parse(value),
+      to: (value: any) => JSON.stringify(value),
+    },
+  })
+  position: string;
 
   @Column()
   @CreateDateColumn()
@@ -23,8 +32,18 @@ export class RoutePoint {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToOne(() => Route, (route) => route.routeOfFlight, {
+  @OneToMany(() => Route, (route) => route.departure, {
     onDelete: 'CASCADE',
   })
-  route: Route;
+  departures: Route[];
+
+  @OneToMany(() => Route, (route) => route.destination, {
+    onDelete: 'CASCADE',
+  })
+  destinations: Route[];
+
+  @OneToMany(() => RouteOfFlight, (routeOfFlight) => routeOfFlight.routePoint, {
+    onDelete: 'CASCADE',
+  })
+  routeOfFlights: RouteOfFlight[];
 }

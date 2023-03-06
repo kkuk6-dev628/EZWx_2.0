@@ -6,20 +6,17 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   ManyToOne,
+  JoinTable,
+  ManyToMany,
 } from 'typeorm';
 import { User } from '../../user/user.entity';
+import { RouteOfFlight } from './route-of-flight.entity';
 import { RoutePoint } from './route-point.entity';
 
 @Entity()
 export class Route {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column()
-  departure: string;
-
-  @Column()
-  destination: string;
 
   @Column()
   altitude: number;
@@ -35,11 +32,19 @@ export class Route {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => RoutePoint, (routePoint) => routePoint.route, {
+  @OneToMany(() => RouteOfFlight, (routeOfFlight) => routeOfFlight.route, {
     onDelete: 'CASCADE',
   })
-  routeOfFlight: RoutePoint[];
+  routeOfFlight: RouteOfFlight[];
 
-  @ManyToOne(() => User, (user) => user.routes)
+  @ManyToOne(() => RoutePoint, (routePoint) => routePoint.destinations)
+  destination: RoutePoint;
+
+  @ManyToOne(() => RoutePoint, (routePoint) => routePoint.departures)
+  departure: RoutePoint;
+
+  @ManyToOne(() => User, (user) => user.routes, {
+    onDelete: 'CASCADE',
+  })
   user: User;
 }

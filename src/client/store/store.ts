@@ -1,3 +1,5 @@
+import { routeApi } from './route/routeApi';
+import { RoutesSlice } from './route/routes';
 import BaseMapLayerControlSlice from './layers/BaseMapLayerControl';
 import UserSettingsSlice from './user/UserSettings';
 import { LayerControlSlice } from './layers/LayerControl';
@@ -16,6 +18,8 @@ const makeStore = () =>
       [ObsIntervalSlice.name]: ObsIntervalSlice.reducer,
       [airportApi.reducerPath]: airportApi.reducer,
       [waypointApi.reducerPath]: waypointApi.reducer,
+      [routeApi.reducerPath]: routeApi.reducer,
+      [RoutesSlice.name]: RoutesSlice.reducer,
       [ObsTimeSlice.name]: ObsTimeSlice.reducer,
       [apiSlice.reducerPath]: apiSlice.reducer,
       [authSlice.name]: authSlice.reducer,
@@ -24,8 +28,11 @@ const makeStore = () =>
       [BaseMapLayerControlSlice.name]: BaseMapLayerControlSlice.reducer,
     },
     devTools: process.env.NODE_ENV !== 'production',
-    middleware: (getDefaultMiddlewares) =>
-      getDefaultMiddlewares().concat(apiSlice.middleware).concat(airportApi.middleware).concat(waypointApi.middleware),
+    middleware: (getDefaultMiddlewares) => {
+      const middleWares = getDefaultMiddlewares();
+      middleWares.push(apiSlice.middleware, airportApi.middleware, waypointApi.middleware, routeApi.middleware);
+      return middleWares;
+    },
   });
 
 export type AppStore = ReturnType<typeof makeStore>;

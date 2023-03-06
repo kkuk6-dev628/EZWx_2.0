@@ -2,7 +2,8 @@
 import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
 import React, { KeyboardEvent, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
-import { RoutePoint, useGetAirportQuery } from '../../store/route/airportApi';
+import { RoutePoint } from '../../interfaces/routeInterfaces';
+import { useGetAirportQuery } from '../../store/route/airportApi';
 import { matchLowerCaseRegex } from '../utils/RegexUtils';
 interface Props {
   selectedValue: RoutePoint;

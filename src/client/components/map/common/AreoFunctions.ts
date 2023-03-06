@@ -1,3 +1,4 @@
+import { Route, RoutePoint } from './../../../store/route/routes';
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { PersonalMinimums } from './../../../store/user/UserSettings';
 import { cacheStartTime, WeatherCausings } from './AreoConstants';
@@ -214,6 +215,42 @@ export const getAirportNameById = (id: string, airportsData: any[]): string => {
     return airport.name;
   }
   return null;
+};
+
+export const validateRoute = (route: Route): boolean => {
+  if (route.departure && route.destination) return true;
+  return false;
+};
+
+export const isSameRoutePoints = (routePoint1: RoutePoint, routePoint2: RoutePoint): boolean => {
+  return routePoint1.key === routePoint2.key && routePoint1.type === routePoint2.type;
+};
+
+export const isSameRoutes = (route1: Route, route2: Route): boolean => {
+  if (!route1 && route2) {
+    return false;
+  }
+  if (route1 && !route2) {
+    return false;
+  }
+  if (!route1 && !route2) {
+    return true;
+  }
+  if (!isSameRoutePoints(route1.departure, route2.departure)) {
+    return false;
+  }
+  if (!isSameRoutePoints(route1.destination, route2.destination)) {
+    return false;
+  }
+  if (route1.routeOfFlight.length !== route2.routeOfFlight.length) {
+    return false;
+  }
+  for (let i = 0; i < route1.routeOfFlight.length; i++) {
+    if (!isSameRoutePoints(route1.routeOfFlight[i], route2.routeOfFlight[i])) {
+      return false;
+    }
+  }
+  return true;
 };
 
 export const diffMinutes = (date1: Date, date2: Date) => {

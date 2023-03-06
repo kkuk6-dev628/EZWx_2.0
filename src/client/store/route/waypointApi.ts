@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { RoutePoint } from './airportApi';
+import { RoutePoint } from '../../interfaces/routeInterfaces';
 
 const baseUrl = getUrl();
 
@@ -30,14 +30,14 @@ export const waypointApi = createApi({
               key: feature.properties.name,
               name: feature.properties.city,
               type: 'waypoint',
-              geom: feature.geometry as GeoJSON.Point,
+              position: feature.geometry as GeoJSON.Point,
             });
           } else {
             acc.push({
               key: feature.properties.name,
               name: feature.properties.state + '/' + feature.properties.country,
               type: 'waypoint',
-              geom: feature.geometry as GeoJSON.Point,
+              position: feature.geometry as GeoJSON.Point,
             });
           }
           return acc;

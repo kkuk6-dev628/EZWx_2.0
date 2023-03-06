@@ -1,5 +1,6 @@
 import { FeatureCollection } from 'geojson';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { RoutePoint } from '../../interfaces/routeInterfaces';
 
 const baseUrl = getUrl();
 
@@ -18,13 +19,6 @@ function getUrl(): any {
   return url;
 }
 
-export interface RoutePoint {
-  key: string;
-  name: string;
-  type: string;
-  geom: GeoJSON.Point;
-}
-
 export const airportApi = createApi({
   reducerPath: 'airportApi',
   baseQuery: fetchBaseQuery({ baseUrl }),
@@ -34,20 +28,19 @@ export const airportApi = createApi({
       transformResponse: (response: FeatureCollection) => {
         return response?.features.reduce((acc: RoutePoint[], feature) => {
           if (feature.properties.name !== '') {
-            if (feature.properties.faaid) {
-              acc.push({
-                key: feature.properties.faaid,
-                name: feature.properties.name,
-                type: 'faaid',
-                geom: feature.geometry as GeoJSON.Point,
-              });
-            }
             if (feature.properties.icaoid) {
               acc.push({
                 key: feature.properties.icaoid,
                 name: feature.properties.name,
                 type: 'icaoid',
-                geom: feature.geometry as GeoJSON.Point,
+                position: feature.geometry as GeoJSON.Point,
+              });
+            } else if (feature.properties.faaid) {
+              acc.push({
+                key: feature.properties.faaid,
+                name: feature.properties.name,
+                type: 'faaid',
+                position: feature.geometry as GeoJSON.Point,
               });
             }
           }

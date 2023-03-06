@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
+import { useGetRoutesQuery } from '../../store/route/routeApi';
 import ProfileModal from '../shared/ProfileModal';
 import SettingsDrawer from '../shared/SettingsDrawer';
 import { SvgDropDown, SvgMenuBurger, SvgProfile, SvgRoundClose, SvgSave, SvgSetting, SvgWarn } from '../utils/SvgIcons';
@@ -103,6 +104,7 @@ export default function Header() {
   const [activeResponsiveMenu, setActiveResponsiveMenu] = useState(false);
   const [isUserLoginUser, setIsUserLoginUser] = useState(false);
   const [userSettingDrawer, setIsShowSettingsDrawer] = useState(false);
+  const recentRoutes = useGetRoutesQuery(null);
 
   useEffect(() => {
     if (pathname === '/try-ezwxbrief' || pathname === '/imagery') {
