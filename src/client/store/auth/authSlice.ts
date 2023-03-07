@@ -1,6 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { authUser } from '../../interfaces/users';
+import { AppState } from '../store';
 
-const initialState = {
+const initialState: authUser = {
   email: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('auth'))?.email : '',
   id: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('auth'))?.id : '',
   displayName: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('auth'))?.displayName : '',
@@ -26,6 +28,6 @@ export const authSlice = createSlice({
 
 export const { userLoggedIn, userLoggedOut } = authSlice.actions;
 
-export const selectAuth = (state) => state.auth;
+export const selectAuth = (state: AppState) => state.auth;
 
 export default authSlice;

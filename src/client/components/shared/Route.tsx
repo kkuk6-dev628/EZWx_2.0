@@ -13,6 +13,7 @@ import { useDispatch } from 'react-redux';
 import { useCreateRouteMutation, useDeleteRouteMutation, useGetRoutesQuery } from '../../store/route/routeApi';
 import { Route, RoutePoint } from '../../interfaces/routeInterfaces';
 import { useMeteoLayersContext } from '../map/leaflet/layer-control/MeteoLayerControlContext';
+import 'leaflet-arc';
 
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
@@ -105,6 +106,7 @@ function Route({ setIsShowModal }: Props) {
   };
 
   const addRoute = () => {
+    addRouteToMap();
     if (isSameRoutes(routeData, activeRoute)) {
       return;
     }
@@ -117,11 +119,14 @@ function Route({ setIsShowModal }: Props) {
       ...routeData.routeOfFlight.map((item) => item.position.coordinates),
       routeData.destination.position.coordinates,
     ];
-    const latlngs = L.GeoJSON.coordsToLatLngs(coordinateList);
-    const polyline = L.polyline(latlngs, { color: 'red' });
     meteoLayers.routeGroupLayer.clearLayers();
-    meteoLayers.routeGroupLayer.addLayer(polyline);
-    map.fitBounds(polyline.getBounds());
+    const latlngs = L.GeoJSON.coordsToLatLngs(coordinateList);
+    latlngs.reduce((a, b) => {
+      const polyline = L.Polyline.Arc(a, b, { color: '#f0fa' });
+      meteoLayers.routeGroupLayer.addLayer(polyline);
+      return b;
+    });
+    // map.fitBounds(polyline.getBounds());
   };
 
   const deleteActiveRoute = () => {

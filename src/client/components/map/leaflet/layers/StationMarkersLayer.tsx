@@ -73,7 +73,6 @@ const nbmStationProperties = [
   'vis',
   'ceil',
   'l_cloud',
-  'pre_wea',
   'cross_r_id',
   'cross_com',
   'valid_date',

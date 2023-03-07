@@ -106,9 +106,6 @@ export default function Header() {
   const [activeResponsiveMenu, setActiveResponsiveMenu] = useState(false);
   const [isUserLoginUser, setIsUserLoginUser] = useState(false);
   const [userSettingDrawer, setIsShowSettingsDrawer] = useState(false);
-  const recentRoutes = useGetRoutesQuery(null);
-  const { data: waypointsData } = useGetWaypointsQuery('');
-  const { data: airportsData } = useGetAirportQuery('');
 
   useEffect(() => {
     if (pathname === '/try-ezwxbrief' || pathname === '/imagery') {

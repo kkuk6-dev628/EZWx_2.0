@@ -28,6 +28,11 @@ import { useSelector } from 'react-redux';
 import BaseMapLayers from './layers/BaseMapLayers';
 import { selectBaseMapLayerControlShow, setBaseMapLayerControlShow } from '../../../store/layers/BaseMapLayerControl';
 import MapSearch from '../../shared/MapSearch';
+import { selectAuth } from '../../../store/auth/authSlice';
+import { toast } from 'react-hot-toast';
+import { useGetAirportQuery } from '../../../store/route/airportApi';
+import { useGetRoutesQuery } from '../../../store/route/routeApi';
+import { useGetWaypointsQuery } from '../../../store/route/waypointApi';
 
 function LeafletMap() {
   const { pathname } = useRouter();
@@ -37,6 +42,12 @@ function LeafletMap() {
   const dispatch = useDispatch();
   const meteoLayerControlShow = useSelector(selectLayerControlShow);
   const baseMapLayerControlShow = useSelector(selectBaseMapLayerControlShow);
+  const auth = useSelector(selectAuth);
+  const { data: waypointsData } = useGetWaypointsQuery('');
+  const { data: airportsData } = useGetAirportQuery('');
+  if (auth.id) {
+    useGetRoutesQuery(null);
+  }
 
   useEffect(() => {
     if (pathname === '/try-ezwxbrief') {
@@ -55,7 +66,11 @@ function LeafletMap() {
         dispatch(setBaseMapLayerControlShow(!baseMapLayerControlShow));
         break;
       case 'route':
-        setIsShowModal(true);
+        if (auth.id) {
+          setIsShowModal(true);
+        } else {
+          toast.error('Please sign in to create route!');
+        }
         break;
       case 'profile':
         setIsShowDateModal(!isShowDateModal);

@@ -10,6 +10,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
   handleRequest<TUser = any>(err: any, user: any, info: any, context: ExecutionContext, status?: any): TUser {
     const response = context.switchToHttp().getResponse();
+    const request = context.switchToHttp().getRequest();
 
     if (err || !user) {
       // console.log('unauthorized...');

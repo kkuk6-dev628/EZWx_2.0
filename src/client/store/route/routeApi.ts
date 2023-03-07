@@ -30,7 +30,7 @@ export const routeApi = createApi({
             dispatch(setActiveRoute({ ...result.data[0] }));
           }
         } catch (err) {
-          toast.error(err, {
+          toast.error('error', {
             position: 'top-right',
             duration: 3000,
           });

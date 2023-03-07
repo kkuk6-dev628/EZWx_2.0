@@ -35,7 +35,7 @@ function ProfileModal({ handleProfileModal, setIsUserLoginUser }: ProfileModalPr
       .then((res) => {
         console.log(res.data);
         dispatch(userLoggedOut());
-        router.push('/home');
+        window.location.href = '/home';
       })
       .catch((err) => console.log(err.message));
   };
