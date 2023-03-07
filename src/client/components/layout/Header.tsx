@@ -163,7 +163,7 @@ export default function Header() {
             <div className="header__lft">
               <Link href="/home">
                 <div className="header__img__area">
-                  <Image src="/images/Logo.png" layout={'fill'} alt="logo" className="header__img" />
+                  <Image src="/images/Logo.png" fill alt="logo" className="header__img" />
                 </div>
               </Link>
               <button onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)} className="header__menu btn">

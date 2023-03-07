@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import Slider from '@mui/material/Slider';
-import React from 'react';
+import React, { useState } from 'react';
 import { diffMinutes, getTimeRangeStart, simpleTimeFormat } from '../map/common/AreoFunctions';
 import { useDispatch, useSelector } from 'react-redux';
 import { setObsTime } from '../../store/time-slider/ObsTimeSlice';
@@ -12,6 +12,7 @@ function CollapsibleBar() {
   const dispatch = useDispatch();
   const obsInterval = useSelector(selectObsInterval);
   const settingsState = useSelector(selectSettings);
+  const [defaultTime] = useState(new Date());
 
   const valueToTime = (value: number): Date => {
     const origin = getTimeRangeStart();
@@ -65,7 +66,7 @@ function CollapsibleBar() {
       <Slider
         key="time-range-slider"
         aria-label="Time Slider"
-        defaultValue={timeToValue(new Date())}
+        defaultValue={timeToValue(defaultTime)}
         max={84 * 12}
         valueLabelFormat={valuetext}
         step={1}
@@ -74,9 +75,6 @@ function CollapsibleBar() {
         onChange={(e) => {
           // @ts-ignore
           handleTimeChange(valueToTime(e.target.value));
-        }}
-        onChangeCommitted={(e) => {
-          // console.log(e);
         }}
       />
       <FormControl sx={{ m: 1, minWidth: 120 }} size="small">

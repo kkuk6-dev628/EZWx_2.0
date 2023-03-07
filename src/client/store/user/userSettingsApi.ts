@@ -12,7 +12,6 @@ const userSettingsApi = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const result = await queryFulfilled;
-          console.log('result', result);
           if (result.data) dispatch(setUserSettings({ ...result.data }));
         } catch (err) {
           console.error('Error: ', err);

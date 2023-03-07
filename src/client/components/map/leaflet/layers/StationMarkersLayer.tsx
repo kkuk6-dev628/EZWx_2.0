@@ -222,7 +222,6 @@ export const StationMarkersLayer = () => {
     axios
       .get('/api/station-time/findAll')
       .then((result) => {
-        console.log(result.data);
         if (!Array.isArray(result.data)) {
           console.log(result.data);
           return;
