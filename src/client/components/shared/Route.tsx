@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineClose, AiOutlineCloseCircle } from 'react-icons/ai';
 import { BsBookmarkPlus } from 'react-icons/bs';
@@ -8,9 +9,8 @@ import { AutoCompleteInput, Modal, MultiSelectInput, PrimaryButton, SecondaryBut
 import { selectActiveRoute } from '../../store/route/routes';
 import { useMap } from 'react-leaflet';
 import { useSelector } from 'react-redux';
-import { isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
-import { useDispatch } from 'react-redux';
-import { useCreateRouteMutation, useDeleteRouteMutation, useGetRoutesQuery } from '../../store/route/routeApi';
+import { addRouteToMap, isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
+import { useCreateRouteMutation, useDeleteRouteMutation } from '../../store/route/routeApi';
 import { Route, RoutePoint } from '../../interfaces/routeInterfaces';
 import { useMeteoLayersContext } from '../map/leaflet/layer-control/MeteoLayerControlContext';
 import 'leaflet-arc';
@@ -51,7 +51,7 @@ function Route({ setIsShowModal }: Props) {
       map.addLayer(groupLayer);
       meteoLayers.routeGroupLayer = groupLayer;
       if (activeRoute) {
-        addRouteToMap();
+        addRouteToMap(routeData, meteoLayers.routeGroupLayer);
       }
     }
   }, []);
@@ -106,27 +106,11 @@ function Route({ setIsShowModal }: Props) {
   };
 
   const addRoute = () => {
-    addRouteToMap();
+    addRouteToMap(routeData, meteoLayers.routeGroupLayer);
     if (isSameRoutes(routeData, activeRoute)) {
       return;
     }
     createRoute(routeData);
-  };
-
-  const addRouteToMap = () => {
-    const coordinateList = [
-      routeData.departure.position.coordinates,
-      ...routeData.routeOfFlight.map((item) => item.position.coordinates),
-      routeData.destination.position.coordinates,
-    ];
-    meteoLayers.routeGroupLayer.clearLayers();
-    const latlngs = L.GeoJSON.coordsToLatLngs(coordinateList);
-    latlngs.reduce((a, b) => {
-      const polyline = L.Polyline.Arc(a, b, { color: '#f0fa' });
-      meteoLayers.routeGroupLayer.addLayer(polyline);
-      return b;
-    });
-    // map.fitBounds(polyline.getBounds());
   };
 
   const deleteActiveRoute = () => {

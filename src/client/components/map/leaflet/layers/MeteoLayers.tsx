@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import MeteoLayerControl, { GroupedLayer } from '../layer-control/MeteoLayerControl';
-import { LayerGroup, useMapEvents } from 'react-leaflet';
+import { LayerGroup, Pane, useMapEvents } from 'react-leaflet';
 import L, { LatLng, LeafletMouseEvent } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -280,6 +280,7 @@ const MeteoLayers = () => {
         <PirepLayer></PirepLayer>
       </GroupedLayer>
       <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
+      <Pane name="route" style={{ zIndex: 690 }}></Pane>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-import { Route, RoutePoint } from './../../../store/route/routes';
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { PersonalMinimums } from './../../../store/user/UserSettings';
 import { cacheStartTime, WeatherCausings } from './AreoConstants';
@@ -8,6 +7,8 @@ import RBush from 'rbush';
 import { LatLng } from 'leaflet';
 import axios from 'axios';
 import { db } from '../../caching/dexieDb';
+import { Route, RoutePoint } from '../../../interfaces/routeInterfaces';
+import ReactDOMServer from 'react-dom/server';
 
 export const getAltitudeString = (value: string, isHundred = true, fzlbase?: string, fzltop?: string): string => {
   if (value === 'SFC' || value == '0') {
@@ -220,6 +221,35 @@ export const getAirportNameById = (id: string, airportsData: any[]): string => {
 export const validateRoute = (route: Route): boolean => {
   if (route.departure && route.destination) return true;
   return false;
+};
+
+export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
+  const coordinateList = [
+    route.departure.position.coordinates,
+    ...route.routeOfFlight.map((item) => item.position.coordinates),
+    route.destination.position.coordinates,
+  ];
+  routeGroupLayer.clearLayers();
+  const latlngs = L.GeoJSON.coordsToLatLngs(coordinateList);
+  latlngs.reduce((a, b) => {
+    //@ts-ignore
+    const polyline = L.Polyline.Arc(a, b, { color: '#f0fa', weight: 6, pane: 'route' });
+    routeGroupLayer.addLayer(polyline);
+    return b;
+  });
+  [route.departure, ...route.routeOfFlight, route.destination].forEach((routePoint) => {
+    const marker = L.marker(L.GeoJSON.coordsToLatLng(routePoint.position.coordinates as any), {
+      icon: new L.DivIcon({
+        className: 'route-label',
+        html: routePoint.key,
+        iconAnchor: [54, 10],
+        iconSize: [50, 20],
+      }),
+      pane: 'route',
+    });
+    routeGroupLayer.addLayer(marker);
+  });
+  // map.fitBounds(polyline.getBounds());
 };
 
 export const isSameRoutePoints = (routePoint1: RoutePoint, routePoint2: RoutePoint): boolean => {
