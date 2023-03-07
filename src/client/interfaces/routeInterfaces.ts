@@ -6,6 +6,7 @@ export interface RoutePoint {
 }
 
 export interface Route {
+  id?: number;
   departure: RoutePoint;
   routeOfFlight: RoutePoint[];
   destination: RoutePoint;

@@ -64,11 +64,14 @@ export class RouteService {
 
   async route(user: User, route: CreateRouteDto) {
     //@ts-ignore
-    const routeEntity = this.routeRepository.create(route);
+    const routeEntity = new Route();
+    routeEntity.useForecastWinds = route.useForecastWinds;
+    routeEntity.altitude = route.altitude;
     routeEntity.routeOfFlight = [];
     routeEntity.user = user;
     routeEntity.departure = await this.selectOrInsertRoutePoint(route.departure);
     routeEntity.destination = await this.selectOrInsertRoutePoint(route.destination);
+    console.log(routeEntity);
     await this.routeRepository.save(routeEntity);
 
     const routeOfFlights = [];
@@ -79,10 +82,16 @@ export class RouteService {
         route: routeEntity,
         routePoint: routePoint,
       });
-      this.routeFlightRepository.save(routeOfFlight);
-      routeOfFlights.push(routeOfFlight);
+      const saved = await this.routeFlightRepository.save(routeOfFlight);
+      routeOfFlights.push(saved);
     }
     routeEntity.routeOfFlight = routeOfFlights;
     return routeEntity;
+  }
+
+  async delete(id: number) {
+    const deleteRoute = await this.routeRepository.findOneBy({ id });
+    this.routeRepository.softRemove(deleteRoute);
+    return deleteRoute;
   }
 }

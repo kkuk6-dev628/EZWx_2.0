@@ -3,7 +3,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
+import { useGetAirportQuery } from '../../store/route/airportApi';
 import { useGetRoutesQuery } from '../../store/route/routeApi';
+import { useGetWaypointsQuery } from '../../store/route/waypointApi';
 import ProfileModal from '../shared/ProfileModal';
 import SettingsDrawer from '../shared/SettingsDrawer';
 import { SvgDropDown, SvgMenuBurger, SvgProfile, SvgRoundClose, SvgSave, SvgSetting, SvgWarn } from '../utils/SvgIcons';
@@ -105,6 +107,8 @@ export default function Header() {
   const [isUserLoginUser, setIsUserLoginUser] = useState(false);
   const [userSettingDrawer, setIsShowSettingsDrawer] = useState(false);
   const recentRoutes = useGetRoutesQuery(null);
+  const { data: waypointsData } = useGetWaypointsQuery('');
+  const { data: airportsData } = useGetAirportQuery('');
 
   useEffect(() => {
     if (pathname === '/try-ezwxbrief' || pathname === '/imagery') {

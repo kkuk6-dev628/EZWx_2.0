@@ -44,47 +44,7 @@ const MeteoLayers = () => {
   const metarLayerStatus = useSelector(selectMetar);
   const personalMinimums = useSelector(selectPersonalMinimums);
   const { data: airportsData } = useGetAirportQuery('');
-  const { data: waypointsData } = useGetWaypointsQuery('');
   const settingsState = useSelector(selectSettings);
-
-  // const fetchAirports = () => {
-  //   const params = {
-  //     maxFeatures: 14000,
-  //     request: 'GetFeature',
-  //     service: 'WFS',
-  //     typeName: 'EZWxBrief:airport',
-  //     version: '1.0.0',
-  //     srsName: 'EPSG:4326',
-  //     propertyName: 'icaoid,name,faaid',
-  //     cql_filter: 'faaid is not null',
-  //     outputFormat: 'application/json',
-  //     v: 1,
-  //   } as any;
-  //   axios
-  //     .get('https://eztile4.ezwxbrief.com/geoserver/EZWxBrief/ows', {
-  //       params: params,
-  //     })
-  //     .then((data) => {
-  //       if (typeof data.data === 'string') {
-  //         console.log('Aireport: Invalid json data!', data.data);
-  //       } else {
-  //         const airports = { icaoid: {}, faaid: {} };
-  //         data.data.features.forEach((feature) => {
-  //           if (!feature.properties.name) return;
-  //           if (feature.properties.faaid) {
-  //             airports.faaid[feature.properties.faaid] = feature.properties.name;
-  //           }
-  //           if (feature.properties.icaoid) {
-  //             airports.icaoid[feature.properties.icaoid] = feature.properties.name;
-  //           }
-  //         });
-  //         setAirportData(airports as any);
-  //       }
-  //     })
-  //     .catch((reason) => {
-  //       console.log('Aireport', reason);
-  //     });
-  // };
 
   const showPopup = (layer: L.GeoJSON, latlng: L.LatLng): void => {
     if (typeof layer.setStyle === 'function') {
@@ -175,7 +135,7 @@ const MeteoLayers = () => {
         debugLayerGroupRef.current.clearLayers();
       }
       Object.values(layers).forEach((layer: L.Path) => {
-        if (layer.options.interactive === false) return;
+        if (layer.options.interactive !== true) return;
         if (map.hasLayer(layer) === false) return;
         //@ts-ignore
         if (layer.resetStyle) layer.resetStyle();
@@ -319,33 +279,6 @@ const MeteoLayers = () => {
       >
         <PirepLayer></PirepLayer>
       </GroupedLayer>
-      {/* <GroupedLayer
-          checked
-          name="temperature"
-          group="Map Layers"
-          pickable={false}
-          order={7}
-        >
-          {/* <TimeDimensionLayer
-            ref={wmsLayerRef}
-            // url="https://eztile1.ezwxbrief.com/geoserver/EZWxBrief/wms?"
-            url="https://{s}.ezwxbrief.com/geoserver/EZWxBrief/wms?"
-            // url="http://3.95.80.120:8080/geoserver/EZWxBrief/wms?"
-            options={{
-              transparent: true,
-              format: 'image/png',
-              crs: CRS.EPSG4326,
-              info_format: 'application/json',
-              identify: false,
-              tiled: false,
-              subdomains: ['eztile1', 'eztile2', 'eztile3', 'eztile4'],
-              layers: 'EZWxBrief:nbm_t2m_10km',
-              // @ts-ignore
-              useCache: true,
-              // crossOrigin: true,
-            }}
-          ></TimeDimensionLayer>
-        </GroupedLayer> */}
       <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
     </div>
   );

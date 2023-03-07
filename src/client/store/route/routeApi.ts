@@ -50,7 +50,27 @@ export const routeApi = createApi({
               position: 'top-right',
               duration: 3000,
             });
-            dispatch(setActiveRoute({ ...result.data }));
+          }
+        } catch (err) {
+          toast.error(err, {
+            position: 'top-right',
+            duration: 3000,
+          });
+          console.error('Error: ', err);
+        }
+      },
+    }),
+    deleteRoute: builder.mutation({
+      query: (id) => ({ url: '/' + id, method: 'Delete' }),
+      invalidatesTags: ['Route'],
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          if (result.data) {
+            toast.success(`Route ${result.data.id} has been deleted!`, {
+              position: 'top-right',
+              duration: 3000,
+            });
           }
         } catch (err) {
           toast.error(err, {
@@ -64,4 +84,4 @@ export const routeApi = createApi({
   }),
 });
 
-export const { useGetRoutesQuery, useCreateRouteMutation } = routeApi;
+export const { useGetRoutesQuery, useCreateRouteMutation, useDeleteRouteMutation } = routeApi;

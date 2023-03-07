@@ -24,14 +24,6 @@ export class RoutePoint {
   })
   position: string;
 
-  @Column()
-  @CreateDateColumn()
-  created_at: Date;
-
-  @Column()
-  @UpdateDateColumn()
-  updated_at: Date;
-
   @OneToMany(() => Route, (route) => route.departure, {
     onDelete: 'CASCADE',
   })

@@ -2,8 +2,9 @@
   .dialog__box {
     position: absolute;
     background: white;
-    top: 30%;
-    left: 30%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     min-width: 300px;
     max-width: 500px;
     // min-height: 300px;

@@ -4,14 +4,15 @@ import { BsBookmarkPlus } from 'react-icons/bs';
 import { AiOutlineMinus } from 'react-icons/ai';
 import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
 import Switch from 'react-switch';
-import { AutoCompleteInput, MultiSelectInput } from '../common/index';
+import { AutoCompleteInput, Modal, MultiSelectInput, PrimaryButton, SecondaryButton } from '../common/index';
 import { selectActiveRoute } from '../../store/route/routes';
 import { useMap } from 'react-leaflet';
 import { useSelector } from 'react-redux';
 import { isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
 import { useDispatch } from 'react-redux';
-import { useCreateRouteMutation, useGetRoutesQuery } from '../../store/route/routeApi';
+import { useCreateRouteMutation, useDeleteRouteMutation, useGetRoutesQuery } from '../../store/route/routeApi';
 import { Route, RoutePoint } from '../../interfaces/routeInterfaces';
+import { useMeteoLayersContext } from '../map/leaflet/layer-control/MeteoLayerControlContext';
 
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
@@ -31,17 +32,34 @@ const emptyFormData: Route = {
 
 function Route({ setIsShowModal }: Props) {
   const map = useMap();
-  const dispatch = useDispatch();
   const activeRoute = useSelector(selectActiveRoute);
-  const [createRoute, createdRoute] = useCreateRouteMutation();
+  const [createRoute] = useCreateRouteMutation();
+  const [deleteRoute] = useDeleteRouteMutation();
   const [routeData, setRouteData] = useState(activeRoute || emptyFormData);
   const ref = useRef();
+  const meteoLayers = useMeteoLayersContext();
+  const [forceRerenderKey, setForceRerenderKey] = useState(Date.now());
+  const [isShowDeleteRouteModal, setIsShowDeleteRouteModal] = useState(false);
 
   useEffect(() => {
     L.DomEvent.disableClickPropagation(ref.current);
     L.DomEvent.disableScrollPropagation(ref.current);
-    L.DomEvent.on(ref.current, 'mousemove contextmenu', L.DomEvent.stop);
+    // L.DomEvent.on(ref.current, 'mousemove contextmenu', L.DomEvent.stop);
+    if (!meteoLayers.routeGroupLayer) {
+      const groupLayer = new L.LayerGroup();
+      map.addLayer(groupLayer);
+      meteoLayers.routeGroupLayer = groupLayer;
+      if (activeRoute) {
+        addRouteToMap();
+      }
+    }
   }, []);
+
+  useEffect(() => {
+    if (activeRoute) {
+      setRouteData(activeRoute);
+    }
+  }, [activeRoute]);
 
   const handleUseForecastWindsChange = () => {
     setRouteData({ ...routeData, useForecastWinds: !routeData.useForecastWinds });
@@ -62,19 +80,16 @@ function Route({ setIsShowModal }: Props) {
   const handleClickOpenInMap = () => {
     if (validateRoute(routeData)) {
       addRoute();
-      const coordinateList = [
-        routeData.departure.position.coordinates,
-        ...routeData.routeOfFlight.map((item) => item.position.coordinates),
-        routeData.destination.position.coordinates,
-      ];
-      const latlngs = L.GeoJSON.coordsToLatLngs(coordinateList);
-      const polyline = L.polyline(latlngs, { color: 'red' }).addTo(map);
+      setIsShowModal(false);
     }
   };
   const handleClickOpenInProfile = () => {
     if (validateRoute(routeData)) {
       addRoute();
     }
+  };
+  const handleClickDelete = () => {
+    setIsShowDeleteRouteModal(true);
   };
   const handleClickReverse = () => {
     setRouteData({
@@ -84,8 +99,9 @@ function Route({ setIsShowModal }: Props) {
       routeOfFlight: [...routeData.routeOfFlight].reverse(),
     });
   };
-  const handleClickDelete = () => {
-    deleteActiveRoute();
+  const handleClickClear = () => {
+    setRouteData(emptyFormData);
+    setForceRerenderKey(Date.now());
   };
 
   const addRoute = () => {
@@ -95,9 +111,23 @@ function Route({ setIsShowModal }: Props) {
     createRoute(routeData);
   };
 
+  const addRouteToMap = () => {
+    const coordinateList = [
+      routeData.departure.position.coordinates,
+      ...routeData.routeOfFlight.map((item) => item.position.coordinates),
+      routeData.destination.position.coordinates,
+    ];
+    const latlngs = L.GeoJSON.coordsToLatLngs(coordinateList);
+    const polyline = L.polyline(latlngs, { color: 'red' });
+    meteoLayers.routeGroupLayer.clearLayers();
+    meteoLayers.routeGroupLayer.addLayer(polyline);
+    map.fitBounds(polyline.getBounds());
+  };
+
   const deleteActiveRoute = () => {
-    // dispatch(deleteRoute(activeRoute.id));
-    setRouteData(emptyFormData);
+    meteoLayers.routeGroupLayer.clearLayers();
+    deleteRoute(activeRoute.id);
+    handleClickClear();
   };
 
   return (
@@ -120,13 +150,7 @@ function Route({ setIsShowModal }: Props) {
                 <SvgLeftRight />
                 <p className="modal__tab__text text">Reverse</p>
               </button>
-              <button
-                className="modal__tab"
-                type="button"
-                onClick={() => {
-                  setRouteData(emptyFormData);
-                }}
-              >
+              <button className="modal__tab" type="button" onClick={handleClickClear}>
                 <AiOutlineCloseCircle className="modal__icon" />
                 <p className="modal__tab__text text">Clear</p>
               </button>
@@ -144,6 +168,7 @@ function Route({ setIsShowModal }: Props) {
                   name={DEPARTURE}
                   selectedValue={routeData[DEPARTURE]}
                   handleAutoComplete={handleAutoComplete}
+                  key={'departure-' + forceRerenderKey}
                   // handleCloseSuggestion={handleCloseSuggestion}
                   // showSuggestion={formData[DEPARTURE_SUGGESTION]}
                 />
@@ -157,6 +182,7 @@ function Route({ setIsShowModal }: Props) {
                   name={ROUTE_OF_FLIGHT}
                   selectedValues={routeData[ROUTE_OF_FLIGHT]}
                   handleAutoComplete={handleMultiSelectInsertion}
+                  key={'path-' + forceRerenderKey}
                 />
               </div>
 
@@ -168,6 +194,7 @@ function Route({ setIsShowModal }: Props) {
                   name={DESTINATION}
                   selectedValue={routeData[DESTINATION]}
                   handleAutoComplete={handleAutoComplete}
+                  key={'destination-' + forceRerenderKey}
                   // handleCloseSuggestion={handleCloseSuggestion}
                   // showSuggestion={formData[DESTINATION_SUGGESTION]}
                 />
@@ -240,6 +267,18 @@ function Route({ setIsShowModal }: Props) {
           </div>
         </div>
       </div>
+      <Modal
+        open={isShowDeleteRouteModal}
+        handleClose={() => setIsShowDeleteRouteModal(false)}
+        title="Delete Route Confirmation"
+        description="Are you sure to delete current active route?"
+        footer={
+          <>
+            <SecondaryButton onClick={() => setIsShowDeleteRouteModal(false)} text="No" isLoading={false} />
+            <PrimaryButton text="Yes" onClick={() => deleteActiveRoute()} isLoading={false} />
+          </>
+        }
+      />
     </div>
   );
 }

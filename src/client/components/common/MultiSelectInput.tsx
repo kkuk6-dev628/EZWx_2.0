@@ -188,6 +188,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
             id="route-name"
             onKeyDown={handleKeyDown}
             placeholder="ENTER WAYPOINT IDS"
+            autoComplete="off"
           />
         </div>
 

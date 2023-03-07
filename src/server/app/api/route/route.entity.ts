@@ -8,6 +8,7 @@ import {
   ManyToOne,
   JoinTable,
   ManyToMany,
+  DeleteDateColumn,
 } from 'typeorm';
 import { User } from '../../user/user.entity';
 import { RouteOfFlight } from './route-of-flight.entity';
@@ -32,6 +33,9 @@ export class Route {
   @UpdateDateColumn()
   updated_at: Date;
 
+  @DeleteDateColumn()
+  deleted_at?: Date;
+
   @OneToMany(() => RouteOfFlight, (routeOfFlight) => routeOfFlight.route, {
     onDelete: 'CASCADE',
   })
@@ -43,8 +47,6 @@ export class Route {
   @ManyToOne(() => RoutePoint, (routePoint) => routePoint.departures)
   departure: RoutePoint;
 
-  @ManyToOne(() => User, (user) => user.routes, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => User, (user) => user.routes)
   user: User;
 }

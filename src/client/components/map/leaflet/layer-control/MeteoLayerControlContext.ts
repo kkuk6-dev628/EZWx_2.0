@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { Layer } from 'leaflet';
+import { Layer, LayerGroup } from 'leaflet';
 
 export interface MeteoLayers {
   metar: Layer;
@@ -11,6 +11,7 @@ export interface MeteoLayers {
   convectiveOutlooks: Layer;
   cwa: Layer;
   gairmet: Layer;
+  routeGroupLayer: LayerGroup;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
