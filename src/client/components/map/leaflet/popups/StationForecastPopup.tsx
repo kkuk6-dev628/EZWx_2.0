@@ -65,8 +65,9 @@ const StationForecastPopup = ({
     return a.cloudBase > b.cloudBase ? 1 : -1;
   });
   const airportName = toTitleCase(
-    getAirportNameById(feature.properties.icaoid, airportsData) ||
-      getAirportNameById(feature.properties.faaid, airportsData),
+    feature.properties.icaoid
+      ? getAirportNameById(feature.properties.icaoid, airportsData)
+      : getAirportNameById(feature.properties.faaid, airportsData),
   );
   let vimi = feature.properties.vis;
   if (vimi >= 4) {

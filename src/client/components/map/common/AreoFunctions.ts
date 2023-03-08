@@ -207,7 +207,7 @@ export const getAirportNameById = (id: string, airportsData: any[]): string => {
   let airport = airportsData.find((item) => {
     return item.key === id;
   });
-  if (!airport) {
+  if (!airport && id) {
     airport = airportsData.find((item) => {
       return item.key === id.slice(1);
     });
