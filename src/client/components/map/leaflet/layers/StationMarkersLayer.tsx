@@ -24,6 +24,7 @@ import {
 } from '../../common/AreoFunctions';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
+import { selectActiveRoute } from '../../../../store/route/routes';
 
 const metarsProperties = [
   'wkb_geometry',
@@ -152,6 +153,7 @@ export const StationMarkersLayer = () => {
   const observationTime = useSelector(selectObsTime);
   const [isPast, setIsPast] = useState(true);
   const [renderedTime, setRenderedTime] = useState(Date.now());
+  const activeRoute = useSelector(selectActiveRoute);
 
   const geojsonLayerRef = useRef();
 
@@ -254,6 +256,18 @@ export const StationMarkersLayer = () => {
     // const nbmStationsClone = { ...nbmStations };
     nbmStations[datasetName] = features;
     // setNbmStations(nbmStationsClone);
+  };
+
+  const unSimplifyFilter = (feature) => {
+    if (!activeRoute) return false;
+    const routePoints = [activeRoute.departure, activeRoute.destination, ...activeRoute.routeOfFlight];
+    const index = routePoints.findIndex((routePoint) => {
+      if (feature.properties.station_id) {
+        return feature.properties.station_id.indexOf(routePoint.key) > -1;
+      }
+      return feature.properties.icaoid == routePoint.key || feature.properties.faaid == routePoint.key;
+    });
+    return index > -1;
   };
 
   const buildIndexedData = (features: GeoJSON.Feature[]): any => {
@@ -1147,6 +1161,7 @@ export const StationMarkersLayer = () => {
           interactive={true}
           pointToLayer={pointToLayer}
           bubblingMouseEvents={true}
+          unSimplifyFilter={unSimplifyFilter}
         ></SimplifiedMarkersLayer>
       )}
     </Pane>

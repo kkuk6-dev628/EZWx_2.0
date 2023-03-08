@@ -2,12 +2,12 @@
 import { PersonalMinimums } from './../../../store/user/UserSettings';
 import { cacheStartTime, WeatherCausings } from './AreoConstants';
 import geojson2svg from 'geojson-to-svg';
-import { SkyCondition } from './Interfaces';
+import { SkyCondition } from '../../../interfaces/stationMarkers';
 import RBush from 'rbush';
 import { LatLng } from 'leaflet';
 import axios from 'axios';
 import { db } from '../../caching/dexieDb';
-import { Route, RoutePoint } from '../../../interfaces/routeInterfaces';
+import { Route, RoutePoint } from '../../../interfaces/route';
 import ReactDOMServer from 'react-dom/server';
 
 export const getAltitudeString = (value: string, isHundred = true, fzlbase?: string, fzltop?: string): string => {
@@ -108,22 +108,34 @@ export const simplifyPoints = (
   map: L.Map,
   features: GeoJSON.Feature[],
   radius: number,
+  route: Route,
   unSimplifyFilter?: (feature: GeoJSON.Feature) => boolean,
 ): GeoJSON.Feature[] => {
   if (!map) return [];
+
+  const getBoxFromGeometry = (map: L.Map, geometry) => {
+    const latlng = new LatLng(geometry.coordinates[1], geometry.coordinates[0]);
+    const layerPoint = map.latLngToLayerPoint(latlng);
+    return {
+      minX: layerPoint.x - radius,
+      minY: layerPoint.y - radius,
+      maxX: layerPoint.x + radius,
+      maxY: layerPoint.y + radius,
+    };
+  };
+
   const results: GeoJSON.Feature[] = [];
   const rbush = new RBush();
+  if (route) {
+    [route.departure.position, route.destination.position, ...route.routeOfFlight.map((item) => item.position)].forEach(
+      (position) => rbush.insert(getBoxFromGeometry(map, position)),
+    );
+  }
   features.forEach((feature) => {
     // @ts-ignore
     const latlng = new LatLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
     if (map.getBounds().contains(latlng)) {
-      const layerPoint = map.latLngToLayerPoint(latlng);
-      const box = {
-        minX: layerPoint.x - radius,
-        minY: layerPoint.y - radius,
-        maxX: layerPoint.x + radius,
-        maxY: layerPoint.y + radius,
-      };
+      const box = getBoxFromGeometry(map, feature.geometry);
       if ((unSimplifyFilter && unSimplifyFilter(feature)) || !rbush.collides(box)) {
         rbush.insert(box);
         results.push(feature);
@@ -242,7 +254,7 @@ export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
       icon: new L.DivIcon({
         className: 'route-label',
         html: routePoint.key,
-        iconAnchor: [routePoint.key.length > 4 ? 64 : 54, 10],
+        iconAnchor: [routePoint.key.length > 4 ? 64 : 54, routePoint.type !== 'waypoint' ? 20 : 10],
         iconSize: [routePoint.key.length > 4 ? 60 : 50, 20],
       }),
       pane: 'route',

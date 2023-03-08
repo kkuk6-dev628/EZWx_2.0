@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { RoutePoint } from '../../interfaces/routeInterfaces';
+import { RoutePoint } from '../../interfaces/route';
 
 const baseUrl = getUrl();
 

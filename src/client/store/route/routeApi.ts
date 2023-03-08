@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Route } from '../../interfaces/routeInterfaces';
+import { Route } from '../../interfaces/route';
 import { setActiveRoute } from './routes';
 import toast from 'react-hot-toast';
 

@@ -2,7 +2,7 @@
 import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
 import React, { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
-import { RoutePoint } from '../../interfaces/routeInterfaces';
+import { RoutePoint } from '../../interfaces/route';
 import { useGetAirportQuery } from '../../store/route/airportApi';
 import { matchLowerCaseRegex } from '../utils/RegexUtils';
 interface Props {

@@ -1,5 +1,7 @@
 import { forwardRef, useEffect, useState } from 'react';
 import { GeoJSON as GeoJSONLayer, useMapEvents } from 'react-leaflet';
+import { useSelector } from 'react-redux';
+import { selectActiveRoute } from '../../../../store/route/routes';
 import { emptyGeoJson } from '../../common/AreoConstants';
 import { simplifyPoints } from '../../common/AreoFunctions';
 
@@ -7,6 +9,7 @@ export const SimplifiedMarkersLayer = forwardRef(
   ({ data, simplifyRadius, visible, unSimplifyFilter, ...props }: any, ref) => {
     const [displayedData, setDisplayedData] = useState<GeoJSON.FeatureCollection>(emptyGeoJson);
     const [renderedTime, setRenderedTime] = useState(Date.now());
+    const activeRoute = useSelector(selectActiveRoute);
 
     useEffect(() => {
       const newKey = Date.now();
@@ -30,6 +33,7 @@ export const SimplifiedMarkersLayer = forwardRef(
         map,
         geojson.features as GeoJSON.Feature[],
         simplifyRadius,
+        activeRoute,
         unSimplifyFilter,
       );
       setDisplayedData({

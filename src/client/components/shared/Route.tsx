@@ -11,7 +11,7 @@ import { useMap } from 'react-leaflet';
 import { useSelector } from 'react-redux';
 import { addRouteToMap, isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
 import { useCreateRouteMutation, useDeleteRouteMutation } from '../../store/route/routeApi';
-import { Route, RoutePoint } from '../../interfaces/routeInterfaces';
+import { Route, RoutePoint } from '../../interfaces/route';
 import { useMeteoLayersContext } from '../map/leaflet/layer-control/MeteoLayerControlContext';
 import 'leaflet-arc';
 

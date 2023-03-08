@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { Route } from '../../interfaces/routeInterfaces';
+import { Route } from '../../interfaces/route';
 import { AppState } from '../store';
 
 export interface RouteState {
