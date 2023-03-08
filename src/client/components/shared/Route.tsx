@@ -22,6 +22,7 @@ interface Props {
 const DEPARTURE = 'departure';
 const ROUTE_OF_FLIGHT = 'routeOfFlight';
 const DESTINATION = 'destination';
+const altitudeStep = 500;
 
 const emptyFormData: Route = {
   departure: null,
@@ -198,7 +199,7 @@ function Route({ setIsShowModal }: Props) {
                     <span
                       className="modal__lft"
                       onClick={() => {
-                        setRouteData({ ...routeData, altitude: routeData.altitude - 1 });
+                        setRouteData({ ...routeData, altitude: routeData.altitude - altitudeStep });
                       }}
                     >
                       <AiOutlineMinus className="modal__icon--mi" />
@@ -216,7 +217,7 @@ function Route({ setIsShowModal }: Props) {
                     <span
                       className="modal__rgt"
                       onClick={() => {
-                        setRouteData({ ...routeData, altitude: routeData.altitude + 1 });
+                        setRouteData({ ...routeData, altitude: routeData.altitude + altitudeStep });
                       }}
                     >
                       +
