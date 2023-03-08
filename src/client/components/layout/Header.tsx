@@ -6,6 +6,7 @@ import { Toaster } from 'react-hot-toast';
 import { useGetAirportQuery } from '../../store/route/airportApi';
 import { useGetRoutesQuery } from '../../store/route/routeApi';
 import { useGetWaypointsQuery } from '../../store/route/waypointApi';
+import { simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
 import ProfileModal from '../shared/ProfileModal';
 import SettingsDrawer from '../shared/SettingsDrawer';
 import { SvgDropDown, SvgMenuBurger, SvgProfile, SvgRoundClose, SvgSave, SvgSetting, SvgWarn } from '../utils/SvgIcons';
@@ -169,7 +170,7 @@ export default function Header() {
               <button onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)} className="header__menu btn">
                 {activeResponsiveMenu ? <SvgRoundClose /> : <SvgMenuBurger />}
               </button>
-              {mapMenu && <button className="header__tab__text">1040Z</button>}
+              {mapMenu && <button className="header__tab__text"></button>}
             </div>
           ) : (
             <button onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)} className="header__menu btn">

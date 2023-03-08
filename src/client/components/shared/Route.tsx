@@ -29,7 +29,7 @@ const emptyFormData: Route = {
   routeOfFlight: [],
   destination: null,
   altitude: 10000,
-  useForecastWinds: true,
+  useForecastWinds: false,
 };
 
 function Route({ setIsShowModal }: Props) {
@@ -44,8 +44,8 @@ function Route({ setIsShowModal }: Props) {
   const [isShowDeleteRouteModal, setIsShowDeleteRouteModal] = useState(false);
 
   useEffect(() => {
-    L.DomEvent.disableClickPropagation(ref.current);
-    L.DomEvent.disableScrollPropagation(ref.current);
+    // L.DomEvent.disableClickPropagation(ref.current);
+    // L.DomEvent.disableScrollPropagation(ref.current);
     // L.DomEvent.on(ref.current, 'mousemove contextmenu', L.DomEvent.stop);
     if (!meteoLayers.routeGroupLayer) {
       const groupLayer = new L.LayerGroup();
@@ -121,37 +121,37 @@ function Route({ setIsShowModal }: Props) {
   };
 
   return (
-    <div className="modal" ref={ref}>
-      <div className="modal__wrp">
-        <div className="modal__top">
-          <p className="modal__top__text text">Enter/Edit/Delete route</p>
-          <button onClick={() => setIsShowModal(false)} className="modal__top__close" type="button">
-            <AiOutlineClose className="modal__icon" />
+    <div className="route-editor" ref={ref}>
+      <div className="route-editor__wrp">
+        <div className="route-editor__top">
+          <p className="route-editor__top__text text">Enter/Edit/Delete route</p>
+          <button onClick={() => setIsShowModal(false)} className="route-editor__top__close" type="button">
+            <AiOutlineClose className="route-editor__icon" />
           </button>
         </div>
-        <div className="modal__content">
-          <div className="modal__content__top">
-            <div className="modal__tabs">
-              <button className="modal__tab" type="button" onClick={handleClickDelete}>
+        <div className="route-editor__content">
+          <div className="route-editor__content__top">
+            <div className="route-editor__tabs">
+              <button className="route-editor__tab" type="button" onClick={handleClickDelete}>
                 <SvgBin />
-                <p className="modal__tab__text text">Delete</p>
+                <p className="route-editor__tab__text text">Delete</p>
               </button>
-              <button className="modal__tab" type="button" onClick={handleClickReverse}>
+              <button className="route-editor__tab" type="button" onClick={handleClickReverse}>
                 <SvgLeftRight />
-                <p className="modal__tab__text text">Reverse</p>
+                <p className="route-editor__tab__text text">Reverse</p>
               </button>
-              <button className="modal__tab" type="button" onClick={handleClickClear}>
-                <AiOutlineCloseCircle className="modal__icon" />
-                <p className="modal__tab__text text">Clear</p>
+              <button className="route-editor__tab" type="button" onClick={handleClickClear}>
+                <AiOutlineCloseCircle className="route-editor__icon" />
+                <p className="route-editor__tab__text text">Clear</p>
               </button>
-              <button className="modal__tab" type="button">
-                <BsBookmarkPlus className="modal__icon" />
-                <p className="modal__tab__text text">Add to saved</p>
+              <button className="route-editor__tab" type="button">
+                <BsBookmarkPlus className="route-editor__icon" />
+                <p className="route-editor__tab__text text">Add to saved</p>
               </button>
             </div>
-            <form action="" className="modal__form">
-              <div className="modal__input__grp">
-                <label htmlFor="route-name" className="modal__label text">
+            <form action="" className="route-editor__form">
+              <div className="route-editor__input__grp">
+                <label htmlFor="route-name" className="route-editor__label text">
                   Departure*
                 </label>
                 <AutoCompleteInput
@@ -164,8 +164,8 @@ function Route({ setIsShowModal }: Props) {
                 />
               </div>
 
-              <div className="modal__input__grp">
-                <label htmlFor="route-flight" className="modal__label text">
+              <div className="route-editor__input__grp">
+                <label htmlFor="route-flight" className="route-editor__label text">
                   Route of Flight
                 </label>
                 <MultiSelectInput
@@ -176,8 +176,8 @@ function Route({ setIsShowModal }: Props) {
                 />
               </div>
 
-              <div className="modal__input__grp">
-                <label htmlFor="route-destination" className="modal__label text">
+              <div className="route-editor__input__grp">
+                <label htmlFor="route-destination" className="route-editor__label text">
                   Destination*
                 </label>
                 <AutoCompleteInput
@@ -190,23 +190,27 @@ function Route({ setIsShowModal }: Props) {
                 />
               </div>
 
-              <div className="modal__swd">
-                <div className="modal__numin__area">
-                  <label htmlFor="route-numin" className="modal__label text">
+              <div className="route-editor__swd">
+                <div className="route-editor__numin__area">
+                  <label htmlFor="route-numin" className="route-editor__label text">
                     Altitude (MSL)*
                   </label>
-                  <div className="modal__numin">
+                  <div className="route-editor__numin">
                     <span
-                      className="modal__lft"
+                      className="route-editor__lft"
                       onClick={() => {
-                        setRouteData({ ...routeData, altitude: routeData.altitude - altitudeStep });
+                        let newValue = routeData.altitude - altitudeStep;
+                        if (newValue < 0) {
+                          newValue = 0;
+                        }
+                        setRouteData({ ...routeData, altitude: newValue });
                       }}
                     >
-                      <AiOutlineMinus className="modal__icon--mi" />
+                      <AiOutlineMinus className="route-editor__icon--mi" />
                     </span>
                     <input
                       type="number"
-                      className="modal__input__num"
+                      className="route-editor__input__num"
                       id="route-numin"
                       value={routeData.altitude}
                       onChange={(e) => {
@@ -215,9 +219,13 @@ function Route({ setIsShowModal }: Props) {
                       placeholder="0"
                     />
                     <span
-                      className="modal__rgt"
+                      className="route-editor__rgt"
                       onClick={() => {
-                        setRouteData({ ...routeData, altitude: routeData.altitude + altitudeStep });
+                        let newValue = routeData.altitude + altitudeStep;
+                        if (newValue > 45000) {
+                          newValue = 45000;
+                        }
+                        setRouteData({ ...routeData, altitude: newValue });
                       }}
                     >
                       +
@@ -225,7 +233,7 @@ function Route({ setIsShowModal }: Props) {
                   </div>
                 </div>
                 <div className="table__data">
-                  <label className="modal__label text" htmlFor="">
+                  <label className="route-editor__label text" htmlFor="">
                     Use Forecast Winds
                   </label>
                   <Switch
@@ -245,23 +253,23 @@ function Route({ setIsShowModal }: Props) {
                 </div>
               </div>
             </form>
-            <div className="modal__btn__grp">
-              <button className="modal__btn--btm" type="button" onClick={handleClickOpenInMap}>
+            <div className="route-editor__btn__grp">
+              <button className="route-editor__btn--btm" type="button" onClick={handleClickOpenInMap}>
                 Open in Map
               </button>
-              <button className="modal__btn--btm" type="button" onClick={handleClickOpenInProfile}>
+              <button className="route-editor__btn--btm" type="button" onClick={handleClickOpenInProfile}>
                 Open in Profile
               </button>
             </div>
-            <p className="modal__txt">* Required field</p>
+            <p className="route-editor__txt">* Required field</p>
           </div>
         </div>
       </div>
       <Modal
         open={isShowDeleteRouteModal}
         handleClose={() => setIsShowDeleteRouteModal(false)}
-        title="Delete Route Confirmation"
-        description="Are you sure to delete current active route?"
+        title="Delete route confirmation"
+        description="Are you sure you want to delete the active route?"
         footer={
           <>
             <SecondaryButton onClick={() => setIsShowDeleteRouteModal(false)} text="No" isLoading={false} />

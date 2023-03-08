@@ -17,6 +17,9 @@ import {
 } from '../../utils/SvgIcons';
 import ReactDOMServer from 'react-dom/server';
 import { useRouter } from 'next/router';
+import Dialog from '@material-ui/core/Dialog';
+import Paper from '@material-ui/core/Paper';
+import Draggable from 'react-draggable';
 import Route from '../../shared/Route';
 import CollapsibleBar from '../../shared/CollapsibleBar';
 import DateSliderModal from '../../shared/DateSliderModal';
@@ -33,12 +36,22 @@ import { toast } from 'react-hot-toast';
 import { useGetAirportQuery } from '../../../store/route/airportApi';
 import { useGetRoutesQuery } from '../../../store/route/routeApi';
 import { useGetWaypointsQuery } from '../../../store/route/waypointApi';
+import { simpleTimeOnlyFormat } from '../common/AreoFunctions';
 
-function LeafletMap() {
+const PaperComponent = (props) => {
+  return (
+    <Draggable>
+      <Paper {...props} />
+    </Draggable>
+  );
+};
+
+const LeafletMap = () => {
   const { pathname } = useRouter();
   const [isShowTabs, setIsShowTabs] = useState(false);
   const [isShowDateModal, setIsShowDateModal] = useState(false);
   const [isShowModal, setIsShowModal] = useState(false);
+  const [zuluTime, setZuluTime] = useState(simpleTimeOnlyFormat(new Date(), false));
   const dispatch = useDispatch();
   const meteoLayerControlShow = useSelector(selectLayerControlShow);
   const baseMapLayerControlShow = useSelector(selectBaseMapLayerControlShow);
@@ -48,6 +61,11 @@ function LeafletMap() {
   if (auth.id) {
     useGetRoutesQuery(null);
   }
+
+  useEffect(() => {
+    const interval = setInterval(() => setZuluTime(simpleTimeOnlyFormat(new Date(), false)), 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (pathname === '/try-ezwxbrief') {
@@ -83,7 +101,7 @@ function LeafletMap() {
   const tabMenus = [
     {
       id: '1040Z',
-      name: '1040Z',
+      name: zuluTime,
       handler: handler,
       svg: null,
       isHideResponsive: true,
@@ -159,7 +177,17 @@ function LeafletMap() {
           zoomInText={ReactDOMServer.renderToString(<SvgRoundPlus></SvgRoundPlus>)}
           zoomOutText={ReactDOMServer.renderToString(<SvgRoundMinus></SvgRoundMinus>)}
         />
-        {isShowModal && <Route setIsShowModal={setIsShowModal} />}
+        <Dialog
+          PaperComponent={PaperComponent}
+          hideBackdrop
+          disableEnforceFocus
+          style={{ position: 'absolute' }}
+          open={isShowModal}
+          onClose={() => setIsShowModal(false)}
+          aria-labelledby="draggable-dialog-title"
+        >
+          <Route setIsShowModal={setIsShowModal} />
+        </Dialog>
       </MapContainer>
 
       {isShowTabs && <MapTabs tabMenus={tabMenus} />}
@@ -167,6 +195,6 @@ function LeafletMap() {
       <CollapsibleBar />
     </div>
   );
-}
+};
 
 export default LeafletMap;

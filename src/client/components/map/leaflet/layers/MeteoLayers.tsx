@@ -280,7 +280,7 @@ const MeteoLayers = () => {
         <PirepLayer></PirepLayer>
       </GroupedLayer>
       <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
-      <Pane name="route" style={{ zIndex: 690 }}></Pane>
+      <Pane name="route" style={{ zIndex: 710 }}></Pane>
     </div>
   );
 };

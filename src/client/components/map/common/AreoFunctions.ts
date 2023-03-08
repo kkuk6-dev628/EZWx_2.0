@@ -242,8 +242,8 @@ export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
       icon: new L.DivIcon({
         className: 'route-label',
         html: routePoint.key,
-        iconAnchor: [54, 10],
-        iconSize: [50, 20],
+        iconAnchor: [routePoint.key.length > 4 ? 64 : 54, 10],
+        iconSize: [routePoint.key.length > 4 ? 60 : 50, 20],
       }),
       pane: 'route',
     });
