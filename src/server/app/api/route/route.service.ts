@@ -71,7 +71,6 @@ export class RouteService {
     routeEntity.user = user;
     routeEntity.departure = await this.selectOrInsertRoutePoint(route.departure);
     routeEntity.destination = await this.selectOrInsertRoutePoint(route.destination);
-    console.log(routeEntity);
     await this.routeRepository.save(routeEntity);
 
     const routeOfFlights = [];

@@ -69,7 +69,7 @@
 .list__item {
   padding: 10px;
   &:hover {
-    background-color: rgb(214, 209, 209);
+    background-color: var(--color-secondary-highlight);
     cursor: pointer;
   }
 }
@@ -92,12 +92,12 @@
   max-height: 239px;
   overflow-y: auto;
   scrollbar-width: 1px;
-  border: 0.5px solid rgb(212, 209, 209);
+  border: 0.5px solid var(--color-secondary-highlight);
   display: flex;
   flex-direction: column;
   transition: all 1s ease-in-out 1s;
 }
 
 .focused {
-  background-color: rgb(214, 209, 209);
+  background-color: var(--color-secondary-highlight);
 }

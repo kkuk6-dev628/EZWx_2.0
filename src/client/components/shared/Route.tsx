@@ -214,7 +214,13 @@ function Route({ setIsShowModal }: Props) {
                       id="route-numin"
                       value={routeData.altitude}
                       onChange={(e) => {
-                        setRouteData({ ...routeData, altitude: parseInt(e.currentTarget.value) });
+                        let newValue = parseInt(e.currentTarget.value);
+                        if (newValue > 45000) {
+                          newValue = 45000;
+                        } else if (newValue < 0) {
+                          newValue = 0;
+                        }
+                        setRouteData({ ...routeData, altitude: newValue });
                       }}
                       placeholder="0"
                     />
@@ -232,14 +238,14 @@ function Route({ setIsShowModal }: Props) {
                     </span>
                   </div>
                 </div>
-                <div className="table__data">
+                <div className="use-forcast">
                   <label className="route-editor__label text" htmlFor="">
                     Use Forecast Winds
                   </label>
                   <Switch
                     checked={routeData.useForecastWinds}
                     onChange={handleUseForecastWindsChange}
-                    onColor="#791DC6"
+                    onColor="#EED8FF"
                     onHandleColor="#3F0C69"
                     offColor="#fff"
                     handleDiameter={32}

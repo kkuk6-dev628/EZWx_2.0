@@ -1,4 +1,5 @@
 .route-editor {
+  max-width: 480px;
   @media (max-width: 460px) {
     max-width: 344px;
   }
@@ -220,6 +221,11 @@
       font-size: 12px;
     }
   }
+  .use-forcast{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
   &__txt {
     font-size: 18px;
@@ -233,7 +239,8 @@
 }
 
 .react-switch {
-  border: 2px solid #c4c4c4;
+  border: 1px solid #c4c4c4;
+  box-sizing: border-box;
   margin-top: 10px;
 }
 

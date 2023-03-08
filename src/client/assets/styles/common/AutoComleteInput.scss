@@ -21,7 +21,7 @@
     padding: 10px 12px;
     flex-grow: 1;
     text-overflow: ellipsis;
-    background-color: rgb(215, 200, 226);
+    background-color: var(--color-secondary-highlight);
     padding-right: 40px;
     font-weight: 450;
     font-size: 1rem;
@@ -53,7 +53,7 @@
 .list__item {
   padding: 10px;
   &:hover {
-    background-color: rgb(214, 209, 209);
+    background-color: var(--color-secondary-highlight);
     cursor: pointer;
   }
 }
@@ -82,5 +82,5 @@
 }
 
 .focused {
-  background-color: rgb(214, 209, 209);
+  background-color: var(--color-secondary-highlight);
 }
