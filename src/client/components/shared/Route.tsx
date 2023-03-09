@@ -9,11 +9,13 @@ import { AutoCompleteInput, Modal, MultiSelectInput, PrimaryButton, SecondaryBut
 import { selectActiveRoute } from '../../store/route/routes';
 import { useMap } from 'react-leaflet';
 import { useSelector } from 'react-redux';
-import { addRouteToMap, isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
+import { addRouteToMap, isSameRoutePoints, isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
 import { useCreateRouteMutation, useDeleteRouteMutation } from '../../store/route/routeApi';
-import { Route, RoutePoint } from '../../interfaces/route';
+import { Route, RouteOfFlight, RoutePoint } from '../../interfaces/route';
 import { useMeteoLayersContext } from '../map/leaflet/layer-control/MeteoLayerControlContext';
 import 'leaflet-arc';
+import DialogTitle from '@mui/material/DialogTitle';
+import { DialogContent } from '@material-ui/core';
 
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
@@ -25,6 +27,7 @@ const DESTINATION = 'destination';
 const altitudeStep = 500;
 
 const emptyFormData: Route = {
+  id: undefined,
   departure: null,
   routeOfFlight: [],
   destination: null,
@@ -33,7 +36,6 @@ const emptyFormData: Route = {
 };
 
 function Route({ setIsShowModal }: Props) {
-  const map = useMap();
   const activeRoute = useSelector(selectActiveRoute);
   const [createRoute] = useCreateRouteMutation();
   const [deleteRoute] = useDeleteRouteMutation();
@@ -42,19 +44,12 @@ function Route({ setIsShowModal }: Props) {
   const meteoLayers = useMeteoLayersContext();
   const [forceRerenderKey, setForceRerenderKey] = useState(Date.now());
   const [isShowDeleteRouteModal, setIsShowDeleteRouteModal] = useState(false);
+  const [altitudeText, setAltitudeText] = useState(routeData.altitude.toLocaleString());
 
   useEffect(() => {
     // L.DomEvent.disableClickPropagation(ref.current);
     // L.DomEvent.disableScrollPropagation(ref.current);
     // L.DomEvent.on(ref.current, 'mousemove contextmenu', L.DomEvent.stop);
-    if (!meteoLayers.routeGroupLayer) {
-      const groupLayer = new L.LayerGroup();
-      map.addLayer(groupLayer);
-      meteoLayers.routeGroupLayer = groupLayer;
-      if (activeRoute) {
-        addRouteToMap(routeData, meteoLayers.routeGroupLayer);
-      }
-    }
   }, []);
 
   useEffect(() => {
@@ -63,17 +58,30 @@ function Route({ setIsShowModal }: Props) {
     }
   }, [activeRoute]);
 
+  useEffect(() => {
+    const newValue = parseInt(altitudeText.replace(/\D+/g, ''));
+    setRouteData({ ...routeData, altitude: newValue });
+  }, [altitudeText]);
+
   const handleUseForecastWindsChange = () => {
     setRouteData({ ...routeData, useForecastWinds: !routeData.useForecastWinds });
   };
 
   const handleAutoComplete = (name: string, val: RoutePoint) => {
+    if (val) {
+      if (
+        (routeData.departure && isSameRoutePoints(routeData.departure, val)) ||
+        (routeData.destination && isSameRoutePoints(routeData.destination, val))
+      ) {
+        return;
+      }
+    }
     setRouteData({
       ...routeData,
       [name]: val,
     });
   };
-  const handleMultiSelectInsertion = (name: string, val: RoutePoint[]) => {
+  const handleMultiSelectInsertion = (name: string, val: RouteOfFlight[]) => {
     setRouteData({
       ...routeData,
       [name]: val,
@@ -94,6 +102,7 @@ function Route({ setIsShowModal }: Props) {
     setIsShowDeleteRouteModal(true);
   };
   const handleClickReverse = () => {
+    setForceRerenderKey(Date.now());
     setRouteData({
       ...routeData,
       departure: routeData.destination,
@@ -104,6 +113,7 @@ function Route({ setIsShowModal }: Props) {
   const handleClickClear = () => {
     setRouteData(emptyFormData);
     setForceRerenderKey(Date.now());
+    setAltitudeText(emptyFormData.altitude.toLocaleString());
   };
 
   const addRoute = () => {
@@ -117,18 +127,30 @@ function Route({ setIsShowModal }: Props) {
   const deleteActiveRoute = () => {
     meteoLayers.routeGroupLayer.clearLayers();
     deleteRoute(activeRoute.id);
+    setIsShowDeleteRouteModal(false);
+    setIsShowModal(false);
     handleClickClear();
+  };
+
+  const roundAltitude = (altitude) => {
+    if (altitude > 45000) {
+      return 45000;
+    } else if (altitude < 500) {
+      return 500;
+    } else {
+      return Math.round(altitude / 500) * 500;
+    }
   };
 
   return (
     <div className="route-editor" ref={ref}>
       <div className="route-editor__wrp">
-        <div className="route-editor__top">
+        <DialogTitle className="route-editor__top" style={{ cursor: 'move' }} id="draggable-dialog-title">
           <p className="route-editor__top__text text">Enter/Edit/Delete route</p>
           <button onClick={() => setIsShowModal(false)} className="route-editor__top__close" type="button">
             <AiOutlineClose className="route-editor__icon" />
           </button>
-        </div>
+        </DialogTitle>
         <div className="route-editor__content">
           <div className="route-editor__content__top">
             <div className="route-editor__tabs">
@@ -199,39 +221,35 @@ function Route({ setIsShowModal }: Props) {
                     <span
                       className="route-editor__lft"
                       onClick={() => {
-                        let newValue = routeData.altitude - altitudeStep;
-                        if (newValue < 0) {
-                          newValue = 0;
-                        }
-                        setRouteData({ ...routeData, altitude: newValue });
+                        const newValue = roundAltitude(routeData.altitude - altitudeStep);
+                        setAltitudeText(newValue.toLocaleString());
                       }}
                     >
                       <AiOutlineMinus className="route-editor__icon--mi" />
                     </span>
                     <input
-                      type="number"
+                      key={'altitude-input-' + forceRerenderKey}
+                      type="text"
                       className="route-editor__input__num"
                       id="route-numin"
-                      value={routeData.altitude}
+                      pattern="[0-9]+([,][0-9]{1,2})?"
+                      value={altitudeText}
                       onChange={(e) => {
-                        let newValue = parseInt(e.currentTarget.value);
-                        if (newValue > 45000) {
-                          newValue = 45000;
-                        } else if (newValue < 0) {
-                          newValue = 0;
-                        }
-                        setRouteData({ ...routeData, altitude: newValue });
+                        const val = parseInt(e.target.value.replace(/\D+/g, ''));
+                        setAltitudeText(val.toLocaleString());
+                      }}
+                      onBlur={(e) => {
+                        const val = parseInt(e.target.value.replace(/\D+/g, ''));
+                        const newValue = roundAltitude(val);
+                        setAltitudeText(newValue.toLocaleString());
                       }}
                       placeholder="0"
                     />
                     <span
                       className="route-editor__rgt"
                       onClick={() => {
-                        let newValue = routeData.altitude + altitudeStep;
-                        if (newValue > 45000) {
-                          newValue = 45000;
-                        }
-                        setRouteData({ ...routeData, altitude: newValue });
+                        const newValue = roundAltitude(routeData.altitude + altitudeStep);
+                        setAltitudeText(newValue.toLocaleString());
                       }}
                     >
                       +

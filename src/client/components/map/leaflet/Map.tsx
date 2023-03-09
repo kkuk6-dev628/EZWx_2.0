@@ -40,7 +40,7 @@ import { simpleTimeOnlyFormat } from '../common/AreoFunctions';
 
 const PaperComponent = (props) => {
   return (
-    <Draggable>
+    <Draggable handle="#draggable-dialog-title" cancel={'[class*="MuiDialogContent-root"]'}>
       <Paper {...props} />
     </Draggable>
   );

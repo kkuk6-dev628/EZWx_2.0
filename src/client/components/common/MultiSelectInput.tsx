@@ -2,14 +2,14 @@
 import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
 import React, { KeyboardEvent, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
-import { RoutePoint } from '../../interfaces/route';
+import { RouteOfFlight, RoutePoint } from '../../interfaces/route';
 import { useGetAirportQuery } from '../../store/route/airportApi';
 import { useGetWaypointsQuery } from '../../store/route/waypointApi';
 import { matchLowerCaseRegex } from '../utils/RegexUtils';
 interface Props {
   name: string;
-  handleAutoComplete: (name: string, value: RoutePoint[]) => void;
-  selectedValues: any[];
+  handleAutoComplete: (name: string, value: RouteOfFlight[]) => void;
+  selectedValues: RouteOfFlight[];
 }
 
 const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) => {
@@ -37,7 +37,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
         return (
           <span
             onClick={() => {
-              handleAutoComplete(name, [...selectedValues, obj]);
+              handleAutoComplete(name, [...selectedValues, { routePoint: obj }]);
               setShowSuggestion(false);
               setInputValue('');
             }}
@@ -110,10 +110,11 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
             handleClose();
           }
           break;
+        case ' ':
         case 'Enter':
           const filteredResult = renderItem(name, inputValue);
           if (filteredResult.length > 0 && currentFocus + 1 <= filteredResult.length && inputValue !== '') {
-            handleAutoComplete(name, [...selectedValues, filteredResult[currentFocus].props.obj]);
+            handleAutoComplete(name, [...selectedValues, { routePoint: filteredResult[currentFocus].props.obj }]);
             setInputValue('');
           }
 
@@ -164,10 +165,10 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
               onTouchMove={(e) => onTouchMove(e, ind)}
               onDragEnd={drop}
               onTouchEnd={drop}
-              key={'route-of-flight-' + el.key + ind}
+              key={'route-of-flight-' + el.routePoint.key + ind}
               // style={{ touchAction: 'none' }}
             >
-              {el.key}
+              {el.routePoint.key}
               <AiOutlineClose
                 className="close__btn"
                 onClick={() =>
@@ -187,7 +188,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
             onChange={handleChange}
             id="route-name"
             onKeyDown={handleKeyDown}
-            placeholder="ENTER WAYPOINT IDS"
+            placeholder="ENTER WAYPOINT ID(S)"
             autoComplete="off"
           />
         </div>

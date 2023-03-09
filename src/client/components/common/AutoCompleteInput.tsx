@@ -71,6 +71,7 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) =
             setShowSuggestion(false);
           }
           break;
+        case ' ':
         case 'Enter':
           const filteredResult = renderItem(name, value);
           if (filteredResult.length > 0 && currentFocus + 1 <= filteredResult.length && value !== '') {
@@ -126,7 +127,7 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) =
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             className="auto__complete__input"
-            placeholder="ICAO or FAA"
+            placeholder="ENTER ICAO OR FAA AIRPORT ID"
             autoComplete="off"
           />
         )}

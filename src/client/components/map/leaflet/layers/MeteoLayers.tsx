@@ -3,7 +3,7 @@ import MeteoLayerControl, { GroupedLayer } from '../layer-control/MeteoLayerCont
 import { LayerGroup, Pane, useMapEvents } from 'react-leaflet';
 import L, { LatLng, LeafletMouseEvent } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import FeatureSelector from '../popups/FeatureSelector';
 import ReactDOMServer from 'react-dom/server';
@@ -28,13 +28,13 @@ import { selectPersonalMinimums, selectSettings } from '../../../../store/user/U
 import { MetarMarkerTypes, pickupRadiusPx } from '../../common/AreoConstants';
 import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
 import { InLayerControl } from '../layer-control/MeteoLayerControl';
-import axios from 'axios';
 import { InBaseLayerControl } from '../layer-control/BaseMapLayerControl';
 import RadarLayer from './RadarLayer';
 import { StationMarkersLayer } from './StationMarkersLayer';
 import StationForecastPopup from '../popups/StationForecastPopup';
 import { useGetAirportQuery } from '../../../../store/route/airportApi';
-import { useGetWaypointsQuery } from '../../../../store/route/waypointApi';
+import { selectActiveRoute } from '../../../../store/route/routes';
+import { addRouteToMap } from '../../common/AreoFunctions';
 
 const maxLayers = 6;
 
@@ -45,6 +45,16 @@ const MeteoLayers = () => {
   const personalMinimums = useSelector(selectPersonalMinimums);
   const { data: airportsData } = useGetAirportQuery('');
   const settingsState = useSelector(selectSettings);
+  const activeRoute = useSelector(selectActiveRoute);
+
+  useEffect(() => {
+    if (!meteoLayers.routeGroupLayer && activeRoute) {
+      const groupLayer = new L.LayerGroup();
+      map.addLayer(groupLayer);
+      meteoLayers.routeGroupLayer = groupLayer;
+      addRouteToMap(activeRoute, meteoLayers.routeGroupLayer);
+    }
+  }, [activeRoute]);
 
   const showPopup = (layer: L.GeoJSON, latlng: L.LatLng): void => {
     if (typeof layer.setStyle === 'function') {
@@ -280,7 +290,7 @@ const MeteoLayers = () => {
         <PirepLayer></PirepLayer>
       </GroupedLayer>
       <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
-      <Pane name="route" style={{ zIndex: 710 }}></Pane>
+      <Pane name="route" style={{ zIndex: 500 }}></Pane>
     </div>
   );
 };

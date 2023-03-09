@@ -27,7 +27,9 @@
     font-size: 1rem;
     text-overflow: ellipsis;
     border-radius: 8px;
-
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     @media (max-width: 460px) {
       padding: 10px 8px;
       font-size: 14px;
@@ -43,6 +45,7 @@
   padding: 2px;
   font-weight: 600;
   cursor: pointer;
+  line-height: 1px;
 }
 
 .auto__complete__loading {

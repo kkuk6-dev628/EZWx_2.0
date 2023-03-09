@@ -268,7 +268,7 @@ const PirepLayer = () => {
   };
 
   return (
-    <Pane name={'pirep'} style={{ zIndex: 699 }}>
+    <Pane name={'pirep'} style={{ zIndex: 490 }}>
       <SimplifiedMarkersLayer
         ref={geojsonLayerRef}
         data={displayedGeojson}

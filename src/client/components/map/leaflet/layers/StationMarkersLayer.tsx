@@ -260,7 +260,11 @@ export const StationMarkersLayer = () => {
 
   const unSimplifyFilter = (feature) => {
     if (!activeRoute) return false;
-    const routePoints = [activeRoute.departure, activeRoute.destination, ...activeRoute.routeOfFlight];
+    const routePoints = [
+      activeRoute.departure,
+      activeRoute.destination,
+      ...activeRoute.routeOfFlight.map((item) => item.routePoint),
+    ];
     const index = routePoints.findIndex((routePoint) => {
       if (feature.properties.station_id) {
         return feature.properties.station_id.indexOf(routePoint.key) > -1;
@@ -1150,7 +1154,7 @@ export const StationMarkersLayer = () => {
   };
 
   return (
-    <Pane name={'station-markers'} style={{ zIndex: 698 }}>
+    <Pane name={'station-markers'} style={{ zIndex: 510 }}>
       {displayedGeojson != null && (
         <SimplifiedMarkersLayer
           key={renderedTime}

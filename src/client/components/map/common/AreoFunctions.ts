@@ -127,9 +127,11 @@ export const simplifyPoints = (
   const results: GeoJSON.Feature[] = [];
   const rbush = new RBush();
   if (route) {
-    [route.departure.position, route.destination.position, ...route.routeOfFlight.map((item) => item.position)].forEach(
-      (position) => rbush.insert(getBoxFromGeometry(map, position)),
-    );
+    [
+      route.departure.position,
+      route.destination.position,
+      ...route.routeOfFlight.map((item) => item.routePoint.position),
+    ].forEach((position) => rbush.insert(getBoxFromGeometry(map, position)));
   }
   features.forEach((feature) => {
     // @ts-ignore
@@ -238,7 +240,7 @@ export const validateRoute = (route: Route): boolean => {
 export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
   const coordinateList = [
     route.departure.position.coordinates,
-    ...route.routeOfFlight.map((item) => item.position.coordinates),
+    ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
     route.destination.position.coordinates,
   ];
   routeGroupLayer.clearLayers();
@@ -249,7 +251,7 @@ export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
     routeGroupLayer.addLayer(polyline);
     return b;
   });
-  [route.departure, ...route.routeOfFlight, route.destination].forEach((routePoint) => {
+  [route.departure, ...route.routeOfFlight.map((item) => item.routePoint), route.destination].forEach((routePoint) => {
     const marker = L.marker(L.GeoJSON.coordsToLatLng(routePoint.position.coordinates as any), {
       icon: new L.DivIcon({
         className: 'route-label',
@@ -288,9 +290,15 @@ export const isSameRoutes = (route1: Route, route2: Route): boolean => {
     return false;
   }
   for (let i = 0; i < route1.routeOfFlight.length; i++) {
-    if (!isSameRoutePoints(route1.routeOfFlight[i], route2.routeOfFlight[i])) {
+    if (!isSameRoutePoints(route1.routeOfFlight[i].routePoint, route2.routeOfFlight[i].routePoint)) {
       return false;
     }
+  }
+  if (route1.altitude !== route2.altitude) {
+    return false;
+  }
+  if (route1.useForecastWinds !== route2.useForecastWinds) {
+    return false;
   }
   return true;
 };
