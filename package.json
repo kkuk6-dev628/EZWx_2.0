@@ -89,7 +89,6 @@
     "react-leaflet": "^4.2.0",
     "react-leaflet-choropleth": "^2.0.1",
     "react-multi-date-picker": "^3.3.4",
-    "react-number-format-with-commas": "^0.0.3",
     "react-redux": "^8.0.5",
     "react-select": "^5.7.0",
     "react-switch": "^7.0.0",
