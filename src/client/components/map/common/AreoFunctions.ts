@@ -237,35 +237,6 @@ export const validateRoute = (route: Route): boolean => {
   return false;
 };
 
-export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
-  const coordinateList = [
-    route.departure.position.coordinates,
-    ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
-    route.destination.position.coordinates,
-  ];
-  routeGroupLayer.clearLayers();
-  const latlngs = L.GeoJSON.coordsToLatLngs(coordinateList);
-  latlngs.reduce((a, b) => {
-    //@ts-ignore
-    const polyline = L.Polyline.Arc(a, b, { color: '#f0fa', weight: 6, pane: 'route' });
-    routeGroupLayer.addLayer(polyline);
-    return b;
-  });
-  [route.departure, ...route.routeOfFlight.map((item) => item.routePoint), route.destination].forEach((routePoint) => {
-    const marker = L.marker(L.GeoJSON.coordsToLatLng(routePoint.position.coordinates as any), {
-      icon: new L.DivIcon({
-        className: 'route-label',
-        html: routePoint.key,
-        iconAnchor: [routePoint.key.length > 4 ? 64 : 54, routePoint.type !== 'waypoint' ? 20 : 10],
-        iconSize: [routePoint.key.length > 4 ? 60 : 50, 20],
-      }),
-      pane: 'route',
-    });
-    routeGroupLayer.addLayer(marker);
-  });
-  // map.fitBounds(polyline.getBounds());
-};
-
 export const isSameRoutePoints = (routePoint1: RoutePoint, routePoint2: RoutePoint): boolean => {
   return routePoint1.key === routePoint2.key && routePoint1.type === routePoint2.type;
 };

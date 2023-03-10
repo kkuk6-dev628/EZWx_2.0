@@ -37,6 +37,7 @@ import { useGetAirportQuery } from '../../../store/route/airportApi';
 import { useGetRoutesQuery } from '../../../store/route/routeApi';
 import { useGetWaypointsQuery } from '../../../store/route/waypointApi';
 import { simpleTimeOnlyFormat } from '../common/AreoFunctions';
+import MapSideButtons from '../../shared/MapSideButtons';
 
 const PaperComponent = (props) => {
   return (
@@ -171,7 +172,8 @@ const LeafletMap = () => {
       >
         <BaseMapLayers></BaseMapLayers>
         <MeteoLayers></MeteoLayers>
-        <MapSearch />
+        {/* <MapSearch /> */}
+        <MapSideButtons></MapSideButtons>
         <ZoomControl
           position="topright"
           zoomInText={ReactDOMServer.renderToString(<SvgRoundPlus></SvgRoundPlus>)}

@@ -5,6 +5,14 @@ export const timeSliderInterval = 5 * 60 * 1000; // in millisecond
 
 export const windIconLimit = { windSpeed: 20, windGust: 25 };
 
+export const paneOrders = {
+  pirep: 680,
+  routeLabel: 678,
+  station: 676,
+  routeLine: 674,
+  polygonLabel: 650, // leaflet setting
+};
+
 export const WeatherCausings = {
   PCPN: 'precipitation',
   BR: 'mist',

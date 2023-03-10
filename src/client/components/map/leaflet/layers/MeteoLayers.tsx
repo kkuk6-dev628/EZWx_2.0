@@ -25,7 +25,7 @@ import MetarsPopup from '../popups/MetarsPopup';
 import { useSelector } from 'react-redux';
 import { selectMetar } from '../../../../store/layers/LayerControl';
 import { selectPersonalMinimums, selectSettings } from '../../../../store/user/UserSettings';
-import { MetarMarkerTypes, pickupRadiusPx } from '../../common/AreoConstants';
+import { MetarMarkerTypes, paneOrders, pickupRadiusPx } from '../../common/AreoConstants';
 import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
 import { InLayerControl } from '../layer-control/MeteoLayerControl';
 import { InBaseLayerControl } from '../layer-control/BaseMapLayerControl';
@@ -34,7 +34,7 @@ import { StationMarkersLayer } from './StationMarkersLayer';
 import StationForecastPopup from '../popups/StationForecastPopup';
 import { useGetAirportQuery } from '../../../../store/route/airportApi';
 import { selectActiveRoute } from '../../../../store/route/routes';
-import { addRouteToMap } from '../../common/AreoFunctions';
+import { addRouteToMap } from '../../../shared/Route';
 
 const maxLayers = 6;
 
@@ -290,7 +290,8 @@ const MeteoLayers = () => {
         <PirepLayer></PirepLayer>
       </GroupedLayer>
       <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
-      <Pane name="route" style={{ zIndex: 500 }}></Pane>
+      <Pane name="route-label" style={{ zIndex: paneOrders.routeLabel }}></Pane>
+      <Pane name="route-line" style={{ zIndex: paneOrders.routeLine }}></Pane>
     </div>
   );
 };

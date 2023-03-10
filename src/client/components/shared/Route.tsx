@@ -7,15 +7,13 @@ import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
 import Switch from 'react-switch';
 import { AutoCompleteInput, Modal, MultiSelectInput, PrimaryButton, SecondaryButton } from '../common/index';
 import { selectActiveRoute } from '../../store/route/routes';
-import { useMap } from 'react-leaflet';
 import { useSelector } from 'react-redux';
-import { addRouteToMap, isSameRoutePoints, isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
-import { useCreateRouteMutation, useDeleteRouteMutation } from '../../store/route/routeApi';
+import { isSameRoutePoints, isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
+import { useCreateRouteMutation } from '../../store/route/routeApi';
 import { Route, RouteOfFlight, RoutePoint } from '../../interfaces/route';
 import { useMeteoLayersContext } from '../map/leaflet/layer-control/MeteoLayerControlContext';
 import 'leaflet-arc';
 import DialogTitle from '@mui/material/DialogTitle';
-import { DialogContent } from '@material-ui/core';
 
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
@@ -35,10 +33,38 @@ const emptyFormData: Route = {
   useForecastWinds: false,
 };
 
+export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
+  const coordinateList = [
+    route.departure.position.coordinates,
+    ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
+    route.destination.position.coordinates,
+  ];
+  routeGroupLayer.clearLayers();
+  const latlngs = L.GeoJSON.coordsToLatLngs(coordinateList);
+  latlngs.reduce((a, b) => {
+    //@ts-ignore
+    const polyline = L.Polyline.Arc(a, b, { color: '#f0fa', weight: 6, pane: 'route-line' });
+    routeGroupLayer.addLayer(polyline);
+    return b;
+  });
+  [route.departure, ...route.routeOfFlight.map((item) => item.routePoint), route.destination].forEach((routePoint) => {
+    const marker = L.marker(L.GeoJSON.coordsToLatLng(routePoint.position.coordinates as any), {
+      icon: new L.DivIcon({
+        className: 'route-label',
+        html: routePoint.key,
+        iconAnchor: [routePoint.key.length > 4 ? 64 : 54, routePoint.type !== 'waypoint' ? 20 : 10],
+        iconSize: [routePoint.key.length > 4 ? 60 : 50, 20],
+      }),
+      pane: 'route-label',
+    });
+    routeGroupLayer.addLayer(marker);
+  });
+  // map.fitBounds(polyline.getBounds());
+};
+
 function Route({ setIsShowModal }: Props) {
   const activeRoute = useSelector(selectActiveRoute);
   const [createRoute] = useCreateRouteMutation();
-  const [deleteRoute] = useDeleteRouteMutation();
   const [routeData, setRouteData] = useState(activeRoute || emptyFormData);
   const ref = useRef();
   const meteoLayers = useMeteoLayersContext();
@@ -126,7 +152,7 @@ function Route({ setIsShowModal }: Props) {
 
   const deleteActiveRoute = () => {
     meteoLayers.routeGroupLayer.clearLayers();
-    deleteRoute(activeRoute.id);
+    // deleteRoute(activeRoute.id);
     setIsShowDeleteRouteModal(false);
     setIsShowModal(false);
     handleClickClear();
@@ -180,6 +206,7 @@ function Route({ setIsShowModal }: Props) {
                   name={DEPARTURE}
                   selectedValue={routeData[DEPARTURE]}
                   handleAutoComplete={handleAutoComplete}
+                  exceptions={routeData.destination ? [routeData.destination.key] : []}
                   key={'departure-' + forceRerenderKey}
                   // handleCloseSuggestion={handleCloseSuggestion}
                   // showSuggestion={formData[DEPARTURE_SUGGESTION]}
@@ -206,6 +233,7 @@ function Route({ setIsShowModal }: Props) {
                   name={DESTINATION}
                   selectedValue={routeData[DESTINATION]}
                   handleAutoComplete={handleAutoComplete}
+                  exceptions={routeData.departure ? [routeData.departure.key] : []}
                   key={'destination-' + forceRerenderKey}
                   // handleCloseSuggestion={handleCloseSuggestion}
                   // showSuggestion={formData[DESTINATION_SUGGESTION]}
@@ -234,12 +262,28 @@ function Route({ setIsShowModal }: Props) {
                       id="route-numin"
                       pattern="[0-9]+([,][0-9]{1,2})?"
                       value={altitudeText}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value.replace(/\D+/g, ''));
-                        setAltitudeText(val.toLocaleString());
+                      onKeyDown={(e) => {
+                        if (
+                          e.key === 'Backspace' ||
+                          e.key === 'Delete' ||
+                          e.key === 'ArrowLeft' ||
+                          e.key === 'ArrowRight'
+                        ) {
+                          return;
+                        }
+                        const regex = /[0-9]|\./;
+                        if (!regex.test(e.key)) {
+                          if (e.preventDefault) e.preventDefault();
+                        }
                       }}
+                      onChange={(e) => setAltitudeText(e.target.value)}
                       onBlur={(e) => {
-                        const val = parseInt(e.target.value.replace(/\D+/g, ''));
+                        let val: number;
+                        if (!e.target.value) {
+                          val = 0;
+                        } else {
+                          val = parseInt(e.target.value.replace(/\D+/g, ''));
+                        }
                         const newValue = roundAltitude(val);
                         setAltitudeText(newValue.toLocaleString());
                       }}

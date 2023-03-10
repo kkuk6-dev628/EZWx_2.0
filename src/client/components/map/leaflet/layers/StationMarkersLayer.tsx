@@ -10,7 +10,7 @@ import SunCalc from 'suncalc';
 
 import { selectMetar } from '../../../../store/layers/LayerControl';
 import { PersonalMinimums, selectPersonalMinimums } from '../../../../store/user/UserSettings';
-import { MetarMarkerTypes, timeSliderInterval, wfsUrl, windIconLimit } from '../../common/AreoConstants';
+import { MetarMarkerTypes, paneOrders, timeSliderInterval, wfsUrl, windIconLimit } from '../../common/AreoConstants';
 import {
   addLeadingZeroes,
   getAbsoluteHours,
@@ -27,8 +27,7 @@ import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
 import { selectActiveRoute } from '../../../../store/route/routes';
 
 const metarsProperties = [
-  'wkb_geometry',
-  'ogc_fid',
+  'geometry',
   'station_id',
   'auto',
   // 'elevation_ft',
@@ -1154,7 +1153,7 @@ export const StationMarkersLayer = () => {
   };
 
   return (
-    <Pane name={'station-markers'} style={{ zIndex: 510 }}>
+    <Pane name={'station-markers'} style={{ zIndex: paneOrders.station }}>
       {displayedGeojson != null && (
         <SimplifiedMarkersLayer
           key={renderedTime}

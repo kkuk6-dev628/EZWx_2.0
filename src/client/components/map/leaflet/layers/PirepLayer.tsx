@@ -6,7 +6,7 @@ import { addLeadingZeroes, loadFeaturesFromCache, loadFeaturesFromWeb } from '..
 import { useSelector } from 'react-redux';
 import { selectPirep } from '../../../../store/layers/LayerControl';
 import { useEffect, useRef, useState } from 'react';
-import { wfsUrl } from '../../common/AreoConstants';
+import { paneOrders, wfsUrl } from '../../common/AreoConstants';
 import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 
@@ -268,7 +268,7 @@ const PirepLayer = () => {
   };
 
   return (
-    <Pane name={'pirep'} style={{ zIndex: 490 }}>
+    <Pane name={'pirep'} style={{ zIndex: paneOrders.pirep }}>
       <SimplifiedMarkersLayer
         ref={geojsonLayerRef}
         data={displayedGeojson}
