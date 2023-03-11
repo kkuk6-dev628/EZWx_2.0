@@ -338,6 +338,7 @@ export const loadFeaturesFromWeb = (
   propertyNames: string[],
   datasetName: string,
   setFeaturesFunc?: (features: GeoJSON.Feature[]) => void,
+  sortBy?: string,
 ) => {
   const params = {
     outputFormat: 'application/json',
@@ -359,9 +360,9 @@ export const loadFeaturesFromWeb = (
         console.log(wfsTypeName + ': Invalid json data!', data.data);
       } else {
         let features: GeoJSON.Feature[] = data.data.features;
-        if (wfsTypeName.indexOf('station') > -1) {
+        if (sortBy) {
           features = features.sort((a, b) => {
-            return `${a.properties.faaid}`.localeCompare(b.properties.faaid);
+            return `${a.properties[sortBy]}`.localeCompare(b.properties[sortBy]);
           });
         }
         storeFeaturesToCache(datasetName, features);

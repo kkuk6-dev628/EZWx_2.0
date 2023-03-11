@@ -243,6 +243,7 @@ export const StationMarkersLayer = () => {
               (features) => {
                 addNbmStation(stationTime.station_table_name, features);
               },
+              'faaid',
             );
           }
         });
