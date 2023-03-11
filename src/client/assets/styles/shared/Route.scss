@@ -282,3 +282,49 @@
   font-size: 14px;
   font-weight: 500;
 }
+
+
+.route__modal__box{
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  flex: 1;
+  .button{
+    display:flex;
+    flex-direction: row;
+    align-items:center;
+  }
+  .buttonDiv{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    margin:40px 0px 6px 0px ; 
+  }
+  .route__modal__box__2{
+    display: flex;
+    flex-direction: column;
+    padding-top: 4px;
+    padding-bottom:4px;
+    .route__modal__box__input1{
+      display: flex;
+      flex-direction: row;
+      border: 1px solid rgb(234, 230, 230);
+      .label{
+        padding-bottom: 10px;
+        font-size: larger;
+      }
+      .route__modal__box__input{
+        padding: 16px;
+        border: none;
+      }
+      .route__modal__box__input:focus{
+        outline: none
+      }
+      .route__modal__box__icon{
+        padding:16px;
+        background-color: lightgray;
+      }
+    }
+  }
+}
