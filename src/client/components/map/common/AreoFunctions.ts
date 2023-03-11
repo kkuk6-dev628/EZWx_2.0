@@ -358,8 +358,14 @@ export const loadFeaturesFromWeb = (
       if (typeof data.data === 'string') {
         console.log(wfsTypeName + ': Invalid json data!', data.data);
       } else {
-        storeFeaturesToCache(datasetName, data.data.features);
-        if (setFeaturesFunc) setFeaturesFunc(data.data.features);
+        let features: GeoJSON.Feature[] = data.data.features;
+        if (wfsTypeName.indexOf('station') > -1) {
+          features = features.sort((a, b) => {
+            return `${a.properties.faaid}`.localeCompare(b.properties.faaid);
+          });
+        }
+        storeFeaturesToCache(datasetName, features);
+        if (setFeaturesFunc) setFeaturesFunc(features);
       }
     })
     .catch((reason) => {
