@@ -229,29 +229,43 @@ export const StationMarkersLayer = () => {
           return;
         }
         setStationTime(result.data);
+
         const stationTimes = [...result.data].filter((stationTime) => {
           const stationValidHour = Math.floor(new Date(stationTime.valid_date).getTime() / 3600 / 1000);
-          return stationValidHour >= getAbsoluteHours(Date.now());
+          return 1 || stationValidHour >= getAbsoluteHours(Date.now());
         });
+        const stationTimesWeb = [...stationTimes];
 
-        stationTimes.forEach(async (stationTime) => {
-          const stationValidHour = Math.floor(new Date(stationTime.valid_date).getTime() / 3600 / 1000);
-          if (1 || stationValidHour >= getAbsoluteHours(Date.now())) {
-            loadFeaturesFromCache(stationTime.station_table_name, (features) => {
-              addNbmStation(stationTime.station_table_name, features);
-            });
-            await loadFeaturesFromWeb(
-              wfsUrl,
-              `EZWxBrief:${stationTime.station_table_name}`,
-              nbmStationProperties,
-              stationTime.station_table_name,
-              (features) => {
-                addNbmStation(stationTime.station_table_name, features);
-              },
-              'faaid',
-            );
+        const queuedLoadCache = () => {
+          if (stationTimes.length === 0) {
+            return;
           }
-        });
+          const [stationTime] = stationTimes.splice(0, 1);
+          loadFeaturesFromCache(stationTime.station_table_name, (features) => {
+            addNbmStation(stationTime.station_table_name, features);
+            queuedLoadCache();
+          });
+        };
+        queuedLoadCache();
+
+        const queuedLoadWeb = () => {
+          if (stationTimesWeb.length === 0) {
+            return;
+          }
+          const [stationTime] = stationTimesWeb.splice(0, 1);
+          loadFeaturesFromWeb(
+            wfsUrl,
+            `EZWxBrief:${stationTime.station_table_name}`,
+            nbmStationProperties,
+            stationTime.station_table_name,
+            (features) => {
+              addNbmStation(stationTime.station_table_name, features);
+              queuedLoadWeb();
+            },
+            'faaid',
+          );
+        };
+        queuedLoadWeb();
       })
       .catch((reason) => {
         console.log(reason);
