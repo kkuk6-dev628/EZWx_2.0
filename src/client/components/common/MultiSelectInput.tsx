@@ -147,7 +147,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
   };
 
   const handleChange = ({ target: { name: _name, value: _value } }) => {
-    setInputValue(_value.replace(matchLowerCaseRegex, (match) => match.toUpperCase()));
+    setInputValue(_value.trim().replace(matchLowerCaseRegex, (match) => match.toUpperCase()));
     setShowSuggestion(true);
     setCurrentFocus(0);
   };

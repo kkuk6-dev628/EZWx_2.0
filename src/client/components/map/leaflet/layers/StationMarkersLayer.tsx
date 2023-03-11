@@ -195,6 +195,7 @@ export const StationMarkersLayer = () => {
       setIsPast(true);
       if (metars.length > 0) {
         const filteredFeatures = metarsFilter(metars, new Date(observationTime));
+        console.log(filteredFeatures);
         setDisplayedData(filteredFeatures);
       }
     }
@@ -275,14 +276,21 @@ export const StationMarkersLayer = () => {
 
   const buildIndexedData = (features: GeoJSON.Feature[]): any => {
     const data = {};
+    // const toLog = {};
     features.map((feature) => {
       const obsTime = new Date(feature.properties.observation_time).getTime();
       const index = Math.floor(obsTime / timeSliderInterval);
       if (index in data === false) {
         data[index] = [];
+        // toLog[new Date(index * timeSliderInterval).toLocaleTimeString()] = [];
       }
       data[index].push(feature);
+      // toLog[new Date(index * timeSliderInterval).toLocaleTimeString()].push({
+      //   id: feature.properties.station_id,
+      //   tm: feature.properties.observation_time,
+      // });
     });
+    // console.log(toLog);
     setIndexedData(data as any);
     return data;
   };
@@ -334,7 +342,14 @@ export const StationMarkersLayer = () => {
         });
       }
     }
-    const result = Object.values(filteredFeatures);
+    const ordered = Object.keys(filteredFeatures)
+      .sort()
+      .reduce((obj, key) => {
+        obj[key] = filteredFeatures[key];
+        return obj;
+      }, {});
+    // console.log(ordered);
+    const result = Object.values(ordered);
     return result as any;
   };
 
