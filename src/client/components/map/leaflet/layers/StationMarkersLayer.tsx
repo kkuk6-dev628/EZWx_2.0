@@ -229,13 +229,18 @@ export const StationMarkersLayer = () => {
           return;
         }
         setStationTime(result.data);
-        result.data.forEach((stationTime) => {
+        const stationTimes = [...result.data].filter((stationTime) => {
+          const stationValidHour = Math.floor(new Date(stationTime.valid_date).getTime() / 3600 / 1000);
+          return stationValidHour >= getAbsoluteHours(Date.now());
+        });
+
+        stationTimes.forEach(async (stationTime) => {
           const stationValidHour = Math.floor(new Date(stationTime.valid_date).getTime() / 3600 / 1000);
           if (1 || stationValidHour >= getAbsoluteHours(Date.now())) {
             loadFeaturesFromCache(stationTime.station_table_name, (features) => {
               addNbmStation(stationTime.station_table_name, features);
             });
-            loadFeaturesFromWeb(
+            await loadFeaturesFromWeb(
               wfsUrl,
               `EZWxBrief:${stationTime.station_table_name}`,
               nbmStationProperties,
