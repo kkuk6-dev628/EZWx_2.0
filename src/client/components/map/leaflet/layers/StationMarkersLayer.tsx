@@ -304,7 +304,7 @@ export const StationMarkersLayer = () => {
               queuedLoadWeb();
             },
             (a, b) =>
-              a.properties.pub - b.properties.pub || (a.properties.faaid as string).localeCompare(b.properties.faaid),
+              b.properties.pub - a.properties.pub || (a.properties.faaid as string).localeCompare(b.properties.faaid),
           );
         };
         queuedLoadWeb();
