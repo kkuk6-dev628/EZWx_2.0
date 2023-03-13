@@ -26,11 +26,11 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
   const renderItem = (name: string, val: string) => {
     try {
       const filteredItems = [];
-      if (!isLoading) {
-        filteredItems.push(...airports.filter((obj: RoutePoint) => obj.key.includes(val)));
-      }
       if (!isLoadingWaypoints) {
         filteredItems.push(...waypoints.filter((item) => item.key.includes(val)));
+      }
+      if (!isLoading) {
+        filteredItems.push(...airports.filter((obj: RoutePoint) => obj.key.includes(val)));
       }
       return filteredItems.map((obj: RoutePoint, ind: number) => {
         const title: string = obj.key + ' - ' + obj.name;

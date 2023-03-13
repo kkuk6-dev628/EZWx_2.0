@@ -114,7 +114,7 @@ function SvgBulbDollar() {
 }
 function SvgSave() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="23px" height="23px" viewBox="0 0 44 44" fill="none">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 44 44" fill="none">
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -129,7 +129,7 @@ function SvgSave() {
 }
 function SvgWarn() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="23px" height="23px" viewBox="0 0 46 46" fill="none">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 46 46" fill="none">
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -158,7 +158,7 @@ function SvgWarn() {
 }
 function SvgSetting() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="23px" height="23px" viewBox="0 0 44 44" fill="none">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 44 44" fill="none">
       <path
         d="M25.5002 18.4999C27.4333 20.433 27.4333 23.5671 25.5002 25.5002C23.5671 27.4333 20.4329 27.4333 18.4998 25.5002C16.5667 23.5671 16.5667 20.433 18.4998 18.4999C20.4329 16.5668 23.5671 16.5668 25.5002 18.4999"
         stroke="white"
@@ -180,7 +180,7 @@ function SvgSetting() {
 }
 function SvgProfile() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="23px" height="23px" viewBox="0 0 44 44" fill="none">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 44 44" fill="none">
       <path
         d="M33.6673 10.3327C40.111 16.7764 40.111 27.2236 33.6673 33.6672C27.2237 40.1109 16.7765 40.1109 10.3329 33.6672C3.88921 27.2236 3.88921 16.7764 10.3329 10.3327C16.7765 3.88909 27.2237 3.88909 33.6673 10.3327"
         stroke="white"

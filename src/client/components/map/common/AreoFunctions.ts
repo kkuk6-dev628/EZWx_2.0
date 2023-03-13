@@ -327,9 +327,11 @@ export const storeFeaturesToCache = (datasetName: string, features: GeoJSON.Feat
 };
 
 export const loadFeaturesFromCache = (datasetName: string, setFeaturesFunc: (features: GeoJSON.Feature[]) => void) => {
-  db[datasetName].toArray().then((features) => {
-    setFeaturesFunc(features);
-  });
+  if (db[datasetName]) {
+    db[datasetName].toArray().then((features) => {
+      setFeaturesFunc(features);
+    });
+  }
 };
 
 export const loadFeaturesFromWeb = (
@@ -340,6 +342,7 @@ export const loadFeaturesFromWeb = (
   setFeaturesFunc?: (features: GeoJSON.Feature[]) => void,
   sortBy?: string,
   filter?: string,
+  storeCache = true,
 ) => {
   const params = {
     outputFormat: 'application/json',
@@ -367,7 +370,7 @@ export const loadFeaturesFromWeb = (
             return `${a.properties[sortBy]}`.localeCompare(b.properties[sortBy]);
           });
         }
-        storeFeaturesToCache(datasetName, features);
+        if (storeCache) storeFeaturesToCache(datasetName, features);
         if (setFeaturesFunc) setFeaturesFunc(features);
       }
     })
@@ -865,6 +868,12 @@ export const getMetarDecodedWxString = (wxString: string): string => {
     case 'SHSN DRSN':
       result = 'Moderate snow showers and drifting snow';
       break;
+    case 'DRSN SHSN':
+      result = 'Snow showers and drifting snow';
+      break;
+    case 'DRSN -SN':
+      result = 'Light snow and drifting snow';
+      break;
     case '+SHSN DRSN':
       result = 'Heavy snow showers and drifting snow';
       break;
@@ -1319,8 +1328,20 @@ export const getMetarDecodedWxString = (wxString: string): string => {
     case 'IC':
       result = 'Ice cystals';
       break;
+    case 'IC HZ':
+      result = 'Ice crystals and haze';
+      break;
+    case 'IC BR':
+      result = 'Ice crystals and mist';
+      break;
+    case 'IC BLSN':
+      result = 'Ice crystals and blowing snow';
+      break;
     case 'IC DRSN':
       result = 'Ice crystals and drifting snow';
+      break;
+    case 'IC -SN DRSN':
+      result = 'Light snow, ice crystals and drifting snow';
       break;
     case 'VCSH DRSN':
       result = 'Showers in the vicinity and drifting snow';

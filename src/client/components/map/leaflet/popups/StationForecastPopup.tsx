@@ -59,6 +59,11 @@ const StationForecastPopup = ({
       skyCover: skyCondition,
       cloudBase: lowestCloud,
     });
+  } else {
+    skyConditions.push({
+      skyCover: 'SKC',
+      cloudBase: 0,
+    });
   }
 
   const skyConditionsAsc = skyConditions.sort((a, b) => {

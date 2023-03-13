@@ -92,11 +92,6 @@ const responsiveLink = [
     name: 'Pilots guide',
     link: '/pilots-guide',
   },
-  {
-    id: 7,
-    name: 'Sign out',
-    link: '/sign-out',
-  },
 ];
 
 export default function Header() {
@@ -214,7 +209,7 @@ export default function Header() {
             <div className="header__rgt__btns flex flex-align-center">
               <Link href="/login">
                 {mapMenu ? (
-                  <button className="header__rgt__btn header__rgt__btn--map btn">BACK TO SITE</button>
+                  <button className="header__rgt__btn header__rgt__btn--map btn">Home</button>
                 ) : (
                   <button className="header__rgt__btn header__rgt__btn--lft btn">New to EZWxBrief?</button>
                 )}

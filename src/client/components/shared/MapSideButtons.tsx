@@ -1,13 +1,12 @@
 import React from 'react';
-import { FaInfoCircle, FaListUl, FaRedoAlt } from 'react-icons/fa';
-import { MdSettings } from 'react-icons/md';
+import { SvgRefresh } from '../utils/SvgIcons';
 
 const MapSideButtons = () => {
   return (
     <div className="pos_relative">
       <div className="map__btns__container">
         <div className="user__action__btns" onClick={() => window.location.reload()}>
-          <FaRedoAlt />
+          <SvgRefresh />
         </div>
         {/* <div className="user__action__btns" onClick={openUserSettingDrawer}>
           <MdSettings />

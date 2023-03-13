@@ -171,8 +171,10 @@ function Route({ setIsShowModal }: Props) {
   return (
     <div className="route-editor" ref={ref}>
       <div className="route-editor__wrp">
-        <DialogTitle className="route-editor__top" style={{ cursor: 'move' }} id="draggable-dialog-title">
-          <p className="route-editor__top__text text">Enter/Edit/Delete route</p>
+        <DialogTitle className="route-editor__top">
+          <div className="route-editor__top__text text" style={{ cursor: 'move' }} id="draggable-dialog-title">
+            Enter/Edit/Delete route
+          </div>
           <button onClick={() => setIsShowModal(false)} className="route-editor__top__close" type="button">
             <AiOutlineClose className="route-editor__icon" />
           </button>

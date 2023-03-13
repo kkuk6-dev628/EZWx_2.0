@@ -19,7 +19,6 @@ import {
   getMetarVisibilityCategory,
   getQueryTime,
   getSkyConditions,
-  getTimeRangeStart,
   getWorstSkyCondition,
   loadFeaturesFromCache,
   loadFeaturesFromWeb,
@@ -39,6 +38,8 @@ const metarsProperties = [
   'observation_time',
   'wind_speed_kt',
   'wind_gust_kt',
+  'crosswind_component_kt',
+  'crosswind_runway_id',
   'flight_category',
   'raw_text',
   'visibility_statute_mi',
@@ -179,6 +180,12 @@ export const StationMarkersLayer = () => {
     if (obsHour > currentHour) {
       setIsPast(false);
       if (stationTime.length > 0) {
+        const lastTime = new Date(stationTime[stationTime.length - 1].valid_date);
+        lastTime.setHours(lastTime.getHours() + 3);
+        if (getAbsoluteHours(lastTime) < obsHour) {
+          setDisplayedData([]);
+          return;
+        }
         const validStation = stationTime.reduce((acc, cur) => {
           const prevDiff = Math.abs(getAbsoluteHours(acc.valid_date) - obsHour);
           const currDiff = Math.abs(getAbsoluteHours(cur.valid_date) - obsHour);
@@ -190,6 +197,8 @@ export const StationMarkersLayer = () => {
         if (nbmStations[validStation.station_table_name]) {
           setDisplayedData(nbmStations[validStation.station_table_name]);
         }
+      } else {
+        setDisplayedData([]);
       }
     } else {
       setIsPast(true);
@@ -242,6 +251,7 @@ export const StationMarkersLayer = () => {
         },
         undefined,
         serverFilter,
+        false,
       );
     };
     queuedLoadWeb(currentTime);
@@ -1014,6 +1024,7 @@ export const StationMarkersLayer = () => {
         case 'SN FG':
         case 'SN FZFG DRSN':
         case 'SHSN DRSN':
+        case 'DRSN SHSN':
         case 'SN DRSN':
         case 'SG DRSN':
         case 'SG':
@@ -1103,10 +1114,15 @@ export const StationMarkersLayer = () => {
         case 'BLSN':
         case 'DRSN':
         case 'SN BLSN':
+        case 'IC BLSN':
         case 'IC DRSN':
+        case 'DRSN -SN':
+        case 'IC -SN DRSN':
           weatherIconClass = 'fas fa-snow-blowing';
           break;
         case 'IC':
+        case 'IC HZ':
+        case 'IC BR':
           weatherIconClass = 'fas fa-sparkles';
           break;
         case 'FC':

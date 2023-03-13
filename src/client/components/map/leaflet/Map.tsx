@@ -169,6 +169,8 @@ const LeafletMap = () => {
         attributionControl={false}
         // preferCanvas={true}
         renderer={L.canvas()}
+        minZoom={4}
+        maxZoom={18}
       >
         <BaseMapLayers></BaseMapLayers>
         <MeteoLayers></MeteoLayers>

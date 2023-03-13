@@ -20,14 +20,19 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
+    padding: 0 20px;
   }
 
   &__top__text {
     font-weight: 400;
     font-size: 18px;
     line-height: 20px;
+    padding: 12px 0;
+    width: 100%;
     color: var(--color-white);
+  }
+  &__top__close {
+    padding: 12px 0;
   }
 
   &__tabs {

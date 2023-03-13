@@ -130,6 +130,18 @@ const MetarsPopup = ({
           <span>{feature.properties.wind_gust_kt} knots</span>
         </Typography>
       )}
+      {feature.properties.crosswind_component_kt != null && (
+        <Typography variant="body2" style={{ margin: 3 }}>
+          <b>Crosswind component: </b>
+          <span>{feature.properties.crosswind_component_kt} knots</span>
+        </Typography>
+      )}
+      {feature.properties.crosswind_component_kt != null && (
+        <Typography variant="body2" style={{ margin: 3 }}>
+          <b>Crosswind runway: </b>
+          <span>{feature.properties.crosswind_runway_id}</span>
+        </Typography>
+      )}
       {feature.properties.temp_c != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Temperature: </b>
