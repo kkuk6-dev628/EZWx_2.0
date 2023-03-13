@@ -80,6 +80,7 @@ const nbmStationProperties = [
   'cross_com',
   'valid_date',
   'geom',
+  'pub',
 ];
 
 export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): { iconUrl: string; ceiling: number } => {
@@ -302,7 +303,8 @@ export const StationMarkersLayer = () => {
               addNbmStation(stationTime.station_table_name, features);
               queuedLoadWeb();
             },
-            'faaid',
+            (a, b) =>
+              a.properties.pub - b.properties.pub || (a.properties.faaid as string).localeCompare(b.properties.faaid),
           );
         };
         queuedLoadWeb();
