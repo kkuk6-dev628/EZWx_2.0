@@ -17,7 +17,9 @@ import {
   getLowestCeiling,
   getMetarCeilingCategory,
   getMetarVisibilityCategory,
+  getQueryTime,
   getSkyConditions,
+  getTimeRangeStart,
   getWorstSkyCondition,
   loadFeaturesFromCache,
   loadFeaturesFromWeb,
@@ -142,13 +144,12 @@ export const getNbmFlightCategoryIconUrl = (feature: GeoJSON.Feature, personalMi
 const nbmStations = {};
 
 export const StationMarkersLayer = () => {
-  const [metars, setMetars] = useState<GeoJSON.Feature[]>([]);
   const [displayedGeojson, setDisplayedGeojson] = useState<GeoJSON.FeatureCollection>();
   const [stationTime, setStationTime] = useState<any[]>([]);
   const [clusterRadius, setClusterRadius] = useState(20);
   const layerState = useSelector(selectMetar);
   const personalMinimums = useSelector(selectPersonalMinimums);
-  const [indexedData, setIndexedData] = useState();
+  const [indexedData, setIndexedData] = useState({});
   const observationTime = useSelector(selectObsTime);
   const [isPast, setIsPast] = useState(true);
   const [renderedTime, setRenderedTime] = useState(Date.now());
@@ -159,18 +160,17 @@ export const StationMarkersLayer = () => {
   const map = useMap();
 
   useEffect(() => {
-    loadFeaturesFromCache('metars', setMetars);
-    loadFeaturesFromWeb(wfsUrl, 'EZWxBrief:metar', metarsProperties, 'metars', setMetars);
+    loadMetars();
     loadNbmStationMarkers();
   }, []);
 
   useEffect(() => {
-    if (!metars) return;
-    if (metars.length > 0) {
-      const filteredFeatures = metarsFilter(metars, new Date(observationTime));
+    if (!indexedData) return;
+    if (Object.keys(indexedData).length > 0) {
+      const filteredFeatures = metarsFilter(new Date(observationTime));
       setDisplayedData(filteredFeatures);
     }
-  }, [metars]);
+  }, [indexedData]);
 
   useEffect(() => {
     if (layerState && layerState.checked === false) return;
@@ -193,9 +193,8 @@ export const StationMarkersLayer = () => {
       }
     } else {
       setIsPast(true);
-      if (metars.length > 0) {
-        const filteredFeatures = metarsFilter(metars, new Date(observationTime));
-        console.log(filteredFeatures);
+      if (Object.keys(indexedData).length > 0) {
+        const filteredFeatures = metarsFilter(new Date(observationTime));
         setDisplayedData(filteredFeatures);
       }
     }
@@ -218,6 +217,34 @@ export const StationMarkersLayer = () => {
       type: 'FeatureCollection',
       features: features,
     });
+  };
+
+  const loadMetars = () => {
+    const currentTime = new Date();
+    const lastTime = new Date();
+    lastTime.setHours(lastTime.getHours() - 12);
+    // loadFeaturesFromCache('metars', setMetars);
+    const queuedLoadWeb = (time: Date) => {
+      if (time < lastTime) {
+        return;
+      }
+      const serverFilter = `observation_time DURING ${getQueryTime(time)}`;
+      loadFeaturesFromWeb(
+        wfsUrl,
+        'EZWxBrief:metar',
+        metarsProperties,
+        'metars',
+        (features) => {
+          buildIndexedData([...features]);
+          const newTime = new Date(time.getTime());
+          newTime.setMinutes(newTime.getMinutes() - 75);
+          queuedLoadWeb(newTime);
+        },
+        undefined,
+        serverFilter,
+      );
+    };
+    queuedLoadWeb(currentTime);
   };
 
   const loadNbmStationMarkers = () => {
@@ -246,6 +273,9 @@ export const StationMarkersLayer = () => {
             queuedLoadCache();
           });
         };
+        // limit number of requests to 3 at the same time.
+        queuedLoadCache();
+        queuedLoadCache();
         queuedLoadCache();
 
         const queuedLoadWeb = () => {
@@ -296,42 +326,30 @@ export const StationMarkersLayer = () => {
 
   const buildIndexedData = (features: GeoJSON.Feature[]): any => {
     const data = {};
-    // const toLog = {};
     features.map((feature) => {
       const obsTime = new Date(feature.properties.observation_time).getTime();
       const index = Math.floor(obsTime / timeSliderInterval);
       if (index in data === false) {
         data[index] = [];
-        // toLog[new Date(index * timeSliderInterval).toLocaleTimeString()] = [];
       }
       data[index].push(feature);
-      // toLog[new Date(index * timeSliderInterval).toLocaleTimeString()].push({
-      //   id: feature.properties.station_id,
-      //   tm: feature.properties.observation_time,
-      // });
     });
-    // console.log(toLog);
-    setIndexedData(data as any);
+    setIndexedData((prevState) => ({ ...prevState, ...data } as any));
     return data;
   };
 
-  const metarsFilter = (features: GeoJSON.Feature[], observationTime: Date): GeoJSON.Feature[] => {
+  const metarsFilter = (observationTime: Date): GeoJSON.Feature[] => {
     const obsHour = getAbsoluteHours(observationTime);
     const currentHour = getAbsoluteHours(Date.now());
     if (obsHour - currentHour > 0) {
       return [];
     }
-    let indexedFeatures = indexedData;
-    if (!indexedFeatures) {
-      indexedFeatures = buildIndexedData(features);
-    }
-    if (!indexedFeatures) return [];
     const filteredFeatures = {};
     const obsTime = new Date(observationTime).getTime();
     const startIndex = Math.floor((obsTime - 75 * 60 * 1000) / timeSliderInterval);
     const endIndex = Math.floor(obsTime / timeSliderInterval);
     for (let index = startIndex; index < endIndex; index++) {
-      const iData = indexedFeatures[index] as GeoJSON.Feature[];
+      const iData = indexedData[index] as GeoJSON.Feature[];
       if (iData) {
         iData.map((feature) => {
           if (
@@ -368,7 +386,6 @@ export const StationMarkersLayer = () => {
         obj[key] = filteredFeatures[key];
         return obj;
       }, {});
-    // console.log(ordered);
     const result = Object.values(ordered);
     return result as any;
   };

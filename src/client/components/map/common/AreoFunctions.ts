@@ -339,6 +339,7 @@ export const loadFeaturesFromWeb = (
   datasetName: string,
   setFeaturesFunc?: (features: GeoJSON.Feature[]) => void,
   sortBy?: string,
+  filter?: string,
 ) => {
   const params = {
     outputFormat: 'application/json',
@@ -349,6 +350,7 @@ export const loadFeaturesFromWeb = (
     version: '1.0.0',
     srsName: 'EPSG:4326',
     propertyName: propertyNames.join(','),
+    cql_filter: filter,
   } as any;
   axios
     .get(url, {
