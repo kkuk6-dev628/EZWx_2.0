@@ -108,7 +108,7 @@ export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): { iconUrl: s
   return { iconUrl, ceiling };
 };
 
-export const getNbmFlightCategoryIconUrl = (feature: GeoJSON.Feature, personalMinimums: PersonalMinimums): string => {
+const getNbmFlightCategory = (feature: GeoJSON.Feature, personalMinimums: PersonalMinimums): string => {
   const visibility = feature.properties.vis;
   const [catVis] = getMetarVisibilityCategory(visibility, personalMinimums);
   const ceiling = feature.properties.ceil;
@@ -127,6 +127,12 @@ export const getNbmFlightCategoryIconUrl = (feature: GeoJSON.Feature, personalMi
     indexFinalCat = -1;
   }
   const finalCat = indexFinalCat > -1 ? categories[indexFinalCat] : 'Black';
+  return finalCat;
+};
+
+export const getNbmFlightCategoryIconUrl = (feature: GeoJSON.Feature, personalMinimums: PersonalMinimums): string => {
+  const finalCat = getNbmFlightCategory(feature, personalMinimums);
+  const ceiling = feature.properties.ceil;
   let skyCondition: string;
   const skyCover = feature.properties.skycov;
   if (ceiling) {
@@ -143,6 +149,7 @@ export const getNbmFlightCategoryIconUrl = (feature: GeoJSON.Feature, personalMi
   const iconUrl = `/icons/metar/${finalCat}-${skyCondition}.png`;
   return iconUrl;
 };
+
 const nbmStations = {};
 
 export const StationMarkersLayer = () => {
@@ -167,7 +174,7 @@ export const StationMarkersLayer = () => {
   }, []);
 
   useEffect(() => {
-    if (!indexedData) return;
+    if (!indexedData || !isPast) return;
     if (Object.keys(indexedData).length > 0) {
       const filteredFeatures = metarsFilter(new Date(observationTime));
       setDisplayedData(filteredFeatures);
@@ -196,7 +203,8 @@ export const StationMarkersLayer = () => {
           return acc;
         });
         if (nbmStations[validStation.station_table_name]) {
-          setDisplayedData(nbmStations[validStation.station_table_name]);
+          const filtered = stationForecastFilter(nbmStations[validStation.station_table_name]);
+          setDisplayedData(filtered);
         }
       } else {
         setDisplayedData([]);
@@ -211,8 +219,34 @@ export const StationMarkersLayer = () => {
   }, [observationTime]);
 
   useEffect(() => {
-    layerState.markerType === MetarMarkerTypes.surfaceWindBarbs.value ? setClusterRadius(20) : setClusterRadius(30);
-    setRenderedTime(Date.now());
+    if (isPast) {
+      layerState.markerType === MetarMarkerTypes.surfaceWindBarbs.value ? setClusterRadius(20) : setClusterRadius(30);
+      setRenderedTime(Date.now());
+    } else {
+      if (stationTime.length > 0) {
+        const obsHour = getAbsoluteHours(observationTime);
+        const lastTime = new Date(stationTime[stationTime.length - 1].valid_date);
+        lastTime.setHours(lastTime.getHours() + 3);
+        if (getAbsoluteHours(lastTime) < obsHour) {
+          setDisplayedData([]);
+          return;
+        }
+        const validStation = stationTime.reduce((acc, cur) => {
+          const prevDiff = Math.abs(getAbsoluteHours(acc.valid_date) - obsHour);
+          const currDiff = Math.abs(getAbsoluteHours(cur.valid_date) - obsHour);
+          if (prevDiff - currDiff > 0) {
+            return cur;
+          }
+          return acc;
+        });
+        if (nbmStations[validStation.station_table_name]) {
+          const filtered = stationForecastFilter(nbmStations[validStation.station_table_name]);
+          setDisplayedData(filtered);
+        }
+      } else {
+        setDisplayedData([]);
+      }
+    }
   }, [
     layerState.markerType,
     layerState.flightCategory.all.checked,
@@ -400,6 +434,35 @@ export const StationMarkersLayer = () => {
       }, {});
     const result = Object.values(ordered);
     return result as any;
+  };
+
+  const stationForecastFilter = (features: GeoJSON.Feature[]): GeoJSON.Feature[] => {
+    if (
+      layerState.markerType !== MetarMarkerTypes.flightCategory.value ||
+      layerState.flightCategory.all.checked === true
+    ) {
+      return features;
+    }
+    const filtered = features.filter((feature) => {
+      const flightCategory = getNbmFlightCategory(feature, personalMinimums);
+      if (layerState.flightCategory.vfr.checked && flightCategory === 'VFR') {
+        return true;
+      }
+      if (layerState.flightCategory.mvfr.checked && flightCategory === 'MVFR') {
+        return true;
+      }
+      if (layerState.flightCategory.ifr.checked && flightCategory === 'IFR') {
+        return true;
+      }
+      if (layerState.flightCategory.lifr.checked && flightCategory === 'LIFR') {
+        return true;
+      }
+      if (flightCategory === 'BLACK') {
+        return true;
+      }
+      return false;
+    });
+    return filtered;
   };
 
   const pointToLayer = (feature: GeoJSON.Feature, latlng: LatLng): L.Layer => {

@@ -47,6 +47,9 @@ const PaperComponent = (props) => {
   );
 };
 
+const maxScreenDimension = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
+const minZoom = maxScreenDimension > 1280 ? 4 : 2;
+
 const LeafletMap = () => {
   const { pathname } = useRouter();
   const [isShowTabs, setIsShowTabs] = useState(false);
@@ -169,7 +172,7 @@ const LeafletMap = () => {
         attributionControl={false}
         // preferCanvas={true}
         renderer={L.canvas()}
-        minZoom={4}
+        minZoom={minZoom}
         maxZoom={18}
       >
         <BaseMapLayers></BaseMapLayers>
