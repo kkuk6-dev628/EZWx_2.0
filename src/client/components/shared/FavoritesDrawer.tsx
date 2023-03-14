@@ -6,6 +6,7 @@ import { selectAuth } from '../../store/auth/authSlice';
 import { FiFilter } from 'react-icons/fi';
 import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { FaFolder, FaFolderOpen } from 'react-icons/fa';
+import useDrop from '../common/useDropHook';
 
 interface Props {
   onClose: (isOpen: boolean) => void;
@@ -16,7 +17,9 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
   const { id } = useSelector(selectAuth);
   const [showFolders, setShowFolders] = useState(false);
   const [collapseState, setCollapseState] = useState({});
-  const dummyFolders = [
+  const [indexes, setIndexes] = useState({ folderIndex: '', folderItemIndex: '' });
+
+  const [folders, setFolders] = useState([
     {
       name: 'My 7-Day Forecasts',
       items: ['first', 'second', 'third'],
@@ -37,8 +40,7 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
       name: 'My Workshops',
       items: [],
     },
-  ];
-
+  ]);
   const handleCloseDrawer = () => {
     closeDrawer();
   };
@@ -47,6 +49,26 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
     onClose(false);
   };
 
+  function handleDrop(e, ind) {
+    e.preventDefault();
+    const foldersCopy = JSON.parse(JSON.stringify(folders));
+    foldersCopy[ind].items.push(foldersCopy[indexes.folderIndex].items[indexes.folderItemIndex]);
+    const itemToRemoveFolder = foldersCopy[indexes.folderIndex].items;
+    itemToRemoveFolder.splice(indexes.folderItemIndex, 1);
+    foldersCopy[indexes.folderIndex].items = itemToRemoveFolder;
+    setFolders(foldersCopy);
+  }
+  function handleDragOver(event) {
+    event.preventDefault();
+  }
+
+  function handleDragLeave(e, ind) {
+    e.preventDefault();
+  }
+
+  const handleDragStart = (index, itemIndex) => {
+    setIndexes({ folderIndex: index, folderItemIndex: itemIndex });
+  };
   return (
     <Drawer anchor={'right'} open={isOpen} onClose={handleCloseDrawer}>
       <div className="drawer__container">
@@ -78,11 +100,11 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
                 <AiOutlinePlus /> <FaFolder className="root__folder__icon" />
               </>
             )}
-            <span className="root__collapse__title">{`EZWxBrief (${dummyFolders.length})`}</span>
+            <span className="root__collapse__title">{`EZWxBrief (${folders.length})`}</span>
           </div>
           <Collapse in={showFolders} timeout="auto" className="root__collapse">
             <div className="collapse__container__body">
-              {dummyFolders.map((el) => (
+              {folders.map((el, ind) => (
                 <>
                   <div
                     onClick={() =>
@@ -92,6 +114,9 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
                       }))
                     }
                     className="folder__title__container"
+                    onDrop={(e) => handleDrop(e, ind)}
+                    onDragOver={(e) => handleDragOver(e)}
+                    onDragLeave={(e) => handleDragLeave(e, ind)}
                   >
                     {collapseState?.[el.name] ? (
                       <FaFolderOpen className="folder__icon" />
@@ -104,8 +129,14 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
                   </div>
                   <Collapse in={collapseState?.[el.name] || false}>
                     <div className="collapse__container__body">
-                      {el.items.map((item) => (
-                        <Typography className="folder__title__container">{item}</Typography>
+                      {el.items.map((item, itemIndex) => (
+                        <Typography
+                          draggable
+                          className="folder__title__container"
+                          onDragStart={() => handleDragStart(ind, itemIndex)}
+                        >
+                          {item}
+                        </Typography>
                       ))}
                     </div>
                   </Collapse>
