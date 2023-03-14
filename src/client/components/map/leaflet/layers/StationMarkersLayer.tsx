@@ -187,28 +187,7 @@ export const StationMarkersLayer = () => {
     const currentHour = getAbsoluteHours(Date.now());
     if (obsHour > currentHour) {
       setIsPast(false);
-      if (stationTime.length > 0) {
-        const lastTime = new Date(stationTime[stationTime.length - 1].valid_date);
-        lastTime.setHours(lastTime.getHours() + 3);
-        if (getAbsoluteHours(lastTime) < obsHour) {
-          setDisplayedData([]);
-          return;
-        }
-        const validStation = stationTime.reduce((acc, cur) => {
-          const prevDiff = Math.abs(getAbsoluteHours(acc.valid_date) - obsHour);
-          const currDiff = Math.abs(getAbsoluteHours(cur.valid_date) - obsHour);
-          if (prevDiff - currDiff > 0) {
-            return cur;
-          }
-          return acc;
-        });
-        if (nbmStations[validStation.station_table_name]) {
-          const filtered = stationForecastFilter(nbmStations[validStation.station_table_name]);
-          setDisplayedData(filtered);
-        }
-      } else {
-        setDisplayedData([]);
-      }
+      updateNbmStationMarkers();
     } else {
       setIsPast(true);
       if (Object.keys(indexedData).length > 0) {
@@ -223,29 +202,7 @@ export const StationMarkersLayer = () => {
       layerState.markerType === MetarMarkerTypes.surfaceWindBarbs.value ? setClusterRadius(20) : setClusterRadius(30);
       setRenderedTime(Date.now());
     } else {
-      if (stationTime.length > 0) {
-        const obsHour = getAbsoluteHours(observationTime);
-        const lastTime = new Date(stationTime[stationTime.length - 1].valid_date);
-        lastTime.setHours(lastTime.getHours() + 3);
-        if (getAbsoluteHours(lastTime) < obsHour) {
-          setDisplayedData([]);
-          return;
-        }
-        const validStation = stationTime.reduce((acc, cur) => {
-          const prevDiff = Math.abs(getAbsoluteHours(acc.valid_date) - obsHour);
-          const currDiff = Math.abs(getAbsoluteHours(cur.valid_date) - obsHour);
-          if (prevDiff - currDiff > 0) {
-            return cur;
-          }
-          return acc;
-        });
-        if (nbmStations[validStation.station_table_name]) {
-          const filtered = stationForecastFilter(nbmStations[validStation.station_table_name]);
-          setDisplayedData(filtered);
-        }
-      } else {
-        setDisplayedData([]);
-      }
+      updateNbmStationMarkers();
     }
   }, [
     layerState.markerType,
@@ -256,6 +213,31 @@ export const StationMarkersLayer = () => {
     layerState.flightCategory.lifr.checked,
   ]);
 
+  const updateNbmStationMarkers = () => {
+    if (stationTime.length > 0) {
+      const obsHour = getAbsoluteHours(observationTime);
+      const lastTime = new Date(stationTime[stationTime.length - 1].valid_date);
+      lastTime.setHours(lastTime.getHours() + 3);
+      if (getAbsoluteHours(lastTime) < obsHour) {
+        setDisplayedData([]);
+        return;
+      }
+      const validStation = stationTime.reduce((acc, cur) => {
+        const prevDiff = Math.abs(getAbsoluteHours(acc.valid_date) - obsHour);
+        const currDiff = Math.abs(getAbsoluteHours(cur.valid_date) - obsHour);
+        if (prevDiff - currDiff > 0 && getAbsoluteHours(cur.valid_date) <= obsHour) {
+          return cur;
+        }
+        return acc;
+      });
+      if (nbmStations[validStation.station_table_name]) {
+        const filtered = stationForecastFilter(nbmStations[validStation.station_table_name]);
+        setDisplayedData(filtered);
+      }
+    } else {
+      setDisplayedData([]);
+    }
+  };
   const setDisplayedData = (features: GeoJSON.Feature[]) => {
     setDisplayedGeojson({
       type: 'FeatureCollection',
@@ -1094,6 +1076,8 @@ export const StationMarkersLayer = () => {
         case 'SG DRSN':
         case 'SG':
         case 'VCSH DRSN':
+        case 'SN FZFG BLSN':
+        case 'FZFG SN':
           weatherIconClass = 'fas fa-cloud-snow';
           break;
         case 'RASN':

@@ -75,13 +75,7 @@ export const simpleTimeFormat = (time: Date, useLocalTime: boolean) => {
     day: '2-digit',
     month: 'short',
     timeZone: !useLocalTime ? 'UTC' : undefined,
-  })} ${time.toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    timeZoneName: 'short',
-    timeZone: !useLocalTime ? 'UTC' : undefined,
-  })}`;
+  })} ${simpleTimeOnlyFormat(time, useLocalTime)}`;
 };
 
 export const simpleTimeOnlyFormat = (time: Date, useLocalTime: boolean) => {
@@ -102,6 +96,14 @@ export const simpleTimeOnlyFormat = (time: Date, useLocalTime: boolean) => {
 export const getThumbnail = (feature, style) => {
   const svgString = geojson2svg().styles({ Polygon: style }).data(feature).render();
   return svgString;
+};
+
+export const celsiusToFahrenheit = (celsius: number): number => {
+  return (celsius * 9) / 5 + 32;
+};
+
+export const knotsToMph = (knots: number): number => {
+  return Math.round(knots * 1.15078);
 };
 
 export const simplifyPoints = (
@@ -180,8 +182,7 @@ export const getCacheVersion = (updateInterval: number): number => {
 export const getTimeRangeStart = () => {
   const currentDate = new Date();
   const origin = new Date();
-  origin.setDate(currentDate.getDate() - 1);
-  origin.setHours(12, 0, 0);
+  origin.setHours(origin.getHours() - 12, 0, 0);
   origin.setMinutes(0);
   origin.setSeconds(0);
   origin.setMilliseconds(0);

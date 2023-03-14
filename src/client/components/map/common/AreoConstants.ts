@@ -89,6 +89,6 @@ export const emptyGeoJson: GeoJSON.FeatureCollection = {
   features: new Array<GeoJSON.Feature>(),
 };
 
-export const pickupRadiusPx = 30;
+export const pickupRadiusPx = 10;
 
 export const wfsUrl = 'https://eztile4.ezwxbrief.com/geoserver/EZWxBrief/ows';
