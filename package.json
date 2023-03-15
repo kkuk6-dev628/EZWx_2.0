@@ -93,7 +93,7 @@
     "react-select": "^5.7.0",
     "react-switch": "^7.0.0",
     "reflect-metadata": "^0.1.13",
-    "rimraf": "^4.1.2",
+    "rimraf": "^4.4.0",
     "rxjs": "^7.8.0",
     "sass": "^1.58.3",
     "styled-components": "^5.3.9",
