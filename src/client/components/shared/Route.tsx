@@ -40,11 +40,13 @@ export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
     route.destination.position.coordinates,
   ];
   routeGroupLayer.clearLayers();
-  const latlngs = L.GeoJSON.coordsToLatLngs(coordinateList);
+  const latlngs: L.LatLng[] = L.GeoJSON.coordsToLatLngs(coordinateList);
   latlngs.reduce((a, b) => {
-    //@ts-ignore
-    const polyline = L.Polyline.Arc(a, b, { color: '#f0fa', weight: 6, pane: 'route-line' });
-    routeGroupLayer.addLayer(polyline);
+    if (a.lat !== b.lat || a.lng !== b.lng) {
+      //@ts-ignore
+      const polyline = L.Polyline.Arc(a, b, { color: '#f0fa', weight: 6, pane: 'route-line' });
+      routeGroupLayer.addLayer(polyline);
+    }
     return b;
   });
   [route.departure, ...route.routeOfFlight.map((item) => item.routePoint), route.destination].forEach((routePoint) => {
@@ -70,6 +72,8 @@ function Route({ setIsShowModal }: Props) {
   const meteoLayers = useMeteoLayersContext();
   const [forceRerenderKey, setForceRerenderKey] = useState(Date.now());
   const [isShowDeleteRouteModal, setIsShowDeleteRouteModal] = useState(false);
+  const [isShowErrorRouteModal, setIsShowErrorRouteModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [altitudeText, setAltitudeText] = useState(routeData.altitude.toLocaleString());
 
   useEffect(() => {
@@ -94,14 +98,6 @@ function Route({ setIsShowModal }: Props) {
   };
 
   const handleAutoComplete = (name: string, val: RoutePoint) => {
-    if (val) {
-      if (
-        (routeData.departure && isSameRoutePoints(routeData.departure, val)) ||
-        (routeData.destination && isSameRoutePoints(routeData.destination, val))
-      ) {
-        return;
-      }
-    }
     setRouteData({
       ...routeData,
       [name]: val,
@@ -114,14 +110,23 @@ function Route({ setIsShowModal }: Props) {
     });
   };
   const handleClickOpenInMap = () => {
-    if (validateRoute(routeData)) {
+    const validity = validateRoute(routeData);
+    if (validity === true) {
       addRoute();
       setIsShowModal(false);
+    } else {
+      setErrorMessage(validity as string);
+      setIsShowErrorRouteModal(true);
     }
   };
   const handleClickOpenInProfile = () => {
-    if (validateRoute(routeData)) {
+    const validity = validateRoute(routeData);
+    if (validity === true) {
       addRoute();
+      setIsShowModal(false);
+    } else {
+      setErrorMessage(validity as string);
+      setIsShowErrorRouteModal(true);
     }
   };
   const handleClickDelete = () => {
@@ -208,7 +213,7 @@ function Route({ setIsShowModal }: Props) {
                   name={DEPARTURE}
                   selectedValue={routeData[DEPARTURE]}
                   handleAutoComplete={handleAutoComplete}
-                  exceptions={routeData.destination ? [routeData.destination.key] : []}
+                  exceptions={[]}
                   key={'departure-' + forceRerenderKey}
                   // handleCloseSuggestion={handleCloseSuggestion}
                   // showSuggestion={formData[DEPARTURE_SUGGESTION]}
@@ -235,7 +240,7 @@ function Route({ setIsShowModal }: Props) {
                   name={DESTINATION}
                   selectedValue={routeData[DESTINATION]}
                   handleAutoComplete={handleAutoComplete}
-                  exceptions={routeData.departure ? [routeData.departure.key] : []}
+                  exceptions={[]}
                   key={'destination-' + forceRerenderKey}
                   // handleCloseSuggestion={handleCloseSuggestion}
                   // showSuggestion={formData[DESTINATION_SUGGESTION]}
@@ -344,6 +349,17 @@ function Route({ setIsShowModal }: Props) {
           <>
             <SecondaryButton onClick={() => setIsShowDeleteRouteModal(false)} text="No" isLoading={false} />
             <PrimaryButton text="Yes" onClick={() => deleteActiveRoute()} isLoading={false} />
+          </>
+        }
+      />
+      <Modal
+        open={isShowErrorRouteModal}
+        handleClose={() => setIsShowErrorRouteModal(false)}
+        title="Route Error"
+        description={errorMessage}
+        footer={
+          <>
+            <PrimaryButton text="Close" onClick={() => setIsShowErrorRouteModal(false)} isLoading={false} />
           </>
         }
       />

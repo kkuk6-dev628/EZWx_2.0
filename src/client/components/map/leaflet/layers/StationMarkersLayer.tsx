@@ -9,10 +9,11 @@ import Image from 'next/image';
 import SunCalc from 'suncalc';
 
 import { selectMetar } from '../../../../store/layers/LayerControl';
-import { PersonalMinimums, selectPersonalMinimums } from '../../../../store/user/UserSettings';
+import { PersonalMinimums, selectPersonalMinimums, selectSettings } from '../../../../store/user/UserSettings';
 import { MetarMarkerTypes, paneOrders, timeSliderInterval, wfsUrl, windIconLimit } from '../../common/AreoConstants';
 import {
   addLeadingZeroes,
+  celsiusToFahrenheit,
   getAbsoluteHours,
   getLowestCeiling,
   getMetarCeilingCategory,
@@ -20,8 +21,10 @@ import {
   getQueryTime,
   getSkyConditions,
   getWorstSkyCondition,
+  knotsToMph,
   loadFeaturesFromCache,
   loadFeaturesFromWeb,
+  visibilityMileToMeter,
 } from '../../common/AreoFunctions';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
@@ -161,8 +164,8 @@ export const StationMarkersLayer = () => {
   const [indexedData, setIndexedData] = useState({});
   const observationTime = useSelector(selectObsTime);
   const [isPast, setIsPast] = useState(true);
-  const [renderedTime, setRenderedTime] = useState(Date.now());
   const activeRoute = useSelector(selectActiveRoute);
+  const userSettings = useSelector(selectSettings);
 
   const geojsonLayerRef = useRef();
 
@@ -200,7 +203,11 @@ export const StationMarkersLayer = () => {
   useEffect(() => {
     if (isPast) {
       layerState.markerType === MetarMarkerTypes.surfaceWindBarbs.value ? setClusterRadius(20) : setClusterRadius(30);
-      setRenderedTime(Date.now());
+      if (Object.keys(indexedData).length > 0) {
+        const filteredFeatures = metarsFilter(new Date(observationTime));
+        setDisplayedData(filteredFeatures);
+      }
+      // setRenderedTime(Date.now());
     } else {
       updateNbmStationMarkers();
     }
@@ -643,11 +650,15 @@ export const StationMarkersLayer = () => {
     if (!visibility) return;
     const [category] = getMetarVisibilityCategory(visibility, personalMinimums);
     let iconUrl = '/icons/metar/MISSING.png';
-    if (visibility === 0.25 && feature.properties.raw_text && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
-      visibility = '<0.25';
-    }
-    if (visibility > 4) {
-      visibility = Math.ceil(visibility);
+    if (userSettings.default_visibility_unit) {
+      visibility = visibilityMileToMeter(visibility);
+    } else {
+      if (visibility === 0.25 && feature.properties.raw_text && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
+        visibility = '<0.25';
+      }
+      if (visibility > 4) {
+        visibility = Math.ceil(visibility);
+      }
     }
     if (category) {
       iconUrl = `/icons/metar/${category}-OVC.png`;
@@ -701,11 +712,9 @@ export const StationMarkersLayer = () => {
     } else if (windSpeed <= 5) {
       colorCode = 'darkerGreen';
     }
-    // const useKnots =
-    //   $('#hdnUserWindSpeed').val().trim() === 'knots' ? true : false;
-    // if (!useKnots) {
-    //   windSpeed = Math.round(parseFloat(windSpeed) * 1.152);
-    // }
+    if (userSettings.default_wind_speed_unit) {
+      windSpeed = knotsToMph(windSpeed);
+    }
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-wind-icon ' + colorCode,
@@ -737,11 +746,9 @@ export const StationMarkersLayer = () => {
     } else if (windGust <= 10) {
       colorCode = 'darkerGreen';
     }
-    // const useKnots =
-    //   $('#hdnUserWindSpeed').val().trim() === 'knots' ? true : false;
-    // if (!useKnots) {
-    //   windGust = Math.round(parseFloat(windGust) * 1.152);
-    // }
+    if (userSettings.default_wind_speed_unit) {
+      windGust = knotsToMph(windGust);
+    }
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-wind-icon ' + colorCode,
@@ -757,8 +764,6 @@ export const StationMarkersLayer = () => {
 
   const getSurfaceTemperatureMarker = (feature: GeoJSON.Feature, latlng: LatLng, tempInCelcius: number) => {
     if (!tempInCelcius) return;
-    tempInCelcius = Math.round(tempInCelcius);
-    // const tempInCelcius = Math.round((temperature - 32) * (5 / 9));
     let colorCode = 'black';
     if (tempInCelcius > 38) {
       colorCode = 'c10000';
@@ -785,13 +790,10 @@ export const StationMarkersLayer = () => {
     } else if (tempInCelcius < -18) {
       colorCode = 'cc0199';
     }
-    // const useCelcius =
-    //   $('#hdnUserTemperatureSetting').val().trim() === 'celsius' ? true : false;
-    // if (useCelcius) {
-    //   temperature = tempInCelcius;
-    // } else {
-    //   temperature = Math.round(temperature);
-    // }
+    if (userSettings.default_temperature_unit) {
+      tempInCelcius = celsiusToFahrenheit(tempInCelcius);
+    }
+    tempInCelcius = Math.round(tempInCelcius);
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-temperature-icon ' + colorCode,
@@ -807,8 +809,6 @@ export const StationMarkersLayer = () => {
 
   const getSurfaceDewpointMarker = (feature: GeoJSON.Feature, latlng: LatLng, tempInCelcius: number) => {
     if (!tempInCelcius) return;
-    tempInCelcius = Math.round(tempInCelcius);
-    // const tempInCelcius = Math.round((temperature - 32) * (5 / 9));
     let colorCode = 'black';
     if (tempInCelcius > 38) {
       colorCode = 'c10000';
@@ -835,13 +835,10 @@ export const StationMarkersLayer = () => {
     } else if (tempInCelcius < -18) {
       colorCode = 'cc0199';
     }
-    // const useCelcius =
-    //   $('#hdnUserTemperatureSetting').val().trim() === 'celsius' ? true : false;
-    // if (useCelcius) {
-    //   temperature = tempInCelcius;
-    // } else {
-    //   temperature = Math.round(temperature);
-    // }
+    if (userSettings.default_temperature_unit) {
+      tempInCelcius = celsiusToFahrenheit(tempInCelcius);
+    }
+    tempInCelcius = Math.round(tempInCelcius);
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-temperature-icon ' + colorCode,
@@ -861,17 +858,8 @@ export const StationMarkersLayer = () => {
     temperature: number,
     dewpointTemperature: number,
   ) => {
-    // const useCelcius =
-    //   $('#hdnUserTemperatureSetting').val().trim() === 'celsius' ? true : false;
     let dewpointDepression = temperature - dewpointTemperature;
-    // const temperatureInCelcius = Math.round((temperature - 32) * (5 / 9));
     let dewpointDepressionInCelcius = Math.round(dewpointDepression);
-    // const dewpointTemperatureInCelcius = Math.round(
-    //   (dewpointTemperature - 32) * (5 / 9),
-    // );
-    // let dewpointDepressionInCelcius = Math.round(
-    //   temperatureInCelcius - dewpointTemperatureInCelcius,
-    // );
     if (dewpointDepressionInCelcius < 0) {
       dewpointDepressionInCelcius = 0;
     }
@@ -892,9 +880,9 @@ export const StationMarkersLayer = () => {
       colorCode = 'magenta';
     }
 
-    // if (useCelcius) {
-    //   dewpointDepression = dewpointDepressionInCelcius;
-    // }
+    if (userSettings.default_temperature_unit) {
+      dewpointDepressionInCelcius = celsiusToFahrenheit(dewpointDepressionInCelcius);
+    }
 
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
@@ -1273,7 +1261,6 @@ export const StationMarkersLayer = () => {
     <Pane name={'station-markers'} style={{ zIndex: paneOrders.station }}>
       {displayedGeojson != null && (
         <SimplifiedMarkersLayer
-          key={renderedTime}
           ref={geojsonLayerRef}
           data={displayedGeojson}
           visible={layerState.checked}

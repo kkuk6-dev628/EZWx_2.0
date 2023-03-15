@@ -113,13 +113,21 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete, exceptions
     setValue('');
     setCurrentFocus(0);
   };
+
+  let displayText;
+  if (selectedValue && selectedValue.key) {
+    displayText = selectedValue.key + ' - ' + selectedValue.name;
+  } else {
+    const airport = airports.filter((curr) => {
+      return curr.key === (selectedValue as any);
+    });
+    displayText = airport.length > 0 ? airport[0].key + ' - ' + airport[0].name : '';
+  }
   return (
     <>
       <div className="auto_complete__input__container">
         {selectedValue ? (
-          <span className="auto__complete__label">
-            {selectedValue.key} - {selectedValue.name}
-          </span>
+          <span className="auto__complete__label">{displayText}</span>
         ) : (
           <input
             type="text"

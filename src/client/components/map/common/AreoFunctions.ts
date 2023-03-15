@@ -8,6 +8,7 @@ import { LatLng } from 'leaflet';
 import axios from 'axios';
 import { db } from '../../caching/dexieDb';
 import { Route, RoutePoint } from '../../../interfaces/route';
+import { route as routeErrorMessages } from '../../lang/messages';
 import ReactDOMServer from 'react-dom/server';
 
 export const getAltitudeString = (value: string, isHundred = true, fzlbase?: string, fzltop?: string): string => {
@@ -99,7 +100,7 @@ export const getThumbnail = (feature, style) => {
 };
 
 export const celsiusToFahrenheit = (celsius: number): number => {
-  return (celsius * 9) / 5 + 32;
+  return Math.round((celsius * 9) / 5 + 32);
 };
 
 export const knotsToMph = (knots: number): number => {
@@ -233,9 +234,26 @@ export const getAirportNameById = (id: string, airportsData: any[]): string => {
   return null;
 };
 
-export const validateRoute = (route: Route): boolean => {
-  if (route.departure && route.destination) return true;
-  return false;
+export const validateRoute = (route: Route): boolean | string => {
+  if (route.departure && route.destination) {
+    if (isSameRoutePoints(route.departure, route.destination)) {
+      if (!route.routeOfFlight) {
+        return routeErrorMessages.en.zeroLengthError;
+      }
+      const wayPoints = route.routeOfFlight.filter(
+        (waypoint) => !isSameRoutePoints(waypoint.routePoint, route.departure),
+      );
+      if (wayPoints.length === 0) {
+        return 'Route of Flight must contain at least one waypoint when Departure and Destination airports are the same';
+      }
+      return true;
+    }
+    return true;
+  }
+  if (!route.departure && !route.destination) {
+    return routeErrorMessages.en.noValidAirportError;
+  }
+  return !route.departure ? routeErrorMessages.en.noValidDepartureError : routeErrorMessages.en.noValidDestinationError;
 };
 
 export const isSameRoutePoints = (routePoint1: RoutePoint, routePoint2: RoutePoint): boolean => {
@@ -379,93 +397,36 @@ export const loadFeaturesFromWeb = (
 };
 
 export const visibilityMileToMeter = (mile: number): number => {
-  let meter = 9999;
-  switch (mile) {
-    case 0:
-      meter = 0;
-      break;
-    case 0.13:
-      meter = 200;
-      break;
-    case 0.25:
-      meter = 400;
-      break;
-    case 0.38:
-      meter = 600;
-      break;
-    case 0.5:
-      meter = 800;
-      break;
-    case 0.62:
-    case 0.63:
-      meter = 1000;
-      break;
-    case 0.75:
-      meter = 1200;
-      break;
-    case 0.88:
-      meter = 1400;
-      break;
-    case 1:
-      meter = 1600;
-      break;
-    case 1.13:
-      meter = 1800;
-      break;
-    case 1.24:
-    case 1.25:
-      meter = 2000;
-      break;
-    case 1.38:
-      meter = 2200;
-      break;
-    case 1.5:
-      meter = 2400;
-      break;
-    case 1.63:
-      meter = 2600;
-      break;
-    case 1.75:
-      meter = 2800;
-      break;
-    case 1.86:
-    case 1.88:
-      meter = 3000;
-      break;
-    case 2:
-      meter = 3200;
-      break;
-    case 2.25:
-      meter = 3600;
-      break;
-    case 2.49:
-    case 2.5:
-      meter = 4000;
-      break;
-    case 2.75:
-      meter = 4400;
-      break;
-    case 3:
-      meter = 4800;
-      break;
-    case 3.11:
-    case 3.5:
-      meter = 5000;
-      break;
-    case 3.73:
-      meter = 6000;
-      break;
-    case 4:
-      meter = 7000;
-      break;
-    case 5:
-      meter = 8000;
-      break;
-    case 6:
-      meter = 9000;
-      break;
-  }
-  return meter;
+  if (mile >= 7) return 9999; // yes that is 9999
+  else if (mile >= 6 && mile < 7) return 9000;
+  else if (mile >= 5 && mile < 6) return 8000;
+  else if (mile >= 4.5 && mile < 5) return 7000;
+  else if (mile >= 4 && mile < 4.5) return 6000;
+  else if (mile >= 3.5 && mile < 4) return 5000;
+  else if (mile >= 3 && mile < 3.5) return 4800;
+  else if (mile == 2.75) return 4400;
+  else if (mile == 2.5) return 4000;
+  else if (mile == 2.25) return 3600;
+  else if (mile == 2.0) return 3200;
+  else if (mile == 1.88) return 3000;
+  else if (mile == 1.75) return 2800;
+  else if (mile == 1.63) return 2600;
+  else if (mile == 1.5) return 2400;
+  else if (mile == 1.38) return 2200;
+  else if (mile == 1.25) return 2000;
+  else if (mile == 1.13) return 1800;
+  else if (mile == 1) return 1600;
+  else if (mile == 0.88) return 1400;
+  else if (mile == 0.75) return 1200;
+  else if (mile == 0.63) return 1000;
+  else if (mile == 0.5) return 800;
+  else if (mile == 0.38) return 600;
+  else if (mile == 0.31) return 500;
+  else if (mile == 0.25) return 400;
+  else if (mile == 0.13) return 200;
+  else if (mile == 0.06) return 100;
+  else if (mile == 0) return 0;
+  return 0.0;
 };
 
 export const visibilityMileToFraction = (mile: number): string => {

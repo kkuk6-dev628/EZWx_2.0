@@ -38,6 +38,7 @@ import { useGetRoutesQuery } from '../../../store/route/routeApi';
 import { useGetWaypointsQuery } from '../../../store/route/waypointApi';
 import { simpleTimeOnlyFormat } from '../common/AreoFunctions';
 import MapSideButtons from '../../shared/MapSideButtons';
+import { selectDataLoadTime } from '../../../store/layers/DataLoadTimeSlice';
 
 const PaperComponent = (props) => {
   return (
@@ -62,6 +63,8 @@ const LeafletMap = () => {
   const auth = useSelector(selectAuth);
   const { data: waypointsData } = useGetWaypointsQuery('');
   const { data: airportsData } = useGetAirportQuery('');
+  const dataLoadTime = useSelector(selectDataLoadTime);
+
   if (auth.id) {
     useGetRoutesQuery(null);
   }
@@ -176,7 +179,7 @@ const LeafletMap = () => {
         maxZoom={18}
       >
         <BaseMapLayers></BaseMapLayers>
-        <MeteoLayers></MeteoLayers>
+        <MeteoLayers key={dataLoadTime}></MeteoLayers>
         {/* <MapSearch /> */}
         <MapSideButtons></MapSideButtons>
         <ZoomControl
@@ -199,7 +202,7 @@ const LeafletMap = () => {
 
       {isShowTabs && <MapTabs tabMenus={tabMenus} />}
       {isShowDateModal && <DateSliderModal setIsShowDateModal={setIsShowDateModal} />}
-      <CollapsibleBar />
+      <CollapsibleBar key={dataLoadTime} />
     </div>
   );
 };

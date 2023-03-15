@@ -1,4 +1,3 @@
-import { StationTime } from './src/server/app/api/station-time/station-time.gisdb-entity';
 import 'dotenv/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
 

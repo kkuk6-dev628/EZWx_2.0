@@ -23,8 +23,8 @@
     "console": "ts-node -r tsconfig-paths/register src/server/console.ts",
     "typeorm": "npx typeorm-ts-node-commonjs -d ormconfig.ts",
     "migration:generate": "yarn typeorm migration:generate",
-    "migration:run": "yarn typeorm -- migration:run",
-    "migration:create": "yarn typeorm -- migration:create -d src/server/migrations -n"
+    "migration:run": "yarn typeorm migration:run",
+    "migration:create": "yarn typeorm migration:create"
   },
   "dependencies": {
     "@babel/runtime": "^7.21.0",
