@@ -237,14 +237,18 @@ export const getAirportNameById = (id: string, airportsData: any[]): string => {
 export const validateRoute = (route: Route): boolean | string => {
   if (route.departure && route.destination) {
     if (isSameRoutePoints(route.departure, route.destination)) {
-      if (!route.routeOfFlight) {
-        return routeErrorMessages.en.zeroLengthError;
+      if (!route.routeOfFlight || route.routeOfFlight.length === 0) {
+        return routeErrorMessages.en.noWaypointsError;
       }
-      const wayPoints = route.routeOfFlight.filter(
-        (waypoint) => !isSameRoutePoints(waypoint.routePoint, route.departure),
-      );
-      if (wayPoints.length === 0) {
-        return 'Route of Flight must contain at least one waypoint when Departure and Destination airports are the same';
+      const wayPoints = [
+        route.departure,
+        ...route.routeOfFlight.map((routeOfFlight) => routeOfFlight.routePoint),
+        route.destination,
+      ];
+      for (let i = 0; i < wayPoints.length - 1; i++) {
+        if (isSameRoutePoints(wayPoints[i], wayPoints[i + 1])) {
+          return routeErrorMessages.en.zeroLengthLegError;
+        }
       }
       return true;
     }

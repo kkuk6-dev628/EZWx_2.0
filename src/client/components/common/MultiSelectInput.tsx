@@ -25,13 +25,17 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
 
   const renderItem = (name: string, val: string) => {
     try {
-      const filteredItems = [];
+      let filteredItems = [];
       if (!isLoadingWaypoints) {
         filteredItems.push(...waypoints.filter((item) => item.key.includes(val)));
       }
       if (!isLoading) {
         filteredItems.push(...airports.filter((obj: RoutePoint) => obj.key.includes(val)));
       }
+      filteredItems = filteredItems.sort((a, b) => {
+        if (a.key === val || a.key === 'K' + val) return -1;
+        if (b.key === val || b.key === 'K' + val) return 1;
+      });
       return filteredItems.map((obj: RoutePoint, ind: number) => {
         const title: string = obj.key + ' - ' + obj.name;
         return (

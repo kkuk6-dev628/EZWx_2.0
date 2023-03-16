@@ -653,7 +653,11 @@ export const StationMarkersLayer = () => {
     const [category] = getMetarVisibilityCategory(visibility, personalMinimums);
     let iconUrl = '/icons/metar/MISSING.png';
     if (userSettings.default_visibility_unit) {
-      visibility = visibilityMileToMeter(visibility);
+      if (visibility === 0.25 && feature.properties.raw_text && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
+        visibility = '<400';
+      } else {
+        visibility = visibilityMileToMeter(visibility);
+      }
     } else {
       if (visibility === 0.25 && feature.properties.raw_text && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
         visibility = '<0.25';
@@ -860,6 +864,9 @@ export const StationMarkersLayer = () => {
     temperature: number,
     dewpointTemperature: number,
   ) => {
+    if (!dewpointTemperature || !temperature) {
+      return;
+    }
     let dewpointDepression = temperature - dewpointTemperature;
     let dewpointDepressionInCelcius = Math.round(dewpointDepression);
     if (dewpointDepressionInCelcius < 0) {
@@ -883,7 +890,7 @@ export const StationMarkersLayer = () => {
     }
 
     if (userSettings.default_temperature_unit) {
-      dewpointDepressionInCelcius = celsiusToFahrenheit(dewpointDepressionInCelcius);
+      dewpointDepressionInCelcius = celsiusToFahrenheit(temperature) - celsiusToFahrenheit(dewpointTemperature);
     }
 
     const metarMarker = L.marker(latlng, {
