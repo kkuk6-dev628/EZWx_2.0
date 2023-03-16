@@ -118,10 +118,14 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete, exceptions
   if (selectedValue && selectedValue.key) {
     displayText = selectedValue.key + ' - ' + selectedValue.name;
   } else {
-    const airport = airports.filter((curr) => {
-      return curr.key === (selectedValue as any);
-    });
-    displayText = airport.length > 0 ? airport[0].key + ' - ' + airport[0].name : '';
+    if (!airports) {
+      displayText = '';
+    } else {
+      const airport = airports.filter((curr) => {
+        return curr.key === (selectedValue as any);
+      });
+      displayText = airport.length > 0 ? airport[0].key + ' - ' + airport[0].name : '';
+    }
   }
   return (
     <>

@@ -39,6 +39,7 @@ import Slider from '@mui/material/Slider';
 import { useMeteoLayersContext } from './MeteoLayerControlContext';
 import { jsonClone } from '../../../utils/ObjectUtil';
 import RangeSlider from '../../../shared/RangeSlider';
+import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
 
 interface IProps {
   children?: ReactElement[];
@@ -62,6 +63,7 @@ export const InLayerControl = createContext<{ value: boolean }>({
 
 const MeteoLayerControl = ({ position, children }: IProps) => {
   const positionClass = (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright;
+  const dataLoadTime = useSelector(selectDataLoadTime);
 
   const ref = useRef<HTMLDivElement>();
   const dispatch = useDispatch();
@@ -82,10 +84,6 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
       toast.error(`No ${layerName}'s data displayed`, {
         position: 'top-right',
       });
-    } else {
-      if (!map?.hasLayer(layerObj)) {
-        map.addLayer(layerObj);
-      }
     }
   };
 
@@ -96,10 +94,6 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
       toast.error(`No ${layerName}'s data displayed`, {
         position: 'top-right',
       });
-    } else {
-      if (map?.hasLayer(layerObj)) {
-        map.removeLayer(layerObj);
-      }
     }
   };
 
@@ -186,6 +180,12 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
       });
     }
   }, [ref?.current]);
+
+  useEffect(() => {
+    if (meteoLayers) {
+      meteoLayers.gairmet = null;
+    }
+  }, [dataLoadTime]);
 
   return (
     //@ts-ignore

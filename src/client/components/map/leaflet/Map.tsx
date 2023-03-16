@@ -179,7 +179,7 @@ const LeafletMap = () => {
         maxZoom={18}
       >
         <BaseMapLayers></BaseMapLayers>
-        <MeteoLayers key={dataLoadTime}></MeteoLayers>
+        <MeteoLayers></MeteoLayers>
         {/* <MapSearch /> */}
         <MapSideButtons></MapSideButtons>
         <ZoomControl

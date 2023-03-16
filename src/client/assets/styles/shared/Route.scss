@@ -144,11 +144,11 @@
     margin-top: 10px;
     font-size: 1.3rem;
     font-weight: 500;
+    justify-content: space-between;
+    align-items: center;
   }
 
   &__lft {
-    position: absolute;
-    left: 0;
     border: 1.5px solid #3f0c69;
     width: 30px;
     height: 30px;
@@ -156,30 +156,24 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    left: 5px;
-    top: 4px;
     cursor: pointer;
+    margin-left: 4px;
   }
 
   &__rgt {
-    position: absolute;
     border: 1.5px solid #3f0c69;
-    right: 0;
     width: 30px;
     height: 30px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    right: 5px;
-    top: 4px;
     cursor: pointer;
+    margin-right: 4px;
   }
 
   &__input__num {
-    position: absolute;
-    width: 60px;
-    left: 40px;
+    width: 48px;
     height: 100%;
     text-align: center;
     border: none;

@@ -29,6 +29,7 @@ import {
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
 import { selectActiveRoute } from '../../../../store/route/routes';
+import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
 
 const metarsProperties = [
   'geometry',
@@ -166,6 +167,7 @@ export const StationMarkersLayer = () => {
   const [isPast, setIsPast] = useState(true);
   const activeRoute = useSelector(selectActiveRoute);
   const userSettings = useSelector(selectSettings);
+  const dataLoadTime = useSelector(selectDataLoadTime);
 
   const geojsonLayerRef = useRef();
 
@@ -174,7 +176,7 @@ export const StationMarkersLayer = () => {
   useEffect(() => {
     loadMetars();
     loadNbmStationMarkers();
-  }, []);
+  }, [dataLoadTime]);
 
   useEffect(() => {
     if (!indexedData || !isPast) return;

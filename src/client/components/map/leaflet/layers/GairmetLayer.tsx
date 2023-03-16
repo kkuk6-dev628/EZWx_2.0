@@ -1,5 +1,5 @@
 import { PathOptions } from 'leaflet';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectGairmet } from '../../../../store/layers/LayerControl';
 import { db } from '../../../caching/dexieDb';
@@ -10,6 +10,8 @@ const GairmetLayer = () => {
   const [jsonData, setJsonData] = useState();
   const layerState = useSelector(selectGairmet);
   const [renderedTime, setRenderedTime] = useState(Date.now());
+  const layerRef = useRef();
+
   useEffect(() => {
     if (layerState.checked) {
       setRenderedTime(Date.now());
@@ -153,6 +155,7 @@ const GairmetLayer = () => {
   return (
     <WFSLayer
       key={renderedTime}
+      ref={layerRef}
       initData={jsonData}
       url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
       maxFeatures={256}
