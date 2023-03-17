@@ -6,6 +6,30 @@ import { selectSettings } from '../../../../store/user/UserSettings';
 import { emptyGeoJson } from '../../common/AreoConstants';
 import { simplifyPoints } from '../../common/AreoFunctions';
 
+export const isSameFeatures = (a: GeoJSON.Feature[], b: GeoJSON.Feature[], compareProperties: string[]): boolean => {
+  if (a.length !== b.length) {
+    return false;
+  }
+  if (a.length === 0) {
+    return true;
+  }
+  const undefinedProperties = compareProperties.filter(
+    (compareProperty) => a[0].properties[compareProperty] === undefined,
+  );
+  if (undefinedProperties.length > 0) {
+    return false;
+  }
+  for (let i = 0; i < a.length; i++) {
+    const differentProperties = compareProperties.filter(
+      (compareProperty) => a[i].properties[compareProperty] !== b[i].properties[compareProperty],
+    );
+    if (differentProperties.length > 0) {
+      return false;
+    }
+  }
+  return true;
+};
+
 export const SimplifiedMarkersLayer = forwardRef(
   ({ data, simplifyRadius, visible, unSimplifyFilter, ...props }: any, ref) => {
     const [displayedData, setDisplayedData] = useState<GeoJSON.FeatureCollection>(emptyGeoJson);
@@ -38,9 +62,14 @@ export const SimplifiedMarkersLayer = forwardRef(
         activeRoute,
         unSimplifyFilter,
       );
-      setDisplayedData({
-        type: 'FeatureCollection',
-        features: simplifiedFeatures,
+      setDisplayedData((prevState) => {
+        if (!prevState || !isSameFeatures(prevState.features, simplifiedFeatures, ['station_id', 'observation_time'])) {
+          return {
+            type: 'FeatureCollection',
+            features: simplifiedFeatures,
+          };
+        }
+        return prevState;
       });
     };
 

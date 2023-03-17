@@ -248,14 +248,9 @@ export const StationMarkersLayer = () => {
     }
   };
   const setDisplayedData = (features: GeoJSON.Feature[]) => {
-    setDisplayedGeojson((prevState) => {
-      if (1 || !prevState || prevState.features.length !== features.length) {
-        return {
-          type: 'FeatureCollection',
-          features: features,
-        };
-      }
-      return prevState;
+    setDisplayedGeojson({
+      type: 'FeatureCollection',
+      features: features,
     });
   };
 
