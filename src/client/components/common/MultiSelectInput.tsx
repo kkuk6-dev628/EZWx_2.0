@@ -33,7 +33,15 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
         filteredItems.push(...airports.filter((obj: RoutePoint) => obj.key.includes(val)));
       }
       filteredItems = filteredItems.sort((a, b) => {
-        if (a.key === val || a.key === 'K' + val) return -1;
+        if (a.key === val && b.key === 'K' + val) {
+          return -1;
+        }
+        if (a.key === 'K' + val && b.key === val) {
+          return 1;
+        }
+        if (a.key === 'K' + val || a.key === val) {
+          return -1;
+        }
         if (b.key === val || b.key === 'K' + val) return 1;
       });
       return filteredItems.map((obj: RoutePoint, ind: number) => {

@@ -248,9 +248,14 @@ export const StationMarkersLayer = () => {
     }
   };
   const setDisplayedData = (features: GeoJSON.Feature[]) => {
-    setDisplayedGeojson({
-      type: 'FeatureCollection',
-      features: features,
+    setDisplayedGeojson((prevState) => {
+      if (1 || !prevState || prevState.features.length !== features.length) {
+        return {
+          type: 'FeatureCollection',
+          features: features,
+        };
+      }
+      return prevState;
     });
   };
 
@@ -294,8 +299,8 @@ export const StationMarkersLayer = () => {
         setStationTime(result.data);
 
         const stationTimes = [...result.data].filter((stationTime) => {
-          const stationValidHour = Math.floor(new Date(stationTime.valid_date).getTime() / 3600 / 1000);
-          return 1 || stationValidHour >= getAbsoluteHours(Date.now());
+          const stationValidHour = getAbsoluteHours(stationTime.valid_date);
+          return stationValidHour >= getAbsoluteHours(Date.now());
         });
         const stationTimesWeb = [...stationTimes];
 
@@ -310,9 +315,9 @@ export const StationMarkersLayer = () => {
           });
         };
         // limit number of requests to 3 at the same time.
-        queuedLoadCache();
-        queuedLoadCache();
-        queuedLoadCache();
+        // queuedLoadCache();
+        // queuedLoadCache();
+        // queuedLoadCache();
 
         const queuedLoadWeb = () => {
           if (stationTimesWeb.length === 0) {
@@ -330,8 +335,12 @@ export const StationMarkersLayer = () => {
             },
             (a, b) =>
               b.properties.pub - a.properties.pub || (a.properties.faaid as string).localeCompare(b.properties.faaid),
+            undefined,
+            false,
           );
         };
+        queuedLoadWeb();
+        queuedLoadWeb();
         queuedLoadWeb();
       })
       .catch((reason) => {

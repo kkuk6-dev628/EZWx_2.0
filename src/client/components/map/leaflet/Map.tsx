@@ -202,7 +202,7 @@ const LeafletMap = () => {
 
       {isShowTabs && <MapTabs tabMenus={tabMenus} />}
       {isShowDateModal && <DateSliderModal setIsShowDateModal={setIsShowDateModal} />}
-      <CollapsibleBar key={dataLoadTime} />
+      <CollapsibleBar />
     </div>
   );
 };

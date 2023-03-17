@@ -56,13 +56,13 @@ const MetarsPopup = ({
       ? 'Calm'
       : !userSettings.default_wind_speed_unit
       ? feature.properties.wind_speed_kt + ' knots'
-      : knotsToMph(feature.properties.wind_speed_kt) + ' miles per hour';
+      : knotsToMph(feature.properties.wind_speed_kt) + ' mph';
   const windGust = !userSettings.default_wind_speed_unit
     ? feature.properties.wind_gust_kt + ' knots'
-    : knotsToMph(feature.properties.wind_gust_kt) + ' miles per hour';
+    : knotsToMph(feature.properties.wind_gust_kt) + ' mph';
   const crossWind = !userSettings.default_wind_speed_unit
     ? feature.properties.crosswind_component_kt + ' knots'
-    : knotsToMph(feature.properties.crosswind_component_kt) + ' miles per hour';
+    : knotsToMph(feature.properties.crosswind_component_kt) + ' mph';
 
   return (
     <>

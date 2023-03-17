@@ -349,9 +349,16 @@ export const storeFeaturesToCache = (datasetName: string, features: GeoJSON.Feat
   chunkedAdd();
 };
 
-export const loadFeaturesFromCache = (datasetName: string, setFeaturesFunc: (features: GeoJSON.Feature[]) => void) => {
+export const loadFeaturesFromCache = (
+  datasetName: string,
+  setFeaturesFunc: (features: GeoJSON.Feature[]) => void,
+  sortFunc?: (a: GeoJSON.Feature, b: GeoJSON.Feature) => number,
+) => {
   if (db[datasetName]) {
     db[datasetName].toArray().then((features) => {
+      if (sortFunc) {
+        features = features.sort(sortFunc);
+      }
       setFeaturesFunc(features);
     });
   }
