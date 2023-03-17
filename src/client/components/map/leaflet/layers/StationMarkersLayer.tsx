@@ -154,6 +154,30 @@ export const getNbmFlightCategoryIconUrl = (feature: GeoJSON.Feature, personalMi
   return iconUrl;
 };
 
+export const isSameFeatures = (a: GeoJSON.Feature[], b: GeoJSON.Feature[], compareProperties: string[]): boolean => {
+  if (a.length !== b.length) {
+    return false;
+  }
+  if (a.length === 0) {
+    return true;
+  }
+  const undefinedProperties = compareProperties.filter(
+    (compareProperty) => a[0].properties[compareProperty] === undefined,
+  );
+  if (undefinedProperties.length > 0) {
+    return false;
+  }
+  for (let i = 0; i < a.length; i++) {
+    const differentProperties = compareProperties.filter(
+      (compareProperty) => a[i].properties[compareProperty] !== b[i].properties[compareProperty],
+    );
+    if (differentProperties.length > 0) {
+      return false;
+    }
+  }
+  return true;
+};
+
 const nbmStations = {};
 
 export const StationMarkersLayer = () => {
@@ -182,7 +206,15 @@ export const StationMarkersLayer = () => {
     if (!indexedData || !isPast) return;
     if (Object.keys(indexedData).length > 0) {
       const filteredFeatures = metarsFilter(new Date(observationTime));
-      setDisplayedData(filteredFeatures);
+      setDisplayedGeojson((prevState) => {
+        if (!prevState) {
+          return {
+            type: 'FeatureCollection',
+            features: filteredFeatures,
+          };
+        }
+        return prevState;
+      });
     }
   }, [indexedData]);
 
