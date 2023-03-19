@@ -7,10 +7,11 @@ import { useGetAirportQuery } from '../../store/route/airportApi';
 import { useGetRoutesQuery } from '../../store/route/routeApi';
 import { useGetWaypointsQuery } from '../../store/route/waypointApi';
 import { simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
-import FavoritesDrawer from '../shared/FavoritesDrawer';
 import ProfileModal from '../shared/ProfileModal';
 import SettingsDrawer from '../shared/SettingsDrawer';
 import { SvgDropDown, SvgMenuBurger, SvgProfile, SvgRoundClose, SvgSave, SvgSetting, SvgWarn } from '../utils/SvgIcons';
+import dynamic from 'next/dynamic';
+const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
 const links = [
   {
