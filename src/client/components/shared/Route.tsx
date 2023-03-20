@@ -372,7 +372,7 @@ function Route({ setIsShowModal }: Props) {
               </label>
               <div className="route__modal__box__input1">
                 <AiOutlineHeart className="route__modal__box__icon" />
-                <input type="text" className="route__modal__box__input" />
+                <input aria-label="name" type="text" className="route__modal__box__input" />
               </div>
             </div>
             <MultipleSelect />
