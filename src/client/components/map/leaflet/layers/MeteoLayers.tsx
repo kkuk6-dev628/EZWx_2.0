@@ -25,7 +25,7 @@ import MetarsPopup from '../popups/MetarsPopup';
 import { useSelector } from 'react-redux';
 import { selectLayerControl, selectMetar } from '../../../../store/layers/LayerControl';
 import { selectPersonalMinimums, selectSettings } from '../../../../store/user/UserSettings';
-import { MetarMarkerTypes, paneOrders, pickupRadiusPx } from '../../common/AreoConstants';
+import { StationMarkersLayerItems, paneOrders, pickupRadiusPx } from '../../common/AreoConstants';
 import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
 import { InLayerControl } from '../layer-control/MeteoLayerControl';
 import { InBaseLayerControl } from '../layer-control/BaseMapLayerControl';
@@ -95,7 +95,7 @@ const MeteoLayers = () => {
         useWidePopup = true;
         break;
       case 'metar':
-        if (metarLayerStatus.markerType === MetarMarkerTypes.ceilingHeight.value) {
+        if (metarLayerStatus.markerType === StationMarkersLayerItems.ceilingHeight.value) {
           offsetX = 25;
         }
         popup = (

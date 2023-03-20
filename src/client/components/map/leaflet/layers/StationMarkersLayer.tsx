@@ -10,7 +10,13 @@ import SunCalc from 'suncalc';
 
 import { selectMetar } from '../../../../store/layers/LayerControl';
 import { PersonalMinimums, selectPersonalMinimums, selectSettings } from '../../../../store/user/UserSettings';
-import { MetarMarkerTypes, paneOrders, timeSliderInterval, wfsUrl, windIconLimit } from '../../common/AreoConstants';
+import {
+  StationMarkersLayerItems,
+  paneOrders,
+  timeSliderInterval,
+  wfsUrl,
+  windIconLimit,
+} from '../../common/AreoConstants';
 import {
   addLeadingZeroes,
   celsiusToFahrenheit,
@@ -236,7 +242,9 @@ export const StationMarkersLayer = () => {
 
   useEffect(() => {
     if (isPast) {
-      layerState.markerType === MetarMarkerTypes.surfaceWindBarbs.value ? setClusterRadius(20) : setClusterRadius(30);
+      layerState.markerType === StationMarkersLayerItems.surfaceWindBarbs.value
+        ? setClusterRadius(20)
+        : setClusterRadius(30);
       if (Object.keys(indexedData).length > 0) {
         const filteredFeatures = metarsFilter(new Date(observationTime));
         setDisplayedData(filteredFeatures);
@@ -426,7 +434,7 @@ export const StationMarkersLayer = () => {
       if (iData) {
         iData.map((feature) => {
           if (
-            layerState.markerType === MetarMarkerTypes.flightCategory.value &&
+            layerState.markerType === StationMarkersLayerItems.flightCategory.value &&
             layerState.flightCategory.all.checked === false
           ) {
             if (!layerState.flightCategory.vfr.checked && feature.properties.flight_category === 'VFR') {
@@ -465,7 +473,7 @@ export const StationMarkersLayer = () => {
 
   const stationForecastFilter = (features: GeoJSON.Feature[]): GeoJSON.Feature[] => {
     if (
-      layerState.markerType !== MetarMarkerTypes.flightCategory.value ||
+      layerState.markerType !== StationMarkersLayerItems.flightCategory.value ||
       layerState.flightCategory.all.checked === true
     ) {
       return features;
@@ -496,19 +504,19 @@ export const StationMarkersLayer = () => {
     let marker = null;
     if (isPast) {
       switch (layerState.markerType) {
-        case MetarMarkerTypes.flightCategory.value:
+        case StationMarkersLayerItems.flightCategory.value:
           marker = getFlightCatMarker(feature, latlng);
           break;
-        case MetarMarkerTypes.ceilingHeight.value:
+        case StationMarkersLayerItems.ceilingHeight.value:
           marker = getCeilingHeightMarker(feature, latlng);
           break;
-        case MetarMarkerTypes.surfaceVisibility.value:
+        case StationMarkersLayerItems.surfaceVisibility.value:
           marker = getSurfaceVisibilityMarker(feature, latlng, feature.properties.visibility_statute_mi);
           break;
-        case MetarMarkerTypes.surfaceWindSpeed.value:
+        case StationMarkersLayerItems.surfaceWindSpeed.value:
           marker = getSurfaceWindSpeedMarker(feature, latlng, feature.properties.wind_speed_kt);
           break;
-        case MetarMarkerTypes.surfaceWindBarbs.value:
+        case StationMarkersLayerItems.surfaceWindBarbs.value:
           marker = getSurfaceWindBarbsMarker(
             feature,
             latlng,
@@ -516,16 +524,16 @@ export const StationMarkersLayer = () => {
             feature.properties.wind_dir_degrees,
           );
           break;
-        case MetarMarkerTypes.surfaceWindGust.value:
+        case StationMarkersLayerItems.surfaceWindGust.value:
           marker = getSurfaceWindGustMarker(feature, latlng, feature.properties.wind_gust_kt);
           break;
-        case MetarMarkerTypes.surfaceTemperature.value:
+        case StationMarkersLayerItems.surfaceTemperature.value:
           marker = getSurfaceTemperatureMarker(feature, latlng, feature.properties.temp_c);
           break;
-        case MetarMarkerTypes.surfaceDewpoint.value:
+        case StationMarkersLayerItems.surfaceDewpoint.value:
           marker = getSurfaceDewpointMarker(feature, latlng, feature.properties.dewpoint_c);
           break;
-        case MetarMarkerTypes.dewpointDepression.value:
+        case StationMarkersLayerItems.dewpointDepression.value:
           marker = getDewpointDepressionMarker(
             feature,
             latlng,
@@ -533,40 +541,40 @@ export const StationMarkersLayer = () => {
             feature.properties.dewpoint_c,
           );
           break;
-        case MetarMarkerTypes.weather.value:
+        case StationMarkersLayerItems.weather.value:
           marker = getWeatherMarker(feature, latlng);
           break;
       }
     } else {
       switch (layerState.markerType) {
-        case MetarMarkerTypes.flightCategory.value:
+        case StationMarkersLayerItems.flightCategory.value:
           marker = getFlightCatMarker(feature, latlng);
           break;
-        case MetarMarkerTypes.ceilingHeight.value:
+        case StationMarkersLayerItems.ceilingHeight.value:
           marker = getNbmCeilingHeightMarker(feature, latlng, feature.properties.ceil, feature.properties.skycov);
           break;
-        case MetarMarkerTypes.surfaceVisibility.value:
+        case StationMarkersLayerItems.surfaceVisibility.value:
           marker = getSurfaceVisibilityMarker(feature, latlng, feature.properties.vis);
           break;
-        case MetarMarkerTypes.surfaceWindSpeed.value:
+        case StationMarkersLayerItems.surfaceWindSpeed.value:
           marker = getSurfaceWindSpeedMarker(feature, latlng, feature.properties.w_speed);
           break;
-        case MetarMarkerTypes.surfaceWindBarbs.value:
+        case StationMarkersLayerItems.surfaceWindBarbs.value:
           marker = getSurfaceWindBarbsMarker(feature, latlng, feature.properties.w_speed, feature.properties.w_dir);
           break;
-        case MetarMarkerTypes.surfaceWindGust.value:
+        case StationMarkersLayerItems.surfaceWindGust.value:
           marker = getSurfaceWindGustMarker(feature, latlng, feature.properties.w_gust);
           break;
-        case MetarMarkerTypes.surfaceTemperature.value:
+        case StationMarkersLayerItems.surfaceTemperature.value:
           marker = getSurfaceTemperatureMarker(feature, latlng, feature.properties.temp_c);
           break;
-        case MetarMarkerTypes.surfaceDewpoint.value:
+        case StationMarkersLayerItems.surfaceDewpoint.value:
           marker = getSurfaceDewpointMarker(feature, latlng, feature.properties.dewp_c);
           break;
-        case MetarMarkerTypes.dewpointDepression.value:
+        case StationMarkersLayerItems.dewpointDepression.value:
           marker = getDewpointDepressionMarker(feature, latlng, feature.properties.temp_c, feature.properties.dewp_c);
           break;
-        case MetarMarkerTypes.weather.value:
+        case StationMarkersLayerItems.weather.value:
           marker = getFlightCatMarker(feature, latlng);
           break;
       }
@@ -608,11 +616,8 @@ export const StationMarkersLayer = () => {
     const ceilingAmount = addLeadingZeroes(ceiling / 100, 3);
     const worstSkyCondition = getWorstSkyCondition(skyConditions);
     let iconUrl = '';
-    if (layerState.usePersonalMinimums) {
-    } else {
-      const [cat] = getMetarCeilingCategory(ceiling, personalMinimums);
-      iconUrl = `/icons/metar/${cat}-${worstSkyCondition}.png`;
-    }
+    const [cat] = getMetarCeilingCategory(ceiling, personalMinimums);
+    iconUrl = `/icons/metar/${cat}-${worstSkyCondition}.png`;
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-ceiling-icon',

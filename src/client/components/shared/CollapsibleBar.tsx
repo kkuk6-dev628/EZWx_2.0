@@ -65,7 +65,7 @@ function CollapsibleBar() {
     <div className="collps">
       <Slider
         className="time-slider"
-        key={`time-range-slider-${Date.now()}`}
+        key={`time-range-slider`}
         aria-label="Time Slider"
         defaultValue={timeToValue(defaultTime)}
         max={84 * 12}

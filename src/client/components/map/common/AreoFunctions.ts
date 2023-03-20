@@ -2,7 +2,7 @@
 import { PersonalMinimums } from './../../../store/user/UserSettings';
 import { cacheStartTime, WeatherCausings } from './AreoConstants';
 import geojson2svg from 'geojson-to-svg';
-import { SkyCondition } from '../../../interfaces/stationMarkers';
+import { SkyCondition } from '../../../interfaces/layerControl';
 import RBush from 'rbush';
 import { LatLng } from 'leaflet';
 import axios from 'axios';

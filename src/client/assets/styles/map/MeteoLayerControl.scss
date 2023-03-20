@@ -167,9 +167,16 @@
   .MuiAccordionDetails-root{
     padding: 0 16px 0 16px !important;
     margin: 0 16px 0 16px !important;
+    display: flex;
+    flex-direction: column;
   }
   .MuiIconButton-root{
     padding: 0;
+  }
+  .personal-mins{
+    display: flex;
+    flex-direction: column;
+    padding-left: 10px;
   }
   .pirep-slider{
     margin: 8px 0 0 8px;
