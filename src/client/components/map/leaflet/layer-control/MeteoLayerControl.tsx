@@ -20,25 +20,33 @@ import {
   setSigmet,
   setMetar,
   setLayerControl,
-  LayerControlState,
   setGairmet,
   setCwa,
-  GairmetLayerState,
-  PirepLayerState,
-  CwaLayerState,
-  MetarLayerState,
   setLayerControlShow,
-  SigmetsLayerState,
-  RadarLayerState,
 } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import { MetarMarkerTypes, POSITION_CLASSES } from '../../common/AreoConstants';
+import { StationMarkersLayerItems, POSITION_CLASSES, UsePersonalMinsLayerItems } from '../../common/AreoConstants';
 import Image from 'next/image';
 import Slider from '@mui/material/Slider';
 import { useMeteoLayersContext } from './MeteoLayerControlContext';
 import { jsonClone } from '../../../utils/ObjectUtil';
 import RangeSlider from '../../../shared/RangeSlider';
+import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
+import {
+  StationMarkersLayerState,
+  SigmetsLayerState,
+  GairmetLayerState,
+  CwaLayerState,
+  PirepLayerState,
+  LayerControlState,
+  RadarLayerState,
+  StationMarkerType,
+  RoutePointType,
+  EvaluationType,
+} from '../../../../interfaces/layerControl';
+import settings from 'react-multi-date-picker/plugins/settings';
+import { InputFieldWrapper, SettingFieldLabel, RadioButton } from '../../../settings-drawer';
 
 interface IProps {
   children?: ReactElement[];
@@ -62,6 +70,7 @@ export const InLayerControl = createContext<{ value: boolean }>({
 
 const MeteoLayerControl = ({ position, children }: IProps) => {
   const positionClass = (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright;
+  const dataLoadTime = useSelector(selectDataLoadTime);
 
   const ref = useRef<HTMLDivElement>();
   const dispatch = useDispatch();
@@ -82,10 +91,6 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
       toast.error(`No ${layerName}'s data displayed`, {
         position: 'top-right',
       });
-    } else {
-      if (!map?.hasLayer(layerObj)) {
-        map.addLayer(layerObj);
-      }
     }
   };
 
@@ -96,14 +101,10 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
       toast.error(`No ${layerName}'s data displayed`, {
         position: 'top-right',
       });
-    } else {
-      if (map?.hasLayer(layerObj)) {
-        map.removeLayer(layerObj);
-      }
     }
   };
 
-  const isCheckedAllMetarFlightCategory = (cloned: MetarLayerState): boolean =>
+  const isCheckedAllMetarFlightCategory = (cloned: StationMarkersLayerState): boolean =>
     cloned.flightCategory.vfr.checked &&
     cloned.flightCategory.mvfr.checked &&
     cloned.flightCategory.ifr.checked &&
@@ -186,6 +187,12 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
       });
     }
   }, [ref?.current]);
+
+  useEffect(() => {
+    if (meteoLayers) {
+      meteoLayers.gairmet = null;
+    }
+  }, [dataLoadTime]);
 
   return (
     //@ts-ignore
@@ -275,17 +282,116 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                     value={layerStatus.metarState.markerType}
                     name="radio-buttons-group-metar"
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                      console.log('radio-buttons-group-metar');
                       map.closePopup();
-                      const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
-                      cloned.markerType = e.target.value;
+                      const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
+                      cloned.markerType = e.target.value as StationMarkerType;
                       cloned.checked = true;
                       dispatch(setMetar(cloned));
                     }}
                   >
                     <FormControlLabel
-                      value={MetarMarkerTypes.flightCategory.value}
+                      value={StationMarkersLayerItems.usePersonalMinimum.value}
                       control={<Radio color="primary" />}
-                      label={MetarMarkerTypes.flightCategory.text}
+                      label={StationMarkersLayerItems.usePersonalMinimum.text}
+                    />
+                    <div className="personal-mins">
+                      <InputFieldWrapper>
+                        <div className="input_radio_container">
+                          <RadioButton
+                            id={UsePersonalMinsLayerItems.departure.value}
+                            value={UsePersonalMinsLayerItems.departure.value}
+                            title={UsePersonalMinsLayerItems.departure.text}
+                            name="max_takeoff_weight_category"
+                            selectedValue={layerStatus.metarState.usePersonalMinimums.routePointType}
+                            description=""
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                              map.closePopup();
+                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
+                              cloned.usePersonalMinimums.routePointType = e.target.value as RoutePointType;
+                              cloned.checked = true;
+                              dispatch(setMetar(cloned));
+                            }}
+                          />
+                          <RadioButton
+                            id={UsePersonalMinsLayerItems.enRoute.value}
+                            value={UsePersonalMinsLayerItems.enRoute.value}
+                            title={UsePersonalMinsLayerItems.enRoute.text}
+                            name="max_takeoff_weight_category"
+                            selectedValue={layerStatus.metarState.usePersonalMinimums.routePointType}
+                            description=""
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                              map.closePopup();
+                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
+                              cloned.usePersonalMinimums.routePointType = e.target.value as RoutePointType;
+                              cloned.checked = true;
+                              dispatch(setMetar(cloned));
+                            }}
+                          />
+                          <RadioButton
+                            id={UsePersonalMinsLayerItems.destination.value}
+                            value={UsePersonalMinsLayerItems.destination.value}
+                            title={UsePersonalMinsLayerItems.destination.text}
+                            name="max_takeoff_weight_category"
+                            selectedValue={layerStatus.metarState.usePersonalMinimums.routePointType}
+                            description=""
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                              map.closePopup();
+                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
+                              cloned.usePersonalMinimums.routePointType = e.target.value as RoutePointType;
+                              cloned.checked = true;
+                              dispatch(setMetar(cloned));
+                            }}
+                          />
+                        </div>
+                      </InputFieldWrapper>
+                      <RadioGroup
+                        value={layerStatus.metarState.usePersonalMinimums.evaluationType}
+                        name="radio-group-personal-mins-eval"
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                          console.log('radio-group-personal-mins-eval');
+                          map.closePopup();
+                          const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
+                          cloned.usePersonalMinimums.evaluationType = e.target.value as EvaluationType;
+                          cloned.markerType = StationMarkersLayerItems.usePersonalMinimum.value as StationMarkerType;
+                          cloned.checked = true;
+                          dispatch(setMetar(cloned));
+                        }}
+                      >
+                        <FormControlLabel
+                          value={UsePersonalMinsLayerItems.flightCategory.value}
+                          control={
+                            <Radio
+                              color="primary"
+                              onChange={(e) => {
+                                console.log('Radio', e.target.value);
+                                e.preventDefault();
+                              }}
+                            />
+                          }
+                          label={UsePersonalMinsLayerItems.flightCategory.text}
+                        />
+                        <FormControlLabel
+                          value={UsePersonalMinsLayerItems.ceiling.value}
+                          control={<Radio color="primary" />}
+                          label={UsePersonalMinsLayerItems.ceiling.text}
+                        />
+                        <FormControlLabel
+                          value={UsePersonalMinsLayerItems.visibility.value}
+                          control={<Radio color="primary" />}
+                          label={UsePersonalMinsLayerItems.visibility.text}
+                        />
+                        <FormControlLabel
+                          value={UsePersonalMinsLayerItems.crosswind.value}
+                          control={<Radio color="primary" />}
+                          label={UsePersonalMinsLayerItems.crosswind.text}
+                        />
+                      </RadioGroup>
+                    </div>
+                    <FormControlLabel
+                      value={StationMarkersLayerItems.flightCategory.value}
+                      control={<Radio color="primary" />}
+                      label={StationMarkersLayerItems.flightCategory.text}
                     />
                     <div className="flight-category-filters">
                       <FormControlLabel
@@ -297,16 +403,16 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
-                              if (layerStatus.metarState.markerType !== MetarMarkerTypes.flightCategory.value) {
+                              if (layerStatus.metarState.markerType !== StationMarkersLayerItems.flightCategory.value) {
                                 return;
                               }
-                              const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
+                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
                               cloned.flightCategory.all.checked = true;
                               cloned.flightCategory.vfr.checked = true;
                               cloned.flightCategory.mvfr.checked = true;
                               cloned.flightCategory.ifr.checked = true;
                               cloned.flightCategory.lifr.checked = true;
-                              cloned.markerType = MetarMarkerTypes.flightCategory.value;
+                              cloned.markerType = StationMarkersLayerItems.flightCategory.value;
                               dispatch(setMetar(cloned));
                             }}
                           />
@@ -322,14 +428,14 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
-                              if (layerStatus.metarState.markerType !== MetarMarkerTypes.flightCategory.value) {
+                              if (layerStatus.metarState.markerType !== StationMarkersLayerItems.flightCategory.value) {
                                 return;
                               }
-                              const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
+                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
                               cloned.flightCategory.vfr.checked = !layerStatus.metarState.flightCategory.vfr.checked;
                               cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
                               if (cloned.flightCategory.vfr.checked) {
-                                cloned.markerType = MetarMarkerTypes.flightCategory.value;
+                                cloned.markerType = StationMarkersLayerItems.flightCategory.value;
                               }
                               dispatch(setMetar(cloned));
                             }}
@@ -341,20 +447,20 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                         control={
                           <Checkbox
                             checked={layerStatus.metarState.flightCategory.mvfr.checked}
-                            value={MetarMarkerTypes.flightCategory.value}
+                            value={StationMarkersLayerItems.flightCategory.value}
                             icon={<CircleUnchecked />}
                             checkedIcon={<CircleCheckedFilled />}
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
-                              if (layerStatus.metarState.markerType !== MetarMarkerTypes.flightCategory.value) {
+                              if (layerStatus.metarState.markerType !== StationMarkersLayerItems.flightCategory.value) {
                                 return;
                               }
-                              const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
+                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
                               cloned.flightCategory.mvfr.checked = !layerStatus.metarState.flightCategory.mvfr.checked;
                               cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
                               if (cloned.flightCategory.mvfr.checked) {
-                                cloned.markerType = MetarMarkerTypes.flightCategory.value;
+                                cloned.markerType = StationMarkersLayerItems.flightCategory.value;
                               }
                               dispatch(setMetar(cloned));
                             }}
@@ -366,20 +472,20 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                         control={
                           <Checkbox
                             checked={layerStatus.metarState.flightCategory.ifr.checked}
-                            value={MetarMarkerTypes.flightCategory.value}
+                            value={StationMarkersLayerItems.flightCategory.value}
                             icon={<CircleUnchecked />}
                             checkedIcon={<CircleCheckedFilled />}
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
-                              if (layerStatus.metarState.markerType !== MetarMarkerTypes.flightCategory.value) {
+                              if (layerStatus.metarState.markerType !== StationMarkersLayerItems.flightCategory.value) {
                                 return;
                               }
-                              const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
+                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
                               cloned.flightCategory.ifr.checked = !layerStatus.metarState.flightCategory.ifr.checked;
                               cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
                               if (cloned.flightCategory.ifr.checked) {
-                                cloned.markerType = MetarMarkerTypes.flightCategory.value;
+                                cloned.markerType = StationMarkersLayerItems.flightCategory.value;
                               }
                               dispatch(setMetar(cloned));
                             }}
@@ -391,20 +497,20 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                         control={
                           <Checkbox
                             checked={layerStatus.metarState.flightCategory.lifr.checked}
-                            value={MetarMarkerTypes.flightCategory.value}
+                            value={StationMarkersLayerItems.flightCategory.value}
                             icon={<CircleUnchecked />}
                             checkedIcon={<CircleCheckedFilled />}
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
-                              if (layerStatus.metarState.markerType !== MetarMarkerTypes.flightCategory.value) {
+                              if (layerStatus.metarState.markerType !== StationMarkersLayerItems.flightCategory.value) {
                                 return;
                               }
-                              const cloned = jsonClone(layerStatus.metarState) as MetarLayerState;
+                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
                               cloned.flightCategory.lifr.checked = !layerStatus.metarState.flightCategory.lifr.checked;
                               cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
                               if (cloned.flightCategory.lifr.checked) {
-                                cloned.markerType = MetarMarkerTypes.flightCategory.value;
+                                cloned.markerType = StationMarkersLayerItems.flightCategory.value;
                               }
                               dispatch(setMetar(cloned));
                             }}
@@ -414,49 +520,49 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                       />
                     </div>
                     <FormControlLabel
-                      value={MetarMarkerTypes.ceilingHeight.value}
+                      value={StationMarkersLayerItems.ceilingHeight.value}
                       control={<Radio color="primary" />}
-                      label={MetarMarkerTypes.ceilingHeight.text}
+                      label={StationMarkersLayerItems.ceilingHeight.text}
                     />
                     <FormControlLabel
-                      value={MetarMarkerTypes.surfaceVisibility.value}
+                      value={StationMarkersLayerItems.surfaceVisibility.value}
                       control={<Radio color="primary" />}
-                      label={MetarMarkerTypes.surfaceVisibility.text}
+                      label={StationMarkersLayerItems.surfaceVisibility.text}
                     />
                     <FormControlLabel
-                      value={MetarMarkerTypes.surfaceWindSpeed.value}
+                      value={StationMarkersLayerItems.surfaceWindSpeed.value}
                       control={<Radio color="primary" />}
-                      label={MetarMarkerTypes.surfaceWindSpeed.text}
+                      label={StationMarkersLayerItems.surfaceWindSpeed.text}
                     />
                     <FormControlLabel
-                      value={MetarMarkerTypes.surfaceWindBarbs.value}
+                      value={StationMarkersLayerItems.surfaceWindBarbs.value}
                       control={<Radio color="primary" />}
-                      label={MetarMarkerTypes.surfaceWindBarbs.text}
+                      label={StationMarkersLayerItems.surfaceWindBarbs.text}
                     />
                     <FormControlLabel
-                      value={MetarMarkerTypes.surfaceWindGust.value}
+                      value={StationMarkersLayerItems.surfaceWindGust.value}
                       control={<Radio color="primary" />}
-                      label={MetarMarkerTypes.surfaceWindGust.text}
+                      label={StationMarkersLayerItems.surfaceWindGust.text}
                     />
                     <FormControlLabel
-                      value={MetarMarkerTypes.surfaceTemperature.value}
+                      value={StationMarkersLayerItems.surfaceTemperature.value}
                       control={<Radio color="primary" />}
-                      label={MetarMarkerTypes.surfaceTemperature.text}
+                      label={StationMarkersLayerItems.surfaceTemperature.text}
                     />
                     <FormControlLabel
-                      value={MetarMarkerTypes.surfaceDewpoint.value}
+                      value={StationMarkersLayerItems.surfaceDewpoint.value}
                       control={<Radio color="primary" />}
-                      label={MetarMarkerTypes.surfaceDewpoint.text}
+                      label={StationMarkersLayerItems.surfaceDewpoint.text}
                     />
                     <FormControlLabel
-                      value={MetarMarkerTypes.dewpointDepression.value}
+                      value={StationMarkersLayerItems.dewpointDepression.value}
                       control={<Radio color="primary" />}
-                      label={MetarMarkerTypes.dewpointDepression.text}
+                      label={StationMarkersLayerItems.dewpointDepression.text}
                     />
                     <FormControlLabel
-                      value={MetarMarkerTypes.weather.value}
+                      value={StationMarkersLayerItems.weather.value}
                       control={<Radio color="primary" />}
-                      label={MetarMarkerTypes.weather.text}
+                      label={StationMarkersLayerItems.weather.text}
                     />
                   </RadioGroup>
                 </AccordionDetails>

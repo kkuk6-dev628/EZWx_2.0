@@ -64,7 +64,8 @@ function CollapsibleBar() {
   return (
     <div className="collps">
       <Slider
-        key="time-range-slider"
+        className="time-slider"
+        key={`time-range-slider`}
         aria-label="Time Slider"
         defaultValue={timeToValue(defaultTime)}
         max={84 * 12}
@@ -77,7 +78,7 @@ function CollapsibleBar() {
           handleTimeChange(valueToTime(e.target.value));
         }}
       />
-      <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+      <FormControl sx={{ m: 1, minWidth: 120 }} size="small" className="interval-select" color="secondary">
         <InputLabel id="Select Observation Interval">Interval</InputLabel>
         <Select
           labelId="select-observation-interval"

@@ -6,9 +6,10 @@ import { addLeadingZeroes, loadFeaturesFromCache, loadFeaturesFromWeb } from '..
 import { useSelector } from 'react-redux';
 import { selectPirep } from '../../../../store/layers/LayerControl';
 import { useEffect, useRef, useState } from 'react';
-import { wfsUrl } from '../../common/AreoConstants';
+import { paneOrders, wfsUrl } from '../../common/AreoConstants';
 import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
+import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
 
 const properties = [
   'wkb_geometry',
@@ -41,13 +42,14 @@ const PirepLayer = () => {
   const [pireps, setPireps] = useState<GeoJSON.Feature[]>([]);
   const layerState = useSelector(selectPirep);
   const observationTime = useSelector(selectObsTime);
+  const dataLoadTime = useSelector(selectDataLoadTime);
   const [displayedGeojson, setDisplayedGeojson] = useState<GeoJSON.FeatureCollection>();
   const geojsonLayerRef = useRef();
 
   useEffect(() => {
     loadFeaturesFromCache('pireps', setPireps);
     loadFeaturesFromWeb(wfsUrl, 'EZWxBrief:pirep', properties, 'pireps', setPireps);
-  }, []);
+  }, [dataLoadTime]);
 
   useEffect(() => {
     const filtered = clientFilter(pireps);
@@ -268,17 +270,19 @@ const PirepLayer = () => {
   };
 
   return (
-    <Pane name={'pirep'} style={{ zIndex: 699 }}>
-      <SimplifiedMarkersLayer
-        ref={geojsonLayerRef}
-        data={displayedGeojson}
-        simplifyRadius={30}
-        visible={layerState.checked}
-        unSimplifyFilter={selectUrgentPirep}
-        interactive={true}
-        pointToLayer={pointToLayer}
-        bubblingMouseEvents={true}
-      ></SimplifiedMarkersLayer>
+    <Pane name={'pirep'} style={{ zIndex: paneOrders.pirep }}>
+      {displayedGeojson != null && (
+        <SimplifiedMarkersLayer
+          ref={geojsonLayerRef}
+          data={displayedGeojson}
+          simplifyRadius={30}
+          visible={layerState.checked}
+          unSimplifyFilter={selectUrgentPirep}
+          interactive={true}
+          pointToLayer={pointToLayer}
+          bubblingMouseEvents={true}
+        ></SimplifiedMarkersLayer>
+      )}
     </Pane>
   );
 };

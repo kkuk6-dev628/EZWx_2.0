@@ -5,12 +5,14 @@ import { PersonalMinimums, selectSettings } from '../../../../store/user/UserSet
 import { MetarSkyValuesToString } from '../../common/AreoConstants';
 import {
   addLeadingZeroes,
+  celsiusToFahrenheit,
   convertTimeFormat,
   getAirportNameById,
   getMetarCeilingCategory,
   getMetarDecodedWxString,
   getMetarVisibilityCategory,
   getSkyConditions,
+  knotsToMph,
   toTitleCase,
   visibilityMileToFraction,
   visibilityMileToMeter,
@@ -42,12 +44,26 @@ const MetarsPopup = ({
   if (vimi >= 4) {
     vimi = Math.ceil(vimi);
   }
-  let visibility = true
+  let visibility = !userSettings.default_visibility_unit
     ? `${visibilityMileToFraction(vimi)} statute ${vimi <= 1 ? 'mile' : 'miles'}`
     : `${visibilityMileToMeter(vimi)} meters`;
   if (vimi === 0.25 && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
     visibility = 'Less than ' + visibility;
   }
+
+  const windSpeed =
+    feature.properties.wind_speed_kt === 0
+      ? 'Calm'
+      : !userSettings.default_wind_speed_unit
+      ? feature.properties.wind_speed_kt + ' knots'
+      : knotsToMph(feature.properties.wind_speed_kt) + ' mph';
+  const windGust = !userSettings.default_wind_speed_unit
+    ? feature.properties.wind_gust_kt + ' knots'
+    : knotsToMph(feature.properties.wind_gust_kt) + ' mph';
+  const crossWind = !userSettings.default_wind_speed_unit
+    ? feature.properties.crosswind_component_kt + ' knots'
+    : knotsToMph(feature.properties.crosswind_component_kt) + ' mph';
+
   return (
     <>
       <div style={{ display: 'flex' }}>
@@ -104,7 +120,7 @@ const MetarsPopup = ({
       {feature.properties.wind_speed_kt != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Wind speed: </b>
-          <span>{feature.properties.wind_speed_kt === 0 ? 'Calm' : feature.properties.wind_speed_kt + ' knots'}</span>
+          <span>{windSpeed}</span>
         </Typography>
       )}
       {feature.properties.wind_dir_degrees !== null &&
@@ -127,19 +143,41 @@ const MetarsPopup = ({
       {feature.properties.wind_gust_kt != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Wind gust: </b>
-          <span>{feature.properties.wind_gust_kt} knots</span>
+          <span>{windGust}</span>
         </Typography>
       )}
+      {feature.properties.crosswind_component_kt != null &&
+        (feature.properties.wind_dir_degrees || !feature.properties.wind_speed_kt) && (
+          <Typography variant="body2" style={{ margin: 3 }}>
+            <b>Crosswind component: </b>
+            <span>{crossWind}</span>
+          </Typography>
+        )}
+      {feature.properties.crosswind_component_kt != null &&
+        (feature.properties.wind_dir_degrees || !feature.properties.wind_speed_kt) && (
+          <Typography variant="body2" style={{ margin: 3 }}>
+            <b>Crosswind runway: </b>
+            <span>{feature.properties.crosswind_runway_id}</span>
+          </Typography>
+        )}
       {feature.properties.temp_c != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Temperature: </b>
-          <span>{feature.properties.temp_c} &deg;C</span>
+          <span>
+            {!userSettings.default_temperature_unit
+              ? feature.properties.temp_c + ' \u00B0C'
+              : celsiusToFahrenheit(feature.properties.temp_c) + ' \u00B0F'}
+          </span>
         </Typography>
       )}
       {feature.properties.dewpoint_c != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Dewpoint: </b>
-          <span>{feature.properties.dewpoint_c} &deg;C</span>
+          <span>
+            {!userSettings.default_temperature_unit
+              ? feature.properties.dewpoint_c + ' \u00B0C'
+              : celsiusToFahrenheit(feature.properties.dewpoint_c) + ' \u00B0F'}
+          </span>
         </Typography>
       )}
       {feature.properties.relativehumiditypercent != null && (

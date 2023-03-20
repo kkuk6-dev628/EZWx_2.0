@@ -3,7 +3,7 @@ import MeteoLayerControl, { GroupedLayer } from '../layer-control/MeteoLayerCont
 import { LayerGroup, Pane, useMapEvents } from 'react-leaflet';
 import L, { LatLng, LeafletMouseEvent } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import FeatureSelector from '../popups/FeatureSelector';
 import ReactDOMServer from 'react-dom/server';
@@ -23,18 +23,18 @@ import 'leaflet-responsive-popup';
 import 'leaflet-responsive-popup/leaflet.responsive.popup.css';
 import MetarsPopup from '../popups/MetarsPopup';
 import { useSelector } from 'react-redux';
-import { selectMetar } from '../../../../store/layers/LayerControl';
+import { selectLayerControl, selectMetar } from '../../../../store/layers/LayerControl';
 import { selectPersonalMinimums, selectSettings } from '../../../../store/user/UserSettings';
-import { MetarMarkerTypes, pickupRadiusPx } from '../../common/AreoConstants';
+import { StationMarkersLayerItems, paneOrders, pickupRadiusPx } from '../../common/AreoConstants';
 import { useMeteoLayersContext } from '../layer-control/MeteoLayerControlContext';
 import { InLayerControl } from '../layer-control/MeteoLayerControl';
-import axios from 'axios';
 import { InBaseLayerControl } from '../layer-control/BaseMapLayerControl';
 import RadarLayer from './RadarLayer';
 import { StationMarkersLayer } from './StationMarkersLayer';
 import StationForecastPopup from '../popups/StationForecastPopup';
 import { useGetAirportQuery } from '../../../../store/route/airportApi';
-import { useGetWaypointsQuery } from '../../../../store/route/waypointApi';
+import { selectActiveRoute } from '../../../../store/route/routes';
+import { addRouteToMap } from '../../../shared/Route';
 
 const maxLayers = 6;
 
@@ -45,6 +45,17 @@ const MeteoLayers = () => {
   const personalMinimums = useSelector(selectPersonalMinimums);
   const { data: airportsData } = useGetAirportQuery('');
   const settingsState = useSelector(selectSettings);
+  const activeRoute = useSelector(selectActiveRoute);
+  const layerControlState = useSelector(selectLayerControl);
+
+  useEffect(() => {
+    if (!meteoLayers.routeGroupLayer && activeRoute) {
+      const groupLayer = new L.LayerGroup();
+      map.addLayer(groupLayer);
+      meteoLayers.routeGroupLayer = groupLayer;
+      addRouteToMap(activeRoute, meteoLayers.routeGroupLayer);
+    }
+  }, [activeRoute]);
 
   const showPopup = (layer: L.GeoJSON, latlng: L.LatLng): void => {
     if (typeof layer.setStyle === 'function') {
@@ -84,7 +95,7 @@ const MeteoLayers = () => {
         useWidePopup = true;
         break;
       case 'metar':
-        if (metarLayerStatus.markerType === MetarMarkerTypes.ceilingHeight.value) {
+        if (metarLayerStatus.markerType === StationMarkersLayerItems.ceilingHeight.value) {
           offsetX = 25;
         }
         popup = (
@@ -135,7 +146,7 @@ const MeteoLayers = () => {
         debugLayerGroupRef.current.clearLayers();
       }
       Object.values(layers).forEach((layer: L.Path) => {
-        if (layer.options.interactive !== true) return;
+        if (!layer || layer.options.interactive !== true) return;
         if (map.hasLayer(layer) === false) return;
         //@ts-ignore
         if (layer.resetStyle) layer.resetStyle();
@@ -224,7 +235,7 @@ const MeteoLayers = () => {
       <MeteoLayerControl position="topright"></MeteoLayerControl>
       <RadarLayer></RadarLayer>
       <GroupedLayer
-        checked
+        checked={layerControlState.metarState.checked}
         addLayerToStore={(layer) => {
           meteoLayers.metar = layer;
         }}
@@ -232,7 +243,7 @@ const MeteoLayers = () => {
         <StationMarkersLayer />
       </GroupedLayer>
       <GroupedLayer
-        checked
+        checked={layerControlState.sigmetState.checked}
         addLayerToStore={(layer) => {
           meteoLayers.sigmet = layer;
         }}
@@ -240,7 +251,7 @@ const MeteoLayers = () => {
         <SigmetLayer></SigmetLayer>
       </GroupedLayer>
       <GroupedLayer
-        checked
+        checked={layerControlState.sigmetState.checked && layerControlState.sigmetState.international.checked}
         addLayerToStore={(layer) => {
           meteoLayers.intlSigmet = layer;
         }}
@@ -248,7 +259,7 @@ const MeteoLayers = () => {
         <IntlSigmetLayer></IntlSigmetLayer>
       </GroupedLayer>
       <GroupedLayer
-        checked
+        checked={layerControlState.cwaState.checked}
         addLayerToStore={(layer) => {
           meteoLayers.cwa = layer;
         }}
@@ -256,7 +267,7 @@ const MeteoLayers = () => {
         <CWALayer></CWALayer>
       </GroupedLayer>
       <GroupedLayer
-        checked
+        checked={layerControlState.sigmetState.checked && layerControlState.sigmetState.convection.checked}
         addLayerToStore={(layer) => {
           meteoLayers.convectiveOutlooks = layer;
         }}
@@ -264,15 +275,15 @@ const MeteoLayers = () => {
         <ConvectiveOutlookLayer></ConvectiveOutlookLayer>
       </GroupedLayer>
       <GroupedLayer
-        checked
+        checked={layerControlState.gairmetState.checked}
         addLayerToStore={(layer) => {
           meteoLayers.gairmet = layer;
         }}
       >
-        <GairmetLayer></GairmetLayer>
+        {true && <GairmetLayer />}
       </GroupedLayer>
       <GroupedLayer
-        checked
+        checked={layerControlState.pirepState.checked}
         addLayerToStore={(layer) => {
           meteoLayers.pirep = layer;
         }}
@@ -280,7 +291,8 @@ const MeteoLayers = () => {
         <PirepLayer></PirepLayer>
       </GroupedLayer>
       <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
-      <Pane name="route" style={{ zIndex: 710 }}></Pane>
+      <Pane name="route-label" style={{ zIndex: paneOrders.routeLabel }}></Pane>
+      <Pane name="route-line" style={{ zIndex: paneOrders.routeLine }}></Pane>
     </div>
   );
 };

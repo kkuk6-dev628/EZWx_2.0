@@ -11,11 +11,13 @@ import authSlice from './auth/authSlice';
 import { apiSlice } from './api/apiSlice';
 import { airportApi } from './route/airportApi';
 import { waypointApi } from './route/waypointApi';
+import DataLoadTimeSlice from './layers/DataLoadTimeSlice';
 
 const makeStore = () =>
   configureStore({
     reducer: {
       [ObsIntervalSlice.name]: ObsIntervalSlice.reducer,
+      [DataLoadTimeSlice.name]: DataLoadTimeSlice.reducer,
       [airportApi.reducerPath]: airportApi.reducer,
       [waypointApi.reducerPath]: waypointApi.reducer,
       [routeApi.reducerPath]: routeApi.reducer,

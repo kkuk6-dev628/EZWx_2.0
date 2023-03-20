@@ -1,4 +1,6 @@
+import { RouteOfFlight } from './../route-of-flight.entity';
 import { IsNotEmpty } from 'class-validator';
+import { RoutePoint } from '../route-point.entity';
 
 export class CreateRoutePointDto {
   @IsNotEmpty()
@@ -15,13 +17,15 @@ export class CreateRoutePointDto {
 }
 
 export class CreateRouteDto {
+  id?: number;
+
   @IsNotEmpty()
   departure: CreateRoutePointDto;
 
   @IsNotEmpty()
   destination: CreateRoutePointDto;
 
-  routeOfFlight: CreateRoutePointDto[];
+  routeOfFlight: RouteOfFlight[];
 
   @IsNotEmpty()
   altitude: number;

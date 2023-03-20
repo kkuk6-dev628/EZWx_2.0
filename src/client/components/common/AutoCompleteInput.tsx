@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
-import React, { KeyboardEvent, useEffect, useRef, useState } from 'react';
+import React, { KeyboardEvent, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { RoutePoint } from '../../interfaces/route';
 import { useGetAirportQuery } from '../../store/route/airportApi';
@@ -9,9 +9,10 @@ interface Props {
   selectedValue: RoutePoint;
   name: string;
   handleAutoComplete: (name: string, value: RoutePoint) => void;
+  exceptions: string[];
 }
 
-const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) => {
+const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete, exceptions }: Props) => {
   const [currentFocus, setCurrentFocus] = useState(0);
   const [value, setValue] = useState('');
   const [showSuggestion, setShowSuggestion] = useState(false);
@@ -19,11 +20,11 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) =
 
   const { isLoading, data: airports } = useGetAirportQuery('');
 
-  const renderItem = (name: string, val: string) => {
+  const renderItem = (name: string, val: string, exceptions: string[]) => {
     try {
       if (isLoading) return [];
       return airports
-        .filter((obj: RoutePoint) => obj.key.includes(val))
+        .filter((obj: RoutePoint) => obj.key.includes(val) && !exceptions.includes(obj.key))
         .map((obj: RoutePoint, ind: number) => {
           const title: string = obj.key + ' - ' + obj.name;
           return (
@@ -54,7 +55,7 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) =
         case 'ArrowDown':
           e.preventDefault();
           if (showSuggestion) {
-            if (renderItem(name, value).length - 1 > currentFocus) {
+            if (renderItem(name, value, exceptions).length - 1 > currentFocus) {
               setCurrentFocus((prev) => prev + 1);
               scrollToFocusItem();
             }
@@ -71,8 +72,9 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) =
             setShowSuggestion(false);
           }
           break;
+        case ' ':
         case 'Enter':
-          const filteredResult = renderItem(name, value);
+          const filteredResult = renderItem(name, value, exceptions);
           if (filteredResult.length > 0 && currentFocus + 1 <= filteredResult.length && value !== '') {
             handleAutoComplete(name, filteredResult[currentFocus].props.obj);
             setShowSuggestion(false);
@@ -100,7 +102,7 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) =
   };
 
   const handleChange = ({ target: { name: _name, value: _value } }) => {
-    setValue(_value.replace(matchLowerCaseRegex, (match) => match.toUpperCase()));
+    setValue(_value.trim().replace(matchLowerCaseRegex, (match) => match.toUpperCase()));
     setShowSuggestion(true);
     setCurrentFocus(0);
   };
@@ -111,13 +113,25 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) =
     setValue('');
     setCurrentFocus(0);
   };
+
+  let displayText;
+  if (selectedValue && selectedValue.key) {
+    displayText = selectedValue.key + ' - ' + selectedValue.name;
+  } else {
+    if (!airports) {
+      displayText = '';
+    } else {
+      const airport = airports.filter((curr) => {
+        return curr.key === (selectedValue as any);
+      });
+      displayText = airport.length > 0 ? airport[0].key + ' - ' + airport[0].name : '';
+    }
+  }
   return (
     <>
       <div className="auto_complete__input__container">
         {selectedValue ? (
-          <span className="auto__complete__label">
-            {selectedValue.key} - {selectedValue.name}
-          </span>
+          <span className="auto__complete__label">{displayText}</span>
         ) : (
           <input
             type="text"
@@ -126,7 +140,7 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) =
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             className="auto__complete__input"
-            placeholder="ICAO or FAA"
+            placeholder="ENTER ICAO OR FAA AIRPORT ID"
             autoComplete="off"
           />
         )}
@@ -145,11 +159,11 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete }: Props) =
         !isLoading &&
         value.length > 1 &&
         airports != undefined &&
-        (renderItem(name, value).length > 0 ? (
+        (renderItem(name, value, exceptions).length > 0 ? (
           <ClickAwayListener onClickAway={() => setShowSuggestion(false)}>
             <div className="input__suggestions__container">
               <div ref={parentRef} className="input__suggestions__content">
-                {renderItem(name, value)}
+                {renderItem(name, value, exceptions)}
               </div>
             </div>
           </ClickAwayListener>

@@ -19,7 +19,7 @@ import {
   useUpdateUserSettingsMutation,
 } from '../../store/user/userSettingsApi';
 import { selectAuth } from '../../store/auth/authSlice';
-import { Modal, PrimaryButton, SecondaryButton } from '../common';
+import { AutoCompleteInput, Modal, PrimaryButton, SecondaryButton } from '../common';
 
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;
@@ -116,16 +116,16 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
               <InputFieldWrapper>
                 <SettingFieldLabel title="Home Airport" description="default home airport" />
                 <div className="input__container">
-                  <input
+                  <AutoCompleteInput
                     name="default_home_airport"
-                    value={settings.default_home_airport}
-                    onChange={handleChange}
-                    type="text"
-                    placeholder="Select Airport..."
-                  />
-                  <RxCross2
-                    className="cancel__icon__button"
-                    onClick={() => handleChange({ target: { name: 'default_home_airport', value: '' } })}
+                    selectedValue={settings.default_home_airport}
+                    handleAutoComplete={(name, value) => {
+                      setSettings({ ...settings, [name]: value && value.key ? value.key : value });
+                    }}
+                    exceptions={[]}
+                    key={'home-airport'}
+                    // handleCloseSuggestion={handleCloseSuggestion}
+                    // showSuggestion={formData[DESTINATION_SUGGESTION]}
                   />
                 </div>
               </InputFieldWrapper>
@@ -194,7 +194,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
             className="collapsed__title__container"
           >
             {isShowAirCraftSettings ? <AiOutlineMinus /> : <AiOutlinePlus />}
-            <span className="collapse__title">AirCraft Settings</span>
+            <span className="collapse__title">Aircraft Settings</span>
           </div>
           <Collapse in={isShowAirCraftSettings} timeout="auto">
             <div className="collapsed__container">

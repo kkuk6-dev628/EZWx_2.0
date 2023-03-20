@@ -11,7 +11,7 @@ const RadioButton = ({ title, description, name = 'maximum-weight-category', id,
       }}
     >
       <span className={styles.radio__label__title}>{title}</span>
-      <span className={styles.radio__label__description}>{description}</span>
+      {description && <span className={styles.radio__label__description}>{description}</span>}
       <input
         onChange={onChange}
         name={name}

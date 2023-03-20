@@ -22,7 +22,11 @@ export const routeApi = createApi({
             [...result.map(({ id }) => ({ type: 'Route', id } as const)), { type: 'Route', id: 'LIST' }]
           : // an error occurred, but we still want to refetch this query when `{ type: 'Posts', id: 'LIST' }` is invalidated
             [{ type: 'Route', id: 'LIST' }],
-      transformResponse: (response: any[]) => response,
+      transformResponse: (response: Route[]) =>
+        response.map((item) => {
+          item.routeOfFlight = item.routeOfFlight.sort((a, b) => (a.order > b.order ? 1 : -1));
+          return item;
+        }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
@@ -30,11 +34,11 @@ export const routeApi = createApi({
             dispatch(setActiveRoute({ ...result.data[0] }));
           }
         } catch (err) {
-          toast.error('error', {
-            position: 'top-right',
-            duration: 3000,
-          });
-          console.error('Error: ', err);
+          // toast.error('error', {
+          //   position: 'top-right',
+          //   duration: 3000,
+          // });
+          console.error('Route cannot be pulled out.', err);
         }
       },
     }),

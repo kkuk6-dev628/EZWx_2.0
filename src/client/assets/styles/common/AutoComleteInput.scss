@@ -21,13 +21,15 @@
     padding: 10px 12px;
     flex-grow: 1;
     text-overflow: ellipsis;
-    background-color: rgb(215, 200, 226);
+    background-color: var(--color-secondary-highlight);
     padding-right: 40px;
     font-weight: 450;
     font-size: 1rem;
     text-overflow: ellipsis;
     border-radius: 8px;
-
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     @media (max-width: 460px) {
       padding: 10px 8px;
       font-size: 14px;
@@ -43,6 +45,7 @@
   padding: 2px;
   font-weight: 600;
   cursor: pointer;
+  line-height: 1px;
 }
 
 .auto__complete__loading {
@@ -53,7 +56,7 @@
 .list__item {
   padding: 10px;
   &:hover {
-    background-color: rgb(214, 209, 209);
+    background-color: var(--color-secondary-highlight);
     cursor: pointer;
   }
 }
@@ -82,5 +85,5 @@
 }
 
 .focused {
-  background-color: rgb(214, 209, 209);
+  background-color: var(--color-secondary-highlight);
 }

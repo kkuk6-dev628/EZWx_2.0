@@ -7,16 +7,15 @@ import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
 import Switch from 'react-switch';
 import { AutoCompleteInput, Modal, MultiSelectInput, PrimaryButton, SecondaryButton } from '../common/index';
 import { selectActiveRoute } from '../../store/route/routes';
-import { useMap } from 'react-leaflet';
 import { useSelector } from 'react-redux';
-import { addRouteToMap, isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
-import { useCreateRouteMutation, useDeleteRouteMutation } from '../../store/route/routeApi';
-import { Route, RoutePoint } from '../../interfaces/route';
+import { isSameRoutePoints, isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
+import { useCreateRouteMutation } from '../../store/route/routeApi';
+import { Route, RouteOfFlight, RoutePoint } from '../../interfaces/route';
 import { useMeteoLayersContext } from '../map/leaflet/layer-control/MeteoLayerControlContext';
 import 'leaflet-arc';
-import { toast } from 'react-hot-toast';
-import { Button, FormControl, InputLabel, MenuItem, NativeSelect, Select } from '@mui/material';
+import { Button } from '@mui/material';
 import MultipleSelect from './MultipleSelect';
+import DialogTitle from '@mui/material/DialogTitle';
 
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
@@ -28,6 +27,7 @@ const DESTINATION = 'destination';
 const altitudeStep = 500;
 
 const emptyFormData: Route = {
+  id: undefined,
   departure: null,
   routeOfFlight: [],
   destination: null,
@@ -35,30 +35,54 @@ const emptyFormData: Route = {
   useForecastWinds: false,
 };
 
+export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
+  const coordinateList = [
+    route.departure.position.coordinates,
+    ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
+    route.destination.position.coordinates,
+  ];
+  routeGroupLayer.clearLayers();
+  const latlngs: L.LatLng[] = L.GeoJSON.coordsToLatLngs(coordinateList);
+  latlngs.reduce((a, b) => {
+    if (a.lat !== b.lat || a.lng !== b.lng) {
+      //@ts-ignore
+      const polyline = L.Polyline.Arc(a, b, { color: '#f0fa', weight: 6, pane: 'route-line' });
+      routeGroupLayer.addLayer(polyline);
+    }
+    return b;
+  });
+  [route.departure, ...route.routeOfFlight.map((item) => item.routePoint), route.destination].forEach((routePoint) => {
+    const marker = L.marker(L.GeoJSON.coordsToLatLng(routePoint.position.coordinates as any), {
+      icon: new L.DivIcon({
+        className: 'route-label',
+        html: routePoint.key,
+        iconAnchor: [routePoint.key.length > 4 ? 64 : 54, routePoint.type !== 'waypoint' ? 20 : 10],
+        iconSize: [routePoint.key.length > 4 ? 60 : 50, 20],
+      }),
+      pane: 'route-label',
+    });
+    routeGroupLayer.addLayer(marker);
+  });
+  // map.fitBounds(polyline.getBounds());
+};
+
 function Route({ setIsShowModal }: Props) {
-  const map = useMap();
   const activeRoute = useSelector(selectActiveRoute);
   const [createRoute] = useCreateRouteMutation();
-  const [deleteRoute] = useDeleteRouteMutation();
   const [routeData, setRouteData] = useState(activeRoute || emptyFormData);
   const ref = useRef();
   const meteoLayers = useMeteoLayersContext();
   const [forceRerenderKey, setForceRerenderKey] = useState(Date.now());
   const [isShowDeleteRouteModal, setIsShowDeleteRouteModal] = useState(false);
   const [isShowSaveRouteModal, setIsShowSaveRouteModal] = useState(false);
+  const [isShowErrorRouteModal, setIsShowErrorRouteModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [altitudeText, setAltitudeText] = useState(routeData.altitude.toLocaleString());
 
   useEffect(() => {
     // L.DomEvent.disableClickPropagation(ref.current);
     // L.DomEvent.disableScrollPropagation(ref.current);
     // L.DomEvent.on(ref.current, 'mousemove contextmenu', L.DomEvent.stop);
-    if (!meteoLayers.routeGroupLayer) {
-      const groupLayer = new L.LayerGroup();
-      map.addLayer(groupLayer);
-      meteoLayers.routeGroupLayer = groupLayer;
-      if (activeRoute) {
-        addRouteToMap(routeData, meteoLayers.routeGroupLayer);
-      }
-    }
   }, []);
 
   useEffect(() => {
@@ -66,6 +90,11 @@ function Route({ setIsShowModal }: Props) {
       setRouteData(activeRoute);
     }
   }, [activeRoute]);
+
+  useEffect(() => {
+    const newValue = parseInt(altitudeText.replace(/\D+/g, ''));
+    setRouteData({ ...routeData, altitude: newValue });
+  }, [altitudeText]);
 
   const handleUseForecastWindsChange = () => {
     setRouteData({ ...routeData, useForecastWinds: !routeData.useForecastWinds });
@@ -77,27 +106,37 @@ function Route({ setIsShowModal }: Props) {
       [name]: val,
     });
   };
-  const handleMultiSelectInsertion = (name: string, val: RoutePoint[]) => {
+  const handleMultiSelectInsertion = (name: string, val: RouteOfFlight[]) => {
     setRouteData({
       ...routeData,
       [name]: val,
     });
   };
   const handleClickOpenInMap = () => {
-    if (validateRoute(routeData)) {
+    const validity = validateRoute(routeData);
+    if (validity === true) {
       addRoute();
       setIsShowModal(false);
+    } else {
+      setErrorMessage(validity as string);
+      setIsShowErrorRouteModal(true);
     }
   };
   const handleClickOpenInProfile = () => {
-    if (validateRoute(routeData)) {
+    const validity = validateRoute(routeData);
+    if (validity === true) {
       addRoute();
+      setIsShowModal(false);
+    } else {
+      setErrorMessage(validity as string);
+      setIsShowErrorRouteModal(true);
     }
   };
   const handleClickDelete = () => {
     setIsShowDeleteRouteModal(true);
   };
   const handleClickReverse = () => {
+    setForceRerenderKey(Date.now());
     setRouteData({
       ...routeData,
       departure: routeData.destination,
@@ -108,6 +147,7 @@ function Route({ setIsShowModal }: Props) {
   const handleClickClear = () => {
     setRouteData(emptyFormData);
     setForceRerenderKey(Date.now());
+    setAltitudeText(emptyFormData.altitude.toLocaleString());
   };
 
   const addRoute = () => {
@@ -120,7 +160,9 @@ function Route({ setIsShowModal }: Props) {
 
   const deleteActiveRoute = () => {
     meteoLayers.routeGroupLayer.clearLayers();
-    deleteRoute(activeRoute.id);
+    // deleteRoute(activeRoute.id);
+    setIsShowDeleteRouteModal(false);
+    setIsShowModal(false);
     handleClickClear();
   };
 
@@ -128,15 +170,27 @@ function Route({ setIsShowModal }: Props) {
     setIsShowSaveRouteModal(true);
   };
 
+  const roundAltitude = (altitude) => {
+    if (altitude > 45000) {
+      return 45000;
+    } else if (altitude < 500) {
+      return 500;
+    } else {
+      return Math.round(altitude / 500) * 500;
+    }
+  };
+
   return (
     <div className="route-editor" ref={ref}>
       <div className="route-editor__wrp">
-        <div className="route-editor__top">
-          <p className="route-editor__top__text text">Enter/Edit/Delete route</p>
+        <DialogTitle className="route-editor__top">
+          <div className="route-editor__top__text text" style={{ cursor: 'move' }} id="draggable-dialog-title">
+            Enter/Edit/Delete route
+          </div>
           <button onClick={() => setIsShowModal(false)} className="route-editor__top__close" type="button">
             <AiOutlineClose className="route-editor__icon" />
           </button>
-        </div>
+        </DialogTitle>
         <div className="route-editor__content">
           <div className="route-editor__content__top">
             <div className="route-editor__tabs">
@@ -166,6 +220,7 @@ function Route({ setIsShowModal }: Props) {
                   name={DEPARTURE}
                   selectedValue={routeData[DEPARTURE]}
                   handleAutoComplete={handleAutoComplete}
+                  exceptions={[]}
                   key={'departure-' + forceRerenderKey}
                   // handleCloseSuggestion={handleCloseSuggestion}
                   // showSuggestion={formData[DEPARTURE_SUGGESTION]}
@@ -192,6 +247,7 @@ function Route({ setIsShowModal }: Props) {
                   name={DESTINATION}
                   selectedValue={routeData[DESTINATION]}
                   handleAutoComplete={handleAutoComplete}
+                  exceptions={[]}
                   key={'destination-' + forceRerenderKey}
                   // handleCloseSuggestion={handleCloseSuggestion}
                   // showSuggestion={formData[DESTINATION_SUGGESTION]}
@@ -207,47 +263,65 @@ function Route({ setIsShowModal }: Props) {
                     <span
                       className="route-editor__lft"
                       onClick={() => {
-                        let newValue = routeData.altitude - altitudeStep;
-                        if (newValue < 0) {
-                          newValue = 0;
-                        }
-                        setRouteData({ ...routeData, altitude: newValue });
+                        const newValue = roundAltitude(routeData.altitude - altitudeStep);
+                        setAltitudeText(newValue.toLocaleString());
                       }}
                     >
                       <AiOutlineMinus className="route-editor__icon--mi" />
                     </span>
                     <input
-                      type="number"
+                      key={'altitude-input-' + forceRerenderKey}
+                      type="text"
                       className="route-editor__input__num"
                       id="route-numin"
-                      value={routeData.altitude}
-                      onChange={(e) => {
-                        setRouteData({ ...routeData, altitude: parseInt(e.currentTarget.value) });
+                      pattern="[0-9]+([,][0-9]{1,2})?"
+                      value={altitudeText}
+                      onKeyDown={(e) => {
+                        if (
+                          e.key === 'Backspace' ||
+                          e.key === 'Delete' ||
+                          e.key === 'ArrowLeft' ||
+                          e.key === 'ArrowRight'
+                        ) {
+                          return;
+                        }
+                        const regex = /[0-9]|\./;
+                        if (!regex.test(e.key)) {
+                          if (e.preventDefault) e.preventDefault();
+                        }
+                      }}
+                      onChange={(e) => setAltitudeText(e.target.value)}
+                      onBlur={(e) => {
+                        let val: number;
+                        if (!e.target.value) {
+                          val = 0;
+                        } else {
+                          val = parseInt(e.target.value.replace(/\D+/g, ''));
+                        }
+                        const newValue = roundAltitude(val);
+                        setAltitudeText(newValue.toLocaleString());
                       }}
                       placeholder="0"
                     />
                     <span
                       className="route-editor__rgt"
                       onClick={() => {
-                        let newValue = routeData.altitude + altitudeStep;
-                        if (newValue > 45000) {
-                          newValue = 45000;
-                        }
-                        setRouteData({ ...routeData, altitude: newValue });
+                        const newValue = roundAltitude(routeData.altitude + altitudeStep);
+                        setAltitudeText(newValue.toLocaleString());
                       }}
                     >
                       +
                     </span>
                   </div>
                 </div>
-                <div className="table__data">
+                <div className="use-forcast">
                   <label className="route-editor__label text" htmlFor="">
                     Use Forecast Winds
                   </label>
                   <Switch
                     checked={routeData.useForecastWinds}
                     onChange={handleUseForecastWindsChange}
-                    onColor="#791DC6"
+                    onColor="#EED8FF"
                     onHandleColor="#3F0C69"
                     offColor="#fff"
                     handleDiameter={32}
@@ -311,6 +385,17 @@ function Route({ setIsShowModal }: Props) {
               <PrimaryButton text="Save" onClick={() => deleteActiveRoute()} isLoading={false} />
             </div>
           </div>
+        }
+      />
+      <Modal
+        open={isShowErrorRouteModal}
+        handleClose={() => setIsShowErrorRouteModal(false)}
+        title="Route Error"
+        description={errorMessage}
+        footer={
+          <>
+            <PrimaryButton text="Close" onClick={() => setIsShowErrorRouteModal(false)} isLoading={false} />
+          </>
         }
       />
     </div>

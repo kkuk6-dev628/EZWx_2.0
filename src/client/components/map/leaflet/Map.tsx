@@ -37,14 +37,19 @@ import { useGetAirportQuery } from '../../../store/route/airportApi';
 import { useGetRoutesQuery } from '../../../store/route/routeApi';
 import { useGetWaypointsQuery } from '../../../store/route/waypointApi';
 import { simpleTimeOnlyFormat } from '../common/AreoFunctions';
+import MapSideButtons from '../../shared/MapSideButtons';
+import { selectDataLoadTime } from '../../../store/layers/DataLoadTimeSlice';
 
 const PaperComponent = (props) => {
   return (
-    <Draggable>
+    <Draggable handle="#draggable-dialog-title" cancel={'[class*="MuiDialogContent-root"]'}>
       <Paper {...props} />
     </Draggable>
   );
 };
+
+const maxScreenDimension = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
+const minZoom = maxScreenDimension > 1280 ? 4 : 2;
 
 const LeafletMap = () => {
   const { pathname } = useRouter();
@@ -58,6 +63,8 @@ const LeafletMap = () => {
   const auth = useSelector(selectAuth);
   const { data: waypointsData } = useGetWaypointsQuery('');
   const { data: airportsData } = useGetAirportQuery('');
+  const dataLoadTime = useSelector(selectDataLoadTime);
+
   if (auth.id) {
     useGetRoutesQuery(null);
   }
@@ -168,10 +175,13 @@ const LeafletMap = () => {
         attributionControl={false}
         // preferCanvas={true}
         renderer={L.canvas()}
+        minZoom={minZoom}
+        maxZoom={18}
       >
         <BaseMapLayers></BaseMapLayers>
         <MeteoLayers></MeteoLayers>
-        <MapSearch />
+        {/* <MapSearch /> */}
+        <MapSideButtons></MapSideButtons>
         <ZoomControl
           position="topright"
           zoomInText={ReactDOMServer.renderToString(<SvgRoundPlus></SvgRoundPlus>)}

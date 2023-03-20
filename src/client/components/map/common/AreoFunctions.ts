@@ -2,12 +2,13 @@
 import { PersonalMinimums } from './../../../store/user/UserSettings';
 import { cacheStartTime, WeatherCausings } from './AreoConstants';
 import geojson2svg from 'geojson-to-svg';
-import { SkyCondition } from '../../../interfaces/stationMarkers';
+import { SkyCondition } from '../../../interfaces/layerControl';
 import RBush from 'rbush';
 import { LatLng } from 'leaflet';
 import axios from 'axios';
 import { db } from '../../caching/dexieDb';
 import { Route, RoutePoint } from '../../../interfaces/route';
+import { route as routeErrorMessages } from '../../lang/messages';
 import ReactDOMServer from 'react-dom/server';
 
 export const getAltitudeString = (value: string, isHundred = true, fzlbase?: string, fzltop?: string): string => {
@@ -75,13 +76,7 @@ export const simpleTimeFormat = (time: Date, useLocalTime: boolean) => {
     day: '2-digit',
     month: 'short',
     timeZone: !useLocalTime ? 'UTC' : undefined,
-  })} ${time.toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    timeZoneName: 'short',
-    timeZone: !useLocalTime ? 'UTC' : undefined,
-  })}`;
+  })} ${simpleTimeOnlyFormat(time, useLocalTime)}`;
 };
 
 export const simpleTimeOnlyFormat = (time: Date, useLocalTime: boolean) => {
@@ -102,6 +97,14 @@ export const simpleTimeOnlyFormat = (time: Date, useLocalTime: boolean) => {
 export const getThumbnail = (feature, style) => {
   const svgString = geojson2svg().styles({ Polygon: style }).data(feature).render();
   return svgString;
+};
+
+export const celsiusToFahrenheit = (celsius: number): number => {
+  return Math.round((celsius * 9) / 5 + 32);
+};
+
+export const knotsToMph = (knots: number): number => {
+  return Math.round(knots * 1.15078);
 };
 
 export const simplifyPoints = (
@@ -127,9 +130,11 @@ export const simplifyPoints = (
   const results: GeoJSON.Feature[] = [];
   const rbush = new RBush();
   if (route) {
-    [route.departure.position, route.destination.position, ...route.routeOfFlight.map((item) => item.position)].forEach(
-      (position) => rbush.insert(getBoxFromGeometry(map, position)),
-    );
+    [
+      route.departure.position,
+      route.destination.position,
+      ...route.routeOfFlight.map((item) => item.routePoint.position),
+    ].forEach((position) => rbush.insert(getBoxFromGeometry(map, position)));
   }
   features.forEach((feature) => {
     // @ts-ignore
@@ -178,8 +183,7 @@ export const getCacheVersion = (updateInterval: number): number => {
 export const getTimeRangeStart = () => {
   const currentDate = new Date();
   const origin = new Date();
-  origin.setDate(currentDate.getDate() - 1);
-  origin.setHours(12, 0, 0);
+  origin.setHours(origin.getHours() - 12, 0, 0);
   origin.setMinutes(0);
   origin.setSeconds(0);
   origin.setMilliseconds(0);
@@ -230,38 +234,30 @@ export const getAirportNameById = (id: string, airportsData: any[]): string => {
   return null;
 };
 
-export const validateRoute = (route: Route): boolean => {
-  if (route.departure && route.destination) return true;
-  return false;
-};
-
-export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
-  const coordinateList = [
-    route.departure.position.coordinates,
-    ...route.routeOfFlight.map((item) => item.position.coordinates),
-    route.destination.position.coordinates,
-  ];
-  routeGroupLayer.clearLayers();
-  const latlngs = L.GeoJSON.coordsToLatLngs(coordinateList);
-  latlngs.reduce((a, b) => {
-    //@ts-ignore
-    const polyline = L.Polyline.Arc(a, b, { color: '#f0fa', weight: 6, pane: 'route' });
-    routeGroupLayer.addLayer(polyline);
-    return b;
-  });
-  [route.departure, ...route.routeOfFlight, route.destination].forEach((routePoint) => {
-    const marker = L.marker(L.GeoJSON.coordsToLatLng(routePoint.position.coordinates as any), {
-      icon: new L.DivIcon({
-        className: 'route-label',
-        html: routePoint.key,
-        iconAnchor: [routePoint.key.length > 4 ? 64 : 54, routePoint.type !== 'waypoint' ? 20 : 10],
-        iconSize: [routePoint.key.length > 4 ? 60 : 50, 20],
-      }),
-      pane: 'route',
-    });
-    routeGroupLayer.addLayer(marker);
-  });
-  // map.fitBounds(polyline.getBounds());
+export const validateRoute = (route: Route): boolean | string => {
+  if (route.departure && route.destination) {
+    if (isSameRoutePoints(route.departure, route.destination)) {
+      if (!route.routeOfFlight || route.routeOfFlight.length === 0) {
+        return routeErrorMessages.en.noWaypointsError;
+      }
+      const wayPoints = [
+        route.departure,
+        ...route.routeOfFlight.map((routeOfFlight) => routeOfFlight.routePoint),
+        route.destination,
+      ];
+      for (let i = 0; i < wayPoints.length - 1; i++) {
+        if (isSameRoutePoints(wayPoints[i], wayPoints[i + 1])) {
+          return routeErrorMessages.en.zeroLengthLegError;
+        }
+      }
+      return true;
+    }
+    return true;
+  }
+  if (!route.departure && !route.destination) {
+    return routeErrorMessages.en.noValidAirportError;
+  }
+  return !route.departure ? routeErrorMessages.en.noValidDepartureError : routeErrorMessages.en.noValidDestinationError;
 };
 
 export const isSameRoutePoints = (routePoint1: RoutePoint, routePoint2: RoutePoint): boolean => {
@@ -288,9 +284,15 @@ export const isSameRoutes = (route1: Route, route2: Route): boolean => {
     return false;
   }
   for (let i = 0; i < route1.routeOfFlight.length; i++) {
-    if (!isSameRoutePoints(route1.routeOfFlight[i], route2.routeOfFlight[i])) {
+    if (!isSameRoutePoints(route1.routeOfFlight[i].routePoint, route2.routeOfFlight[i].routePoint)) {
       return false;
     }
+  }
+  if (route1.altitude !== route2.altitude) {
+    return false;
+  }
+  if (route1.useForecastWinds !== route2.useForecastWinds) {
+    return false;
   }
   return true;
 };
@@ -347,10 +349,19 @@ export const storeFeaturesToCache = (datasetName: string, features: GeoJSON.Feat
   chunkedAdd();
 };
 
-export const loadFeaturesFromCache = (datasetName: string, setFeaturesFunc: (features: GeoJSON.Feature[]) => void) => {
-  db[datasetName].toArray().then((features) => {
-    setFeaturesFunc(features);
-  });
+export const loadFeaturesFromCache = (
+  datasetName: string,
+  setFeaturesFunc: (features: GeoJSON.Feature[]) => void,
+  sortFunc?: (a: GeoJSON.Feature, b: GeoJSON.Feature) => number,
+) => {
+  if (db[datasetName]) {
+    db[datasetName].toArray().then((features) => {
+      if (sortFunc) {
+        features = features.sort(sortFunc);
+      }
+      setFeaturesFunc(features);
+    });
+  }
 };
 
 export const loadFeaturesFromWeb = (
@@ -359,6 +370,9 @@ export const loadFeaturesFromWeb = (
   propertyNames: string[],
   datasetName: string,
   setFeaturesFunc?: (features: GeoJSON.Feature[]) => void,
+  sortFunc?: (a: GeoJSON.Feature, b: GeoJSON.Feature) => number,
+  filter?: string,
+  storeCache = true,
 ) => {
   const params = {
     outputFormat: 'application/json',
@@ -369,6 +383,7 @@ export const loadFeaturesFromWeb = (
     version: '1.0.0',
     srsName: 'EPSG:4326',
     propertyName: propertyNames.join(','),
+    cql_filter: filter,
   } as any;
   axios
     .get(url, {
@@ -379,8 +394,12 @@ export const loadFeaturesFromWeb = (
       if (typeof data.data === 'string') {
         console.log(wfsTypeName + ': Invalid json data!', data.data);
       } else {
-        storeFeaturesToCache(datasetName, data.data.features);
-        if (setFeaturesFunc) setFeaturesFunc(data.data.features);
+        let features: GeoJSON.Feature[] = data.data.features;
+        if (sortFunc) {
+          features = features.sort(sortFunc);
+        }
+        if (storeCache) storeFeaturesToCache(datasetName, features);
+        if (setFeaturesFunc) setFeaturesFunc(features);
       }
     })
     .catch((reason) => {
@@ -389,93 +408,36 @@ export const loadFeaturesFromWeb = (
 };
 
 export const visibilityMileToMeter = (mile: number): number => {
-  let meter = 9999;
-  switch (mile) {
-    case 0:
-      meter = 0;
-      break;
-    case 0.13:
-      meter = 200;
-      break;
-    case 0.25:
-      meter = 400;
-      break;
-    case 0.38:
-      meter = 600;
-      break;
-    case 0.5:
-      meter = 800;
-      break;
-    case 0.62:
-    case 0.63:
-      meter = 1000;
-      break;
-    case 0.75:
-      meter = 1200;
-      break;
-    case 0.88:
-      meter = 1400;
-      break;
-    case 1:
-      meter = 1600;
-      break;
-    case 1.13:
-      meter = 1800;
-      break;
-    case 1.24:
-    case 1.25:
-      meter = 2000;
-      break;
-    case 1.38:
-      meter = 2200;
-      break;
-    case 1.5:
-      meter = 2400;
-      break;
-    case 1.63:
-      meter = 2600;
-      break;
-    case 1.75:
-      meter = 2800;
-      break;
-    case 1.86:
-    case 1.88:
-      meter = 3000;
-      break;
-    case 2:
-      meter = 3200;
-      break;
-    case 2.25:
-      meter = 3600;
-      break;
-    case 2.49:
-    case 2.5:
-      meter = 4000;
-      break;
-    case 2.75:
-      meter = 4400;
-      break;
-    case 3:
-      meter = 4800;
-      break;
-    case 3.11:
-    case 3.5:
-      meter = 5000;
-      break;
-    case 3.73:
-      meter = 6000;
-      break;
-    case 4:
-      meter = 7000;
-      break;
-    case 5:
-      meter = 8000;
-      break;
-    case 6:
-      meter = 9000;
-      break;
-  }
-  return meter;
+  if (mile >= 7) return 9999; // yes that is 9999
+  else if (mile >= 6 && mile < 7) return 9000;
+  else if (mile >= 5 && mile < 6) return 8000;
+  else if (mile >= 4.5 && mile < 5) return 7000;
+  else if (mile >= 4 && mile < 4.5) return 6000;
+  else if (mile >= 3.5 && mile < 4) return 5000;
+  else if (mile >= 3 && mile < 3.5) return 4800;
+  else if (mile == 2.75) return 4400;
+  else if (mile == 2.5) return 4000;
+  else if (mile == 2.25) return 3600;
+  else if (mile == 2.0) return 3200;
+  else if (mile == 1.88) return 3000;
+  else if (mile == 1.75) return 2800;
+  else if (mile == 1.63) return 2600;
+  else if (mile == 1.5) return 2400;
+  else if (mile == 1.38) return 2200;
+  else if (mile == 1.25) return 2000;
+  else if (mile == 1.13) return 1800;
+  else if (mile == 1) return 1600;
+  else if (mile == 0.88) return 1400;
+  else if (mile == 0.75) return 1200;
+  else if (mile == 0.63) return 1000;
+  else if (mile == 0.5) return 800;
+  else if (mile == 0.38) return 600;
+  else if (mile == 0.31) return 500;
+  else if (mile == 0.25) return 400;
+  else if (mile == 0.13) return 200;
+  else if (mile == 0.06) return 100;
+  else if (mile == 0) return 0;
+  return 0.0;
 };
 
 export const visibilityMileToFraction = (mile: number): string => {
@@ -876,6 +838,12 @@ export const getMetarDecodedWxString = (wxString: string): string => {
       break;
     case 'SHSN DRSN':
       result = 'Moderate snow showers and drifting snow';
+      break;
+    case 'DRSN SHSN':
+      result = 'Snow showers and drifting snow';
+      break;
+    case 'DRSN -SN':
+      result = 'Light snow and drifting snow';
       break;
     case '+SHSN DRSN':
       result = 'Heavy snow showers and drifting snow';
@@ -1331,8 +1299,20 @@ export const getMetarDecodedWxString = (wxString: string): string => {
     case 'IC':
       result = 'Ice cystals';
       break;
+    case 'IC HZ':
+      result = 'Ice crystals and haze';
+      break;
+    case 'IC BR':
+      result = 'Ice crystals and mist';
+      break;
+    case 'IC BLSN':
+      result = 'Ice crystals and blowing snow';
+      break;
     case 'IC DRSN':
       result = 'Ice crystals and drifting snow';
+      break;
+    case 'IC -SN DRSN':
+      result = 'Light snow, ice crystals and drifting snow';
       break;
     case 'VCSH DRSN':
       result = 'Showers in the vicinity and drifting snow';

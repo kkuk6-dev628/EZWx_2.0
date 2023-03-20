@@ -9,26 +9,36 @@ import Image from 'next/image';
 import SunCalc from 'suncalc';
 
 import { selectMetar } from '../../../../store/layers/LayerControl';
-import { PersonalMinimums, selectPersonalMinimums } from '../../../../store/user/UserSettings';
-import { MetarMarkerTypes, timeSliderInterval, wfsUrl, windIconLimit } from '../../common/AreoConstants';
+import { PersonalMinimums, selectPersonalMinimums, selectSettings } from '../../../../store/user/UserSettings';
+import {
+  StationMarkersLayerItems,
+  paneOrders,
+  timeSliderInterval,
+  wfsUrl,
+  windIconLimit,
+} from '../../common/AreoConstants';
 import {
   addLeadingZeroes,
+  celsiusToFahrenheit,
   getAbsoluteHours,
   getLowestCeiling,
   getMetarCeilingCategory,
   getMetarVisibilityCategory,
+  getQueryTime,
   getSkyConditions,
   getWorstSkyCondition,
+  knotsToMph,
   loadFeaturesFromCache,
   loadFeaturesFromWeb,
+  visibilityMileToMeter,
 } from '../../common/AreoFunctions';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
 import { selectActiveRoute } from '../../../../store/route/routes';
+import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
 
 const metarsProperties = [
-  'wkb_geometry',
-  'ogc_fid',
+  'geometry',
   'station_id',
   'auto',
   // 'elevation_ft',
@@ -38,6 +48,8 @@ const metarsProperties = [
   'observation_time',
   'wind_speed_kt',
   'wind_gust_kt',
+  'crosswind_component_kt',
+  'crosswind_runway_id',
   'flight_category',
   'raw_text',
   'visibility_statute_mi',
@@ -78,6 +90,7 @@ const nbmStationProperties = [
   'cross_com',
   'valid_date',
   'geom',
+  'pub',
 ];
 
 export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): { iconUrl: string; ceiling: number } => {
@@ -105,7 +118,7 @@ export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): { iconUrl: s
   return { iconUrl, ceiling };
 };
 
-export const getNbmFlightCategoryIconUrl = (feature: GeoJSON.Feature, personalMinimums: PersonalMinimums): string => {
+const getNbmFlightCategory = (feature: GeoJSON.Feature, personalMinimums: PersonalMinimums): string => {
   const visibility = feature.properties.vis;
   const [catVis] = getMetarVisibilityCategory(visibility, personalMinimums);
   const ceiling = feature.properties.ceil;
@@ -124,6 +137,12 @@ export const getNbmFlightCategoryIconUrl = (feature: GeoJSON.Feature, personalMi
     indexFinalCat = -1;
   }
   const finalCat = indexFinalCat > -1 ? categories[indexFinalCat] : 'Black';
+  return finalCat;
+};
+
+export const getNbmFlightCategoryIconUrl = (feature: GeoJSON.Feature, personalMinimums: PersonalMinimums): string => {
+  const finalCat = getNbmFlightCategory(feature, personalMinimums);
+  const ceiling = feature.properties.ceil;
   let skyCondition: string;
   const skyCover = feature.properties.skycov;
   if (ceiling) {
@@ -140,38 +159,70 @@ export const getNbmFlightCategoryIconUrl = (feature: GeoJSON.Feature, personalMi
   const iconUrl = `/icons/metar/${finalCat}-${skyCondition}.png`;
   return iconUrl;
 };
+
+export const isSameFeatures = (a: GeoJSON.Feature[], b: GeoJSON.Feature[], compareProperties: string[]): boolean => {
+  if (a.length !== b.length) {
+    return false;
+  }
+  if (a.length === 0) {
+    return true;
+  }
+  const undefinedProperties = compareProperties.filter(
+    (compareProperty) => a[0].properties[compareProperty] === undefined,
+  );
+  if (undefinedProperties.length > 0) {
+    return false;
+  }
+  for (let i = 0; i < a.length; i++) {
+    const differentProperties = compareProperties.filter(
+      (compareProperty) => a[i].properties[compareProperty] !== b[i].properties[compareProperty],
+    );
+    if (differentProperties.length > 0) {
+      return false;
+    }
+  }
+  return true;
+};
+
 const nbmStations = {};
 
 export const StationMarkersLayer = () => {
-  const [metars, setMetars] = useState<GeoJSON.Feature[]>([]);
   const [displayedGeojson, setDisplayedGeojson] = useState<GeoJSON.FeatureCollection>();
   const [stationTime, setStationTime] = useState<any[]>([]);
   const [clusterRadius, setClusterRadius] = useState(20);
   const layerState = useSelector(selectMetar);
   const personalMinimums = useSelector(selectPersonalMinimums);
-  const [indexedData, setIndexedData] = useState();
+  const [indexedData, setIndexedData] = useState({});
   const observationTime = useSelector(selectObsTime);
   const [isPast, setIsPast] = useState(true);
-  const [renderedTime, setRenderedTime] = useState(Date.now());
   const activeRoute = useSelector(selectActiveRoute);
+  const userSettings = useSelector(selectSettings);
+  const dataLoadTime = useSelector(selectDataLoadTime);
 
   const geojsonLayerRef = useRef();
 
   const map = useMap();
 
   useEffect(() => {
-    loadFeaturesFromCache('metars', setMetars);
-    loadFeaturesFromWeb(wfsUrl, 'EZWxBrief:metar', metarsProperties, 'metars', setMetars);
+    loadMetars();
     loadNbmStationMarkers();
-  }, []);
+  }, [dataLoadTime]);
 
   useEffect(() => {
-    if (!metars) return;
-    if (metars.length > 0) {
-      const filteredFeatures = metarsFilter(metars, new Date(observationTime));
-      setDisplayedData(filteredFeatures);
+    if (!indexedData || !isPast) return;
+    if (Object.keys(indexedData).length > 0) {
+      const filteredFeatures = metarsFilter(new Date(observationTime));
+      setDisplayedGeojson((prevState) => {
+        if (!prevState) {
+          return {
+            type: 'FeatureCollection',
+            features: filteredFeatures,
+          };
+        }
+        return prevState;
+      });
     }
-  }, [metars]);
+  }, [indexedData]);
 
   useEffect(() => {
     if (layerState && layerState.checked === false) return;
@@ -179,31 +230,29 @@ export const StationMarkersLayer = () => {
     const currentHour = getAbsoluteHours(Date.now());
     if (obsHour > currentHour) {
       setIsPast(false);
-      if (stationTime.length > 0) {
-        const validStation = stationTime.reduce((acc, cur) => {
-          const prevDiff = Math.abs(getAbsoluteHours(acc.valid_date) - obsHour);
-          const currDiff = Math.abs(getAbsoluteHours(cur.valid_date) - obsHour);
-          if (prevDiff - currDiff > 0) {
-            return cur;
-          }
-          return acc;
-        });
-        if (nbmStations[validStation.station_table_name]) {
-          setDisplayedData(nbmStations[validStation.station_table_name]);
-        }
-      }
+      updateNbmStationMarkers();
     } else {
       setIsPast(true);
-      if (metars.length > 0) {
-        const filteredFeatures = metarsFilter(metars, new Date(observationTime));
+      if (Object.keys(indexedData).length > 0) {
+        const filteredFeatures = metarsFilter(new Date(observationTime));
         setDisplayedData(filteredFeatures);
       }
     }
   }, [observationTime]);
 
   useEffect(() => {
-    layerState.markerType === MetarMarkerTypes.surfaceWindBarbs.value ? setClusterRadius(20) : setClusterRadius(30);
-    setRenderedTime(Date.now());
+    if (isPast) {
+      layerState.markerType === StationMarkersLayerItems.surfaceWindBarbs.value
+        ? setClusterRadius(20)
+        : setClusterRadius(30);
+      if (Object.keys(indexedData).length > 0) {
+        const filteredFeatures = metarsFilter(new Date(observationTime));
+        setDisplayedData(filteredFeatures);
+      }
+      // setRenderedTime(Date.now());
+    } else {
+      updateNbmStationMarkers();
+    }
   }, [
     layerState.markerType,
     layerState.flightCategory.all.checked,
@@ -213,11 +262,65 @@ export const StationMarkersLayer = () => {
     layerState.flightCategory.lifr.checked,
   ]);
 
+  const updateNbmStationMarkers = () => {
+    if (stationTime.length > 0) {
+      const obsHour = getAbsoluteHours(observationTime);
+      const lastTime = new Date(stationTime[stationTime.length - 1].valid_date);
+      lastTime.setHours(lastTime.getHours() + 3);
+      if (getAbsoluteHours(lastTime) < obsHour) {
+        setDisplayedData([]);
+        return;
+      }
+      const validStation = stationTime.reduce((acc, cur) => {
+        const prevDiff = Math.abs(getAbsoluteHours(acc.valid_date) - obsHour);
+        const currDiff = Math.abs(getAbsoluteHours(cur.valid_date) - obsHour);
+        if (prevDiff - currDiff > 0 && getAbsoluteHours(cur.valid_date) <= obsHour) {
+          return cur;
+        }
+        return acc;
+      });
+      if (nbmStations[validStation.station_table_name]) {
+        const filtered = stationForecastFilter(nbmStations[validStation.station_table_name]);
+        setDisplayedData(filtered);
+      }
+    } else {
+      setDisplayedData([]);
+    }
+  };
   const setDisplayedData = (features: GeoJSON.Feature[]) => {
     setDisplayedGeojson({
       type: 'FeatureCollection',
       features: features,
     });
+  };
+
+  const loadMetars = () => {
+    const currentTime = new Date();
+    const lastTime = new Date();
+    lastTime.setHours(lastTime.getHours() - 12);
+    // loadFeaturesFromCache('metars', setMetars);
+    const queuedLoadWeb = (time: Date) => {
+      if (time < lastTime) {
+        return;
+      }
+      const serverFilter = `observation_time DURING ${getQueryTime(time)}`;
+      loadFeaturesFromWeb(
+        wfsUrl,
+        'EZWxBrief:metar',
+        metarsProperties,
+        'metars',
+        (features) => {
+          buildIndexedData([...features]);
+          const newTime = new Date(time.getTime());
+          newTime.setMinutes(newTime.getMinutes() - 75);
+          queuedLoadWeb(newTime);
+        },
+        undefined,
+        serverFilter,
+        false,
+      );
+    };
+    queuedLoadWeb(currentTime);
   };
 
   const loadNbmStationMarkers = () => {
@@ -229,23 +332,51 @@ export const StationMarkersLayer = () => {
           return;
         }
         setStationTime(result.data);
-        result.data.forEach((stationTime) => {
-          const stationValidHour = Math.floor(new Date(stationTime.valid_date).getTime() / 3600 / 1000);
-          if (1 || stationValidHour >= getAbsoluteHours(Date.now())) {
-            loadFeaturesFromCache(stationTime.station_table_name, (features) => {
-              addNbmStation(stationTime.station_table_name, features);
-            });
-            loadFeaturesFromWeb(
-              wfsUrl,
-              `EZWxBrief:${stationTime.station_table_name}`,
-              nbmStationProperties,
-              stationTime.station_table_name,
-              (features) => {
-                addNbmStation(stationTime.station_table_name, features);
-              },
-            );
-          }
+
+        const stationTimes = [...result.data].filter((stationTime) => {
+          const stationValidHour = getAbsoluteHours(stationTime.valid_date);
+          return stationValidHour >= getAbsoluteHours(Date.now());
         });
+        const stationTimesWeb = [...stationTimes];
+
+        const queuedLoadCache = () => {
+          if (stationTimes.length === 0) {
+            return;
+          }
+          const [stationTime] = stationTimes.splice(0, 1);
+          loadFeaturesFromCache(stationTime.station_table_name, (features) => {
+            addNbmStation(stationTime.station_table_name, features);
+            queuedLoadCache();
+          });
+        };
+        // limit number of requests to 3 at the same time.
+        // queuedLoadCache();
+        // queuedLoadCache();
+        // queuedLoadCache();
+
+        const queuedLoadWeb = () => {
+          if (stationTimesWeb.length === 0) {
+            return;
+          }
+          const [stationTime] = stationTimesWeb.splice(0, 1);
+          loadFeaturesFromWeb(
+            wfsUrl,
+            `EZWxBrief:${stationTime.station_table_name}`,
+            nbmStationProperties,
+            stationTime.station_table_name,
+            (features) => {
+              addNbmStation(stationTime.station_table_name, features);
+              queuedLoadWeb();
+            },
+            (a, b) =>
+              b.properties.pub - a.properties.pub || (a.properties.faaid as string).localeCompare(b.properties.faaid),
+            undefined,
+            false,
+          );
+        };
+        queuedLoadWeb();
+        queuedLoadWeb();
+        queuedLoadWeb();
       })
       .catch((reason) => {
         console.log(reason);
@@ -260,7 +391,11 @@ export const StationMarkersLayer = () => {
 
   const unSimplifyFilter = (feature) => {
     if (!activeRoute) return false;
-    const routePoints = [activeRoute.departure, activeRoute.destination, ...activeRoute.routeOfFlight];
+    const routePoints = [
+      activeRoute.departure,
+      activeRoute.destination,
+      ...activeRoute.routeOfFlight.map((item) => item.routePoint),
+    ];
     const index = routePoints.findIndex((routePoint) => {
       if (feature.properties.station_id) {
         return feature.properties.station_id.indexOf(routePoint.key) > -1;
@@ -280,31 +415,26 @@ export const StationMarkersLayer = () => {
       }
       data[index].push(feature);
     });
-    setIndexedData(data as any);
+    setIndexedData((prevState) => ({ ...prevState, ...data } as any));
     return data;
   };
 
-  const metarsFilter = (features: GeoJSON.Feature[], observationTime: Date): GeoJSON.Feature[] => {
+  const metarsFilter = (observationTime: Date): GeoJSON.Feature[] => {
     const obsHour = getAbsoluteHours(observationTime);
     const currentHour = getAbsoluteHours(Date.now());
     if (obsHour - currentHour > 0) {
       return [];
     }
-    let indexedFeatures = indexedData;
-    if (!indexedFeatures) {
-      indexedFeatures = buildIndexedData(features);
-    }
-    if (!indexedFeatures) return [];
     const filteredFeatures = {};
     const obsTime = new Date(observationTime).getTime();
     const startIndex = Math.floor((obsTime - 75 * 60 * 1000) / timeSliderInterval);
     const endIndex = Math.floor(obsTime / timeSliderInterval);
     for (let index = startIndex; index < endIndex; index++) {
-      const iData = indexedFeatures[index] as GeoJSON.Feature[];
+      const iData = indexedData[index] as GeoJSON.Feature[];
       if (iData) {
         iData.map((feature) => {
           if (
-            layerState.markerType === MetarMarkerTypes.flightCategory.value &&
+            layerState.markerType === StationMarkersLayerItems.flightCategory.value &&
             layerState.flightCategory.all.checked === false
           ) {
             if (!layerState.flightCategory.vfr.checked && feature.properties.flight_category === 'VFR') {
@@ -331,27 +461,62 @@ export const StationMarkersLayer = () => {
         });
       }
     }
-    const result = Object.values(filteredFeatures);
+    const ordered = Object.keys(filteredFeatures)
+      .sort()
+      .reduce((obj, key) => {
+        obj[key] = filteredFeatures[key];
+        return obj;
+      }, {});
+    const result = Object.values(ordered);
     return result as any;
+  };
+
+  const stationForecastFilter = (features: GeoJSON.Feature[]): GeoJSON.Feature[] => {
+    if (
+      layerState.markerType !== StationMarkersLayerItems.flightCategory.value ||
+      layerState.flightCategory.all.checked === true
+    ) {
+      return features;
+    }
+    const filtered = features.filter((feature) => {
+      const flightCategory = getNbmFlightCategory(feature, personalMinimums);
+      if (layerState.flightCategory.vfr.checked && flightCategory === 'VFR') {
+        return true;
+      }
+      if (layerState.flightCategory.mvfr.checked && flightCategory === 'MVFR') {
+        return true;
+      }
+      if (layerState.flightCategory.ifr.checked && flightCategory === 'IFR') {
+        return true;
+      }
+      if (layerState.flightCategory.lifr.checked && flightCategory === 'LIFR') {
+        return true;
+      }
+      if (flightCategory === 'BLACK') {
+        return true;
+      }
+      return false;
+    });
+    return filtered;
   };
 
   const pointToLayer = (feature: GeoJSON.Feature, latlng: LatLng): L.Layer => {
     let marker = null;
     if (isPast) {
       switch (layerState.markerType) {
-        case MetarMarkerTypes.flightCategory.value:
+        case StationMarkersLayerItems.flightCategory.value:
           marker = getFlightCatMarker(feature, latlng);
           break;
-        case MetarMarkerTypes.ceilingHeight.value:
+        case StationMarkersLayerItems.ceilingHeight.value:
           marker = getCeilingHeightMarker(feature, latlng);
           break;
-        case MetarMarkerTypes.surfaceVisibility.value:
+        case StationMarkersLayerItems.surfaceVisibility.value:
           marker = getSurfaceVisibilityMarker(feature, latlng, feature.properties.visibility_statute_mi);
           break;
-        case MetarMarkerTypes.surfaceWindSpeed.value:
+        case StationMarkersLayerItems.surfaceWindSpeed.value:
           marker = getSurfaceWindSpeedMarker(feature, latlng, feature.properties.wind_speed_kt);
           break;
-        case MetarMarkerTypes.surfaceWindBarbs.value:
+        case StationMarkersLayerItems.surfaceWindBarbs.value:
           marker = getSurfaceWindBarbsMarker(
             feature,
             latlng,
@@ -359,16 +524,16 @@ export const StationMarkersLayer = () => {
             feature.properties.wind_dir_degrees,
           );
           break;
-        case MetarMarkerTypes.surfaceWindGust.value:
+        case StationMarkersLayerItems.surfaceWindGust.value:
           marker = getSurfaceWindGustMarker(feature, latlng, feature.properties.wind_gust_kt);
           break;
-        case MetarMarkerTypes.surfaceTemperature.value:
+        case StationMarkersLayerItems.surfaceTemperature.value:
           marker = getSurfaceTemperatureMarker(feature, latlng, feature.properties.temp_c);
           break;
-        case MetarMarkerTypes.surfaceDewpoint.value:
+        case StationMarkersLayerItems.surfaceDewpoint.value:
           marker = getSurfaceDewpointMarker(feature, latlng, feature.properties.dewpoint_c);
           break;
-        case MetarMarkerTypes.dewpointDepression.value:
+        case StationMarkersLayerItems.dewpointDepression.value:
           marker = getDewpointDepressionMarker(
             feature,
             latlng,
@@ -376,40 +541,40 @@ export const StationMarkersLayer = () => {
             feature.properties.dewpoint_c,
           );
           break;
-        case MetarMarkerTypes.weather.value:
+        case StationMarkersLayerItems.weather.value:
           marker = getWeatherMarker(feature, latlng);
           break;
       }
     } else {
       switch (layerState.markerType) {
-        case MetarMarkerTypes.flightCategory.value:
+        case StationMarkersLayerItems.flightCategory.value:
           marker = getFlightCatMarker(feature, latlng);
           break;
-        case MetarMarkerTypes.ceilingHeight.value:
+        case StationMarkersLayerItems.ceilingHeight.value:
           marker = getNbmCeilingHeightMarker(feature, latlng, feature.properties.ceil, feature.properties.skycov);
           break;
-        case MetarMarkerTypes.surfaceVisibility.value:
+        case StationMarkersLayerItems.surfaceVisibility.value:
           marker = getSurfaceVisibilityMarker(feature, latlng, feature.properties.vis);
           break;
-        case MetarMarkerTypes.surfaceWindSpeed.value:
+        case StationMarkersLayerItems.surfaceWindSpeed.value:
           marker = getSurfaceWindSpeedMarker(feature, latlng, feature.properties.w_speed);
           break;
-        case MetarMarkerTypes.surfaceWindBarbs.value:
+        case StationMarkersLayerItems.surfaceWindBarbs.value:
           marker = getSurfaceWindBarbsMarker(feature, latlng, feature.properties.w_speed, feature.properties.w_dir);
           break;
-        case MetarMarkerTypes.surfaceWindGust.value:
+        case StationMarkersLayerItems.surfaceWindGust.value:
           marker = getSurfaceWindGustMarker(feature, latlng, feature.properties.w_gust);
           break;
-        case MetarMarkerTypes.surfaceTemperature.value:
+        case StationMarkersLayerItems.surfaceTemperature.value:
           marker = getSurfaceTemperatureMarker(feature, latlng, feature.properties.temp_c);
           break;
-        case MetarMarkerTypes.surfaceDewpoint.value:
+        case StationMarkersLayerItems.surfaceDewpoint.value:
           marker = getSurfaceDewpointMarker(feature, latlng, feature.properties.dewp_c);
           break;
-        case MetarMarkerTypes.dewpointDepression.value:
+        case StationMarkersLayerItems.dewpointDepression.value:
           marker = getDewpointDepressionMarker(feature, latlng, feature.properties.temp_c, feature.properties.dewp_c);
           break;
-        case MetarMarkerTypes.weather.value:
+        case StationMarkersLayerItems.weather.value:
           marker = getFlightCatMarker(feature, latlng);
           break;
       }
@@ -451,11 +616,8 @@ export const StationMarkersLayer = () => {
     const ceilingAmount = addLeadingZeroes(ceiling / 100, 3);
     const worstSkyCondition = getWorstSkyCondition(skyConditions);
     let iconUrl = '';
-    if (layerState.usePersonalMinimums) {
-    } else {
-      const [cat] = getMetarCeilingCategory(ceiling, personalMinimums);
-      iconUrl = `/icons/metar/${cat}-${worstSkyCondition}.png`;
-    }
+    const [cat] = getMetarCeilingCategory(ceiling, personalMinimums);
+    iconUrl = `/icons/metar/${cat}-${worstSkyCondition}.png`;
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-ceiling-icon',
@@ -531,11 +693,19 @@ export const StationMarkersLayer = () => {
     if (!visibility) return;
     const [category] = getMetarVisibilityCategory(visibility, personalMinimums);
     let iconUrl = '/icons/metar/MISSING.png';
-    if (visibility === 0.25 && feature.properties.raw_text && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
-      visibility = '<0.25';
-    }
-    if (visibility > 4) {
-      visibility = Math.ceil(visibility);
+    if (userSettings.default_visibility_unit) {
+      if (visibility === 0.25 && feature.properties.raw_text && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
+        visibility = '<400';
+      } else {
+        visibility = visibilityMileToMeter(visibility);
+      }
+    } else {
+      if (visibility === 0.25 && feature.properties.raw_text && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
+        visibility = '<0.25';
+      }
+      if (visibility > 4) {
+        visibility = Math.ceil(visibility);
+      }
     }
     if (category) {
       iconUrl = `/icons/metar/${category}-OVC.png`;
@@ -589,11 +759,9 @@ export const StationMarkersLayer = () => {
     } else if (windSpeed <= 5) {
       colorCode = 'darkerGreen';
     }
-    // const useKnots =
-    //   $('#hdnUserWindSpeed').val().trim() === 'knots' ? true : false;
-    // if (!useKnots) {
-    //   windSpeed = Math.round(parseFloat(windSpeed) * 1.152);
-    // }
+    if (userSettings.default_wind_speed_unit) {
+      windSpeed = knotsToMph(windSpeed);
+    }
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-wind-icon ' + colorCode,
@@ -625,11 +793,9 @@ export const StationMarkersLayer = () => {
     } else if (windGust <= 10) {
       colorCode = 'darkerGreen';
     }
-    // const useKnots =
-    //   $('#hdnUserWindSpeed').val().trim() === 'knots' ? true : false;
-    // if (!useKnots) {
-    //   windGust = Math.round(parseFloat(windGust) * 1.152);
-    // }
+    if (userSettings.default_wind_speed_unit) {
+      windGust = knotsToMph(windGust);
+    }
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-wind-icon ' + colorCode,
@@ -645,8 +811,6 @@ export const StationMarkersLayer = () => {
 
   const getSurfaceTemperatureMarker = (feature: GeoJSON.Feature, latlng: LatLng, tempInCelcius: number) => {
     if (!tempInCelcius) return;
-    tempInCelcius = Math.round(tempInCelcius);
-    // const tempInCelcius = Math.round((temperature - 32) * (5 / 9));
     let colorCode = 'black';
     if (tempInCelcius > 38) {
       colorCode = 'c10000';
@@ -673,13 +837,10 @@ export const StationMarkersLayer = () => {
     } else if (tempInCelcius < -18) {
       colorCode = 'cc0199';
     }
-    // const useCelcius =
-    //   $('#hdnUserTemperatureSetting').val().trim() === 'celsius' ? true : false;
-    // if (useCelcius) {
-    //   temperature = tempInCelcius;
-    // } else {
-    //   temperature = Math.round(temperature);
-    // }
+    if (userSettings.default_temperature_unit) {
+      tempInCelcius = celsiusToFahrenheit(tempInCelcius);
+    }
+    tempInCelcius = Math.round(tempInCelcius);
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-temperature-icon ' + colorCode,
@@ -695,8 +856,6 @@ export const StationMarkersLayer = () => {
 
   const getSurfaceDewpointMarker = (feature: GeoJSON.Feature, latlng: LatLng, tempInCelcius: number) => {
     if (!tempInCelcius) return;
-    tempInCelcius = Math.round(tempInCelcius);
-    // const tempInCelcius = Math.round((temperature - 32) * (5 / 9));
     let colorCode = 'black';
     if (tempInCelcius > 38) {
       colorCode = 'c10000';
@@ -723,13 +882,10 @@ export const StationMarkersLayer = () => {
     } else if (tempInCelcius < -18) {
       colorCode = 'cc0199';
     }
-    // const useCelcius =
-    //   $('#hdnUserTemperatureSetting').val().trim() === 'celsius' ? true : false;
-    // if (useCelcius) {
-    //   temperature = tempInCelcius;
-    // } else {
-    //   temperature = Math.round(temperature);
-    // }
+    if (userSettings.default_temperature_unit) {
+      tempInCelcius = celsiusToFahrenheit(tempInCelcius);
+    }
+    tempInCelcius = Math.round(tempInCelcius);
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-temperature-icon ' + colorCode,
@@ -749,17 +905,11 @@ export const StationMarkersLayer = () => {
     temperature: number,
     dewpointTemperature: number,
   ) => {
-    // const useCelcius =
-    //   $('#hdnUserTemperatureSetting').val().trim() === 'celsius' ? true : false;
+    if (!dewpointTemperature || !temperature) {
+      return;
+    }
     let dewpointDepression = temperature - dewpointTemperature;
-    // const temperatureInCelcius = Math.round((temperature - 32) * (5 / 9));
     let dewpointDepressionInCelcius = Math.round(dewpointDepression);
-    // const dewpointTemperatureInCelcius = Math.round(
-    //   (dewpointTemperature - 32) * (5 / 9),
-    // );
-    // let dewpointDepressionInCelcius = Math.round(
-    //   temperatureInCelcius - dewpointTemperatureInCelcius,
-    // );
     if (dewpointDepressionInCelcius < 0) {
       dewpointDepressionInCelcius = 0;
     }
@@ -780,9 +930,9 @@ export const StationMarkersLayer = () => {
       colorCode = 'magenta';
     }
 
-    // if (useCelcius) {
-    //   dewpointDepression = dewpointDepressionInCelcius;
-    // }
+    if (userSettings.default_temperature_unit) {
+      dewpointDepressionInCelcius = celsiusToFahrenheit(temperature) - celsiusToFahrenheit(dewpointTemperature);
+    }
 
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
@@ -959,10 +1109,13 @@ export const StationMarkersLayer = () => {
         case 'SN FG':
         case 'SN FZFG DRSN':
         case 'SHSN DRSN':
+        case 'DRSN SHSN':
         case 'SN DRSN':
         case 'SG DRSN':
         case 'SG':
         case 'VCSH DRSN':
+        case 'SN FZFG BLSN':
+        case 'FZFG SN':
           weatherIconClass = 'fas fa-cloud-snow';
           break;
         case 'RASN':
@@ -1048,10 +1201,15 @@ export const StationMarkersLayer = () => {
         case 'BLSN':
         case 'DRSN':
         case 'SN BLSN':
+        case 'IC BLSN':
         case 'IC DRSN':
+        case 'DRSN -SN':
+        case 'IC -SN DRSN':
           weatherIconClass = 'fas fa-snow-blowing';
           break;
         case 'IC':
+        case 'IC HZ':
+        case 'IC BR':
           weatherIconClass = 'fas fa-sparkles';
           break;
         case 'FC':
@@ -1150,10 +1308,9 @@ export const StationMarkersLayer = () => {
   };
 
   return (
-    <Pane name={'station-markers'} style={{ zIndex: 698 }}>
+    <Pane name={'station-markers'} style={{ zIndex: paneOrders.station }}>
       {displayedGeojson != null && (
         <SimplifiedMarkersLayer
-          key={renderedTime}
           ref={geojsonLayerRef}
           data={displayedGeojson}
           visible={layerState.checked}

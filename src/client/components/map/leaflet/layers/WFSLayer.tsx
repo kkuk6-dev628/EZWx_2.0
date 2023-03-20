@@ -12,6 +12,7 @@ import { AppState } from '../../../../store/store';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { emptyGeoJson } from '../../common/AreoConstants';
 import Dexie from 'dexie';
+import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
 
 interface WFSLayerProps {
   url: string;
@@ -28,12 +29,8 @@ interface WFSLayerProps {
   pointToLayer?: (feature: GeoJSON.Feature, latlng: LatLng) => L.Layer;
   serverFilter?: string;
   clientFilter?: (features: GeoJSON.Feature[], obsTime: Date) => GeoJSON.Feature[];
-  isClusteredMarker?: boolean;
-  selectClusterMarker?: (layers: Layer[]) => Layer;
   readDb: () => any;
   writeDb: (features: GeoJSON.Feature[]) => void;
-  markerPane?: string;
-  maxClusterRadius?: number;
   layerStateSelector?: (state: AppState) => any;
   cacheVersion?: number;
 }
@@ -55,24 +52,19 @@ const WFSLayer = React.forwardRef(
       pointToLayer,
       serverFilter: filter,
       clientFilter,
-      isClusteredMarker = false,
-      selectClusterMarker,
       readDb,
       writeDb,
-      markerPane,
-      maxClusterRadius = 30,
       layerStateSelector,
       cacheVersion,
     }: WFSLayerProps,
-    wfsRef: any,
+    parentRef: any,
   ) => {
     const observationTime = useSelector(selectObsTime);
-
     const [geoJSON, setGeoJSON] = useState<FeatureCollection>(initData);
-
     const [displayedData, setDisplayedData] = useState<FeatureCollection>(emptyGeoJson);
-
     const [geoJsonKey, setGeoJsonKey] = useState(12034512);
+    const localRef = useRef();
+    const dataLoadTime = useSelector(selectDataLoadTime);
 
     useEffect(() => {
       const newKey = Date.now();
@@ -122,12 +114,14 @@ const WFSLayer = React.forwardRef(
     const map = useMapEvents({
       zoomend: () => {
         const zoom = map.getZoom();
+        const layer = localRef.current as L.GeoJSON;
+        if (!layer) return;
         if (zoom < showLabelZoom && (!lastZoom || lastZoom >= showLabelZoom)) {
-          ref.current.eachLayer((l) => {
+          layer.eachLayer((l) => {
             setLabelShow(l, false);
           });
         } else if (zoom >= showLabelZoom && (!lastZoom || lastZoom < showLabelZoom)) {
-          ref.current.eachLayer(function (l) {
+          layer.eachLayer(function (l) {
             setLabelShow(l, true);
           });
         }
@@ -137,7 +131,6 @@ const WFSLayer = React.forwardRef(
         if (enableBBoxQuery) fetchGeoJSON();
       },
     });
-    const ref = useRef(null);
     useEffect(() => {
       if (initData.features.length == 0) {
         readDb().then((cachedFeatures) => {
@@ -150,7 +143,7 @@ const WFSLayer = React.forwardRef(
         });
         fetchGeoJSON();
       }
-    }, []);
+    }, [dataLoadTime]);
 
     let lastZoom: number;
 
@@ -199,7 +192,7 @@ const WFSLayer = React.forwardRef(
           if (typeof data.data === 'string') {
             console.log(typeName + ': Invalid json data!', data.data);
           } else {
-            if (ref.current && map.hasLayer(ref.current)) map.removeLayer(ref.current);
+            if (localRef.current && map.hasLayer(localRef.current)) map.removeLayer(localRef.current);
             writeDb(data.data.features);
             setGeoJSON(data.data);
           }
@@ -229,64 +222,13 @@ const WFSLayer = React.forwardRef(
 
     return (
       <>
-        {isClusteredMarker && (
-          <MarkerClusterGroup
-            ref={wfsRef}
-            // @ts-ignore
-            iconCreateFunction={(cluster) => {
-              const children = cluster.getAllChildMarkers();
-              let marker;
-              if (selectClusterMarker) {
-                marker = selectClusterMarker(children);
-              }
-              if (!marker) {
-                marker = children.sort((a: any, b: any) => {
-                  return a._leaflet_id > b._leaflet_id ? 1 : -1;
-                })[0];
-              }
-              return marker.getIcon();
-            }}
-            getPositionFunction={(cluster) => {
-              const children = cluster.getAllChildMarkers();
-              let marker;
-              if (selectClusterMarker) {
-                marker = selectClusterMarker(children);
-              }
-              if (!marker) {
-                marker = children.sort((a: any, b: any) => {
-                  return a._leaflet_id > b._leaflet_id ? 1 : -1;
-                })[0];
-              }
-              return marker.getLatLng();
-            }}
-            singleMarkerMode={true}
-            zoomToBoundsOnClick={false}
-            showCoverageOnHover={false}
-            spiderfyOnMaxZoom={false}
-            removeOutsideVisibleBounds={true}
-            maxClusterRadius={maxClusterRadius}
-            clusterPane={markerPane ? markerPane : undefined}
-          >
-            {displayedData != null && (
-              <GeoJSONLayer
-                key={geoJsonKey}
-                ref={ref}
-                data={displayedData}
-                // @ts-ignore
-                interactive={interactive}
-                // @ts-ignore
-                onEachFeature={onEachFeature}
-                style={style}
-                pointToLayer={pointToLayer}
-                bubblingMouseEvents={true}
-              ></GeoJSONLayer>
-            )}
-          </MarkerClusterGroup>
-        )}
-        {!isClusteredMarker && displayedData != null && (
+        {displayedData != null && (
           <GeoJSONLayer
             key={geoJsonKey}
-            ref={ref}
+            ref={(ref) => {
+              if (parentRef) parentRef.current = ref;
+              localRef.current = ref as any;
+            }}
             data={displayedData}
             // @ts-ignore
             interactive={interactive}

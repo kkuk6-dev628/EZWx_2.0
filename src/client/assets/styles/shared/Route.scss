@@ -1,4 +1,5 @@
 .route-editor {
+  max-width: 480px;
   @media (max-width: 460px) {
     max-width: 344px;
   }
@@ -19,14 +20,19 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
+    padding: 0 20px;
   }
 
   &__top__text {
     font-weight: 400;
     font-size: 18px;
     line-height: 20px;
+    padding: 12px 0;
+    width: 100%;
     color: var(--color-white);
+  }
+  &__top__close {
+    padding: 12px 0;
   }
 
   &__tabs {
@@ -138,11 +144,11 @@
     margin-top: 10px;
     font-size: 1.3rem;
     font-weight: 500;
+    justify-content: space-between;
+    align-items: center;
   }
 
   &__lft {
-    position: absolute;
-    left: 0;
     border: 1.5px solid #3f0c69;
     width: 30px;
     height: 30px;
@@ -150,31 +156,24 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    left: 5px;
-    top: 4px;
     cursor: pointer;
+    margin-left: 4px;
   }
 
   &__rgt {
-    position: absolute;
     border: 1.5px solid #3f0c69;
-    right: 0;
     width: 30px;
     height: 30px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    right: 5px;
-    top: 4px;
     cursor: pointer;
+    margin-right: 4px;
   }
 
   &__input__num {
-    position: absolute;
-    width: 60px;
-    left: 40px;
-    padding-left: 7px;
+    width: 48px;
     height: 100%;
     text-align: center;
     border: none;
@@ -220,6 +219,11 @@
       font-size: 12px;
     }
   }
+  .use-forcast{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
   &__txt {
     font-size: 18px;
@@ -233,7 +237,8 @@
 }
 
 .react-switch {
-  border: 2px solid #c4c4c4;
+  border: 1px solid #c4c4c4;
+  box-sizing: border-box;
   margin-top: 10px;
 }
 

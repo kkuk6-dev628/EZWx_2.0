@@ -36,13 +36,13 @@ export class RouteService {
           departure: true,
         },
       });
-      res.forEach((route) => {
-        const routeOfFlight = route.routeOfFlight
-          .sort((a, b) => (a.order > b.order ? 1 : -1))
-          .map((item: RouteOfFlight) => item.routePoint);
-        //@ts-ignore
-        route.routeOfFlight = routeOfFlight;
-      });
+      // res.forEach((route) => {
+      //   const routeOfFlight = route.routeOfFlight
+      //     .sort((a, b) => (a.order > b.order ? 1 : -1))
+      //     .map((item: RouteOfFlight) => item.routePoint);
+      //   //@ts-ignore
+      //   route.routeOfFlight = routeOfFlight;
+      // });
       return res;
     } catch (e) {
       console.log('Error in find route', e);
@@ -63,7 +63,24 @@ export class RouteService {
   }
 
   async route(user: User, route: CreateRouteDto) {
-    //@ts-ignore
+    if (route.id) {
+      const updateRoute = await this.routeRepository.preload(route);
+      updateRoute.departure = await this.selectOrInsertRoutePoint(route.departure);
+      updateRoute.destination = await this.selectOrInsertRoutePoint(route.destination);
+      const routeOfFlights = [];
+      this.routeFlightRepository.delete({ routeId: route.id });
+      for (let i = 0; i < route.routeOfFlight.length; i++) {
+        const updateRouteOfFlight = new RouteOfFlight();
+        const routePoint = await this.selectOrInsertRoutePoint(route.routeOfFlight[i].routePoint);
+        updateRouteOfFlight.routePointId = routePoint.id;
+        updateRouteOfFlight.routeId = route.id;
+        updateRouteOfFlight.order = i;
+        const saved = await this.routeFlightRepository.save(updateRouteOfFlight);
+        routeOfFlights.push(saved);
+      }
+      updateRoute.routeOfFlight = routeOfFlights;
+      return await this.routeRepository.save(updateRoute);
+    }
     const routeEntity = new Route();
     routeEntity.useForecastWinds = route.useForecastWinds;
     routeEntity.altitude = route.altitude;
@@ -71,12 +88,11 @@ export class RouteService {
     routeEntity.user = user;
     routeEntity.departure = await this.selectOrInsertRoutePoint(route.departure);
     routeEntity.destination = await this.selectOrInsertRoutePoint(route.destination);
-    console.log(routeEntity);
-    await this.routeRepository.save(routeEntity);
+    const res = await this.routeRepository.save(routeEntity);
 
     const routeOfFlights = [];
     for (let i = 0; i < route.routeOfFlight.length; i++) {
-      const routePoint = await this.selectOrInsertRoutePoint(route.routeOfFlight[i]);
+      const routePoint = await this.selectOrInsertRoutePoint(route.routeOfFlight[i].routePoint);
       const routeOfFlight = this.routeFlightRepository.create({
         order: i,
         route: routeEntity,
@@ -86,7 +102,7 @@ export class RouteService {
       routeOfFlights.push(saved);
     }
     routeEntity.routeOfFlight = routeOfFlights;
-    return routeEntity;
+    return res;
   }
 
   async delete(id: number) {

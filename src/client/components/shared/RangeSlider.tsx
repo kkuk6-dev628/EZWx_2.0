@@ -2,7 +2,7 @@ import * as React from 'react';
 import Slider from '@mui/material/Slider';
 
 const RangeSlider = React.forwardRef((props: any, ref) => {
-  const [value2, setValue2] = React.useState<number[]>(props.value);
+  const [value2, setValue2] = React.useState<[number, number]>(props.value);
   const [className, setClassName] = React.useState('');
   const minDistance = props.mindistance || 10;
   const max = props.max || 100;
@@ -12,7 +12,7 @@ const RangeSlider = React.forwardRef((props: any, ref) => {
     setValue2(props.value);
   });
 
-  const handleChange2 = (event: Event, newValue: number | number[], activeThumb: number) => {
+  const handleChange2 = (event: Event, newValue: number | [number, number], activeThumb: number) => {
     if (!Array.isArray(newValue)) {
       return;
     }
@@ -71,7 +71,7 @@ const RangeSlider = React.forwardRef((props: any, ref) => {
         setValue2(values);
       }
     } else {
-      setValue2(newValue as number[]);
+      setValue2(newValue as [number, number]);
     }
     if (props.onChange) props.onChange(event, values, activeThumb);
   };
