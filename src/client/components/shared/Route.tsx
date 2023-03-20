@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useRef, useState } from 'react';
-import { AiOutlineClose, AiOutlineCloseCircle } from 'react-icons/ai';
-import { BsBookmarkPlus } from 'react-icons/bs';
+import { AiOutlineClose, AiOutlineCloseCircle, AiOutlineHeart } from 'react-icons/ai';
+import { BsBookmarkPlus, BsFolderPlus } from 'react-icons/bs';
 import { AiOutlineMinus } from 'react-icons/ai';
 import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
 import Switch from 'react-switch';
@@ -13,6 +13,8 @@ import { useCreateRouteMutation } from '../../store/route/routeApi';
 import { Route, RouteOfFlight, RoutePoint } from '../../interfaces/route';
 import { useMeteoLayersContext } from '../map/leaflet/layer-control/MeteoLayerControlContext';
 import 'leaflet-arc';
+import { Button } from '@mui/material';
+import MultipleSelect from './MultipleSelect';
 import DialogTitle from '@mui/material/DialogTitle';
 
 interface Props {
@@ -72,6 +74,7 @@ function Route({ setIsShowModal }: Props) {
   const meteoLayers = useMeteoLayersContext();
   const [forceRerenderKey, setForceRerenderKey] = useState(Date.now());
   const [isShowDeleteRouteModal, setIsShowDeleteRouteModal] = useState(false);
+  const [isShowSaveRouteModal, setIsShowSaveRouteModal] = useState(false);
   const [isShowErrorRouteModal, setIsShowErrorRouteModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [altitudeText, setAltitudeText] = useState(routeData.altitude.toLocaleString());
@@ -163,6 +166,10 @@ function Route({ setIsShowModal }: Props) {
     handleClickClear();
   };
 
+  const handleSaveRoute = () => {
+    setIsShowSaveRouteModal(true);
+  };
+
   const roundAltitude = (altitude) => {
     if (altitude > 45000) {
       return 45000;
@@ -199,7 +206,7 @@ function Route({ setIsShowModal }: Props) {
                 <AiOutlineCloseCircle className="route-editor__icon" />
                 <p className="route-editor__tab__text text">Clear</p>
               </button>
-              <button className="route-editor__tab" type="button">
+              <button className="route-editor__tab" type="button" onClick={handleSaveRoute}>
                 <BsBookmarkPlus className="route-editor__icon" />
                 <p className="route-editor__tab__text text">Add to saved</p>
               </button>
@@ -346,10 +353,38 @@ function Route({ setIsShowModal }: Props) {
         title="Delete route confirmation"
         description="Are you sure you want to delete the active route?"
         footer={
-          <>
+          <div>
             <SecondaryButton onClick={() => setIsShowDeleteRouteModal(false)} text="No" isLoading={false} />
             <PrimaryButton text="Yes" onClick={() => deleteActiveRoute()} isLoading={false} />
-          </>
+          </div>
+        }
+      />
+      <Modal
+        open={isShowSaveRouteModal}
+        handleClose={() => setIsShowSaveRouteModal(false)}
+        title="Save favorite"
+        description=""
+        footer={
+          <div className="route__modal__box">
+            <div className="route__modal__box__2">
+              <label className="label" htmlFor="">
+                Name
+              </label>
+              <div className="route__modal__box__input1">
+                <AiOutlineHeart className="route__modal__box__icon" />
+                <input type="text" className="route__modal__box__input" />
+              </div>
+            </div>
+            <MultipleSelect />
+            <div className="button">
+              <BsFolderPlus />
+              <Button variant="text">Add New Folder</Button>
+            </div>
+            <div className="buttonDiv">
+              <SecondaryButton onClick={() => setIsShowDeleteRouteModal(false)} text="Cancel" isLoading={false} />
+              <PrimaryButton text="Save" onClick={() => deleteActiveRoute()} isLoading={false} />
+            </div>
+          </div>
         }
       />
       <Modal

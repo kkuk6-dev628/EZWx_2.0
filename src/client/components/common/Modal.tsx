@@ -17,7 +17,7 @@ export const Modal = ({ open = true, handleClose, footer = null, title, descript
           <h4>{title}</h4>
           <RxCross2 className="icon__button" onClick={handleClose} />
         </div>
-        <div className="dialog__box__body">{description}</div>
+        {description && <div className="dialog__box__body">{description}</div>}
         {footer && <div className="dialog__box__footer">{footer}</div>}
       </Box>
     </MUIModal>

@@ -10,6 +10,8 @@ import { simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
 import ProfileModal from '../shared/ProfileModal';
 import SettingsDrawer from '../shared/SettingsDrawer';
 import { SvgDropDown, SvgMenuBurger, SvgProfile, SvgRoundClose, SvgSave, SvgSetting, SvgWarn } from '../utils/SvgIcons';
+import dynamic from 'next/dynamic';
+const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
 const links = [
   {
@@ -102,6 +104,7 @@ export default function Header() {
   const [activeResponsiveMenu, setActiveResponsiveMenu] = useState(false);
   const [isUserLoginUser, setIsUserLoginUser] = useState(false);
   const [userSettingDrawer, setIsShowSettingsDrawer] = useState(false);
+  const [favoritesDrawer, setFavoritesDrawer] = useState(false);
 
   useEffect(() => {
     if (pathname === '/try-ezwxbrief' || pathname === '/imagery') {
@@ -219,7 +222,10 @@ export default function Header() {
                   <button className="header__rgt__btn header__rgt__btn--icon btn">
                     <SvgWarn />
                   </button>
-                  <button className="header__rgt__btn header__rgt__btn--icon btn">
+                  <button
+                    className="header__rgt__btn header__rgt__btn--icon btn"
+                    onClick={() => setFavoritesDrawer(true)}
+                  >
                     <SvgSave />
                   </button>
                   <button
@@ -245,6 +251,7 @@ export default function Header() {
           isShowSettingsDrawer={userSettingDrawer}
           setIsShowSettingsDrawer={() => setIsShowSettingsDrawer(false)}
         />
+        <FavoritesDrawer isOpen={favoritesDrawer} onClose={() => setFavoritesDrawer(false)} />
         {isShowProfileModal && (
           <ProfileModal setIsUserLoginUser={setIsUserLoginUser} handleProfileModal={handleProfileModal} />
         )}
