@@ -1,8 +1,9 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { RouteOfFlight } from './route-of-flight.entity';
 import { Route } from './route.entity';
 
 @Entity('route_points')
+@Index(['key', 'type'])
 export class RoutePoint {
   @PrimaryGeneratedColumn()
   id: number;

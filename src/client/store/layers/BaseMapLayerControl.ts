@@ -1,18 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { BaseMapLayerControlState } from '../../interfaces/layerControl';
 import { AppState } from '../store';
-import { LayerState } from './LayerControl';
-
-export interface BaseMapLayerControlState {
-  show: boolean;
-  usProvincesState: LayerState;
-  canadianProvincesState: LayerState;
-  countryWarningAreaState: LayerState;
-  streetState: LayerState;
-  topoState: LayerState;
-  terrainState: LayerState;
-  darkState: LayerState;
-  satelliteState: LayerState;
-}
 
 const initialState: BaseMapLayerControlState = {
   show: false,

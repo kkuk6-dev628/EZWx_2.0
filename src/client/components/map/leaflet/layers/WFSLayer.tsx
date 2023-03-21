@@ -3,16 +3,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useMapEvents, GeoJSON as GeoJSONLayer } from 'react-leaflet';
 import L, { LatLng, Layer, PathOptions } from 'leaflet';
 import axios from 'axios';
-import MarkerClusterGroup from '../react-layers/MarkerClusterGroup';
 import { useSelector } from 'react-redux';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
-import { generateHash } from '../../common/AreoFunctions';
 import GeoJSON, { FeatureCollection } from 'geojson';
 import { AppState } from '../../../../store/store';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { emptyGeoJson } from '../../common/AreoConstants';
-import Dexie from 'dexie';
 import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
+import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 
 interface WFSLayerProps {
   url: string;
@@ -31,7 +28,7 @@ interface WFSLayerProps {
   clientFilter?: (features: GeoJSON.Feature[], obsTime: Date) => GeoJSON.Feature[];
   readDb: () => any;
   writeDb: (features: GeoJSON.Feature[]) => void;
-  layerStateSelector?: (state: AppState) => any;
+  layerStateName?: string;
   cacheVersion?: number;
 }
 
@@ -54,7 +51,7 @@ const WFSLayer = React.forwardRef(
       clientFilter,
       readDb,
       writeDb,
-      layerStateSelector,
+      layerStateName: layerStateSelector,
       cacheVersion,
     }: WFSLayerProps,
     parentRef: any,
@@ -65,6 +62,7 @@ const WFSLayer = React.forwardRef(
     const [geoJsonKey, setGeoJsonKey] = useState(12034512);
     const localRef = useRef();
     const dataLoadTime = useSelector(selectDataLoadTime);
+    const { data: layerControlState } = useGetLayerControlStateQuery('');
 
     useEffect(() => {
       const newKey = Date.now();
@@ -88,7 +86,7 @@ const WFSLayer = React.forwardRef(
 
     let layerState = null;
     if (layerStateSelector) {
-      layerState = useSelector(layerStateSelector);
+      layerState = layerControlState[layerStateSelector];
     }
     useEffect(() => {
       if (!geoJSON) return;

@@ -2,30 +2,32 @@ import { PathOptions } from 'leaflet';
 import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectGairmet } from '../../../../store/layers/LayerControl';
+import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 import { db } from '../../../caching/dexieDb';
 import { addLeadingZeroes } from '../../common/AreoFunctions';
 import WFSLayer from './WFSLayer';
 
 const GairmetLayer = () => {
   const [jsonData, setJsonData] = useState();
-  const layerState = useSelector(selectGairmet);
+  const { data: layerControlState } = useGetLayerControlStateQuery('');
+  const gairmetLayerState = layerControlState.gairmetState;
   const [renderedTime, setRenderedTime] = useState(Date.now());
   const layerRef = useRef();
 
   useEffect(() => {
-    if (layerState.checked) {
+    if (gairmetLayerState.checked) {
       setRenderedTime(Date.now());
     }
   }, [
-    layerState.all.checked,
-    layerState.multiFrzLevels.checked,
-    layerState.turbulenceHi.checked,
-    layerState.airframeIcing.checked,
-    layerState.turbulenceLow.checked,
-    layerState.ifrConditions.checked,
-    layerState.mountainObscuration.checked,
-    layerState.nonconvectiveLlws.checked,
-    layerState.sfcWinds.checked,
+    gairmetLayerState.all.checked,
+    gairmetLayerState.multiFrzLevels.checked,
+    gairmetLayerState.turbulenceHi.checked,
+    gairmetLayerState.airframeIcing.checked,
+    gairmetLayerState.turbulenceLow.checked,
+    gairmetLayerState.ifrConditions.checked,
+    gairmetLayerState.mountainObscuration.checked,
+    gairmetLayerState.nonconvectiveLlws.checked,
+    gairmetLayerState.sfcWinds.checked,
   ]);
   const gairmetStyle = (feature: GeoJSON.Feature): PathOptions => {
     const style = {
@@ -120,31 +122,31 @@ const GairmetLayer = () => {
       if (!inTime) {
         return false;
       }
-      if (layerState.all.checked) {
+      if (gairmetLayerState.all.checked) {
         return true;
       }
-      if (layerState.airframeIcing.checked && feature.properties.hazard === 'ICE') {
+      if (gairmetLayerState.airframeIcing.checked && feature.properties.hazard === 'ICE') {
         return true;
       }
-      if (layerState.multiFrzLevels.checked && feature.properties.hazard === 'M_FZLVL') {
+      if (gairmetLayerState.multiFrzLevels.checked && feature.properties.hazard === 'M_FZLVL') {
         return true;
       }
-      if (layerState.turbulenceHi.checked && feature.properties.hazard === 'TURB-HI') {
+      if (gairmetLayerState.turbulenceHi.checked && feature.properties.hazard === 'TURB-HI') {
         return true;
       }
-      if (layerState.turbulenceLow.checked && feature.properties.hazard === 'TURB-LO') {
+      if (gairmetLayerState.turbulenceLow.checked && feature.properties.hazard === 'TURB-LO') {
         return true;
       }
-      if (layerState.ifrConditions.checked && feature.properties.hazard === 'IFR') {
+      if (gairmetLayerState.ifrConditions.checked && feature.properties.hazard === 'IFR') {
         return true;
       }
-      if (layerState.mountainObscuration.checked && feature.properties.hazard === 'MT_OBSC') {
+      if (gairmetLayerState.mountainObscuration.checked && feature.properties.hazard === 'MT_OBSC') {
         return true;
       }
-      if (layerState.nonconvectiveLlws.checked && feature.properties.hazard === 'LLWS') {
+      if (gairmetLayerState.nonconvectiveLlws.checked && feature.properties.hazard === 'LLWS') {
         return true;
       }
-      if (layerState.sfcWinds.checked && feature.properties.hazard === 'SFC_WND') {
+      if (gairmetLayerState.sfcWinds.checked && feature.properties.hazard === 'SFC_WND') {
         return true;
       }
       return false;
@@ -177,7 +179,7 @@ const GairmetLayer = () => {
       // serverFilter={`forecast IN ('0')`}
       getLabel={getLabel}
       clientFilter={clientFilter}
-      layerStateSelector={selectGairmet}
+      layerStateName={'gairmetState'}
       readDb={() => db.gairmet.toArray()}
       writeDb={(features) => {
         db.gairmet.clear();

@@ -110,11 +110,26 @@ export interface CwaLayerState extends LayerState {
 }
 
 export interface LayerControlState {
+  id?: number;
+  userId?: number;
   show: boolean;
-  metarState: StationMarkersLayerState;
+  stationMarkersState: StationMarkersLayerState;
   radarState: RadarLayerState;
   sigmetState: SigmetsLayerState;
   gairmetState: GairmetLayerState;
   pirepState: PirepLayerState;
   cwaState: CwaLayerState;
+}
+export interface BaseMapLayerControlState {
+  id?: number;
+  userId?: number;
+  show: boolean;
+  usProvincesState: LayerState;
+  canadianProvincesState: LayerState;
+  countryWarningAreaState: LayerState;
+  streetState: LayerState;
+  topoState: LayerState;
+  terrainState: LayerState;
+  darkState: LayerState;
+  satelliteState: LayerState;
 }

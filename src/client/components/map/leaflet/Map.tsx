@@ -26,7 +26,7 @@ import DateSliderModal from '../../shared/DateSliderModal';
 import MeteoLayers from './layers/MeteoLayers';
 // import './plugins/CacheTileLayer';
 import { useDispatch } from 'react-redux';
-import { selectLayerControlShow, setLayerControlShow } from '../../../store/layers/LayerControl';
+import { selectLayerControlShow } from '../../../store/layers/LayerControl';
 import { useSelector } from 'react-redux';
 import BaseMapLayers from './layers/BaseMapLayers';
 import { selectBaseMapLayerControlShow, setBaseMapLayerControlShow } from '../../../store/layers/BaseMapLayerControl';
@@ -39,6 +39,12 @@ import { useGetWaypointsQuery } from '../../../store/route/waypointApi';
 import { simpleTimeOnlyFormat } from '../common/AreoFunctions';
 import MapSideButtons from '../../shared/MapSideButtons';
 import { selectDataLoadTime } from '../../../store/layers/DataLoadTimeSlice';
+import {
+  useGetLayerControlStateQuery,
+  useUpdateLayerControlStateMutation,
+} from '../../../store/layers/layerControlApi';
+import { jsonClone } from '../../utils/ObjectUtil';
+import { LayerControlState } from '../../../interfaces/layerControl';
 
 const PaperComponent = (props) => {
   return (
@@ -63,6 +69,8 @@ const LeafletMap = () => {
   const auth = useSelector(selectAuth);
   const { data: waypointsData } = useGetWaypointsQuery('');
   const { data: airportsData } = useGetAirportQuery('');
+  const { data: layerControlState, isLoading: isLayerControlStateLoading } = useGetLayerControlStateQuery('');
+  const [updateLayerControlState] = useUpdateLayerControlStateMutation();
   const dataLoadTime = useSelector(selectDataLoadTime);
 
   if (auth.id) {
@@ -80,14 +88,19 @@ const LeafletMap = () => {
     }
   }, [pathname]);
 
+  const setLayerControlShow = (layerControlShow: boolean) => {
+    const cloned = jsonClone(layerControlState) as LayerControlState;
+    cloned.show = layerControlShow;
+    updateLayerControlState(cloned);
+  };
   const handler = (id: string) => {
     switch (id) {
       case 'layer':
-        dispatch(setLayerControlShow(!meteoLayerControlShow));
+        setLayerControlShow(!layerControlState.show);
         dispatch(setBaseMapLayerControlShow(false));
         break;
       case 'basemap':
-        dispatch(setLayerControlShow(false));
+        setLayerControlShow(false);
         dispatch(setBaseMapLayerControlShow(!baseMapLayerControlShow));
         break;
       case 'route':
@@ -179,7 +192,7 @@ const LeafletMap = () => {
         maxZoom={18}
       >
         <BaseMapLayers></BaseMapLayers>
-        <MeteoLayers></MeteoLayers>
+        {!isLayerControlStateLoading && <MeteoLayers></MeteoLayers>}
         {/* <MapSearch /> */}
         <MapSideButtons></MapSideButtons>
         <ZoomControl

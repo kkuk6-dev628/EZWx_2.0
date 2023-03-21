@@ -48,7 +48,7 @@ const IntlSigmetLayer = () => {
       style={gairmetStyle}
       getLabel={getLabel}
       clientFilter={clientFilter}
-      layerStateSelector={selectSigmet}
+      layerStateName={selectSigmet}
       readDb={() => db.intlSigmet.toArray()}
       writeDb={(features) => {
         db.intlSigmet.clear();

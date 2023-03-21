@@ -2,24 +2,26 @@ import { PathOptions } from 'leaflet';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCwa } from '../../../../store/layers/LayerControl';
+import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 import { db } from '../../../caching/dexieDb';
 import WFSLayer from './WFSLayer';
 
 const CWALayer = () => {
   const [jsonData, setJsonData] = useState();
-  const layerState = useSelector(selectCwa);
+  const { data: layerControlState } = useGetLayerControlStateQuery('');
+  const cwaLayerState = layerControlState.cwaState;
   const [renderedTime, setRenderedTime] = useState(Date.now());
   useEffect(() => {
-    if (layerState.checked) {
+    if (cwaLayerState.checked) {
       setRenderedTime(Date.now());
     }
   }, [
-    layerState.all.checked,
-    layerState.convection.checked,
-    layerState.turbulence.checked,
-    layerState.airframeIcing.checked,
-    layerState.ifrConditions.checked,
-    layerState.other.checked,
+    cwaLayerState.all.checked,
+    cwaLayerState.convection.checked,
+    cwaLayerState.turbulence.checked,
+    cwaLayerState.airframeIcing.checked,
+    cwaLayerState.ifrConditions.checked,
+    cwaLayerState.other.checked,
   ]);
 
   const style = (): PathOptions => {
@@ -61,26 +63,26 @@ const CWALayer = () => {
       if (!inTime) {
         return false;
       }
-      if (layerState.all.checked) {
+      if (cwaLayerState.all.checked) {
         return true;
       }
-      if (layerState.airframeIcing.checked && feature.properties.hazard === 'ICE') {
+      if (cwaLayerState.airframeIcing.checked && feature.properties.hazard === 'ICE') {
         return true;
       }
-      if (layerState.turbulence.checked && feature.properties.hazard === 'TURB') {
+      if (cwaLayerState.turbulence.checked && feature.properties.hazard === 'TURB') {
         return true;
       }
-      if (layerState.ifrConditions.checked && feature.properties.hazard === 'IFR') {
+      if (cwaLayerState.ifrConditions.checked && feature.properties.hazard === 'IFR') {
         return true;
       }
       if (
-        layerState.convection.checked &&
+        cwaLayerState.convection.checked &&
         (feature.properties.hazard === 'TS' || feature.properties.hazard === 'PCPN')
       ) {
         return true;
       }
       if (
-        layerState.other.checked &&
+        cwaLayerState.other.checked &&
         ['ICE', 'TURB', 'IFR', 'TS', 'PCPN'].includes(feature.properties.hazard) === false
       ) {
         return true;
@@ -112,7 +114,7 @@ const CWALayer = () => {
       style={style}
       getLabel={getLabel}
       clientFilter={clientFilter}
-      layerStateSelector={selectCwa}
+      layerStateName={'cwaState'}
       readDb={() => db.cwa.toArray()}
       writeDb={(features) => {
         db.cwa.clear();

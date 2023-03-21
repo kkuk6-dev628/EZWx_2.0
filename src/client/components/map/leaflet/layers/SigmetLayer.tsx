@@ -1,26 +1,26 @@
 import { PathOptions } from 'leaflet';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { selectSigmet } from '../../../../store/layers/LayerControl';
+import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 import { db } from '../../../caching/dexieDb';
 import WFSLayer from './WFSLayer';
 
 const SigmetLayer = () => {
   const [jsonData, setJsonData] = useState();
-  const layerState = useSelector(selectSigmet);
+  const { data: layerControlState } = useGetLayerControlStateQuery('');
+  const sigmetLayerState = layerControlState.sigmetState;
   const [renderedTime, setRenderedTime] = useState(Date.now());
   useEffect(() => {
-    if (layerState.checked) {
+    if (sigmetLayerState.checked) {
       setRenderedTime(Date.now());
     }
   }, [
-    layerState.all.checked,
-    layerState.convection.checked,
-    layerState.turbulence.checked,
-    layerState.airframeIcing.checked,
-    layerState.dust.checked,
-    layerState.ash.checked,
-    layerState.other.checked,
+    sigmetLayerState.all.checked,
+    sigmetLayerState.convection.checked,
+    sigmetLayerState.turbulence.checked,
+    sigmetLayerState.airframeIcing.checked,
+    sigmetLayerState.dust.checked,
+    sigmetLayerState.ash.checked,
+    sigmetLayerState.other.checked,
   ]);
 
   const gairmetStyle = (): PathOptions => {
@@ -63,26 +63,26 @@ const SigmetLayer = () => {
       if (!inTime) {
         return false;
       }
-      if (layerState.all.checked) {
+      if (sigmetLayerState.all.checked) {
         return true;
       }
-      if (layerState.convection.checked && feature.properties.hazard === 'CONVECTIVE') {
+      if (sigmetLayerState.convection.checked && feature.properties.hazard === 'CONVECTIVE') {
         return true;
       }
-      if (layerState.turbulence.checked && feature.properties.hazard === 'TURB') {
+      if (sigmetLayerState.turbulence.checked && feature.properties.hazard === 'TURB') {
         return true;
       }
-      if (layerState.airframeIcing.checked && feature.properties.hazard === 'ICING') {
+      if (sigmetLayerState.airframeIcing.checked && feature.properties.hazard === 'ICING') {
         return true;
       }
-      if (layerState.dust.checked && feature.properties.hazard === 'IFR') {
+      if (sigmetLayerState.dust.checked && feature.properties.hazard === 'IFR') {
         return true;
       }
-      if (layerState.ash.checked && feature.properties.hazard === 'ASH') {
+      if (sigmetLayerState.ash.checked && feature.properties.hazard === 'ASH') {
         return true;
       }
       if (
-        layerState.other.checked &&
+        sigmetLayerState.other.checked &&
         ['CONVECTIVE', 'TURB', 'ICING', 'IFR', 'ASH'].includes(feature.properties.hazard) === false
       ) {
         return true;
@@ -111,7 +111,7 @@ const SigmetLayer = () => {
       style={gairmetStyle}
       getLabel={getLabel}
       clientFilter={clientFilter}
-      layerStateSelector={selectSigmet}
+      layerStateName={'sigmetState'}
       readDb={() => db.sigmet.toArray()}
       writeDb={(features) => {
         db.sigmet.clear();

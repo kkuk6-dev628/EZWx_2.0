@@ -36,6 +36,7 @@ import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
 import { selectActiveRoute } from '../../../../store/route/routes';
 import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
+import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 
 const metarsProperties = [
   'geometry',
@@ -190,7 +191,7 @@ export const StationMarkersLayer = () => {
   const [displayedGeojson, setDisplayedGeojson] = useState<GeoJSON.FeatureCollection>();
   const [stationTime, setStationTime] = useState<any[]>([]);
   const [clusterRadius, setClusterRadius] = useState(20);
-  const layerState = useSelector(selectMetar);
+  const { data: layerState, isLoading: isLayerControlStateLoading } = useGetLayerControlStateQuery('');
   const personalMinimums = useSelector(selectPersonalMinimums);
   const [indexedData, setIndexedData] = useState({});
   const observationTime = useSelector(selectObsTime);
@@ -225,7 +226,7 @@ export const StationMarkersLayer = () => {
   }, [indexedData]);
 
   useEffect(() => {
-    if (layerState && layerState.checked === false) return;
+    if (layerState && layerState.stationMarkersState.checked === false) return;
     const obsHour = getAbsoluteHours(observationTime);
     const currentHour = getAbsoluteHours(Date.now());
     if (obsHour > currentHour) {
@@ -242,7 +243,7 @@ export const StationMarkersLayer = () => {
 
   useEffect(() => {
     if (isPast) {
-      layerState.markerType === StationMarkersLayerItems.surfaceWindBarbs.value
+      layerState.stationMarkersState.markerType === StationMarkersLayerItems.surfaceWindBarbs.value
         ? setClusterRadius(20)
         : setClusterRadius(30);
       if (Object.keys(indexedData).length > 0) {
@@ -254,12 +255,12 @@ export const StationMarkersLayer = () => {
       updateNbmStationMarkers();
     }
   }, [
-    layerState.markerType,
-    layerState.flightCategory.all.checked,
-    layerState.flightCategory.vfr.checked,
-    layerState.flightCategory.mvfr.checked,
-    layerState.flightCategory.ifr.checked,
-    layerState.flightCategory.lifr.checked,
+    layerState.stationMarkersState.markerType,
+    layerState.stationMarkersState.flightCategory.all.checked,
+    layerState.stationMarkersState.flightCategory.vfr.checked,
+    layerState.stationMarkersState.flightCategory.mvfr.checked,
+    layerState.stationMarkersState.flightCategory.ifr.checked,
+    layerState.stationMarkersState.flightCategory.lifr.checked,
   ]);
 
   const updateNbmStationMarkers = () => {
@@ -434,19 +435,31 @@ export const StationMarkersLayer = () => {
       if (iData) {
         iData.map((feature) => {
           if (
-            layerState.markerType === StationMarkersLayerItems.flightCategory.value &&
-            layerState.flightCategory.all.checked === false
+            layerState.stationMarkersState.markerType === StationMarkersLayerItems.flightCategory.value &&
+            layerState.stationMarkersState.flightCategory.all.checked === false
           ) {
-            if (!layerState.flightCategory.vfr.checked && feature.properties.flight_category === 'VFR') {
+            if (
+              !layerState.stationMarkersState.flightCategory.vfr.checked &&
+              feature.properties.flight_category === 'VFR'
+            ) {
               return;
             }
-            if (!layerState.flightCategory.mvfr.checked && feature.properties.flight_category === 'MVFR') {
+            if (
+              !layerState.stationMarkersState.flightCategory.mvfr.checked &&
+              feature.properties.flight_category === 'MVFR'
+            ) {
               return;
             }
-            if (!layerState.flightCategory.ifr.checked && feature.properties.flight_category === 'IFR') {
+            if (
+              !layerState.stationMarkersState.flightCategory.ifr.checked &&
+              feature.properties.flight_category === 'IFR'
+            ) {
               return;
             }
-            if (!layerState.flightCategory.lifr.checked && feature.properties.flight_category === 'LIFR') {
+            if (
+              !layerState.stationMarkersState.flightCategory.lifr.checked &&
+              feature.properties.flight_category === 'LIFR'
+            ) {
               return;
             }
           }
@@ -473,23 +486,23 @@ export const StationMarkersLayer = () => {
 
   const stationForecastFilter = (features: GeoJSON.Feature[]): GeoJSON.Feature[] => {
     if (
-      layerState.markerType !== StationMarkersLayerItems.flightCategory.value ||
-      layerState.flightCategory.all.checked === true
+      layerState.stationMarkersState.markerType !== StationMarkersLayerItems.flightCategory.value ||
+      layerState.stationMarkersState.flightCategory.all.checked === true
     ) {
       return features;
     }
     const filtered = features.filter((feature) => {
       const flightCategory = getNbmFlightCategory(feature, personalMinimums);
-      if (layerState.flightCategory.vfr.checked && flightCategory === 'VFR') {
+      if (layerState.stationMarkersState.flightCategory.vfr.checked && flightCategory === 'VFR') {
         return true;
       }
-      if (layerState.flightCategory.mvfr.checked && flightCategory === 'MVFR') {
+      if (layerState.stationMarkersState.flightCategory.mvfr.checked && flightCategory === 'MVFR') {
         return true;
       }
-      if (layerState.flightCategory.ifr.checked && flightCategory === 'IFR') {
+      if (layerState.stationMarkersState.flightCategory.ifr.checked && flightCategory === 'IFR') {
         return true;
       }
-      if (layerState.flightCategory.lifr.checked && flightCategory === 'LIFR') {
+      if (layerState.stationMarkersState.flightCategory.lifr.checked && flightCategory === 'LIFR') {
         return true;
       }
       if (flightCategory === 'BLACK') {
@@ -503,7 +516,7 @@ export const StationMarkersLayer = () => {
   const pointToLayer = (feature: GeoJSON.Feature, latlng: LatLng): L.Layer => {
     let marker = null;
     if (isPast) {
-      switch (layerState.markerType) {
+      switch (layerState.stationMarkersState.markerType) {
         case StationMarkersLayerItems.flightCategory.value:
           marker = getFlightCatMarker(feature, latlng);
           break;
@@ -546,7 +559,7 @@ export const StationMarkersLayer = () => {
           break;
       }
     } else {
-      switch (layerState.markerType) {
+      switch (layerState.stationMarkersState.markerType) {
         case StationMarkersLayerItems.flightCategory.value:
           marker = getFlightCatMarker(feature, latlng);
           break;
@@ -656,11 +669,8 @@ export const StationMarkersLayer = () => {
     const ceilingAmount = addLeadingZeroes(ceilingHeight / 100, 3);
     const worstSkyCondition = skyCover >= 88 ? 'OVC' : 'BKN';
     let iconUrl = '';
-    if (layerState.usePersonalMinimums) {
-    } else {
-      const [cat] = getMetarCeilingCategory(ceilingHeight, personalMinimums);
-      iconUrl = `/icons/metar/${cat}-${worstSkyCondition}.png`;
-    }
+    const [cat] = getMetarCeilingCategory(ceilingHeight, personalMinimums);
+    iconUrl = `/icons/metar/${cat}-${worstSkyCondition}.png`;
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-ceiling-icon',
@@ -1313,7 +1323,7 @@ export const StationMarkersLayer = () => {
         <SimplifiedMarkersLayer
           ref={geojsonLayerRef}
           data={displayedGeojson}
-          visible={layerState.checked}
+          visible={layerState.stationMarkersState.checked}
           simplifyRadius={clusterRadius}
           interactive={true}
           pointToLayer={pointToLayer}

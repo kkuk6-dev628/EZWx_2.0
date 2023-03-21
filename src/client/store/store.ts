@@ -1,3 +1,4 @@
+import { layerControlApi } from './layers/layerControlApi';
 import { routeApi } from './route/routeApi';
 import { RoutesSlice } from './route/routes';
 import BaseMapLayerControlSlice from './layers/BaseMapLayerControl';
@@ -21,6 +22,7 @@ const makeStore = () =>
       [airportApi.reducerPath]: airportApi.reducer,
       [waypointApi.reducerPath]: waypointApi.reducer,
       [routeApi.reducerPath]: routeApi.reducer,
+      [layerControlApi.reducerPath]: layerControlApi.reducer,
       [RoutesSlice.name]: RoutesSlice.reducer,
       [ObsTimeSlice.name]: ObsTimeSlice.reducer,
       [apiSlice.reducerPath]: apiSlice.reducer,
@@ -32,7 +34,13 @@ const makeStore = () =>
     devTools: process.env.NODE_ENV !== 'production',
     middleware: (getDefaultMiddlewares) => {
       const middleWares = getDefaultMiddlewares();
-      middleWares.push(apiSlice.middleware, airportApi.middleware, waypointApi.middleware, routeApi.middleware);
+      middleWares.push(
+        apiSlice.middleware,
+        airportApi.middleware,
+        waypointApi.middleware,
+        routeApi.middleware,
+        layerControlApi.middleware,
+      );
       return middleWares;
     },
   });

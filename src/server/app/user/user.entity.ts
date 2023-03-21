@@ -9,6 +9,7 @@ import {
   Unique,
   JoinTable,
   OneToMany,
+  DeleteDateColumn,
 } from 'typeorm';
 import { Route } from '../api/route/route.entity';
 
@@ -67,6 +68,9 @@ export class User {
   @Column()
   @UpdateDateColumn()
   updated_at: Date;
+
+  @DeleteDateColumn()
+  deleted_at?: Date;
 
   @ManyToMany(() => Certification, {
     cascade: true,

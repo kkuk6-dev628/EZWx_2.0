@@ -35,18 +35,18 @@ import StationForecastPopup from '../popups/StationForecastPopup';
 import { useGetAirportQuery } from '../../../../store/route/airportApi';
 import { selectActiveRoute } from '../../../../store/route/routes';
 import { addRouteToMap } from '../../../shared/Route';
+import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 
 const maxLayers = 6;
 
 const MeteoLayers = () => {
   const layers = useMeteoLayersContext();
   const debugLayerGroupRef = useRef(null);
-  const metarLayerStatus = useSelector(selectMetar);
   const personalMinimums = useSelector(selectPersonalMinimums);
   const { data: airportsData } = useGetAirportQuery('');
   const settingsState = useSelector(selectSettings);
   const activeRoute = useSelector(selectActiveRoute);
-  const layerControlState = useSelector(selectLayerControl);
+  const { data: layerControlState, isLoading: isLayerControlStateLoading } = useGetLayerControlStateQuery('');
 
   useEffect(() => {
     if (!meteoLayers.routeGroupLayer && activeRoute) {
@@ -95,7 +95,7 @@ const MeteoLayers = () => {
         useWidePopup = true;
         break;
       case 'metar':
-        if (metarLayerStatus.markerType === StationMarkersLayerItems.ceilingHeight.value) {
+        if (layerControlState.stationMarkersState.markerType === StationMarkersLayerItems.ceilingHeight.value) {
           offsetX = 25;
         }
         popup = (
@@ -235,7 +235,7 @@ const MeteoLayers = () => {
       <MeteoLayerControl position="topright"></MeteoLayerControl>
       <RadarLayer></RadarLayer>
       <GroupedLayer
-        checked={layerControlState.metarState.checked}
+        checked={layerControlState.stationMarkersState.checked}
         addLayerToStore={(layer) => {
           meteoLayers.metar = layer;
         }}

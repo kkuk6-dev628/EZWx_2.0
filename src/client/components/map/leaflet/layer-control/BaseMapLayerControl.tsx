@@ -4,7 +4,6 @@ import { useMap } from 'react-leaflet';
 import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
 import {
-  BaseMapLayerControlState,
   selectBaseMapLayerControl,
   setBaseMapLayerControl,
   setBaseMapLayerControlShow,
@@ -15,6 +14,7 @@ import CircleCheckedFilled from '@material-ui/icons/CheckCircle';
 import CircleUnchecked from '@material-ui/icons/RadioButtonUnchecked';
 import { jsonClone } from '../../../utils/ObjectUtil';
 import { useBaseMapLayersContext } from './BaseMapLayerControlContext';
+import { BaseMapLayerControlState } from '../../../../interfaces/layerControl';
 
 export const InBaseLayerControl = createContext<{ value: boolean }>({
   value: false,

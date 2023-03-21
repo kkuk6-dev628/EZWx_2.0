@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import { useSelector } from 'react-redux';
 import { selectRadar } from '../../../../store/layers/LayerControl';
+import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { addLeadingZeroes } from '../../common/AreoFunctions';
 import WMS from '../plugins/leaflet.wms';
@@ -75,7 +76,8 @@ const getAbsoluteMinutes = (time: number): number => {
 const RadarLayer = () => {
   const map = useMap();
   const radarLayers = useRadarLayersContext();
-  const radarLayerState = useSelector(selectRadar);
+  const { data: layerControlState, isLoading: isLayerControlStateLoading } = useGetLayerControlStateQuery('');
+  const radarLayerState = layerControlState.radarState;
   const observationTime = useSelector(selectObsTime);
 
   useEffect(() => {
@@ -133,6 +135,9 @@ const RadarLayer = () => {
   ]);
 
   const getValidRadar = (radars: Radar[], obsTimeSpan: number): Radar => {
+    if (radars.length === 0) {
+      return;
+    }
     const returns = radars.reduce((prev, curr) => {
       const prevDiff = prev.valid_timespan - obsTimeSpan;
       const currDiff = curr.valid_timespan - obsTimeSpan;

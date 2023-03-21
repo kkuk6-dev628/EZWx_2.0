@@ -10,6 +10,7 @@ import { paneOrders, wfsUrl } from '../../common/AreoConstants';
 import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
+import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 
 const properties = [
   'wkb_geometry',
@@ -40,7 +41,8 @@ const properties = [
 
 const PirepLayer = () => {
   const [pireps, setPireps] = useState<GeoJSON.Feature[]>([]);
-  const layerState = useSelector(selectPirep);
+  const { data: layerControlState } = useGetLayerControlStateQuery('');
+  const pirepLayerState = layerControlState.pirepState;
   const observationTime = useSelector(selectObsTime);
   const dataLoadTime = useSelector(selectDataLoadTime);
   const [displayedGeojson, setDisplayedGeojson] = useState<GeoJSON.FeatureCollection>();
@@ -55,14 +57,14 @@ const PirepLayer = () => {
     const filtered = clientFilter(pireps);
     setDisplayedData(filtered);
   }, [
-    layerState.all.checked,
-    layerState.urgentOnly.checked,
-    layerState.icing.checked,
-    layerState.turbulence.checked,
-    layerState.weatherSky.checked,
-    layerState.altitude.valueMin,
-    layerState.altitude.valueMax,
-    layerState.time.hours,
+    pirepLayerState.all.checked,
+    pirepLayerState.urgentOnly.checked,
+    pirepLayerState.icing.checked,
+    pirepLayerState.turbulence.checked,
+    pirepLayerState.weatherSky.checked,
+    pirepLayerState.altitude.valueMin,
+    pirepLayerState.altitude.valueMax,
+    pirepLayerState.time.hours,
     observationTime,
     pireps,
   ]);
@@ -239,29 +241,33 @@ const PirepLayer = () => {
       if (!inTime) {
         return false;
       }
-      if (layerState.urgentOnly.checked) {
+      if (pirepLayerState.urgentOnly.checked) {
         if (feature.properties.aireptype !== 'Urgent PIREP') {
           return false;
         }
       }
       const inAltitudeRange =
-        (layerState.altitude.valueMin <= feature.properties.fltlvl &&
-          feature.properties.fltlvl <= layerState.altitude.valueMax) ||
+        (pirepLayerState.altitude.valueMin <= feature.properties.fltlvl &&
+          feature.properties.fltlvl <= pirepLayerState.altitude.valueMax) ||
         feature.properties.fltlvl == 0;
 
       if (!inAltitudeRange) {
         return false;
       }
-      if (layerState.all.checked) {
+      if (pirepLayerState.all.checked) {
         return true;
       }
-      if (!layerState.icing.checked && feature.properties.icgint1 !== null) {
+      if (!pirepLayerState.icing.checked && feature.properties.icgint1 !== null) {
         return false;
       }
-      if (!layerState.turbulence.checked && feature.properties.tbint1 !== null) {
+      if (!pirepLayerState.turbulence.checked && feature.properties.tbint1 !== null) {
         return false;
       }
-      if (!layerState.weatherSky.checked && feature.properties.tbint1 === null && feature.properties.icgint1 === null) {
+      if (
+        !pirepLayerState.weatherSky.checked &&
+        feature.properties.tbint1 === null &&
+        feature.properties.icgint1 === null
+      ) {
         return false;
       }
       return true;
@@ -276,7 +282,7 @@ const PirepLayer = () => {
           ref={geojsonLayerRef}
           data={displayedGeojson}
           simplifyRadius={30}
-          visible={layerState.checked}
+          visible={pirepLayerState.checked}
           unSimplifyFilter={selectUrgentPirep}
           interactive={true}
           pointToLayer={pointToLayer}

@@ -1,6 +1,5 @@
 import { RouteOfFlight } from './../route-of-flight.entity';
 import { IsNotEmpty } from 'class-validator';
-import { RoutePoint } from '../route-point.entity';
 
 export class CreateRoutePointDto {
   @IsNotEmpty()

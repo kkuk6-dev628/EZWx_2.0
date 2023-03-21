@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { ChangeEvent, ReactElement, useEffect, useRef, createContext, useContext } from 'react';
+import React, { ChangeEvent, ReactElement, useEffect, useRef, createContext, useContext, useState } from 'react';
 import { Radio, RadioGroup } from '@material-ui/core';
 import { useMap } from 'react-leaflet';
 import { Layer, DomEvent, LayerGroup, CircleMarker, FeatureGroup } from 'leaflet';
@@ -13,18 +13,6 @@ import toast from 'react-hot-toast';
 import CircleCheckedFilled from '@material-ui/icons/CheckCircle';
 import CircleUnchecked from '@material-ui/icons/RadioButtonUnchecked';
 import createControlledLayer, { OrderedLayerProps } from './controlledLayer';
-import {
-  selectLayerControl,
-  setPirep,
-  setRadar,
-  setSigmet,
-  setMetar,
-  setLayerControl,
-  setGairmet,
-  setCwa,
-  setLayerControlShow,
-} from '../../../../store/layers/LayerControl';
-import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { StationMarkersLayerItems, POSITION_CLASSES, UsePersonalMinsLayerItems } from '../../common/AreoConstants';
 import Image from 'next/image';
@@ -40,13 +28,15 @@ import {
   CwaLayerState,
   PirepLayerState,
   LayerControlState,
-  RadarLayerState,
   StationMarkerType,
   RoutePointType,
   EvaluationType,
 } from '../../../../interfaces/layerControl';
-import settings from 'react-multi-date-picker/plugins/settings';
-import { InputFieldWrapper, SettingFieldLabel, RadioButton } from '../../../settings-drawer';
+import { InputFieldWrapper, RadioButton } from '../../../settings-drawer';
+import {
+  useGetLayerControlStateQuery,
+  useUpdateLayerControlStateMutation,
+} from '../../../../store/layers/layerControlApi';
 
 interface IProps {
   children?: ReactElement[];
@@ -70,12 +60,11 @@ export const InLayerControl = createContext<{ value: boolean }>({
 
 const MeteoLayerControl = ({ position, children }: IProps) => {
   const positionClass = (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright;
-  const dataLoadTime = useSelector(selectDataLoadTime);
 
   const ref = useRef<HTMLDivElement>();
-  const dispatch = useDispatch();
   const meteoLayers = useMeteoLayersContext();
-  const layerStatus = useSelector(selectLayerControl);
+  const { data: layerStatus, isLoading: isLoadingLayerControlState } = useGetLayerControlStateQuery('');
+  const [updateLayerControlState] = useUpdateLayerControlStateMutation();
 
   const map = useMap();
 
@@ -141,8 +130,8 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
     cloned.icing.checked && cloned.turbulence.checked && cloned.weatherSky.checked;
 
   const getLayerControlStateWithAllClosed = (): LayerControlState => {
-    const cloned = JSON.parse(JSON.stringify(layerStatus));
-    cloned.metarState.expanded = false;
+    const cloned = JSON.parse(JSON.stringify(layerStatus)) as LayerControlState;
+    cloned.stationMarkersState.expanded = false;
     cloned.radarState.expanded = false;
     cloned.sigmetState.expanded = false;
     cloned.gairmetState.expanded = false;
@@ -188,16 +177,10 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
     }
   }, [ref?.current]);
 
-  useEffect(() => {
-    if (meteoLayers) {
-      meteoLayers.gairmet = null;
-    }
-  }, [dataLoadTime]);
-
   return (
     //@ts-ignore
     <div className={positionClass + ' layer-control-container'} ref={ref}>
-      {layerStatus.show && (
+      {!isLoadingLayerControlState && layerStatus.show && (
         <div id="layer-control" className="leaflet-control leaflet-bar layer-control">
           <div className="layer-control__header">
             <div
@@ -234,7 +217,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
           <div
             className="btn-close"
             onClick={() => {
-              dispatch(setLayerControlShow(false));
+              updateLayerControlState({ ...layerStatus, show: false });
               disableMapInteraction(false);
             }}
           >
@@ -242,7 +225,11 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
           </div>
           <div className="layer-control-contents">
             <div className="layer-control-item">
-              <Accordion key={`metar-layer`} defaultExpanded={false} expanded={layerStatus.metarState.expanded}>
+              <Accordion
+                key={`metar-layer`}
+                defaultExpanded={false}
+                expanded={layerStatus.stationMarkersState.expanded}
+              >
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel1a-content"
@@ -250,8 +237,8 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                   IconButtonProps={{
                     onClick: () => {
                       const clonedLayerControlState = getLayerControlStateWithAllClosed();
-                      clonedLayerControlState.metarState.expanded = !layerStatus.metarState.expanded;
-                      dispatch(setLayerControl(clonedLayerControlState));
+                      clonedLayerControlState.stationMarkersState.expanded = !layerStatus.stationMarkersState.expanded;
+                      updateLayerControlState(clonedLayerControlState);
                     },
                   }}
                 >
@@ -259,35 +246,35 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                     control={
                       <Checkbox
                         style={{ pointerEvents: 'none' }}
-                        checked={layerStatus.metarState.checked}
+                        checked={layerStatus.stationMarkersState.checked}
                         icon={<CircleUnchecked />}
                         checkedIcon={<CircleCheckedFilled />}
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          const cloned = jsonClone(layerStatus.metarState);
-                          cloned.checked = !layerStatus.metarState.checked;
-                          dispatch(setMetar(cloned));
-                          cloned.checked
-                            ? showLayer(meteoLayers.metar, layerStatus.metarState.name)
-                            : hideLayer(meteoLayers.metar, layerStatus.metarState.name);
+                          const cloned = jsonClone(layerStatus) as LayerControlState;
+                          cloned.stationMarkersState.checked = !layerStatus.stationMarkersState.checked;
+                          updateLayerControlState(cloned);
+                          cloned.stationMarkersState.checked
+                            ? showLayer(meteoLayers.metar, layerStatus.stationMarkersState.name)
+                            : hideLayer(meteoLayers.metar, layerStatus.stationMarkersState.name);
                         }}
                       />
                     }
-                    label={layerStatus.metarState.name}
+                    label={layerStatus.stationMarkersState.name}
                   />
                 </AccordionSummary>
                 <AccordionDetails>
                   <RadioGroup
-                    value={layerStatus.metarState.markerType}
+                    value={layerStatus.stationMarkersState.markerType}
                     name="radio-buttons-group-metar"
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       console.log('radio-buttons-group-metar');
                       map.closePopup();
-                      const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
-                      cloned.markerType = e.target.value as StationMarkerType;
-                      cloned.checked = true;
-                      dispatch(setMetar(cloned));
+                      const cloned = jsonClone(layerStatus) as LayerControlState;
+                      cloned.stationMarkersState.markerType = e.target.value as StationMarkerType;
+                      cloned.stationMarkersState.checked = true;
+                      updateLayerControlState(cloned);
                     }}
                   >
                     <FormControlLabel
@@ -303,14 +290,15 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             value={UsePersonalMinsLayerItems.departure.value}
                             title={UsePersonalMinsLayerItems.departure.text}
                             name="max_takeoff_weight_category"
-                            selectedValue={layerStatus.metarState.usePersonalMinimums.routePointType}
+                            selectedValue={layerStatus.stationMarkersState.usePersonalMinimums.routePointType}
                             description=""
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
                               map.closePopup();
-                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
-                              cloned.usePersonalMinimums.routePointType = e.target.value as RoutePointType;
-                              cloned.checked = true;
-                              dispatch(setMetar(cloned));
+                              const cloned = jsonClone(layerStatus) as LayerControlState;
+                              cloned.stationMarkersState.usePersonalMinimums.routePointType = e.target
+                                .value as RoutePointType;
+                              cloned.stationMarkersState.checked = true;
+                              updateLayerControlState(cloned);
                             }}
                           />
                           <RadioButton
@@ -318,14 +306,15 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             value={UsePersonalMinsLayerItems.enRoute.value}
                             title={UsePersonalMinsLayerItems.enRoute.text}
                             name="max_takeoff_weight_category"
-                            selectedValue={layerStatus.metarState.usePersonalMinimums.routePointType}
+                            selectedValue={layerStatus.stationMarkersState.usePersonalMinimums.routePointType}
                             description=""
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
                               map.closePopup();
-                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
-                              cloned.usePersonalMinimums.routePointType = e.target.value as RoutePointType;
-                              cloned.checked = true;
-                              dispatch(setMetar(cloned));
+                              const cloned = jsonClone(layerStatus) as LayerControlState;
+                              cloned.stationMarkersState.usePersonalMinimums.routePointType = e.target
+                                .value as RoutePointType;
+                              cloned.stationMarkersState.checked = true;
+                              updateLayerControlState(cloned);
                             }}
                           />
                           <RadioButton
@@ -333,42 +322,37 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             value={UsePersonalMinsLayerItems.destination.value}
                             title={UsePersonalMinsLayerItems.destination.text}
                             name="max_takeoff_weight_category"
-                            selectedValue={layerStatus.metarState.usePersonalMinimums.routePointType}
+                            selectedValue={layerStatus.stationMarkersState.usePersonalMinimums.routePointType}
                             description=""
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
                               map.closePopup();
-                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
-                              cloned.usePersonalMinimums.routePointType = e.target.value as RoutePointType;
-                              cloned.checked = true;
-                              dispatch(setMetar(cloned));
+                              const cloned = jsonClone(layerStatus) as LayerControlState;
+                              cloned.stationMarkersState.usePersonalMinimums.routePointType = e.target
+                                .value as RoutePointType;
+                              cloned.stationMarkersState.checked = true;
+                              updateLayerControlState(cloned);
                             }}
                           />
                         </div>
                       </InputFieldWrapper>
                       <RadioGroup
-                        value={layerStatus.metarState.usePersonalMinimums.evaluationType}
+                        value={layerStatus.stationMarkersState.usePersonalMinimums.evaluationType}
                         name="radio-group-personal-mins-eval"
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                           console.log('radio-group-personal-mins-eval');
                           map.closePopup();
-                          const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
-                          cloned.usePersonalMinimums.evaluationType = e.target.value as EvaluationType;
-                          cloned.markerType = StationMarkersLayerItems.usePersonalMinimum.value as StationMarkerType;
-                          cloned.checked = true;
-                          dispatch(setMetar(cloned));
+                          const cloned = jsonClone(layerStatus) as LayerControlState;
+                          cloned.stationMarkersState.usePersonalMinimums.evaluationType = e.target
+                            .value as EvaluationType;
+                          cloned.stationMarkersState.markerType = StationMarkersLayerItems.usePersonalMinimum
+                            .value as StationMarkerType;
+                          cloned.stationMarkersState.checked = true;
+                          updateLayerControlState(cloned);
                         }}
                       >
                         <FormControlLabel
                           value={UsePersonalMinsLayerItems.flightCategory.value}
-                          control={
-                            <Radio
-                              color="primary"
-                              onChange={(e) => {
-                                console.log('Radio', e.target.value);
-                                e.preventDefault();
-                              }}
-                            />
-                          }
+                          control={<Radio color="primary" />}
                           label={UsePersonalMinsLayerItems.flightCategory.text}
                         />
                         <FormControlLabel
@@ -397,126 +381,153 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                       <FormControlLabel
                         control={
                           <Checkbox
-                            checked={layerStatus.metarState.flightCategory.all.checked}
+                            checked={layerStatus.stationMarkersState.flightCategory.all.checked}
                             icon={<CircleUnchecked />}
                             checkedIcon={<CircleCheckedFilled />}
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
-                              if (layerStatus.metarState.markerType !== StationMarkersLayerItems.flightCategory.value) {
+                              if (
+                                layerStatus.stationMarkersState.markerType !==
+                                StationMarkersLayerItems.flightCategory.value
+                              ) {
                                 return;
                               }
-                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
-                              cloned.flightCategory.all.checked = true;
-                              cloned.flightCategory.vfr.checked = true;
-                              cloned.flightCategory.mvfr.checked = true;
-                              cloned.flightCategory.ifr.checked = true;
-                              cloned.flightCategory.lifr.checked = true;
-                              cloned.markerType = StationMarkersLayerItems.flightCategory.value;
-                              dispatch(setMetar(cloned));
+                              const cloned = jsonClone(layerStatus) as LayerControlState;
+                              cloned.stationMarkersState.flightCategory.all.checked = true;
+                              cloned.stationMarkersState.flightCategory.vfr.checked = true;
+                              cloned.stationMarkersState.flightCategory.mvfr.checked = true;
+                              cloned.stationMarkersState.flightCategory.ifr.checked = true;
+                              cloned.stationMarkersState.flightCategory.lifr.checked = true;
+                              cloned.stationMarkersState.markerType = StationMarkersLayerItems.flightCategory.value;
+                              updateLayerControlState(cloned);
                             }}
                           />
                         }
-                        label={layerStatus.metarState.flightCategory.all.name}
+                        label={layerStatus.stationMarkersState.flightCategory.all.name}
                       />
                       <FormControlLabel
                         control={
                           <Checkbox
-                            checked={layerStatus.metarState.flightCategory.vfr.checked}
+                            checked={layerStatus.stationMarkersState.flightCategory.vfr.checked}
                             icon={<CircleUnchecked />}
                             checkedIcon={<CircleCheckedFilled />}
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
-                              if (layerStatus.metarState.markerType !== StationMarkersLayerItems.flightCategory.value) {
+                              if (
+                                layerStatus.stationMarkersState.markerType !==
+                                StationMarkersLayerItems.flightCategory.value
+                              ) {
                                 return;
                               }
-                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
-                              cloned.flightCategory.vfr.checked = !layerStatus.metarState.flightCategory.vfr.checked;
-                              cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
-                              if (cloned.flightCategory.vfr.checked) {
-                                cloned.markerType = StationMarkersLayerItems.flightCategory.value;
+                              const cloned = jsonClone(layerStatus) as LayerControlState;
+                              cloned.stationMarkersState.flightCategory.vfr.checked =
+                                !layerStatus.stationMarkersState.flightCategory.vfr.checked;
+                              cloned.stationMarkersState.flightCategory.all.checked = isCheckedAllMetarFlightCategory(
+                                cloned.stationMarkersState,
+                              );
+                              if (cloned.stationMarkersState.flightCategory.vfr.checked) {
+                                cloned.stationMarkersState.markerType = StationMarkersLayerItems.flightCategory.value;
                               }
-                              dispatch(setMetar(cloned));
+                              updateLayerControlState(cloned);
                             }}
                           />
                         }
-                        label={layerStatus.metarState.flightCategory.vfr.name}
+                        label={layerStatus.stationMarkersState.flightCategory.vfr.name}
                       />
                       <FormControlLabel
                         control={
                           <Checkbox
-                            checked={layerStatus.metarState.flightCategory.mvfr.checked}
+                            checked={layerStatus.stationMarkersState.flightCategory.mvfr.checked}
                             value={StationMarkersLayerItems.flightCategory.value}
                             icon={<CircleUnchecked />}
                             checkedIcon={<CircleCheckedFilled />}
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
-                              if (layerStatus.metarState.markerType !== StationMarkersLayerItems.flightCategory.value) {
+                              if (
+                                layerStatus.stationMarkersState.markerType !==
+                                StationMarkersLayerItems.flightCategory.value
+                              ) {
                                 return;
                               }
-                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
-                              cloned.flightCategory.mvfr.checked = !layerStatus.metarState.flightCategory.mvfr.checked;
-                              cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
-                              if (cloned.flightCategory.mvfr.checked) {
-                                cloned.markerType = StationMarkersLayerItems.flightCategory.value;
+                              const cloned = jsonClone(layerStatus) as LayerControlState;
+                              cloned.stationMarkersState.flightCategory.mvfr.checked =
+                                !layerStatus.stationMarkersState.flightCategory.mvfr.checked;
+                              cloned.stationMarkersState.flightCategory.all.checked = isCheckedAllMetarFlightCategory(
+                                cloned.stationMarkersState,
+                              );
+                              if (cloned.stationMarkersState.flightCategory.mvfr.checked) {
+                                cloned.stationMarkersState.markerType = StationMarkersLayerItems.flightCategory.value;
                               }
-                              dispatch(setMetar(cloned));
+                              updateLayerControlState(cloned);
                             }}
                           />
                         }
-                        label={layerStatus.metarState.flightCategory.mvfr.name}
+                        label={layerStatus.stationMarkersState.flightCategory.mvfr.name}
                       />
                       <FormControlLabel
                         control={
                           <Checkbox
-                            checked={layerStatus.metarState.flightCategory.ifr.checked}
+                            checked={layerStatus.stationMarkersState.flightCategory.ifr.checked}
                             value={StationMarkersLayerItems.flightCategory.value}
                             icon={<CircleUnchecked />}
                             checkedIcon={<CircleCheckedFilled />}
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
-                              if (layerStatus.metarState.markerType !== StationMarkersLayerItems.flightCategory.value) {
+                              if (
+                                layerStatus.stationMarkersState.markerType !==
+                                StationMarkersLayerItems.flightCategory.value
+                              ) {
                                 return;
                               }
-                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
-                              cloned.flightCategory.ifr.checked = !layerStatus.metarState.flightCategory.ifr.checked;
-                              cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
-                              if (cloned.flightCategory.ifr.checked) {
-                                cloned.markerType = StationMarkersLayerItems.flightCategory.value;
+                              const cloned = jsonClone(layerStatus) as LayerControlState;
+                              cloned.stationMarkersState.flightCategory.ifr.checked =
+                                !layerStatus.stationMarkersState.flightCategory.ifr.checked;
+                              cloned.stationMarkersState.flightCategory.all.checked = isCheckedAllMetarFlightCategory(
+                                cloned.stationMarkersState,
+                              );
+                              if (cloned.stationMarkersState.flightCategory.ifr.checked) {
+                                cloned.stationMarkersState.markerType = StationMarkersLayerItems.flightCategory.value;
                               }
-                              dispatch(setMetar(cloned));
+                              updateLayerControlState(cloned);
                             }}
                           />
                         }
-                        label={layerStatus.metarState.flightCategory.ifr.name}
+                        label={layerStatus.stationMarkersState.flightCategory.ifr.name}
                       />
                       <FormControlLabel
                         control={
                           <Checkbox
-                            checked={layerStatus.metarState.flightCategory.lifr.checked}
+                            checked={layerStatus.stationMarkersState.flightCategory.lifr.checked}
                             value={StationMarkersLayerItems.flightCategory.value}
                             icon={<CircleUnchecked />}
                             checkedIcon={<CircleCheckedFilled />}
                             name="checkedB"
                             color="primary"
                             onClick={(_e) => {
-                              if (layerStatus.metarState.markerType !== StationMarkersLayerItems.flightCategory.value) {
+                              if (
+                                layerStatus.stationMarkersState.markerType !==
+                                StationMarkersLayerItems.flightCategory.value
+                              ) {
                                 return;
                               }
-                              const cloned = jsonClone(layerStatus.metarState) as StationMarkersLayerState;
-                              cloned.flightCategory.lifr.checked = !layerStatus.metarState.flightCategory.lifr.checked;
-                              cloned.flightCategory.all.checked = isCheckedAllMetarFlightCategory(cloned);
-                              if (cloned.flightCategory.lifr.checked) {
-                                cloned.markerType = StationMarkersLayerItems.flightCategory.value;
+                              const cloned = jsonClone(layerStatus) as LayerControlState;
+                              cloned.stationMarkersState.flightCategory.lifr.checked =
+                                !layerStatus.stationMarkersState.flightCategory.lifr.checked;
+                              cloned.stationMarkersState.flightCategory.all.checked = isCheckedAllMetarFlightCategory(
+                                cloned.stationMarkersState,
+                              );
+                              if (cloned.stationMarkersState.flightCategory.lifr.checked) {
+                                cloned.stationMarkersState.markerType = StationMarkersLayerItems.flightCategory.value;
                               }
-                              dispatch(setMetar(cloned));
+                              updateLayerControlState(cloned);
                             }}
                           />
                         }
-                        label={layerStatus.metarState.flightCategory.lifr.name}
+                        label={layerStatus.stationMarkersState.flightCategory.lifr.name}
                       />
                     </div>
                     <FormControlLabel
@@ -578,7 +589,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                     onClick: () => {
                       const clonedLayerControlState = getLayerControlStateWithAllClosed();
                       clonedLayerControlState.radarState.expanded = !layerStatus.radarState.expanded;
-                      dispatch(setLayerControl(clonedLayerControlState));
+                      updateLayerControlState(clonedLayerControlState);
                     },
                   }}
                 >
@@ -593,9 +604,9 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          const cloned = jsonClone(layerStatus.radarState) as CwaLayerState;
-                          cloned.checked = !layerStatus.radarState.checked;
-                          dispatch(setRadar(cloned));
+                          const cloned = jsonClone(layerStatus) as LayerControlState;
+                          cloned.radarState.checked = !layerStatus.radarState.checked;
+                          updateLayerControlState(cloned);
                         }}
                       />
                     }
@@ -611,11 +622,11 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          const cloned = jsonClone(layerStatus.radarState) as RadarLayerState;
-                          cloned.checked = true;
-                          cloned.baseReflectivity.checked = true;
-                          cloned.echoTopHeight.checked = false;
-                          dispatch(setRadar(cloned));
+                          const cloned = jsonClone(layerStatus) as LayerControlState;
+                          cloned.radarState.checked = true;
+                          cloned.radarState.baseReflectivity.checked = true;
+                          cloned.radarState.echoTopHeight.checked = false;
+                          updateLayerControlState(cloned);
                         }}
                       />
                     }
@@ -630,11 +641,11 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          const cloned = jsonClone(layerStatus.radarState) as RadarLayerState;
-                          cloned.checked = true;
-                          cloned.baseReflectivity.checked = false;
-                          cloned.echoTopHeight.checked = true;
-                          dispatch(setRadar(cloned));
+                          const cloned = jsonClone(layerStatus) as LayerControlState;
+                          cloned.radarState.checked = true;
+                          cloned.radarState.baseReflectivity.checked = false;
+                          cloned.radarState.echoTopHeight.checked = true;
+                          updateLayerControlState(cloned);
                         }}
                       />
                     }
@@ -649,10 +660,12 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                         name="checkedB"
                         color="primary"
                         onClick={(_e) => {
-                          const cloned = jsonClone(layerStatus.radarState) as RadarLayerState;
-                          cloned.forecastRadar.checked = !layerStatus.radarState.forecastRadar.checked;
-                          cloned.forecastRadar.checked ? (cloned.checked = cloned.forecastRadar.checked) : null;
-                          dispatch(setRadar(cloned));
+                          const cloned = jsonClone(layerStatus) as LayerControlState;
+                          cloned.radarState.forecastRadar.checked = !layerStatus.radarState.forecastRadar.checked;
+                          cloned.radarState.forecastRadar.checked
+                            ? (cloned.radarState.checked = cloned.radarState.forecastRadar.checked)
+                            : null;
+                          updateLayerControlState(cloned);
                         }}
                       />
                     }
@@ -675,9 +688,9 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                           { value: 100, label: 100 },
                         ]}
                         onChange={(e: Event, newValue: number) => {
-                          const cloned = jsonClone(layerStatus.radarState) as RadarLayerState;
-                          cloned.opacity = newValue;
-                          dispatch(setRadar(cloned));
+                          const cloned = jsonClone(layerStatus) as LayerControlState;
+                          cloned.radarState.opacity = newValue;
+                          updateLayerControlState(cloned);
                         }}
                       />
                     </div>
@@ -695,7 +708,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                     onClick: () => {
                       const clonedLayerControlState = getLayerControlStateWithAllClosed();
                       clonedLayerControlState.sigmetState.expanded = !layerStatus.sigmetState.expanded;
-                      dispatch(setLayerControl(clonedLayerControlState));
+                      updateLayerControlState(clonedLayerControlState);
                     },
                   }}
                 >
@@ -713,7 +726,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                           // e.stopPropagation();
                           const cloned = jsonClone(layerStatus.sigmetState);
                           cloned.checked = !layerStatus.sigmetState.checked;
-                          dispatch(setSigmet(cloned));
+                          updateLayerControlState({ ...layerStatus, sigmetState: cloned });
                           if (cloned.checked) {
                             showLayer(meteoLayers.sigmet, layerStatus.sigmetState.name);
                             if (layerStatus.sigmetState.outlooks.checked) {
@@ -756,7 +769,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                           showLayer(meteoLayers.sigmet, layerStatus.sigmetState.name);
                           showLayer(meteoLayers.convectiveOutlooks, layerStatus.sigmetState.outlooks.name);
                           showLayer(meteoLayers.intlSigmet, layerStatus.sigmetState.international.name);
-                          dispatch(setSigmet(cloned));
+                          updateLayerControlState({ ...layerStatus, sigmetState: cloned });
                         }}
                       />
                     }
@@ -778,7 +791,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.sigmet, cloned.name);
                           }
-                          dispatch(setSigmet(cloned));
+                          updateLayerControlState({ ...layerStatus, sigmetState: cloned });
                         }}
                       />
                     }
@@ -802,7 +815,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                           } else {
                             hideLayer(meteoLayers.convectiveOutlooks, layerStatus.sigmetState.outlooks.name);
                           }
-                          dispatch(setSigmet(cloned));
+                          updateLayerControlState({ ...layerStatus, sigmetState: cloned });
                         }}
                       />
                     }
@@ -824,7 +837,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.sigmet, cloned.name);
                           }
-                          dispatch(setSigmet(cloned));
+                          updateLayerControlState({ ...layerStatus, sigmetState: cloned });
                         }}
                       />
                     }
@@ -846,7 +859,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.sigmet, cloned.name);
                           }
-                          dispatch(setSigmet(cloned));
+                          updateLayerControlState({ ...layerStatus, sigmetState: cloned });
                         }}
                       />
                     }
@@ -868,7 +881,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.sigmet, cloned.name);
                           }
-                          dispatch(setSigmet(cloned));
+                          updateLayerControlState({ ...layerStatus, sigmetState: cloned });
                         }}
                       />
                     }
@@ -890,7 +903,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.sigmet, cloned.name);
                           }
-                          dispatch(setSigmet(cloned));
+                          updateLayerControlState({ ...layerStatus, sigmetState: cloned });
                         }}
                       />
                     }
@@ -912,7 +925,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.sigmet, cloned.name);
                           }
-                          dispatch(setSigmet(cloned));
+                          updateLayerControlState({ ...layerStatus, sigmetState: cloned });
                         }}
                       />
                     }
@@ -936,7 +949,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                           } else {
                             hideLayer(meteoLayers.intlSigmet, layerStatus.sigmetState.international.name);
                           }
-                          dispatch(setSigmet(cloned));
+                          updateLayerControlState({ ...layerStatus, sigmetState: cloned });
                         }}
                       />
                     }
@@ -955,7 +968,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                     onClick: () => {
                       const clonedLayerControlState = getLayerControlStateWithAllClosed();
                       clonedLayerControlState.gairmetState.expanded = !layerStatus.gairmetState.expanded;
-                      dispatch(setLayerControl(clonedLayerControlState));
+                      updateLayerControlState(clonedLayerControlState);
                     },
                   }}
                 >
@@ -972,7 +985,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                         onClick={(_e) => {
                           const cloned = jsonClone(layerStatus.gairmetState);
                           cloned.checked = !layerStatus.gairmetState.checked;
-                          dispatch(setGairmet(cloned));
+                          updateLayerControlState({ ...layerStatus, gairmetState: cloned });
                           cloned.checked
                             ? showLayer(meteoLayers.gairmet, layerStatus.gairmetState.name)
                             : hideLayer(meteoLayers.gairmet, layerStatus.gairmetState.name);
@@ -1002,7 +1015,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                           cloned.nonconvectiveLlws.checked = true;
                           cloned.sfcWinds.checked = true;
                           showLayer(meteoLayers.gairmet, layerStatus.gairmetState.name);
-                          dispatch(setGairmet(cloned));
+                          updateLayerControlState({ ...layerStatus, gairmetState: cloned });
                         }}
                       />
                     }
@@ -1024,7 +1037,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
                           }
-                          dispatch(setGairmet(cloned));
+                          updateLayerControlState({ ...layerStatus, gairmetState: cloned });
                         }}
                       />
                     }
@@ -1046,7 +1059,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
                           }
-                          dispatch(setGairmet(cloned));
+                          updateLayerControlState({ ...layerStatus, gairmetState: cloned });
                         }}
                       />
                     }
@@ -1068,7 +1081,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
                           }
-                          dispatch(setGairmet(cloned));
+                          updateLayerControlState({ ...layerStatus, gairmetState: cloned });
                         }}
                       />
                     }
@@ -1090,7 +1103,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
                           }
-                          dispatch(setGairmet(cloned));
+                          updateLayerControlState({ ...layerStatus, gairmetState: cloned });
                         }}
                       />
                     }
@@ -1112,7 +1125,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
                           }
-                          dispatch(setGairmet(cloned));
+                          updateLayerControlState({ ...layerStatus, gairmetState: cloned });
                         }}
                       />
                     }
@@ -1134,7 +1147,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
                           }
-                          dispatch(setGairmet(cloned));
+                          updateLayerControlState({ ...layerStatus, gairmetState: cloned });
                         }}
                       />
                     }
@@ -1156,7 +1169,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
                           }
-                          dispatch(setGairmet(cloned));
+                          updateLayerControlState({ ...layerStatus, gairmetState: cloned });
                         }}
                       />
                     }
@@ -1178,7 +1191,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.gairmet, cloned.name);
                           }
-                          dispatch(setGairmet(cloned));
+                          updateLayerControlState({ ...layerStatus, gairmetState: cloned });
                         }}
                       />
                     }
@@ -1197,7 +1210,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                     onClick: () => {
                       const clonedLayerControlState = getLayerControlStateWithAllClosed();
                       clonedLayerControlState.pirepState.expanded = !layerStatus.pirepState.expanded;
-                      dispatch(setLayerControl(clonedLayerControlState));
+                      updateLayerControlState(clonedLayerControlState);
                     },
                   }}
                 >
@@ -1214,7 +1227,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                         onClick={(_e) => {
                           const cloned = jsonClone(layerStatus.pirepState);
                           cloned.checked = !layerStatus.pirepState.checked;
-                          dispatch(setPirep(cloned));
+                          updateLayerControlState({ ...layerStatus, pirepState: cloned });
                           cloned.checked
                             ? showLayer(meteoLayers.pirep, layerStatus.pirepState.name)
                             : hideLayer(meteoLayers.pirep, layerStatus.pirepState.name);
@@ -1239,7 +1252,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.pirep, cloned.name);
                           }
-                          dispatch(setPirep(cloned));
+                          updateLayerControlState({ ...layerStatus, pirepState: cloned });
                         }}
                       />
                     }
@@ -1261,7 +1274,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                           cloned.turbulence.checked = true;
                           cloned.weatherSky.checked = true;
                           showLayer(meteoLayers.pirep, cloned.name);
-                          dispatch(setPirep(cloned));
+                          updateLayerControlState({ ...layerStatus, pirepState: cloned });
                         }}
                       />
                     }
@@ -1283,7 +1296,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.pirep, cloned.name);
                           }
-                          dispatch(setPirep(cloned));
+                          updateLayerControlState({ ...layerStatus, pirepState: cloned });
                         }}
                       />
                     }
@@ -1305,7 +1318,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.pirep, cloned.name);
                           }
-                          dispatch(setPirep(cloned));
+                          updateLayerControlState({ ...layerStatus, pirepState: cloned });
                         }}
                       />
                     }
@@ -1327,7 +1340,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.pirep, cloned.name);
                           }
-                          dispatch(setPirep(cloned));
+                          updateLayerControlState({ ...layerStatus, pirepState: cloned });
                         }}
                       />
                     }
@@ -1350,7 +1363,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                                 cloned.altitude.valueMin = cloned.altitude.min;
                                 cloned.altitude.valueMax = cloned.altitude.max;
                                 cloned.altitude.all = true;
-                                dispatch(setPirep(cloned));
+                                updateLayerControlState({ ...layerStatus, pirepState: cloned });
                               }}
                             />
                           }
@@ -1378,7 +1391,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                           } else {
                             cloned.altitude.all = false;
                           }
-                          dispatch(setPirep(cloned));
+                          updateLayerControlState({ ...layerStatus, pirepState: cloned });
                         }}
                         valueLabelDisplay="on"
                         component={null}
@@ -1398,7 +1411,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                     onClick: () => {
                       const clonedLayerControlState = getLayerControlStateWithAllClosed();
                       clonedLayerControlState.cwaState.expanded = !layerStatus.cwaState.expanded;
-                      dispatch(setLayerControl(clonedLayerControlState));
+                      updateLayerControlState(clonedLayerControlState);
                     },
                   }}
                 >
@@ -1415,7 +1428,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                         onClick={(_e) => {
                           const cloned = jsonClone(layerStatus.cwaState) as CwaLayerState;
                           cloned.checked = !layerStatus.cwaState.checked;
-                          dispatch(setCwa(cloned));
+                          updateLayerControlState({ ...layerStatus, cwaState: cloned });
                           cloned.checked
                             ? showLayer(meteoLayers.cwa, layerStatus.cwaState.name)
                             : hideLayer(meteoLayers.cwa, layerStatus.cwaState.name);
@@ -1443,7 +1456,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                           cloned.convection.checked = true;
                           cloned.other.checked = true;
                           showLayer(meteoLayers.cwa, cloned.name);
-                          dispatch(setCwa(cloned));
+                          updateLayerControlState({ ...layerStatus, cwaState: cloned });
                         }}
                       />
                     }
@@ -1465,7 +1478,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.cwa, cloned.name);
                           }
-                          dispatch(setCwa(cloned));
+                          updateLayerControlState({ ...layerStatus, cwaState: cloned });
                         }}
                       />
                     }
@@ -1487,7 +1500,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.cwa, cloned.name);
                           }
-                          dispatch(setCwa(cloned));
+                          updateLayerControlState({ ...layerStatus, cwaState: cloned });
                         }}
                       />
                     }
@@ -1509,7 +1522,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.cwa, cloned.name);
                           }
-                          dispatch(setCwa(cloned));
+                          updateLayerControlState({ ...layerStatus, cwaState: cloned });
                         }}
                       />
                     }
@@ -1531,7 +1544,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.cwa, cloned.name);
                           }
-                          dispatch(setCwa(cloned));
+                          updateLayerControlState({ ...layerStatus, cwaState: cloned });
                         }}
                       />
                     }
@@ -1553,7 +1566,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             cloned.checked = true;
                             showLayer(meteoLayers.cwa, cloned.name);
                           }
-                          dispatch(setCwa(cloned));
+                          updateLayerControlState({ ...layerStatus, cwaState: cloned });
                         }}
                       />
                     }

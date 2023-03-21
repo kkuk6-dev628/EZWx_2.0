@@ -2,9 +2,9 @@ import { createSlice } from '@reduxjs/toolkit';
 import { LayerControlState } from '../../interfaces/layerControl';
 import { AppState } from '../store';
 
-const initialState: LayerControlState = {
+export const initialLayerControlState: LayerControlState = {
   show: false,
-  metarState: {
+  stationMarkersState: {
     checked: true,
     opacity: 100,
     expanded: false,
@@ -107,10 +107,10 @@ const initialState: LayerControlState = {
 
 export const LayerControlSlice = createSlice({
   name: 'layerControl',
-  initialState,
+  initialState: initialLayerControlState,
   reducers: {
     setMetar: (state, action) => {
-      state.metarState = action.payload;
+      state.stationMarkersState = action.payload;
     },
     setPirep: (state, action) => {
       state.pirepState = action.payload;
@@ -128,7 +128,7 @@ export const LayerControlSlice = createSlice({
       state.cwaState = action.payload;
     },
     setLayerControl: (state, action) => {
-      state.metarState = action.payload.metarState;
+      state.stationMarkersState = action.payload.stationMarkersState;
       state.radarState = action.payload.radarState;
       state.sigmetState = action.payload.sigmetState;
       state.gairmetState = action.payload.gairmetState;
@@ -144,7 +144,7 @@ export const LayerControlSlice = createSlice({
 export const { setMetar, setPirep, setRadar, setSigmet, setGairmet, setCwa, setLayerControl, setLayerControlShow } =
   LayerControlSlice.actions;
 
-export const selectMetar = (state: AppState) => state.layerControl.metarState;
+export const selectMetar = (state: AppState) => state.layerControl.stationMarkersState;
 export const selectRadar = (state: AppState) => state.layerControl.radarState;
 export const selectSigmet = (state: AppState) => state.layerControl.sigmetState;
 export const selectGairmet = (state: AppState) => state.layerControl.gairmetState;

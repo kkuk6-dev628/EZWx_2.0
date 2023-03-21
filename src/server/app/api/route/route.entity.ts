@@ -9,6 +9,7 @@ import {
   JoinTable,
   ManyToMany,
   DeleteDateColumn,
+  Index,
 } from 'typeorm';
 import { User } from '../../user/user.entity';
 import { RouteOfFlight } from './route-of-flight.entity';
@@ -47,6 +48,7 @@ export class Route {
   @ManyToOne(() => RoutePoint, (routePoint) => routePoint.departures)
   departure: RoutePoint;
 
+  @Index()
   @ManyToOne(() => User, (user) => user.routes)
   user: User;
 }

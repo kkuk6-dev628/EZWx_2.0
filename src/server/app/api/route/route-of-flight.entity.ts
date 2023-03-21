@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index } from 'typeorm';
 import { RoutePoint } from './route-point.entity';
 import { Route } from './route.entity';
 
@@ -7,9 +7,11 @@ export class RouteOfFlight {
   @PrimaryGeneratedColumn()
   public id: number;
 
+  @Index()
   @Column()
   public routeId: number;
 
+  @Index()
   @Column()
   public routePointId: number;
 

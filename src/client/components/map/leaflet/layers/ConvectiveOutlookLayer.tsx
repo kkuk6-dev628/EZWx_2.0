@@ -52,7 +52,7 @@ const ConvectiveOutlookLayer = () => {
       style={style}
       getLabel={getLabel}
       clientFilter={clientFilter}
-      layerStateSelector={selectSigmet}
+      layerStateName={selectSigmet}
       readDb={() => db.convectiveOutlook.toArray()}
       writeDb={(features) => {
         db.convectiveOutlook.clear();
