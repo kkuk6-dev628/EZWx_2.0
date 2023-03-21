@@ -2,8 +2,12 @@ import { createSlice } from '@reduxjs/toolkit';
 import { BaseMapLayerControlState } from '../../interfaces/layerControl';
 import { AppState } from '../store';
 
-const initialState: BaseMapLayerControlState = {
+export const initialBaseLayerControlState: BaseMapLayerControlState = {
   show: false,
+  bounds: [
+    [55.0, -130.0],
+    [20.0, -60.0],
+  ],
   usProvincesState: {
     checked: true,
     name: 'U.S. States',
@@ -56,28 +60,14 @@ const initialState: BaseMapLayerControlState = {
 
 const BaseMapLayerControlSlice = createSlice({
   name: 'baseMapLayerControl',
-  initialState,
+  initialState: initialBaseLayerControlState,
   reducers: {
-    setBaseMapLayerControl: (state, action) => {
-      state.show = action.payload.show;
-      state.usProvincesState = action.payload.usProvincesState;
-      state.canadianProvincesState = action.payload.canadianProvincesState;
-      state.countryWarningAreaState = action.payload.countryWarningAreaState;
-      state.streetState = action.payload.streetState;
-      state.topoState = action.payload.topoState;
-      state.terrainState = action.payload.terrainState;
-      state.darkState = action.payload.darkState;
-      state.satelliteState = action.payload.satelliteState;
-    },
-    setBaseMapLayerControlShow: (state, action) => {
-      state.show = action.payload;
-    },
+    setBaseMapLayerControl: (state, action) => action.payload,
   },
 });
 
-export const { setBaseMapLayerControl, setBaseMapLayerControlShow } = BaseMapLayerControlSlice.actions;
+export const { setBaseMapLayerControl } = BaseMapLayerControlSlice.actions;
 
 export const selectBaseMapLayerControl = (state: AppState) => state.baseMapLayerControl;
-export const selectBaseMapLayerControlShow = (state: AppState) => state.baseMapLayerControl.show;
 
 export default BaseMapLayerControlSlice;

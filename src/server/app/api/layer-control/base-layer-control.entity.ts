@@ -26,6 +26,14 @@ export class BaseLayerControl {
       to: (value: any) => JSON.stringify(value),
     },
   })
+  bounds: string;
+
+  @Column({
+    transformer: {
+      from: (value: string) => JSON.parse(value),
+      to: (value: any) => JSON.stringify(value),
+    },
+  })
   usProvincesState: string;
 
   @Column({

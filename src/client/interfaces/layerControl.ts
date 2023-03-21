@@ -1,3 +1,5 @@
+import { LatLngBounds } from 'leaflet';
+
 export interface SkyCondition {
   skyCover: string;
   cloudBase: number;
@@ -124,6 +126,7 @@ export interface BaseMapLayerControlState {
   id?: number;
   userId?: number;
   show: boolean;
+  bounds: any;
   usProvincesState: LayerState;
   canadianProvincesState: LayerState;
   countryWarningAreaState: LayerState;

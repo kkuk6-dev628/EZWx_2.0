@@ -1,13 +1,9 @@
 import { DomEvent, Layer } from 'leaflet';
-import { createContext, ReactElement, useContext, useEffect, useRef } from 'react';
-import { useMap } from 'react-leaflet';
+import { createContext, ReactElement, useContext, useEffect, useRef, useState } from 'react';
+import { useMap, useMapEvent } from 'react-leaflet';
 import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
-import {
-  selectBaseMapLayerControl,
-  setBaseMapLayerControl,
-  setBaseMapLayerControlShow,
-} from '../../../../store/layers/BaseMapLayerControl';
+import { selectBaseMapLayerControl, setBaseMapLayerControl } from '../../../../store/layers/BaseMapLayerControl';
 import { POSITION_CLASSES } from '../../common/AreoConstants';
 import { FormControlLabel, Checkbox } from '@material-ui/core';
 import CircleCheckedFilled from '@material-ui/icons/CheckCircle';
@@ -15,6 +11,11 @@ import CircleUnchecked from '@material-ui/icons/RadioButtonUnchecked';
 import { jsonClone } from '../../../utils/ObjectUtil';
 import { useBaseMapLayersContext } from './BaseMapLayerControlContext';
 import { BaseMapLayerControlState } from '../../../../interfaces/layerControl';
+import {
+  useGetBaseLayerControlStateQuery,
+  useUpdateBaseLayerControlStateMutation,
+} from '../../../../store/layers/layerControlApi';
+import { selectAuth } from '../../../../store/auth/authSlice';
 
 export const InBaseLayerControl = createContext<{ value: boolean }>({
   value: false,
@@ -27,8 +28,27 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
   const dispatch = useDispatch();
   const baseMapLayers = useBaseMapLayersContext();
   const baseMapLayerStatus = useSelector(selectBaseMapLayerControl);
+  const [updateBaseLayerControlState] = useUpdateBaseLayerControlStateMutation();
+  const auth = useSelector(selectAuth);
+  const { data: serverData } = useGetBaseLayerControlStateQuery('');
 
-  const map = useMap();
+  useEffect(() => {
+    if (serverData) map.fitBounds(serverData.bounds);
+  }, [serverData]);
+
+  const map = useMapEvent('moveend', (event) => {
+    if (auth.id) {
+      const bounds = map.getBounds();
+      updateBaseLayerControlState({
+        ...baseMapLayerStatus,
+        bounds: [
+          [bounds.getNorthEast().lat, bounds.getNorthEast().lng],
+          [bounds.getSouthWest().lat, bounds.getSouthWest().lng],
+        ],
+      });
+    }
+  });
+
   const showLayer = (layerObj: Layer) => {
     map.closePopup();
     if (!layerObj) return;
@@ -89,18 +109,40 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
     return clonedBaseMapLayerStatus;
   };
 
+  const setBaseLayerControlState = (cloned: BaseMapLayerControlState, commit = true) => {
+    if (commit && auth.id) updateBaseLayerControlState(cloned);
+    dispatch(setBaseMapLayerControl(cloned));
+  };
+
+  const [width, setWidth] = useState<number>(window.innerWidth);
+
+  function handleWindowSizeChange() {
+    setWidth(window.innerWidth);
+  }
+  useEffect(() => {
+    window.addEventListener('resize', handleWindowSizeChange);
+    return () => {
+      window.removeEventListener('resize', handleWindowSizeChange);
+    };
+  }, []);
+
+  const isMobile = width <= 768;
+
   useEffect(() => {
     if (ref?.current) {
-      // DomEvent.disableClickPropagation(ref.current);
+      if (isMobile) {
+        DomEvent.disableClickPropagation(ref.current);
+      } else {
+        ref.current.addEventListener('mouseover', function () {
+          disableMapInteraction(true);
+        });
+        // Re-enable dragging when user's cursor leaves the element
+        ref.current.addEventListener('mouseout', function () {
+          disableMapInteraction(false);
+        });
+      }
       DomEvent.disableScrollPropagation(ref.current);
-      // Disable dragging when user's cursor enters the element
-      ref.current.addEventListener('mouseover', function () {
-        disableMapInteraction(true);
-      });
-      // Re-enable dragging when user's cursor leaves the element
-      ref.current.addEventListener('mouseout', function () {
-        disableMapInteraction(false);
-      });
+      // L.DomEvent.on(ref.current, 'mousemove contextmenu drag', L.DomEvent.stop);
     }
   }, [ref?.current]);
 
@@ -125,7 +167,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
           <div
             className="btn-close"
             onClick={() => {
-              dispatch(setBaseMapLayerControlShow(false));
+              dispatch(setBaseMapLayerControl({ ...baseMapLayerStatus, show: false }));
               disableMapInteraction(false);
             }}
           >
@@ -145,7 +187,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
                       let cloned = jsonClone(baseMapLayerStatus) as BaseMapLayerControlState;
                       cloned = uncheckAllBoundaryLayers(cloned);
                       cloned.usProvincesState.checked = !baseMapLayerStatus.usProvincesState.checked;
-                      dispatch(setBaseMapLayerControl(cloned));
+                      setBaseLayerControlState(cloned);
                       cloned.usProvincesState.checked
                         ? showLayer(baseMapLayers.usProvinces)
                         : hideLayer(baseMapLayers.usProvinces);
@@ -167,7 +209,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
                     onClick={(_e) => {
                       const cloned = jsonClone(baseMapLayerStatus) as BaseMapLayerControlState;
                       cloned.canadianProvincesState.checked = !baseMapLayerStatus.canadianProvincesState.checked;
-                      dispatch(setBaseMapLayerControl(cloned));
+                      setBaseLayerControlState(cloned);
                       cloned.canadianProvincesState.checked
                         ? showLayer(baseMapLayers.canadianProvinces)
                         : hideLayer(baseMapLayers.canadianProvinces);
@@ -190,7 +232,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
                       let cloned = jsonClone(baseMapLayerStatus) as BaseMapLayerControlState;
                       cloned = uncheckAllBoundaryLayers(cloned);
                       cloned.countryWarningAreaState.checked = !baseMapLayerStatus.countryWarningAreaState.checked;
-                      dispatch(setBaseMapLayerControl(cloned));
+                      setBaseLayerControlState(cloned);
                       cloned.countryWarningAreaState.checked
                         ? showLayer(baseMapLayers.countyWarningAreas)
                         : hideLayer(baseMapLayers.countyWarningAreas);
@@ -213,7 +255,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
                       let cloned = jsonClone(baseMapLayerStatus) as BaseMapLayerControlState;
                       cloned = uncheckAllTileLayers(cloned);
                       cloned.streetState.checked = !baseMapLayerStatus.streetState.checked;
-                      dispatch(setBaseMapLayerControl(cloned));
+                      setBaseLayerControlState(cloned);
                       cloned.streetState.checked ? showLayer(baseMapLayers.street) : hideLayer(baseMapLayers.street);
                     }}
                   />
@@ -234,7 +276,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
                       let cloned = jsonClone(baseMapLayerStatus) as BaseMapLayerControlState;
                       cloned = uncheckAllTileLayers(cloned);
                       cloned.topoState.checked = !baseMapLayerStatus.topoState.checked;
-                      dispatch(setBaseMapLayerControl(cloned));
+                      setBaseLayerControlState(cloned);
                       cloned.topoState.checked ? showLayer(baseMapLayers.topo) : hideLayer(baseMapLayers.topo);
                     }}
                   />
@@ -255,7 +297,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
                       let cloned = jsonClone(baseMapLayerStatus) as BaseMapLayerControlState;
                       cloned = uncheckAllTileLayers(cloned);
                       cloned.terrainState.checked = !baseMapLayerStatus.terrainState.checked;
-                      dispatch(setBaseMapLayerControl(cloned));
+                      setBaseLayerControlState(cloned);
                       cloned.terrainState.checked ? showLayer(baseMapLayers.terrain) : hideLayer(baseMapLayers.terrain);
                     }}
                   />
@@ -276,7 +318,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
                       let cloned = jsonClone(baseMapLayerStatus) as BaseMapLayerControlState;
                       cloned = uncheckAllTileLayers(cloned);
                       cloned.darkState.checked = !baseMapLayerStatus.darkState.checked;
-                      dispatch(setBaseMapLayerControl(cloned));
+                      setBaseLayerControlState(cloned);
                       cloned.darkState.checked ? showLayer(baseMapLayers.dark) : hideLayer(baseMapLayers.dark);
                     }}
                   />
@@ -297,7 +339,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
                       let cloned = jsonClone(baseMapLayerStatus) as BaseMapLayerControlState;
                       cloned = uncheckAllTileLayers(cloned);
                       cloned.satelliteState.checked = !baseMapLayerStatus.satelliteState.checked;
-                      dispatch(setBaseMapLayerControl(cloned));
+                      setBaseLayerControlState(cloned);
                       cloned.satelliteState.checked
                         ? showLayer(baseMapLayers.satellite)
                         : hideLayer(baseMapLayers.satellite);

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useEffect, useState } from 'react';
-import { MapContainer, ZoomControl } from 'react-leaflet';
+import { MapContainer, useMapEvent, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import styles from './Map.module.css';
 import MapTabs from '../../shared/MapTabs';
@@ -28,7 +28,7 @@ import MeteoLayers from './layers/MeteoLayers';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import BaseMapLayers from './layers/BaseMapLayers';
-import { selectBaseMapLayerControlShow, setBaseMapLayerControlShow } from '../../../store/layers/BaseMapLayerControl';
+import { selectBaseMapLayerControl, setBaseMapLayerControl } from '../../../store/layers/BaseMapLayerControl';
 import { selectAuth } from '../../../store/auth/authSlice';
 import { toast } from 'react-hot-toast';
 import { useGetAirportQuery } from '../../../store/route/airportApi';
@@ -37,11 +37,13 @@ import { useGetWaypointsQuery } from '../../../store/route/waypointApi';
 import { simpleTimeOnlyFormat } from '../common/AreoFunctions';
 import MapSideButtons from '../../shared/MapSideButtons';
 import {
+  useGetBaseLayerControlStateQuery,
   useGetLayerControlStateQuery,
+  useUpdateBaseLayerControlStateMutation,
   useUpdateLayerControlStateMutation,
 } from '../../../store/layers/layerControlApi';
 import { jsonClone } from '../../utils/ObjectUtil';
-import { LayerControlState } from '../../../interfaces/layerControl';
+import { BaseMapLayerControlState, LayerControlState } from '../../../interfaces/layerControl';
 import { selectLayerControlState, setLayerControlState } from '../../../store/layers/LayerControl';
 
 const PaperComponent = (props) => {
@@ -62,16 +64,18 @@ const LeafletMap = () => {
   const [isShowModal, setIsShowModal] = useState(false);
   const [zuluTime, setZuluTime] = useState(simpleTimeOnlyFormat(new Date(), false));
   const dispatch = useDispatch();
-  const baseMapLayerControlShow = useSelector(selectBaseMapLayerControlShow);
+  const baseMapLayerControl = useSelector(selectBaseMapLayerControl);
   const auth = useSelector(selectAuth);
   useGetWaypointsQuery('');
   useGetAirportQuery('');
   const layerControlState = useSelector(selectLayerControlState);
   const [updateLayerControlState] = useUpdateLayerControlStateMutation();
+  const [updateBaseLayerControlState] = useUpdateBaseLayerControlStateMutation();
 
   if (auth.id) {
     useGetLayerControlStateQuery('');
     useGetRoutesQuery(null);
+    useGetBaseLayerControlStateQuery('');
   }
 
   useEffect(() => {
@@ -91,15 +95,23 @@ const LeafletMap = () => {
     dispatch(setLayerControlState(cloned));
     if (auth.id) updateLayerControlState(cloned);
   };
+
+  const setBaseLayerControlShow = (baseLayerControlShow: boolean) => {
+    const cloned = jsonClone(baseMapLayerControl) as BaseMapLayerControlState;
+    cloned.show = baseLayerControlShow;
+    dispatch(setBaseMapLayerControl(cloned));
+    if (auth.id) updateBaseLayerControlState(cloned);
+  };
+
   const handler = (id: string) => {
     switch (id) {
       case 'layer':
         setLayerControlShow(!layerControlState.show);
-        dispatch(setBaseMapLayerControlShow(false));
+        setBaseLayerControlShow(false);
         break;
       case 'basemap':
         setLayerControlShow(false);
-        dispatch(setBaseMapLayerControlShow(!baseMapLayerControlShow));
+        setBaseLayerControlShow(!baseMapLayerControl.show);
         break;
       case 'route':
         if (auth.id) {
@@ -171,10 +183,7 @@ const LeafletMap = () => {
     <div className="map__container">
       <MapContainer
         className={styles.map}
-        bounds={[
-          [55.0, -130.0],
-          [20.0, -60.0],
-        ]}
+        bounds={baseMapLayerControl.bounds}
         // @ts-ignore
         // timeDimension={true}
         // timeDimensionOptions={{

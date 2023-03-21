@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { ChangeEvent, ReactElement, useEffect, useRef, createContext, useContext } from 'react';
+import React, { ChangeEvent, ReactElement, useEffect, useRef, createContext, useContext, useState } from 'react';
 import { Radio, RadioGroup } from '@material-ui/core';
 import { useMap } from 'react-leaflet';
 import { Layer, DomEvent, LayerGroup, CircleMarker, FeatureGroup } from 'leaflet';
@@ -169,19 +169,36 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
       map.keyboard.enable();
     }
   };
+  const [width, setWidth] = useState<number>(window.innerWidth);
+
+  function handleWindowSizeChange() {
+    setWidth(window.innerWidth);
+  }
+  useEffect(() => {
+    window.addEventListener('resize', handleWindowSizeChange);
+    return () => {
+      window.removeEventListener('resize', handleWindowSizeChange);
+    };
+  }, []);
+
+  const isMobile = width <= 768;
 
   useEffect(() => {
     if (ref?.current) {
-      // DomEvent.disableClickPropagation(ref.current);
+      if (isMobile) {
+        DomEvent.disableClickPropagation(ref.current);
+      } else {
+        ref.current.addEventListener('mouseover', function () {
+          disableMapInteraction(true);
+        });
+        // Re-enable dragging when user's cursor leaves the element
+        ref.current.addEventListener('mouseout', function () {
+          disableMapInteraction(false);
+        });
+      }
       DomEvent.disableScrollPropagation(ref.current);
+      // L.DomEvent.on(ref.current, 'mousemove contextmenu drag', L.DomEvent.stop);
       // Disable dragging when user's cursor enters the element
-      ref.current.addEventListener('mouseover', function () {
-        disableMapInteraction(true);
-      });
-      // Re-enable dragging when user's cursor leaves the element
-      ref.current.addEventListener('mouseout', function () {
-        disableMapInteraction(false);
-      });
     }
   }, [ref?.current]);
 
