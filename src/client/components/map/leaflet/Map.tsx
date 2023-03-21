@@ -42,7 +42,7 @@ import {
 } from '../../../store/layers/layerControlApi';
 import { jsonClone } from '../../utils/ObjectUtil';
 import { LayerControlState } from '../../../interfaces/layerControl';
-import { setLayerControlState } from '../../../store/layers/LayerControl';
+import { selectLayerControlState, setLayerControlState } from '../../../store/layers/LayerControl';
 
 const PaperComponent = (props) => {
   return (
@@ -64,16 +64,13 @@ const LeafletMap = () => {
   const dispatch = useDispatch();
   const baseMapLayerControlShow = useSelector(selectBaseMapLayerControlShow);
   const auth = useSelector(selectAuth);
-  const { data: waypointsData } = useGetWaypointsQuery('');
-  const { data: airportsData } = useGetAirportQuery('');
-  const {
-    data: layerControlState,
-    isLoading: isLayerControlStateLoading,
-    error: errorLayerControlStateLoading,
-  } = useGetLayerControlStateQuery('');
+  useGetWaypointsQuery('');
+  useGetAirportQuery('');
+  const layerControlState = useSelector(selectLayerControlState);
   const [updateLayerControlState] = useUpdateLayerControlStateMutation();
 
   if (auth.id) {
+    useGetLayerControlStateQuery('');
     useGetRoutesQuery(null);
   }
 
@@ -92,7 +89,7 @@ const LeafletMap = () => {
     const cloned = jsonClone(layerControlState) as LayerControlState;
     cloned.show = layerControlShow;
     dispatch(setLayerControlState(cloned));
-    updateLayerControlState(cloned);
+    if (auth.id) updateLayerControlState(cloned);
   };
   const handler = (id: string) => {
     switch (id) {
@@ -193,7 +190,7 @@ const LeafletMap = () => {
         maxZoom={18}
       >
         <BaseMapLayers></BaseMapLayers>
-        {!isLayerControlStateLoading && !errorLayerControlStateLoading && <MeteoLayers></MeteoLayers>}
+        <MeteoLayers></MeteoLayers>
         {/* <MapSearch /> */}
         <MapSideButtons></MapSideButtons>
         <ZoomControl

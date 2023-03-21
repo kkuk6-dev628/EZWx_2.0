@@ -38,6 +38,7 @@ import {
 import { useSelector } from 'react-redux';
 import { selectLayerControlState, setLayerControlState } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';
+import { selectAuth } from '../../../../store/auth/authSlice';
 
 interface IProps {
   children?: ReactElement[];
@@ -61,7 +62,7 @@ export const InLayerControl = createContext<{ value: boolean }>({
 
 const MeteoLayerControl = ({ position, children }: IProps) => {
   const positionClass = (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright;
-
+  const auth = useSelector(selectAuth);
   const ref = useRef<HTMLDivElement>();
   const meteoLayers = useMeteoLayersContext();
   const [updateLayerControlStateAPI] = useUpdateLayerControlStateMutation();
@@ -72,7 +73,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
 
   const updateLayerControl = (cloned: LayerControlState, commit = true) => {
     dispatch(setLayerControlState(cloned));
-    if (commit) updateLayerControlStateAPI(cloned);
+    if (commit && auth.id) updateLayerControlStateAPI(cloned);
   };
 
   const checkEmptyLayer = (layer: Layer): boolean => {
