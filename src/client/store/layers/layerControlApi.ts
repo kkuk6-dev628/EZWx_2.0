@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { LayerControlState } from '../../interfaces/layerControl';
-import { initialLayerControlState, setPirepAltitudeMax, setPirepAltitudeMin, setRadarOpacity } from './LayerControl';
+import { initialLayerControlState, setLayerControlState } from './LayerControl';
 
 const baseUrl = '/api/layer-control';
 
@@ -31,10 +31,8 @@ export const layerControlApi = createApi({
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
-          if (!result.data) {
-            dispatch(setRadarOpacity(result.data.radarState.opacity));
-            dispatch(setPirepAltitudeMin(result.data.pirepState.altitude.valueMin));
-            dispatch(setPirepAltitudeMax(result.data.pirepState.altitude.valueMax));
+          if (result.data) {
+            dispatch(setLayerControlState(result.data));
           }
         } catch (err) {
           console.error('LayerControl state cannot be pulled out.', err);

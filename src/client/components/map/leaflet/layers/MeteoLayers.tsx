@@ -34,7 +34,7 @@ import StationForecastPopup from '../popups/StationForecastPopup';
 import { useGetAirportQuery } from '../../../../store/route/airportApi';
 import { selectActiveRoute } from '../../../../store/route/routes';
 import { addRouteToMap } from '../../../shared/Route';
-import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
+import { selectLayerControlState } from '../../../../store/layers/LayerControl';
 
 const maxLayers = 6;
 
@@ -45,11 +45,7 @@ const MeteoLayers = () => {
   const { data: airportsData } = useGetAirportQuery('');
   const settingsState = useSelector(selectSettings);
   const activeRoute = useSelector(selectActiveRoute);
-  const {
-    data: layerControlState,
-    isLoading: isLayerControlStateLoading,
-    error: errorLayerControlStateLoading,
-  } = useGetLayerControlStateQuery('');
+  const layerControlState = useSelector(selectLayerControlState);
 
   useEffect(() => {
     if (!meteoLayers.routeGroupLayer && activeRoute) {
@@ -232,72 +228,71 @@ const MeteoLayers = () => {
   //   map.addLayer(L.gridLayer.gridDebug());
   // }, [map]);
   const meteoLayers = useMeteoLayersContext();
-  if (!isLayerControlStateLoading && !errorLayerControlStateLoading)
-    return (
-      <div className="route__layer">
-        <MeteoLayerControl position="topright"></MeteoLayerControl>
-        <RadarLayer></RadarLayer>
-        <GroupedLayer
-          checked={layerControlState.stationMarkersState.checked}
-          addLayerToStore={(layer) => {
-            meteoLayers.metar = layer;
-          }}
-        >
-          <StationMarkersLayer />
-        </GroupedLayer>
-        <GroupedLayer
-          checked={layerControlState.sigmetState.checked}
-          addLayerToStore={(layer) => {
-            meteoLayers.sigmet = layer;
-          }}
-        >
-          <SigmetLayer></SigmetLayer>
-        </GroupedLayer>
-        <GroupedLayer
-          checked={layerControlState.sigmetState.checked && layerControlState.sigmetState.international.checked}
-          addLayerToStore={(layer) => {
-            meteoLayers.intlSigmet = layer;
-          }}
-        >
-          <IntlSigmetLayer></IntlSigmetLayer>
-        </GroupedLayer>
-        <GroupedLayer
-          checked={layerControlState.cwaState.checked}
-          addLayerToStore={(layer) => {
-            meteoLayers.cwa = layer;
-          }}
-        >
-          <CWALayer></CWALayer>
-        </GroupedLayer>
-        <GroupedLayer
-          checked={layerControlState.sigmetState.checked && layerControlState.sigmetState.convection.checked}
-          addLayerToStore={(layer) => {
-            meteoLayers.convectiveOutlooks = layer;
-          }}
-        >
-          <ConvectiveOutlookLayer></ConvectiveOutlookLayer>
-        </GroupedLayer>
-        <GroupedLayer
-          checked={layerControlState.gairmetState.checked}
-          addLayerToStore={(layer) => {
-            meteoLayers.gairmet = layer;
-          }}
-        >
-          {true && <GairmetLayer />}
-        </GroupedLayer>
-        <GroupedLayer
-          checked={layerControlState.pirepState.checked}
-          addLayerToStore={(layer) => {
-            meteoLayers.pirep = layer;
-          }}
-        >
-          <PirepLayer></PirepLayer>
-        </GroupedLayer>
-        <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
-        <Pane name="route-label" style={{ zIndex: paneOrders.routeLabel }}></Pane>
-        <Pane name="route-line" style={{ zIndex: paneOrders.routeLine }}></Pane>
-      </div>
-    );
+  return (
+    <div className="route__layer">
+      <MeteoLayerControl position="topright"></MeteoLayerControl>
+      <RadarLayer></RadarLayer>
+      <GroupedLayer
+        checked={layerControlState.stationMarkersState.checked}
+        addLayerToStore={(layer) => {
+          meteoLayers.metar = layer;
+        }}
+      >
+        <StationMarkersLayer />
+      </GroupedLayer>
+      <GroupedLayer
+        checked={layerControlState.sigmetState.checked}
+        addLayerToStore={(layer) => {
+          meteoLayers.sigmet = layer;
+        }}
+      >
+        <SigmetLayer></SigmetLayer>
+      </GroupedLayer>
+      <GroupedLayer
+        checked={layerControlState.sigmetState.checked && layerControlState.sigmetState.international.checked}
+        addLayerToStore={(layer) => {
+          meteoLayers.intlSigmet = layer;
+        }}
+      >
+        <IntlSigmetLayer></IntlSigmetLayer>
+      </GroupedLayer>
+      <GroupedLayer
+        checked={layerControlState.cwaState.checked}
+        addLayerToStore={(layer) => {
+          meteoLayers.cwa = layer;
+        }}
+      >
+        <CWALayer></CWALayer>
+      </GroupedLayer>
+      <GroupedLayer
+        checked={layerControlState.sigmetState.checked && layerControlState.sigmetState.convection.checked}
+        addLayerToStore={(layer) => {
+          meteoLayers.convectiveOutlooks = layer;
+        }}
+      >
+        <ConvectiveOutlookLayer></ConvectiveOutlookLayer>
+      </GroupedLayer>
+      <GroupedLayer
+        checked={layerControlState.gairmetState.checked}
+        addLayerToStore={(layer) => {
+          meteoLayers.gairmet = layer;
+        }}
+      >
+        {true && <GairmetLayer />}
+      </GroupedLayer>
+      <GroupedLayer
+        checked={layerControlState.pirepState.checked}
+        addLayerToStore={(layer) => {
+          meteoLayers.pirep = layer;
+        }}
+      >
+        <PirepLayer></PirepLayer>
+      </GroupedLayer>
+      <LayerGroup ref={debugLayerGroupRef}></LayerGroup>
+      <Pane name="route-label" style={{ zIndex: paneOrders.routeLabel }}></Pane>
+      <Pane name="route-line" style={{ zIndex: paneOrders.routeLine }}></Pane>
+    </div>
+  );
 };
 
 export default MeteoLayers;

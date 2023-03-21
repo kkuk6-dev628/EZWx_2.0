@@ -9,6 +9,7 @@ import GeoJSON, { FeatureCollection } from 'geojson';
 import { emptyGeoJson } from '../../common/AreoConstants';
 import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
 import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
+import { selectLayerControlState } from '../../../../store/layers/LayerControl';
 
 interface WFSLayerProps {
   url: string;
@@ -61,7 +62,7 @@ const WFSLayer = React.forwardRef(
     const [geoJsonKey, setGeoJsonKey] = useState(12034512);
     const localRef = useRef();
     const dataLoadTime = useSelector(selectDataLoadTime);
-    const { data: layerControlState } = useGetLayerControlStateQuery('');
+    const layerControlState = useSelector(selectLayerControlState);
 
     useEffect(() => {
       const newKey = Date.now();

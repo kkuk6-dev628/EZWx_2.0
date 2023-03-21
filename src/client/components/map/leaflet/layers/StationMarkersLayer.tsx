@@ -35,7 +35,7 @@ import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
 import { selectActiveRoute } from '../../../../store/route/routes';
 import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
-import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
+import { selectLayerControlState } from '../../../../store/layers/LayerControl';
 
 const metarsProperties = [
   'geometry',
@@ -190,7 +190,7 @@ export const StationMarkersLayer = () => {
   const [displayedGeojson, setDisplayedGeojson] = useState<GeoJSON.FeatureCollection>();
   const [stationTime, setStationTime] = useState<any[]>([]);
   const [clusterRadius, setClusterRadius] = useState(20);
-  const { data: layerState } = useGetLayerControlStateQuery('');
+  const layerState = useSelector(selectLayerControlState);
   const personalMinimums = useSelector(selectPersonalMinimums);
   const [indexedData, setIndexedData] = useState({});
   const observationTime = useSelector(selectObsTime);

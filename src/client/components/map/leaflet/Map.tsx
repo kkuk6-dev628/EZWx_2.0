@@ -42,6 +42,7 @@ import {
 } from '../../../store/layers/layerControlApi';
 import { jsonClone } from '../../utils/ObjectUtil';
 import { LayerControlState } from '../../../interfaces/layerControl';
+import { setLayerControlState } from '../../../store/layers/LayerControl';
 
 const PaperComponent = (props) => {
   return (
@@ -90,6 +91,7 @@ const LeafletMap = () => {
   const setLayerControlShow = (layerControlShow: boolean) => {
     const cloned = jsonClone(layerControlState) as LayerControlState;
     cloned.show = layerControlShow;
+    dispatch(setLayerControlState(cloned));
     updateLayerControlState(cloned);
   };
   const handler = (id: string) => {

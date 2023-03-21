@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { LayerControlSlidersState, LayerControlState } from '../../interfaces/layerControl';
+import { LayerControlState } from '../../interfaces/layerControl';
 import { AppState } from '../store';
 
 export const initialLayerControlState: LayerControlState = {
@@ -105,32 +105,18 @@ export const initialLayerControlState: LayerControlState = {
   },
 };
 
-const layerControlSliderInitState: LayerControlSlidersState = {
-  radarOpacity: 100,
-  pirepAltitudeMin: 0,
-  pirepAltitudeMax: 600,
-};
-
 export const LayerControlSlidersSlice = createSlice({
-  name: 'layerControlSliders',
-  initialState: layerControlSliderInitState,
+  name: 'layerControlState',
+  initialState: initialLayerControlState,
   reducers: {
-    setRadarOpacity: (state, action) => {
-      state.radarOpacity = action.payload;
-    },
-    setPirepAltitudeMin: (state, action) => {
-      state.pirepAltitudeMin = action.payload;
-    },
-    setPirepAltitudeMax: (state, action) => {
-      state.pirepAltitudeMax = action.payload;
+    setLayerControlState: (state, action) => {
+      return action.payload;
     },
   },
 });
 
-export const { setRadarOpacity, setPirepAltitudeMin, setPirepAltitudeMax } = LayerControlSlidersSlice.actions;
+export const { setLayerControlState } = LayerControlSlidersSlice.actions;
 
-export const selectRadarLayerOpacity = (state: AppState) => state.layerControlSliders.radarOpacity;
-export const selectPirepAltitudeMin = (state: AppState) => state.layerControlSliders.pirepAltitudeMin;
-export const selectPirepAltitudeMax = (state: AppState) => state.layerControlSliders.pirepAltitudeMax;
+export const selectLayerControlState = (state: AppState) => state.layerControlState;
 
 export default LayerControlSlidersSlice;

@@ -1,5 +1,4 @@
 import { PathOptions } from 'leaflet';
-import { selectSigmet } from '../../../../store/layers/LayerControl';
 import { db } from '../../../caching/dexieDb';
 import WFSLayer from './WFSLayer';
 
@@ -48,7 +47,7 @@ const IntlSigmetLayer = () => {
       style={gairmetStyle}
       getLabel={getLabel}
       clientFilter={clientFilter}
-      layerStateName={selectSigmet}
+      layerStateName="sigmetState"
       readDb={() => db.intlSigmet.toArray()}
       writeDb={(features) => {
         db.intlSigmet.clear();

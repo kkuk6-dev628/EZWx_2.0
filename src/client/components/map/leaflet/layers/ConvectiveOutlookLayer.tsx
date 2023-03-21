@@ -1,5 +1,4 @@
 import { PathOptions } from 'leaflet';
-import { selectSigmet } from '../../../../store/layers/LayerControl';
 import { db } from '../../../caching/dexieDb';
 import WFSLayer from './WFSLayer';
 
@@ -52,7 +51,7 @@ const ConvectiveOutlookLayer = () => {
       style={style}
       getLabel={getLabel}
       clientFilter={clientFilter}
-      layerStateName={selectSigmet}
+      layerStateName="sigmetState"
       readDb={() => db.convectiveOutlook.toArray()}
       writeDb={(features) => {
         db.convectiveOutlook.clear();

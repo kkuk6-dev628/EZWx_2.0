@@ -1,12 +1,14 @@
 import { PathOptions } from 'leaflet';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { selectLayerControlState } from '../../../../store/layers/LayerControl';
 import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 import { db } from '../../../caching/dexieDb';
 import WFSLayer from './WFSLayer';
 
 const SigmetLayer = () => {
   const [jsonData, setJsonData] = useState();
-  const { data: layerControlState } = useGetLayerControlStateQuery('');
+  const layerControlState = useSelector(selectLayerControlState);
   const sigmetLayerState = layerControlState.sigmetState;
   const [renderedTime, setRenderedTime] = useState(Date.now());
   useEffect(() => {

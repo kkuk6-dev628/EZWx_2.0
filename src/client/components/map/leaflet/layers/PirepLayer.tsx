@@ -10,7 +10,7 @@ import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
 import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
-import { selectPirepAltitudeMax, selectPirepAltitudeMin } from '../../../../store/layers/LayerControl';
+import { selectLayerControlState } from '../../../../store/layers/LayerControl';
 
 const properties = [
   'wkb_geometry',
@@ -41,14 +41,12 @@ const properties = [
 
 const PirepLayer = () => {
   const [pireps, setPireps] = useState<GeoJSON.Feature[]>([]);
-  const { data: layerControlState } = useGetLayerControlStateQuery('');
+  const layerControlState = useSelector(selectLayerControlState);
   const pirepLayerState = layerControlState.pirepState;
   const observationTime = useSelector(selectObsTime);
   const dataLoadTime = useSelector(selectDataLoadTime);
   const [displayedGeojson, setDisplayedGeojson] = useState<GeoJSON.FeatureCollection>();
   const geojsonLayerRef = useRef();
-  const pirepAltitudeMin = useSelector(selectPirepAltitudeMin);
-  const pirepAltitudeMax = useSelector(selectPirepAltitudeMax);
 
   useEffect(() => {
     loadFeaturesFromCache('pireps', setPireps);
@@ -64,8 +62,8 @@ const PirepLayer = () => {
     pirepLayerState.icing.checked,
     pirepLayerState.turbulence.checked,
     pirepLayerState.weatherSky.checked,
-    pirepAltitudeMin,
-    pirepAltitudeMax,
+    pirepLayerState.altitude.valueMin,
+    pirepLayerState.altitude.valueMax,
     pirepLayerState.time.hours,
     observationTime,
     pireps,
@@ -249,7 +247,8 @@ const PirepLayer = () => {
         }
       }
       const inAltitudeRange =
-        (pirepAltitudeMin <= feature.properties.fltlvl && feature.properties.fltlvl <= pirepAltitudeMax) ||
+        (pirepLayerState.altitude.valueMin <= feature.properties.fltlvl &&
+          feature.properties.fltlvl <= pirepLayerState.altitude.valueMax) ||
         feature.properties.fltlvl == 0;
 
       if (!inAltitudeRange) {

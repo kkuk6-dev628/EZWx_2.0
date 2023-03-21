@@ -1,12 +1,13 @@
 import { PathOptions } from 'leaflet';
 import { useEffect, useState } from 'react';
-import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
+import { useSelector } from 'react-redux';
+import { selectLayerControlState } from '../../../../store/layers/LayerControl';
 import { db } from '../../../caching/dexieDb';
 import WFSLayer from './WFSLayer';
 
 const CWALayer = () => {
   const [jsonData, setJsonData] = useState();
-  const { data: layerControlState } = useGetLayerControlStateQuery('');
+  const layerControlState = useSelector(selectLayerControlState);
   const cwaLayerState = layerControlState.cwaState;
   const [renderedTime, setRenderedTime] = useState(Date.now());
   useEffect(() => {

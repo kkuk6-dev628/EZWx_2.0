@@ -1,13 +1,14 @@
 import { PathOptions } from 'leaflet';
 import { useState, useEffect, useRef } from 'react';
-import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
+import { useSelector } from 'react-redux';
+import { selectLayerControlState } from '../../../../store/layers/LayerControl';
 import { db } from '../../../caching/dexieDb';
 import { addLeadingZeroes } from '../../common/AreoFunctions';
 import WFSLayer from './WFSLayer';
 
 const GairmetLayer = () => {
   const [jsonData, setJsonData] = useState();
-  const { data: layerControlState } = useGetLayerControlStateQuery('');
+  const layerControlState = useSelector(selectLayerControlState);
   const gairmetLayerState = layerControlState.gairmetState;
   const [renderedTime, setRenderedTime] = useState(Date.now());
   const layerRef = useRef();

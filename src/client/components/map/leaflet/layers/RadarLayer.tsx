@@ -2,7 +2,7 @@ import axios from 'axios';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import { useSelector } from 'react-redux';
-import { selectRadarLayerOpacity } from '../../../../store/layers/LayerControl';
+import { selectLayerControlState } from '../../../../store/layers/LayerControl';
 import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { addLeadingZeroes } from '../../common/AreoFunctions';
@@ -75,10 +75,9 @@ const getAbsoluteMinutes = (time: number): number => {
 const RadarLayer = () => {
   const map = useMap();
   const radarLayers = useRadarLayersContext();
-  const { data: layerControlState } = useGetLayerControlStateQuery('');
-  const radarLayerState = layerControlState.radarState;
-  const radarLayerOpacity = useSelector(selectRadarLayerOpacity);
+  const layerControlState = useSelector(selectLayerControlState);
   const observationTime = useSelector(selectObsTime);
+  const radarLayerState = layerControlState.radarState;
   const [fetchedRadarLayers, setFetchedRadarLayers] = useState(false);
 
   useEffect(() => {
@@ -114,7 +113,7 @@ const RadarLayer = () => {
     radarLayers.echoTopHeight.forEach((echoTopHeight) => echoTopHeight.layer.setOpacity(0));
     radarLayers.forecast.forEach((forecast) => forecast.layer?.setOpacity(0));
     const differenceMinutes = getTimeDifference();
-    const opacity = radarLayerOpacity / 100;
+    const opacity = radarLayerState.opacity / 100;
     let validRadar: Radar;
     if (differenceMinutes <= 0) {
       if (radarLayerState.baseReflectivity.checked) {
@@ -131,8 +130,8 @@ const RadarLayer = () => {
     radarLayerState.baseReflectivity.checked,
     radarLayerState.echoTopHeight.checked,
     radarLayerState.forecastRadar.checked,
+    radarLayerState.opacity,
     observationTime,
-    radarLayerOpacity,
     fetchedRadarLayers,
   ]);
 

@@ -124,6 +124,7 @@ export default function Header() {
   }, [pathname]);
   const handleActiveMenu = (id) => {
     setActiveMenu(id);
+    setActiveResponsiveMenu(false);
   };
 
   useEffect(() => {
