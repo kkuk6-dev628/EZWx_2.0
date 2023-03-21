@@ -31,6 +31,7 @@ import {
   StationMarkerType,
   RoutePointType,
   EvaluationType,
+  StationMarkersLayerItemType,
 } from '../../../../interfaces/layerControl';
 import { InputFieldWrapper, RadioButton } from '../../../settings-drawer';
 import {

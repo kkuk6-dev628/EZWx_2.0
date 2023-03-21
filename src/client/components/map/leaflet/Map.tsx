@@ -69,7 +69,11 @@ const LeafletMap = () => {
   const auth = useSelector(selectAuth);
   const { data: waypointsData } = useGetWaypointsQuery('');
   const { data: airportsData } = useGetAirportQuery('');
-  const { data: layerControlState, isLoading: isLayerControlStateLoading } = useGetLayerControlStateQuery('');
+  const {
+    data: layerControlState,
+    isLoading: isLayerControlStateLoading,
+    error: errorLayerControlStateLoading,
+  } = useGetLayerControlStateQuery('');
   const [updateLayerControlState] = useUpdateLayerControlStateMutation();
   const dataLoadTime = useSelector(selectDataLoadTime);
 
@@ -192,7 +196,7 @@ const LeafletMap = () => {
         maxZoom={18}
       >
         <BaseMapLayers></BaseMapLayers>
-        {!isLayerControlStateLoading && <MeteoLayers></MeteoLayers>}
+        {!isLayerControlStateLoading && !errorLayerControlStateLoading && <MeteoLayers></MeteoLayers>}
         {/* <MapSearch /> */}
         <MapSideButtons></MapSideButtons>
         <ZoomControl

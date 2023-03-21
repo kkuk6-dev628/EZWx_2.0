@@ -1,8 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Route } from '../../interfaces/route';
-import toast from 'react-hot-toast';
 import { LayerControlState } from '../../interfaces/layerControl';
-import { setLayerControl, initialLayerControlState } from './LayerControl';
+import { initialLayerControlState } from './LayerControl';
 
 const baseUrl = '/api/layer-control';
 
@@ -13,9 +11,6 @@ export const layerControlApi = createApi({
   endpoints: (builder) => ({
     getLayerControlState: builder.query({
       query: () => ({ url: '', method: 'Get' }),
-      // Provides a list of `Posts` by `id`.
-      // If any mutation is executed that `invalidate`s any of these tags, this query will re-run to be always up-to-date.
-      // The `LIST` id is a "virtual id" we just made up to be able to invalidate this query specifically if a new `Posts` element was added.
       providesTags: (result) =>
         // is result available?
         result
@@ -33,16 +28,25 @@ export const layerControlApi = createApi({
         console.error(response);
         return initialLayerControlState;
       },
-      // async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-      //   try {
-      //     const result = await queryFulfilled;
-      //     if (result.data) {
-      //       dispatch(setLayerControl({ ...result.data }));
-      //     }
-      //   } catch (err) {
-      //     console.error('Route cannot be pulled out.', err);
-      //   }
-      // },
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          if (!result.data) {
+            dispatch(
+              layerControlApi.util.updateQueryData('getLayerControlState', 'nouser', (draft) =>
+                Object.assign(draft, initialLayerControlState),
+              ),
+            );
+          }
+        } catch (err) {
+          console.error('LayerControl state cannot be pulled out.', err);
+          dispatch(
+            layerControlApi.util.updateQueryData('getLayerControlState', 'nouser', (draft) =>
+              Object.assign(draft, initialLayerControlState),
+            ),
+          );
+        }
+      },
     }),
     updateLayerControlState: builder.mutation({
       query: (data) => ({ url: '', method: 'Post', body: data }),

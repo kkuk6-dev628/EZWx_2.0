@@ -8,7 +8,6 @@ import { useSelector } from 'react-redux';
 import Image from 'next/image';
 import SunCalc from 'suncalc';
 
-import { selectMetar } from '../../../../store/layers/LayerControl';
 import { PersonalMinimums, selectPersonalMinimums, selectSettings } from '../../../../store/user/UserSettings';
 import {
   StationMarkersLayerItems,
