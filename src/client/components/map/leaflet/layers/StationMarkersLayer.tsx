@@ -190,7 +190,7 @@ export const StationMarkersLayer = () => {
   const [displayedGeojson, setDisplayedGeojson] = useState<GeoJSON.FeatureCollection>();
   const [stationTime, setStationTime] = useState<any[]>([]);
   const [clusterRadius, setClusterRadius] = useState(20);
-  const { data: layerState, isLoading: isLayerControlStateLoading } = useGetLayerControlStateQuery('');
+  const { data: layerState } = useGetLayerControlStateQuery('');
   const personalMinimums = useSelector(selectPersonalMinimums);
   const [indexedData, setIndexedData] = useState({});
   const observationTime = useSelector(selectObsTime);
@@ -339,6 +339,7 @@ export const StationMarkersLayer = () => {
         });
         const stationTimesWeb = [...stationTimes];
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const queuedLoadCache = () => {
           if (stationTimes.length === 0) {
             return;

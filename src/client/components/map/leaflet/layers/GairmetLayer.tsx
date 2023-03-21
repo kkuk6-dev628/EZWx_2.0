@@ -1,7 +1,5 @@
 import { PathOptions } from 'leaflet';
 import { useState, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
-import { selectGairmet } from '../../../../store/layers/LayerControl';
 import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 import { db } from '../../../caching/dexieDb';
 import { addLeadingZeroes } from '../../common/AreoFunctions';

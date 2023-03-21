@@ -133,3 +133,9 @@ export interface BaseMapLayerControlState {
   darkState: LayerState;
   satelliteState: LayerState;
 }
+
+export interface LayerControlSlidersState {
+  radarOpacity: number;
+  pirepAltitudeMin: number;
+  pirepAltitudeMax: number;
+}

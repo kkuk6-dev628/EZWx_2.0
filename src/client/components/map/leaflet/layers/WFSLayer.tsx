@@ -6,7 +6,6 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import GeoJSON, { FeatureCollection } from 'geojson';
-import { AppState } from '../../../../store/store';
 import { emptyGeoJson } from '../../common/AreoConstants';
 import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
 import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';

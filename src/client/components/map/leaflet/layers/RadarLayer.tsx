@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import { useSelector } from 'react-redux';
-import { selectRadar } from '../../../../store/layers/LayerControl';
+import { selectRadarLayerOpacity } from '../../../../store/layers/LayerControl';
 import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { addLeadingZeroes } from '../../common/AreoFunctions';
@@ -67,7 +67,6 @@ const forecastRadarLayer = 'refd_';
 
 const forecastMinute = 18 * 60;
 const forecastMinute1 = 36 * 60;
-const forecastMinute2 = 48 * 60;
 
 const getAbsoluteMinutes = (time: number): number => {
   return Math.floor(time / 60 / 1000);
@@ -76,9 +75,11 @@ const getAbsoluteMinutes = (time: number): number => {
 const RadarLayer = () => {
   const map = useMap();
   const radarLayers = useRadarLayersContext();
-  const { data: layerControlState, isLoading: isLayerControlStateLoading } = useGetLayerControlStateQuery('');
+  const { data: layerControlState } = useGetLayerControlStateQuery('');
   const radarLayerState = layerControlState.radarState;
+  const radarLayerOpacity = useSelector(selectRadarLayerOpacity);
   const observationTime = useSelector(selectObsTime);
+  const [fetchedRadarLayers, setFetchedRadarLayers] = useState(false);
 
   useEffect(() => {
     fetchReflectivityJsons();
@@ -113,7 +114,7 @@ const RadarLayer = () => {
     radarLayers.echoTopHeight.forEach((echoTopHeight) => echoTopHeight.layer.setOpacity(0));
     radarLayers.forecast.forEach((forecast) => forecast.layer?.setOpacity(0));
     const differenceMinutes = getTimeDifference();
-    const opacity = radarLayerState.opacity / 100;
+    const opacity = radarLayerOpacity / 100;
     let validRadar: Radar;
     if (differenceMinutes <= 0) {
       if (radarLayerState.baseReflectivity.checked) {
@@ -131,7 +132,8 @@ const RadarLayer = () => {
     radarLayerState.echoTopHeight.checked,
     radarLayerState.forecastRadar.checked,
     observationTime,
-    radarLayerState.opacity,
+    radarLayerOpacity,
+    fetchedRadarLayers,
   ]);
 
   const getValidRadar = (radars: Radar[], obsTimeSpan: number): Radar => {
@@ -196,6 +198,9 @@ const RadarLayer = () => {
             },
           ).setOpacity(0),
         };
+        if (i === 10) {
+          setFetchedRadarLayers(true);
+        }
       });
       const url2 = `https://mesonet.agron.iastate.edu/data/gis/images/4326/USCOMP/eet_${i}.json`;
       axios.get(url2).then((data) => {

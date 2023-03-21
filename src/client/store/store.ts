@@ -3,7 +3,7 @@ import { routeApi } from './route/routeApi';
 import { RoutesSlice } from './route/routes';
 import BaseMapLayerControlSlice from './layers/BaseMapLayerControl';
 import UserSettingsSlice from './user/UserSettings';
-import { LayerControlSlice } from './layers/LayerControl';
+import { LayerControlSlidersSlice } from './layers/LayerControl';
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import ObsTimeSlice from './time-slider/ObsTimeSlice';
 import ObsIntervalSlice from './time-slider/ObsIntervalSlice';
@@ -27,7 +27,7 @@ const makeStore = () =>
       [ObsTimeSlice.name]: ObsTimeSlice.reducer,
       [apiSlice.reducerPath]: apiSlice.reducer,
       [authSlice.name]: authSlice.reducer,
-      [LayerControlSlice.name]: LayerControlSlice.reducer,
+      [LayerControlSlidersSlice.name]: LayerControlSlidersSlice.reducer,
       [UserSettingsSlice.name]: UserSettingsSlice.reducer,
       [BaseMapLayerControlSlice.name]: BaseMapLayerControlSlice.reducer,
     },

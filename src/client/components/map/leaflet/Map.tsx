@@ -26,11 +26,9 @@ import DateSliderModal from '../../shared/DateSliderModal';
 import MeteoLayers from './layers/MeteoLayers';
 // import './plugins/CacheTileLayer';
 import { useDispatch } from 'react-redux';
-import { selectLayerControlShow } from '../../../store/layers/LayerControl';
 import { useSelector } from 'react-redux';
 import BaseMapLayers from './layers/BaseMapLayers';
 import { selectBaseMapLayerControlShow, setBaseMapLayerControlShow } from '../../../store/layers/BaseMapLayerControl';
-import MapSearch from '../../shared/MapSearch';
 import { selectAuth } from '../../../store/auth/authSlice';
 import { toast } from 'react-hot-toast';
 import { useGetAirportQuery } from '../../../store/route/airportApi';
@@ -38,7 +36,6 @@ import { useGetRoutesQuery } from '../../../store/route/routeApi';
 import { useGetWaypointsQuery } from '../../../store/route/waypointApi';
 import { simpleTimeOnlyFormat } from '../common/AreoFunctions';
 import MapSideButtons from '../../shared/MapSideButtons';
-import { selectDataLoadTime } from '../../../store/layers/DataLoadTimeSlice';
 import {
   useGetLayerControlStateQuery,
   useUpdateLayerControlStateMutation,
@@ -64,7 +61,6 @@ const LeafletMap = () => {
   const [isShowModal, setIsShowModal] = useState(false);
   const [zuluTime, setZuluTime] = useState(simpleTimeOnlyFormat(new Date(), false));
   const dispatch = useDispatch();
-  const meteoLayerControlShow = useSelector(selectLayerControlShow);
   const baseMapLayerControlShow = useSelector(selectBaseMapLayerControlShow);
   const auth = useSelector(selectAuth);
   const { data: waypointsData } = useGetWaypointsQuery('');
@@ -75,7 +71,6 @@ const LeafletMap = () => {
     error: errorLayerControlStateLoading,
   } = useGetLayerControlStateQuery('');
   const [updateLayerControlState] = useUpdateLayerControlStateMutation();
-  const dataLoadTime = useSelector(selectDataLoadTime);
 
   if (auth.id) {
     useGetRoutesQuery(null);

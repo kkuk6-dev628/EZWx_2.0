@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { LayerControlState } from '../../interfaces/layerControl';
-import { initialLayerControlState } from './LayerControl';
+import { initialLayerControlState, setPirepAltitudeMax, setPirepAltitudeMin, setRadarOpacity } from './LayerControl';
 
 const baseUrl = '/api/layer-control';
 
@@ -32,19 +32,12 @@ export const layerControlApi = createApi({
         try {
           const result = await queryFulfilled;
           if (!result.data) {
-            dispatch(
-              layerControlApi.util.updateQueryData('getLayerControlState', 'nouser', (draft) =>
-                Object.assign(draft, initialLayerControlState),
-              ),
-            );
+            dispatch(setRadarOpacity(result.data.radarState.opacity));
+            dispatch(setPirepAltitudeMin(result.data.pirepState.altitude.valueMin));
+            dispatch(setPirepAltitudeMax(result.data.pirepState.altitude.valueMax));
           }
         } catch (err) {
           console.error('LayerControl state cannot be pulled out.', err);
-          dispatch(
-            layerControlApi.util.updateQueryData('getLayerControlState', 'nouser', (draft) =>
-              Object.assign(draft, initialLayerControlState),
-            ),
-          );
         }
       },
     }),

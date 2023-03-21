@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { LayerControlState } from '../../interfaces/layerControl';
+import { LayerControlSlidersState, LayerControlState } from '../../interfaces/layerControl';
 import { AppState } from '../store';
 
 export const initialLayerControlState: LayerControlState = {
@@ -105,55 +105,32 @@ export const initialLayerControlState: LayerControlState = {
   },
 };
 
-export const LayerControlSlice = createSlice({
-  name: 'layerControl',
-  initialState: initialLayerControlState,
+const layerControlSliderInitState: LayerControlSlidersState = {
+  radarOpacity: 100,
+  pirepAltitudeMin: 0,
+  pirepAltitudeMax: 600,
+};
+
+export const LayerControlSlidersSlice = createSlice({
+  name: 'layerControlSliders',
+  initialState: layerControlSliderInitState,
   reducers: {
-    setMetar: (state, action) => {
-      state.stationMarkersState = action.payload;
+    setRadarOpacity: (state, action) => {
+      state.radarOpacity = action.payload;
     },
-    setPirep: (state, action) => {
-      state.pirepState = action.payload;
+    setPirepAltitudeMin: (state, action) => {
+      state.pirepAltitudeMin = action.payload;
     },
-    setRadar: (state, action) => {
-      state.radarState = action.payload;
-    },
-    setSigmet: (state, action) => {
-      state.sigmetState = action.payload;
-    },
-    setGairmet: (state, action) => {
-      state.gairmetState = action.payload;
-    },
-    setCwa: (state, action) => {
-      state.cwaState = action.payload;
-    },
-    setLayerControl: (state, action) => {
-      state.stationMarkersState = action.payload.stationMarkersState;
-      state.radarState = action.payload.radarState;
-      state.sigmetState = action.payload.sigmetState;
-      state.gairmetState = action.payload.gairmetState;
-      state.pirepState = action.payload.pirepState;
-      state.cwaState = action.payload.cwaState;
-    },
-    setLayerControlShow: (state, action) => {
-      state.show = action.payload;
+    setPirepAltitudeMax: (state, action) => {
+      state.pirepAltitudeMax = action.payload;
     },
   },
 });
 
-export const { setMetar, setPirep, setRadar, setSigmet, setGairmet, setCwa, setLayerControl, setLayerControlShow } =
-  LayerControlSlice.actions;
+export const { setRadarOpacity, setPirepAltitudeMin, setPirepAltitudeMax } = LayerControlSlidersSlice.actions;
 
-export const selectMetar = (state: AppState) => state.layerControl.stationMarkersState;
-export const selectRadar = (state: AppState) => state.layerControl.radarState;
-export const selectSigmet = (state: AppState) => state.layerControl.sigmetState;
-export const selectGairmet = (state: AppState) => state.layerControl.gairmetState;
-export const selectPirep = (state: AppState) => state.layerControl.pirepState;
-export const selectCwa = (state: AppState) => state.layerControl.cwaState;
-export const selectIntlSigmet = (state: AppState) => state.layerControl.sigmetState.international;
-export const selectOutlooks = (state: AppState) => state.layerControl.sigmetState.outlooks;
+export const selectRadarLayerOpacity = (state: AppState) => state.layerControlSliders.radarOpacity;
+export const selectPirepAltitudeMin = (state: AppState) => state.layerControlSliders.pirepAltitudeMin;
+export const selectPirepAltitudeMax = (state: AppState) => state.layerControlSliders.pirepAltitudeMax;
 
-export const selectLayerControl = (state: AppState) => state.layerControl;
-export const selectLayerControlShow = (state: AppState) => state.layerControl.show;
-
-export default LayerControlSlice;
+export default LayerControlSlidersSlice;

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { ChangeEvent, ReactElement, useEffect, useRef, createContext, useContext, useState } from 'react';
+import React, { ChangeEvent, ReactElement, useEffect, useRef, createContext, useContext } from 'react';
 import { Radio, RadioGroup } from '@material-ui/core';
 import { useMap } from 'react-leaflet';
 import { Layer, DomEvent, LayerGroup, CircleMarker, FeatureGroup } from 'leaflet';
@@ -13,14 +13,12 @@ import toast from 'react-hot-toast';
 import CircleCheckedFilled from '@material-ui/icons/CheckCircle';
 import CircleUnchecked from '@material-ui/icons/RadioButtonUnchecked';
 import createControlledLayer, { OrderedLayerProps } from './controlledLayer';
-import { useSelector } from 'react-redux';
 import { StationMarkersLayerItems, POSITION_CLASSES, UsePersonalMinsLayerItems } from '../../common/AreoConstants';
 import Image from 'next/image';
 import Slider from '@mui/material/Slider';
 import { useMeteoLayersContext } from './MeteoLayerControlContext';
 import { jsonClone } from '../../../utils/ObjectUtil';
 import RangeSlider from '../../../shared/RangeSlider';
-import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
 import {
   StationMarkersLayerState,
   SigmetsLayerState,
@@ -31,13 +29,22 @@ import {
   StationMarkerType,
   RoutePointType,
   EvaluationType,
-  StationMarkersLayerItemType,
 } from '../../../../interfaces/layerControl';
 import { InputFieldWrapper, RadioButton } from '../../../settings-drawer';
 import {
   useGetLayerControlStateQuery,
   useUpdateLayerControlStateMutation,
 } from '../../../../store/layers/layerControlApi';
+import { useSelector } from 'react-redux';
+import {
+  selectPirepAltitudeMax,
+  selectPirepAltitudeMin,
+  selectRadarLayerOpacity,
+  setPirepAltitudeMax,
+  setPirepAltitudeMin,
+  setRadarOpacity,
+} from '../../../../store/layers/LayerControl';
+import { useDispatch } from 'react-redux';
 
 interface IProps {
   children?: ReactElement[];
@@ -66,6 +73,10 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
   const meteoLayers = useMeteoLayersContext();
   const { data: layerStatus, isLoading: isLoadingLayerControlState } = useGetLayerControlStateQuery('');
   const [updateLayerControlState] = useUpdateLayerControlStateMutation();
+  const radarLayerOpacity = useSelector(selectRadarLayerOpacity);
+  const pirepAltitudeMin = useSelector(selectPirepAltitudeMin);
+  const pirepAltitudeMax = useSelector(selectPirepAltitudeMax);
+  const dispatch = useDispatch();
 
   const map = useMap();
 
@@ -682,16 +693,19 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                         min={0}
                         max={100}
                         step={5}
-                        value={layerStatus.radarState.opacity}
+                        value={radarLayerOpacity}
                         valueLabelDisplay="on"
                         marks={[
                           { value: 0, label: 0 },
                           { value: 100, label: 100 },
                         ]}
-                        onChange={(e: Event, newValue: number) => {
+                        onChangeCommitted={(e: Event, newValue: number) => {
                           const cloned = jsonClone(layerStatus) as LayerControlState;
                           cloned.radarState.opacity = newValue;
                           updateLayerControlState(cloned);
+                        }}
+                        onChange={(e: Event, newValue: number) => {
+                          dispatch(setRadarOpacity(newValue));
                         }}
                       />
                     </div>
@@ -1378,9 +1392,16 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                         min={layerStatus.pirepState.altitude.min}
                         max={layerStatus.pirepState.altitude.max}
                         step={5}
-                        value={[layerStatus.pirepState.altitude.valueMin, layerStatus.pirepState.altitude.valueMax]}
+                        value={[pirepAltitudeMin, pirepAltitudeMax]}
                         mindistance={20}
                         onChange={(_e: Event, newValues: number[]) => {
+                          if (!Array.isArray(newValues)) {
+                            return;
+                          }
+                          dispatch(setPirepAltitudeMin(newValues[0]));
+                          dispatch(setPirepAltitudeMax(newValues[1]));
+                        }}
+                        onChangeCommitted={(_e: Event, newValues: number[]) => {
                           if (!Array.isArray(newValues)) {
                             return;
                           }

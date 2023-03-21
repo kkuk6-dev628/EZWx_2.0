@@ -8,7 +8,7 @@ import Switch from 'react-switch';
 import { AutoCompleteInput, Modal, MultiSelectInput, PrimaryButton, SecondaryButton } from '../common/index';
 import { selectActiveRoute } from '../../store/route/routes';
 import { useSelector } from 'react-redux';
-import { isSameRoutePoints, isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
+import { isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
 import { useCreateRouteMutation } from '../../store/route/routeApi';
 import { Route, RouteOfFlight, RoutePoint } from '../../interfaces/route';
 import { useMeteoLayersContext } from '../map/leaflet/layer-control/MeteoLayerControlContext';

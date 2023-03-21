@@ -4,13 +4,13 @@ import ReactDOMServer from 'react-dom/server';
 import { Pane, useMap } from 'react-leaflet';
 import { addLeadingZeroes, loadFeaturesFromCache, loadFeaturesFromWeb } from '../../common/AreoFunctions';
 import { useSelector } from 'react-redux';
-import { selectPirep } from '../../../../store/layers/LayerControl';
 import { useEffect, useRef, useState } from 'react';
 import { paneOrders, wfsUrl } from '../../common/AreoConstants';
 import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
 import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
 import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
+import { selectPirepAltitudeMax, selectPirepAltitudeMin } from '../../../../store/layers/LayerControl';
 
 const properties = [
   'wkb_geometry',
@@ -47,6 +47,8 @@ const PirepLayer = () => {
   const dataLoadTime = useSelector(selectDataLoadTime);
   const [displayedGeojson, setDisplayedGeojson] = useState<GeoJSON.FeatureCollection>();
   const geojsonLayerRef = useRef();
+  const pirepAltitudeMin = useSelector(selectPirepAltitudeMin);
+  const pirepAltitudeMax = useSelector(selectPirepAltitudeMax);
 
   useEffect(() => {
     loadFeaturesFromCache('pireps', setPireps);
@@ -62,8 +64,8 @@ const PirepLayer = () => {
     pirepLayerState.icing.checked,
     pirepLayerState.turbulence.checked,
     pirepLayerState.weatherSky.checked,
-    pirepLayerState.altitude.valueMin,
-    pirepLayerState.altitude.valueMax,
+    pirepAltitudeMin,
+    pirepAltitudeMax,
     pirepLayerState.time.hours,
     observationTime,
     pireps,
@@ -247,8 +249,7 @@ const PirepLayer = () => {
         }
       }
       const inAltitudeRange =
-        (pirepLayerState.altitude.valueMin <= feature.properties.fltlvl &&
-          feature.properties.fltlvl <= pirepLayerState.altitude.valueMax) ||
+        (pirepAltitudeMin <= feature.properties.fltlvl && feature.properties.fltlvl <= pirepAltitudeMax) ||
         feature.properties.fltlvl == 0;
 
       if (!inAltitudeRange) {
