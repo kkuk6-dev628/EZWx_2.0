@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
+import { CircularProgress, ClickAwayListener, Paper, Typography } from '@mui/material';
 import React, { KeyboardEvent, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { RouteOfFlight, RoutePoint } from '../../interfaces/route';
 import { useGetAirportQuery } from '../../store/route/airportApi';
 import { useGetWaypointsQuery } from '../../store/route/waypointApi';
 import { matchLowerCaseRegex } from '../utils/RegexUtils';
+import Draggable from 'react-draggable';
+
 interface Props {
   name: string;
   handleAutoComplete: (name: string, value: RouteOfFlight[]) => void;
@@ -169,28 +171,23 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
       <div className="multi__input__container">
         <div className="multi_values__container" ref={dragElementsParentRef}>
           {selectedValues.map((el, ind) => (
-            <span
-              draggable
-              onDragStart={(e) => dragStart(e, ind)}
-              onTouchStart={(e) => dragStart(e, ind)}
-              onDragEnter={(e) => dragEnter(e, ind)}
-              onTouchMove={(e) => onTouchMove(e, ind)}
-              onDragEnd={drop}
-              onTouchEnd={drop}
+            <Draggable
               key={'route-of-flight-' + el.routePoint.key + ind}
               // style={{ touchAction: 'none' }}
             >
-              {el.routePoint.key}
-              <AiOutlineClose
-                className="close__btn"
-                onClick={() =>
-                  handleAutoComplete(
-                    name,
-                    selectedValues.filter((value) => value !== el),
-                  )
-                }
-              />
-            </span>
+              <span>
+                {el.routePoint.key}
+                <AiOutlineClose
+                  className="close__btn"
+                  onClick={() =>
+                    handleAutoComplete(
+                      name,
+                      selectedValues.filter((value) => value !== el),
+                    )
+                  }
+                />
+              </span>
+            </Draggable>
           ))}
 
           <input

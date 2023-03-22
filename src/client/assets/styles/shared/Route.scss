@@ -333,3 +333,6 @@
     }
   }
 }
+.react-draggable:not(.react-draggable-dragged) {
+  transform: none !important;
+}
