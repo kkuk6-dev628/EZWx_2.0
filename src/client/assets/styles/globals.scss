@@ -1,6 +1,6 @@
+@import './partial/variables';
 @import './partial/base';
 @import './partial/typography';
-@import './partial/variables';
 @import 'leaflet';
 /*------ Layout ------*/
 //Header
@@ -46,8 +46,9 @@
 
 // common
 @import './common/AutoComleteInput.scss';
-@import './common/MultiSelectInput.scss';
 @import './common/Button.scss';
+@import './common/ColoredRangeSlider.scss';
+@import './common/MultiSelectInput.scss';
 
 //Profile
 @import './pages/Profile.scss';

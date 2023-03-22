@@ -11,7 +11,8 @@ p {
   box-sizing: border-box;
   scroll-behavior: smooth;
   font-family: var(--font-main);
-  scroll-behavior: smooth;
+	font-size: rem($fs-base);
+	letter-spacing: 0.1px;
   color: var(--color-dark);
 }
 

@@ -20,6 +20,7 @@ import {
 } from '../../store/user/userSettingsApi';
 import { selectAuth } from '../../store/auth/authSlice';
 import { AutoCompleteInput, Modal, PrimaryButton, SecondaryButton } from '../common';
+import { ColoredRangeSlider, formatForDecimal, formatForInteger } from '../common/ColoredRangeSlider';
 
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;
@@ -64,8 +65,8 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
     setIsShowSettingsDrawer(false);
   };
 
-  const handleChange = (e) => {
-    setSettings({ ...settings, [e.target.name]: e.target.value });
+  const handleChange = (name, value) => {
+    setSettings({ ...settings, [name]: value });
   };
 
   const handleToggle = (e) => {
@@ -254,21 +255,23 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                   description="acceptable ceiling at departure airport (ft agl)"
                 />
                 <div className="range__slider">
-                  <RangeSlider
-                    name="ceiling_at_departure"
-                    value={settings.ceiling_at_departure}
-                    mindistance={100}
-                    onChange={handleChange}
-                    marks={[
-                      { label: '6000', value: 6000 },
-                      { label: '100', value: 100 },
-                    ]}
-                    max={6000}
-                    min={100}
-                    track="normal"
-                    valueLabelDisplay="on"
-                    component={null}
-                    disableSwap
+                  <ColoredRangeSlider
+                    start={settings.ceiling_at_departure}
+                    step={100}
+                    connect={[true, true, true]}
+                    range={{ min: 100, max: 6000 }}
+                    tooltips={[true, true]}
+                    format={formatForInteger}
+                    pips={{
+                      mode: 'range',
+                      density: 100,
+                    }}
+                    direction="rtl"
+                    margin={1000}
+                    connectClasses={['green', 'yellow', 'red']}
+                    onChange={(values) => {
+                      handleChange('ceiling_at_departure', values);
+                    }}
                   />
                 </div>
               </InputFieldWrapper>
@@ -278,20 +281,23 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                   description="acceptable surface visibility at departure airport (statute miles)"
                 />
                 <div className="range__slider">
-                  <RangeSlider
-                    name="surface_visibility_at_departure"
-                    value={settings.surface_visibility_at_departure}
-                    onChange={handleChange}
-                    mindistance={2}
-                    marks={[
-                      { label: '12', value: 12 },
-                      { label: '0', value: 2 },
-                    ]}
-                    max={12}
-                    min={2}
-                    valueLabelDisplay="on"
-                    component={null}
-                    disableSwap
+                  <ColoredRangeSlider
+                    start={settings.surface_visibility_at_departure}
+                    step={0.5}
+                    connect={[true, true, true]}
+                    range={{ min: 0, max: 15 }}
+                    tooltips={[true, true]}
+                    format={formatForDecimal}
+                    pips={{
+                      mode: 'range',
+                      density: 0.5,
+                    }}
+                    direction="rtl"
+                    margin={1}
+                    connectClasses={['green', 'yellow', 'red']}
+                    onChange={(values) => {
+                      handleChange('surface_visibility_at_departure', values);
+                    }}
                   />
                 </div>
               </InputFieldWrapper>
@@ -301,20 +307,23 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                   description="acceptable crosswind at departure airport (knots)"
                 />
                 <div className="range__slider">
-                  <RangeSlider
-                    name="crosswinds_at_departure_airport"
-                    value={settings.crosswinds_at_departure_airport}
-                    onChange={handleChange}
-                    mindistance={5}
-                    marks={[
-                      { label: '35', value: 35 },
-                      { label: '0', value: 3 },
-                    ]}
-                    max={35}
-                    min={3}
-                    valueLabelDisplay="on"
-                    component={null}
-                    disableSwap
+                  <ColoredRangeSlider
+                    start={settings.crosswinds_at_departure_airport}
+                    step={1}
+                    connect={[true, true, true]}
+                    range={{ min: 1, max: 50 }}
+                    tooltips={[true, true]}
+                    format={formatForDecimal}
+                    pips={{
+                      mode: 'range',
+                      density: 1,
+                    }}
+                    direction="rtl"
+                    margin={1}
+                    connectClasses={['green', 'yellow', 'red']}
+                    onChange={(values) => {
+                      handleChange('crosswinds_at_departure_airport', values);
+                    }}
                   />
                 </div>
               </InputFieldWrapper>
@@ -325,20 +334,23 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                   description="acceptable ceiling along proposed route (ft agl)"
                 />
                 <div className="range__slider">
-                  <RangeSlider
-                    name="ceiling_along_route"
-                    value={settings.ceiling_along_route}
-                    onChange={handleChange}
-                    mindistance={100}
-                    marks={[
-                      { label: '6000', value: 6000 },
-                      { label: '0', value: 100 },
-                    ]}
-                    max={6000}
-                    min={100}
-                    valueLabelDisplay="on"
-                    component={null}
-                    disableSwap
+                  <ColoredRangeSlider
+                    start={settings.ceiling_along_route}
+                    step={100}
+                    connect={[true, true, true]}
+                    range={{ min: 0, max: 6000 }}
+                    tooltips={[true, true]}
+                    format={formatForInteger}
+                    pips={{
+                      mode: 'range',
+                      density: 100,
+                    }}
+                    direction="rtl"
+                    margin={1000}
+                    connectClasses={['green', 'yellow', 'red']}
+                    onChange={(values) => {
+                      handleChange('ceiling_along_route', values);
+                    }}
                   />
                 </div>
               </InputFieldWrapper>
@@ -349,20 +361,23 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                   description="acceptable surface visibility along proposed route (statute miles)"
                 />
                 <div className="range__slider">
-                  <RangeSlider
-                    name="surface_visibility_along_route"
-                    value={settings.surface_visibility_along_route}
-                    onChange={handleChange}
-                    mindistance={2}
-                    marks={[
-                      { label: '12', value: 12 },
-                      { label: '0', value: 2 },
-                    ]}
-                    max={12}
-                    min={2}
-                    valueLabelDisplay="on"
-                    component={null}
-                    disableSwap
+                  <ColoredRangeSlider
+                    start={settings.surface_visibility_along_route}
+                    step={0.5}
+                    connect={[true, true, true]}
+                    range={{ min: 0, max: 15 }}
+                    tooltips={[true, true]}
+                    format={formatForDecimal}
+                    pips={{
+                      mode: 'range',
+                      density: 0.5,
+                    }}
+                    direction="rtl"
+                    margin={1}
+                    connectClasses={['green', 'yellow', 'red']}
+                    onChange={(values) => {
+                      handleChange('surface_visibility_along_route', values);
+                    }}
                   />
                 </div>
               </InputFieldWrapper>
@@ -370,48 +385,48 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
               <InputFieldWrapper>
                 <SettingFieldLabel title="En Route Icing Probability" description="acceptable icing probabilty (%)" />
                 <div className="range__slider">
-                  <RangeSlider
-                    name="en_route_icing_probability"
-                    value={settings.en_route_icing_probability}
-                    onChange={handleChange}
-                    mindistance={2}
-                    marks={[
-                      { label: '12', value: 12 },
-                      { label: '0', value: 2 },
-                    ]}
-                    max={12}
-                    min={2}
-                    valueLabelDisplay="on"
-                    component={null}
+                  <ColoredRangeSlider
+                    start={settings.en_route_icing_probability}
+                    step={1}
+                    connect={[true, true, true]}
+                    range={{ min: 0, max: 100 }}
+                    tooltips={[true, true]}
+                    format={formatForInteger}
+                    pips={{
+                      mode: 'range',
+                      density: 1,
+                    }}
+                    direction="rtl"
+                    margin={1}
+                    connectClasses={['green', 'yellow', 'red']}
+                    onChange={(values) => {
+                      handleChange('en_route_icing_probability', values);
+                    }}
                   />
                 </div>
               </InputFieldWrapper>
 
               <InputFieldWrapper>
-                <SettingFieldLabel
-                  title="En Route Icing Intensity"
-                  description="acceptable icing intensity
-"
-                />
+                <SettingFieldLabel title="En Route Icing Intensity" description="acceptable icing intensity" />
                 <div className="range__slider">
-                  <RangeSlider
-                    name="en_route_icing_intensity"
-                    value={settings.en_route_icing_intensity}
-                    onChange={handleChange}
-                    mindistance={2}
-                    marks={[
-                      { label: 'Hvy', value: 10 },
-                      { label: 'Mod', value: 8 },
-                      { label: 'Lgt', value: 6 },
-                      { label: 'Trc', value: 4 },
-                      { label: 'None', value: 2 },
-                    ]}
+                  <ColoredRangeSlider
+                    start={settings.en_route_icing_intensity}
                     step={2}
-                    max={10}
-                    min={2}
-                    valueLabelDisplay="off"
-                    component={null}
-                    disableSwap
+                    connect={[true, true, true]}
+                    range={{ min: 2, max: 10 }}
+                    tooltips={[true, true]}
+                    format={formatForDecimal}
+                    pips={{
+                      mode: 'range',
+                      values: [2, 4, 6, 8, 10],
+                      density: 2,
+                    }}
+                    direction="rtl"
+                    margin={2}
+                    connectClasses={['green', 'yellow', 'red']}
+                    onChange={(values) => {
+                      handleChange('en_route_icing_intensity', values);
+                    }}
                   />
                 </div>
               </InputFieldWrapper>
@@ -422,20 +437,23 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                   description="acceptable turbulence intensity (edr * 100)"
                 />
                 <div className="range__slider">
-                  <RangeSlider
-                    name="en_route_turbulence_intensity"
-                    value={settings.en_route_turbulence_intensity}
-                    onChange={handleChange}
-                    mindistance={10}
-                    marks={[
-                      { label: '100', value: 100 },
-                      { label: '0', value: 5 },
-                    ]}
-                    max={100}
-                    min={5}
-                    valueLabelDisplay="on"
-                    component={null}
-                    disableSwap
+                  <ColoredRangeSlider
+                    start={settings.en_route_turbulence_intensity}
+                    step={1}
+                    connect={[true, true, true]}
+                    range={{ min: 0, max: 100 }}
+                    tooltips={[true, true]}
+                    format={formatForInteger}
+                    pips={{
+                      mode: 'range',
+                      density: 1,
+                    }}
+                    direction="rtl"
+                    margin={1}
+                    connectClasses={['green', 'yellow', 'red']}
+                    onChange={(values) => {
+                      handleChange('en_route_turbulence_intensity', values);
+                    }}
                   />
                 </div>
               </InputFieldWrapper>
@@ -446,7 +464,25 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                   description="acceptable convective potential"
                 />
                 <div className="range__slider">
-                  <RangeSlider
+                  <ColoredRangeSlider
+                    start={settings.en_route_convective_potential}
+                    step={2}
+                    connect={[true, true, true]}
+                    range={{ min: 2, max: 12 }}
+                    tooltips={[true, true]}
+                    format={formatForDecimal}
+                    pips={{
+                      mode: 'range',
+                      density: 2,
+                    }}
+                    direction="rtl"
+                    margin={2}
+                    connectClasses={['green', 'yellow', 'red']}
+                    onChange={(values) => {
+                      handleChange('en_route_convective_potential', values);
+                    }}
+                  />
+                  {/* <RangeSlider
                     name="en_route_convective_potential"
                     value={settings.en_route_convective_potential}
                     onChange={handleChange}
@@ -465,7 +501,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     valueLabelDisplay="off"
                     component={null}
                     disableSwap
-                  />
+                  /> */}
                 </div>
               </InputFieldWrapper>
 
@@ -475,20 +511,23 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                   description="acceptable ceiling at destination airport (ft agl)"
                 />
                 <div className="range__slider">
-                  <RangeSlider
-                    name="ceiling_at_destination"
-                    value={settings.ceiling_at_destination}
-                    onChange={handleChange}
-                    mindistance={100}
-                    marks={[
-                      { label: '6000', value: 6000 },
-                      { label: '0', value: 100 },
-                    ]}
-                    max={6000}
-                    min={100}
-                    valueLabelDisplay="on"
-                    component={null}
-                    disableSwap
+                  <ColoredRangeSlider
+                    start={settings.ceiling_at_destination}
+                    step={100}
+                    connect={[true, true, true]}
+                    range={{ min: 0, max: 6000 }}
+                    tooltips={[true, true]}
+                    format={formatForInteger}
+                    pips={{
+                      mode: 'range',
+                      density: 100,
+                    }}
+                    direction="rtl"
+                    margin={1000}
+                    connectClasses={['green', 'yellow', 'red']}
+                    onChange={(values) => {
+                      handleChange('ceiling_at_destination', values);
+                    }}
                   />
                 </div>
               </InputFieldWrapper>
@@ -499,21 +538,23 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                   description="acceptable surface visibility at the destination airport (statute miles)"
                 />
                 <div className="range__slider">
-                  <RangeSlider
-                    name="surface_visibility_at_destination"
-                    value={settings.surface_visibility_at_destination}
-                    onChange={handleChange}
-                    mindistance={1}
-                    marks={[
-                      { label: '12', value: 12 },
-                      { label: '0', value: 2 },
-                    ]}
-                    max={12}
-                    min={2}
+                  <ColoredRangeSlider
+                    start={settings.surface_visibility_at_destination}
                     step={0.5}
-                    valueLabelDisplay="on"
-                    component={null}
-                    disableSwap
+                    connect={[true, true, true]}
+                    range={{ min: 0, max: 15 }}
+                    tooltips={[true, true]}
+                    format={formatForDecimal}
+                    pips={{
+                      mode: 'range',
+                      density: 0.5,
+                    }}
+                    direction="rtl"
+                    margin={1}
+                    connectClasses={['green', 'yellow', 'red']}
+                    onChange={(values) => {
+                      handleChange('surface_visibility_at_destination', values);
+                    }}
                   />
                 </div>
               </InputFieldWrapper>
@@ -523,20 +564,23 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                   description="acceptable crosswind at destination airport (knots)"
                 />
                 <div className="range__slider">
-                  <RangeSlider
-                    name="crosswinds_at_destination_airport"
-                    value={settings.crosswinds_at_destination_airport}
-                    onChange={handleChange}
-                    mindistance={5}
-                    marks={[
-                      { label: '35', value: 35 },
-                      { label: '0', value: 3 },
-                    ]}
-                    max={35}
-                    min={3}
-                    valueLabelDisplay="on"
-                    component={null}
-                    disableSwap
+                  <ColoredRangeSlider
+                    start={settings.crosswinds_at_destination_airport}
+                    step={1}
+                    connect={[true, true, true]}
+                    range={{ min: 1, max: 50 }}
+                    tooltips={[true, true]}
+                    format={formatForInteger}
+                    pips={{
+                      mode: 'range',
+                      density: 1,
+                    }}
+                    direction="rtl"
+                    margin={2}
+                    connectClasses={['green', 'yellow', 'red']}
+                    onChange={(values) => {
+                      handleChange('crosswinds_at_destination_airport', values);
+                    }}
                   />
                 </div>
               </InputFieldWrapper>

@@ -17,3 +17,20 @@
   --color-teal: teal;
   --layer-control-item-height: 24px;
 }
+/* font vars below will auto change to rem values using function rem($value)*/
+$fs-base:								13px !default;
+$fs-nano:								$fs-base - 2;   /* 11px   */
+$fs-xs: 								$fs-base - 1;   /* 12px   */
+$fs-sm: 								$fs-base - 0.5; /* 12.5px */
+$fs-md: 								$fs-base + 1;   /* 14px   */
+$fs-lg: 								$fs-base + 2;   /* 15px   */
+$fs-xl: 								$fs-base + 3;   /* 16px   */
+$fs-xxl: 								$fs-base + 15;  /* 28px   */
+
+$html-font-size: 16px;
+@function stripUnit($value) {
+    @return $value / ($value * 0 + 1);
+}
+@function rem($pxValue) {
+    @return #{stripUnit($pxValue) / stripUnit($html-font-size)}rem;
+}

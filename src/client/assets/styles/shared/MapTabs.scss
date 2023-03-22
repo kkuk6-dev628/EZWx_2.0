@@ -8,7 +8,9 @@
   background-color: var(--color-white);
   max-width: 70px;
   width: 100%;
-
+  p {
+    font-size: rem($fs-xl);
+  }
   @media screen and (max-width: 1024px) {
     flex-direction: row;
     height: auto;

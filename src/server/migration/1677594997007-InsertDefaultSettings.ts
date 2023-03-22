@@ -36,7 +36,7 @@ export class InsertDefaultSettings1677594997007 implements MigrationInterface {
         surface_visibility_at_destination_max,
         crosswinds_at_destination_airport_min,
         crosswinds_at_destination_airport_max
-      ) VALUES ('home', ${false}, ${false}, ${false}, ${false}, ${false}, 'light',${50}, ${100}, ${6000}, ${2}, ${12}, ${3}, ${35}, ${100}, ${6000}, ${2}, ${12}, ${5}, ${100}, ${5}, ${100}, ${5}, ${100}, ${2}, ${10}, ${100}, ${6000}, ${2}, ${12}, ${3}, ${35})`,
+      ) VALUES ('home', ${false}, ${false}, ${false}, ${false}, ${false}, 'light',${50}, ${1000}, ${3000}, ${3}, ${7}, ${10}, ${15}, ${1000}, ${3000}, ${3}, ${7}, ${10}, ${20}, ${5}, ${100}, ${16}, ${36}, ${2}, ${10}, ${1000}, ${3000}, ${3}, ${7}, ${10}, ${15})`,
     );
   }
   // eslint-disable-next-line @typescript-eslint/no-empty-function

@@ -1,0 +1,68 @@
+.colored-range-slider {
+  .noUi-connect {
+    &.red {
+      background-color: red;
+    }
+    &.green {
+      background-color: green;
+    }
+    &.yellow {
+      background-color: yellow;
+    }
+  }
+  .noUi-marker-horizontal.noUi-marker-large {
+    height: 0px;
+  }
+  .noUi-pips-horizontal {
+    padding: 0px 0;
+    height: 30px;
+    top: 96%;
+    left: 0;
+    width: 100%;
+  }
+  .noUi-horizontal .noUi-tooltip {
+    -webkit-transform: translate(-50%, 0);
+    transform: translate(-50%, 0);
+    left: 50%;
+    bottom: 110%;
+  }
+  .noUi-tooltip {
+    display: block;
+    position: absolute;
+    border: none;
+    /* border-radius: 3px; */
+    background: #fff;
+    color: #000;
+    padding: 0px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .noUi-active {
+    box-shadow: none;
+  }
+
+  .noUi-tooltip {
+    font-size: 12px;
+  }
+
+  .noUi-handle {
+    outline-width: 0px;
+  }
+  .slider-margin {
+    margin-top: 0.75rem !important;
+    margin-bottom: 1rem !important;
+  }
+  .noUi-marker-horizontal.noUi-marker-large {
+    height: 0px;
+  }
+  .noUi-horizontal .noUi-handle {
+    width: 16px;
+    height: 26px;
+    left: 17px;
+    top: -4px;
+  }
+  .noUi-handle:before, .noUi-handle:after {
+    display: none;
+  }
+}
