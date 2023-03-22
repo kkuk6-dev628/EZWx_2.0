@@ -31,10 +31,7 @@ import {
   EvaluationType,
 } from '../../../../interfaces/layerControl';
 import { InputFieldWrapper, RadioButton } from '../../../settings-drawer';
-import {
-  useGetLayerControlStateQuery,
-  useUpdateLayerControlStateMutation,
-} from '../../../../store/layers/layerControlApi';
+import { useUpdateLayerControlStateMutation } from '../../../../store/layers/layerControlApi';
 import { useSelector } from 'react-redux';
 import { selectLayerControlState, setLayerControlState } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';

@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { UserSettings } from '../../interfaces/users';
 import { AppState } from '../store';
 
 export interface PersonalMinimumItem {
@@ -19,7 +20,10 @@ export interface UserSettingsState {
   personalMinimumsState: PersonalMinimums;
 }
 
-const initialState: any = {
+export const initialUserSettingsState: {
+  personalMinimumsState: PersonalMinimums;
+  settings: UserSettings;
+} = {
   personalMinimumsState: {
     LIFR: { cat: 'LIFR', color: '#f0f', ceiling: 0, visibility: 0 },
     IFR: { cat: 'IFR', color: '#f00', ceiling: 500, visibility: 1 },
@@ -27,6 +31,8 @@ const initialState: any = {
     VFR: { cat: 'VFR', color: '#008300', ceiling: 3000, visibility: 5 },
   },
   settings: {
+    observation_time: Date.now(),
+    observation_interval: 75,
     default_home_airport: '',
     default_temperature_unit: true,
     default_time_display_unit: true,
@@ -52,7 +58,7 @@ const initialState: any = {
 
 export const UserSettingsSlice = createSlice({
   name: 'userSettings',
-  initialState,
+  initialState: initialUserSettingsState,
   reducers: {
     setUserSettings: (state, action) => {
       state.settings = action.payload;

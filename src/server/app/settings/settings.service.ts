@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserSettingsDto, UpdateUserSettingsDto } from './dto/create_settings_dto';
+import { User } from 'src/server/common/types/user';
 
 @Injectable()
 export class SettingsService {
@@ -45,7 +46,7 @@ export class SettingsService {
     return await this.userSettingsRepository.save(newUserSettings);
   }
 
-  async update(dto: UpdateUserSettingsDto) {
+  async update(user: User, dto: UpdateUserSettingsDto) {
     try {
       const {
         ceiling_at_departure,
@@ -94,6 +95,7 @@ export class SettingsService {
         res = await this.userSettingsRepository.save({ id: res.id, ...modified_dto });
       } else {
         const settings = this.userSettingsRepository.create(modified_dto);
+        settings.user_id = user.id;
         res = await this.userSettingsRepository.save(settings);
       }
       const { id, ...userSettings } = res;

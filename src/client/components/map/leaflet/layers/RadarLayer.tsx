@@ -3,8 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import { useSelector } from 'react-redux';
 import { selectLayerControlState } from '../../../../store/layers/LayerControl';
-import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
-import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
+import { selectSettings } from '../../../../store/user/UserSettings';
 import { addLeadingZeroes } from '../../common/AreoFunctions';
 import WMS from '../plugins/leaflet.wms';
 
@@ -76,7 +75,8 @@ const RadarLayer = () => {
   const map = useMap();
   const radarLayers = useRadarLayersContext();
   const layerControlState = useSelector(selectLayerControlState);
-  const observationTime = useSelector(selectObsTime);
+  const userSettings = useSelector(selectSettings);
+  const observationTime = userSettings.observation_time;
   const radarLayerState = layerControlState.radarState;
   const [fetchedRadarLayers, setFetchedRadarLayers] = useState(false);
 

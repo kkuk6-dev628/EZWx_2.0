@@ -5,8 +5,6 @@ import BaseMapLayerControlSlice from './layers/BaseMapLayerControl';
 import UserSettingsSlice from './user/UserSettings';
 import { LayerControlSlidersSlice } from './layers/LayerControl';
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
-import ObsTimeSlice from './time-slider/ObsTimeSlice';
-import ObsIntervalSlice from './time-slider/ObsIntervalSlice';
 import { createWrapper } from 'next-redux-wrapper';
 import authSlice from './auth/authSlice';
 import { apiSlice } from './api/apiSlice';
@@ -17,14 +15,12 @@ import DataLoadTimeSlice from './layers/DataLoadTimeSlice';
 const makeStore = () =>
   configureStore({
     reducer: {
-      [ObsIntervalSlice.name]: ObsIntervalSlice.reducer,
       [DataLoadTimeSlice.name]: DataLoadTimeSlice.reducer,
       [airportApi.reducerPath]: airportApi.reducer,
       [waypointApi.reducerPath]: waypointApi.reducer,
       [routeApi.reducerPath]: routeApi.reducer,
       [layerControlApi.reducerPath]: layerControlApi.reducer,
       [RoutesSlice.name]: RoutesSlice.reducer,
-      [ObsTimeSlice.name]: ObsTimeSlice.reducer,
       [apiSlice.reducerPath]: apiSlice.reducer,
       [authSlice.name]: authSlice.reducer,
       [LayerControlSlidersSlice.name]: LayerControlSlidersSlice.reducer,

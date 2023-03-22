@@ -2,7 +2,6 @@ import { PathOptions } from 'leaflet';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectLayerControlState } from '../../../../store/layers/LayerControl';
-import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 import { db } from '../../../caching/dexieDb';
 import WFSLayer from './WFSLayer';
 

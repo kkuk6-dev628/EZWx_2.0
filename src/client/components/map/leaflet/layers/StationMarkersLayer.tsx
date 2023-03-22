@@ -31,7 +31,6 @@ import {
   loadFeaturesFromWeb,
   visibilityMileToMeter,
 } from '../../common/AreoFunctions';
-import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
 import { selectActiveRoute } from '../../../../store/route/routes';
 import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
@@ -193,10 +192,10 @@ export const StationMarkersLayer = () => {
   const layerState = useSelector(selectLayerControlState);
   const personalMinimums = useSelector(selectPersonalMinimums);
   const [indexedData, setIndexedData] = useState({});
-  const observationTime = useSelector(selectObsTime);
+  const userSettings = useSelector(selectSettings);
+  const observationTime = userSettings.observation_time;
   const [isPast, setIsPast] = useState(true);
   const activeRoute = useSelector(selectActiveRoute);
-  const userSettings = useSelector(selectSettings);
   const dataLoadTime = useSelector(selectDataLoadTime);
 
   const geojsonLayerRef = useRef();

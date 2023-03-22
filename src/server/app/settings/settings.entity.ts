@@ -3,6 +3,10 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 export class UserSettings {
   @PrimaryGeneratedColumn()
   id: number;
+  @Column({ type: 'bigint' })
+  observation_time: string;
+  @Column()
+  observation_interval: number;
   @Column()
   default_home_airport: string;
   @Column()

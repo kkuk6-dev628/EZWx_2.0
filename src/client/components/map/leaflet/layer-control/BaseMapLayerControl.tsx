@@ -1,6 +1,6 @@
 import { DomEvent, Layer } from 'leaflet';
 import { createContext, ReactElement, useContext, useEffect, useRef, useState } from 'react';
-import { useMap, useMapEvent } from 'react-leaflet';
+import { useMapEvent } from 'react-leaflet';
 import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
 import { selectBaseMapLayerControl, setBaseMapLayerControl } from '../../../../store/layers/BaseMapLayerControl';
@@ -30,13 +30,13 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
   const baseMapLayerStatus = useSelector(selectBaseMapLayerControl);
   const [updateBaseLayerControlState] = useUpdateBaseLayerControlStateMutation();
   const auth = useSelector(selectAuth);
-  const { data: serverData } = useGetBaseLayerControlStateQuery('');
+  const { data: serverData } = auth.id ? useGetBaseLayerControlStateQuery('') : { data: undefined };
 
   useEffect(() => {
     if (serverData) map.fitBounds(serverData.bounds);
   }, [serverData]);
 
-  const map = useMapEvent('moveend', (event) => {
+  const map = useMapEvent('moveend', () => {
     if (auth.id) {
       const bounds = map.getBounds();
       updateBaseLayerControlState({

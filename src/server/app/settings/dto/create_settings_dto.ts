@@ -1,4 +1,6 @@
 export class CreateUserSettingsDto {
+  observation_time: string;
+  observation_interval: number;
   default_home_airport: string;
   default_temperature_unit: boolean;
   default_time_display_unit: boolean;
@@ -53,6 +55,8 @@ export class CreateUserSettingsDto {
 
 export class UpdateUserSettingsDto {
   id: number;
+  observation_time: string;
+  observation_interval: number;
   default_home_airport: string;
   default_temperature_unit: boolean;
   default_time_display_unit: boolean;

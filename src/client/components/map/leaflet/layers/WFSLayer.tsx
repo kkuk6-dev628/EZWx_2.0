@@ -4,12 +4,11 @@ import { useMapEvents, GeoJSON as GeoJSONLayer } from 'react-leaflet';
 import L, { LatLng, Layer, PathOptions } from 'leaflet';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import GeoJSON, { FeatureCollection } from 'geojson';
 import { emptyGeoJson } from '../../common/AreoConstants';
 import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
-import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 import { selectLayerControlState } from '../../../../store/layers/LayerControl';
+import { selectSettings } from '../../../../store/user/UserSettings';
 
 interface WFSLayerProps {
   url: string;
@@ -56,7 +55,8 @@ const WFSLayer = React.forwardRef(
     }: WFSLayerProps,
     parentRef: any,
   ) => {
-    const observationTime = useSelector(selectObsTime);
+    const userSettings = useSelector(selectSettings);
+    const observationTime = userSettings.observation_time;
     const [geoJSON, setGeoJSON] = useState<FeatureCollection>(initData);
     const [displayedData, setDisplayedData] = useState<FeatureCollection>(emptyGeoJson);
     const [geoJsonKey, setGeoJsonKey] = useState(12034512);

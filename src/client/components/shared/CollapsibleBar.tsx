@@ -1,18 +1,20 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import Slider from '@mui/material/Slider';
-import React, { useState } from 'react';
+import React from 'react';
 import { diffMinutes, getTimeRangeStart, simpleTimeFormat } from '../map/common/AreoFunctions';
 import { useDispatch, useSelector } from 'react-redux';
-import { setObsTime } from '../../store/time-slider/ObsTimeSlice';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { selectObsInterval, setObsInterval } from '../../store/time-slider/ObsIntervalSlice';
-import { selectSettings } from '../../store/user/UserSettings';
+import { selectSettings, setUserSettings } from '../../store/user/UserSettings';
+import { useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
+import { selectAuth } from '../../store/auth/authSlice';
 
 function CollapsibleBar() {
   const dispatch = useDispatch();
-  const obsInterval = useSelector(selectObsInterval);
   const settingsState = useSelector(selectSettings);
-  const [defaultTime] = useState(new Date());
+  const obsInterval = settingsState.observation_interval;
+  let defaultTime = new Date();
+  const [updateUserSettingsAPI] = useUpdateUserSettingsMutation();
+  const auth = useSelector(selectAuth);
 
   const valueToTime = (value: number): Date => {
     const origin = getTimeRangeStart();
@@ -26,6 +28,12 @@ function CollapsibleBar() {
     return Math.floor(diff / 5);
   };
 
+  if (
+    settingsState.observation_time >= getTimeRangeStart().getTime() &&
+    settingsState.observation_time <= valueToTime(84 * 12).getTime()
+  ) {
+    defaultTime = new Date(settingsState.observation_time);
+  }
   const marks = [
     {
       value: 0,
@@ -53,12 +61,17 @@ function CollapsibleBar() {
     return <div>{simpleTimeFormat(valueToTime(value), settingsState.default_time_display_unit)}</div>;
   }
 
-  const handleTimeChange = (time: Date) => {
-    dispatch(setObsTime(time.toISOString()));
+  const handleTimeChange = (time: Date, commit = true) => {
+    const timespan = time.getTime();
+    const newSettings = { ...settingsState, observation_time: timespan };
+    if (commit && auth.id) updateUserSettingsAPI(newSettings);
+    dispatch(setUserSettings(newSettings));
   };
 
   const handleIntervalChange = (minutes: number) => {
-    dispatch(setObsInterval(minutes));
+    const newSettings = { ...settingsState, observation_interval: minutes };
+    if (auth.id) updateUserSettingsAPI(newSettings);
+    dispatch(setUserSettings(newSettings));
   };
 
   return (
@@ -73,9 +86,11 @@ function CollapsibleBar() {
         step={1}
         marks={marks}
         valueLabelDisplay="on"
-        onChange={(e) => {
-          // @ts-ignore
-          handleTimeChange(valueToTime(e.target.value));
+        onChange={(_e, newValue: number) => {
+          handleTimeChange(valueToTime(newValue), false);
+        }}
+        onChangeCommitted={(_e, newValue: number) => {
+          handleTimeChange(valueToTime(newValue));
         }}
       />
       <FormControl sx={{ m: 1, minWidth: 120 }} size="small" className="interval-select" color="secondary">

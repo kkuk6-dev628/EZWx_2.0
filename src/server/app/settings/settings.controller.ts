@@ -1,5 +1,6 @@
+import { JwtAuthGuard } from './../auth/jwt/jwt-auth.guard';
 import { SettingsService } from './settings.service';
-import { Body, Controller, Get, HttpCode, Param, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Request, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { CreateUserSettingsDto, UpdateUserSettingsDto } from './dto/create_settings_dto';
 
 @Controller('settings')
@@ -19,8 +20,9 @@ export class SettingsController {
 
   @Put('update')
   @HttpCode(200)
-  update(@Body() updateUserSettingsDto: UpdateUserSettingsDto) {
-    return this.settingService.update(updateUserSettingsDto);
+  @UseGuards(JwtAuthGuard)
+  update(@Request() request, @Body() updateUserSettingsDto: UpdateUserSettingsDto) {
+    return this.settingService.update(request.user, updateUserSettingsDto);
   }
 
   @Patch('/restore/:user_id')

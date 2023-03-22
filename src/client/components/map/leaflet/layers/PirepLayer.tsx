@@ -7,10 +7,9 @@ import { useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
 import { paneOrders, wfsUrl } from '../../common/AreoConstants';
 import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
-import { selectObsTime } from '../../../../store/time-slider/ObsTimeSlice';
 import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
-import { useGetLayerControlStateQuery } from '../../../../store/layers/layerControlApi';
 import { selectLayerControlState } from '../../../../store/layers/LayerControl';
+import { selectSettings } from '../../../../store/user/UserSettings';
 
 const properties = [
   'wkb_geometry',
@@ -43,7 +42,8 @@ const PirepLayer = () => {
   const [pireps, setPireps] = useState<GeoJSON.Feature[]>([]);
   const layerControlState = useSelector(selectLayerControlState);
   const pirepLayerState = layerControlState.pirepState;
-  const observationTime = useSelector(selectObsTime);
+  const userSettings = useSelector(selectSettings);
+  const observationTime = userSettings.observation_time;
   const dataLoadTime = useSelector(selectDataLoadTime);
   const [displayedGeojson, setDisplayedGeojson] = useState<GeoJSON.FeatureCollection>();
   const geojsonLayerRef = useRef();

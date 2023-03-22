@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useEffect, useState } from 'react';
-import { MapContainer, useMapEvent, ZoomControl } from 'react-leaflet';
+import { MapContainer, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import styles from './Map.module.css';
 import MapTabs from '../../shared/MapTabs';
