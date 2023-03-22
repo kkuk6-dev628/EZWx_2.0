@@ -84,18 +84,18 @@
   .PrivateRadioButtonIcon-root-5{
 
     svg{
-      height: 18px!important;
-      width: 18px!important;
+      height: 16px!important;
+      width: 16px!important;
     }
   }
 
   .MuiFormControlLabel-root{
-    height: 24px;
+    height: 22px;
   }
 
   .PrivateRadioButtonIcon-root-8 > svg{
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 168px;
   }
 
   .PrivateSwitchBase-root-1{
@@ -111,8 +111,8 @@
     border: 0;
 
     .MuiSvgIcon-root{
-      height: 18px;
-      width: 18px;
+      height: 14px;
+      width: 14px;
     }
   }
   .MuiRadio-root{
@@ -187,6 +187,9 @@
     display: flex;
     flex-direction: column;
     padding-left: 10px;
+    .RadioButton_radio__label__container__mLRn4 {
+      padding: 4px 5px;
+    }
   }
   .pirep-slider{
     margin: 8px 0 0 8px;
