@@ -693,9 +693,9 @@ export const StationMarkersLayer = () => {
         break;
       case 'crosswind':
         const crosswinds = isPast ? feature.properties.crosswind_component_kt : feature.properties.cross_com;
-        const windDir = isPast ? feature.properties.wind_dir_degrees : feature.properties.w_dir;
-        const windSpeed = isPast ? feature.properties.wind_speed_kt : feature.properties.w_speed;
-        if (crosswinds != null && (windDir || !windSpeed)) {
+        // const windDir = isPast ? feature.properties.wind_dir_degrees : feature.properties.w_dir;
+        // const windSpeed = isPast ? feature.properties.wind_speed_kt : feature.properties.w_speed;
+        if (crosswinds != null) {
           const crosswindsCategory = getPersonalMinsCategoryForCrosswinds(crosswinds);
           color = personalMinsColors[crosswindsCategory];
         } else {
