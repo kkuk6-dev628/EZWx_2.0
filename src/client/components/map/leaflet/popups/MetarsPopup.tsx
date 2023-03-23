@@ -17,7 +17,7 @@ import {
   visibilityMileToFraction,
   visibilityMileToMeter,
 } from '../../common/AreoFunctions';
-import { getFlightCategoryIconUrl } from '../layers/StationMarkersLayer';
+import { getCeilingFromMetars, getFlightCategoryIconUrl } from '../layers/StationMarkersLayer';
 
 const MetarsPopup = ({
   layer,
@@ -32,7 +32,8 @@ const MetarsPopup = ({
 }) => {
   const feature = layer.feature;
   const skyConditions = getSkyConditions(layer.feature);
-  const { iconUrl, ceiling } = getFlightCategoryIconUrl(layer.feature);
+  const ceiling = getCeilingFromMetars(layer.feature);
+  const iconUrl = getFlightCategoryIconUrl(layer.feature);
   const [, ceilingColor] = getMetarCeilingCategory(ceiling, personalMinimums);
   const [, visibilityColor] = getMetarVisibilityCategory(feature.properties.visibility_statute_mi, personalMinimums);
   const skyConditionsAsc = skyConditions.sort((a, b) => {

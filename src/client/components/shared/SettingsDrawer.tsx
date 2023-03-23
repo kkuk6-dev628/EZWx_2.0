@@ -213,7 +213,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     name="max_takeoff_weight_category"
                     selectedValue={settings.max_takeoff_weight_category}
                     description={'(< 15,500 lbs)'}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange('max_takeoff_weight_category', e.target.value)}
                   />
                   <RadioButton
                     id="mediumWeight"
@@ -222,7 +222,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     name="max_takeoff_weight_category"
                     selectedValue={settings.max_takeoff_weight_category}
                     description={'(15,500 - 300,000 lbs)'}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange('max_takeoff_weight_category', e.target.value)}
                   />
                   <RadioButton
                     id="heavyWeight"
@@ -231,13 +231,17 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     name="max_takeoff_weight_category"
                     selectedValue={settings.max_takeoff_weight_category}
                     description={'(> 300,000 lbs)'}
-                    onChange={handleChange}
+                    onChange={(e) => handleChange('max_takeoff_weight_category', e.target.value)}
                   />
                 </div>
               </InputFieldWrapper>
               <InputFieldWrapper>
                 <SettingFieldLabel title="True Airspeed" description="true airspeed for en route operations (knots)" />
-                <StyledSlider onChange={handleChange} name="true_airspeed" value={settings.true_airspeed} />
+                <StyledSlider
+                  onChange={(e) => handleChange('true_airspeed', e.target.value)}
+                  name="true_airspeed"
+                  value={settings.true_airspeed}
+                />
               </InputFieldWrapper>
             </div>
           </Collapse>

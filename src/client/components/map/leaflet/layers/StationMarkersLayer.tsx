@@ -92,15 +92,25 @@ const nbmStationProperties = [
   'pub',
 ];
 
-export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): { iconUrl: string; ceiling: number } => {
+const personalMinsColors = ['red', 'yellow', 'green'];
+
+export const getCeilingFromMetars = (feature: GeoJSON.Feature) => {
+  if (feature.properties.vert_vis_ft) {
+    return feature.properties.vert_vis_ft;
+  }
   const skyConditions = getSkyConditions(feature);
-  let sky: string, ceiling: number;
+  const skyCondition = getLowestCeiling(skyConditions);
+  if (skyCondition == null) return;
+  const ceiling = skyCondition.cloudBase;
+  return ceiling;
+};
+
+export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): string => {
+  const skyConditions = getSkyConditions(feature);
+  let sky: string;
   if (feature.properties.vert_vis_ft) {
     sky = 'OVX';
-    ceiling = feature.properties.vert_vis_ft;
   } else if (skyConditions.length > 0) {
-    const skyCondition = getLowestCeiling(skyConditions);
-    if (skyCondition) ceiling = skyCondition.cloudBase;
     sky = getWorstSkyCondition(skyConditions);
   }
   let flightCategory = feature.properties.flight_category;
@@ -114,7 +124,7 @@ export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): { iconUrl: s
   if (flightCategory && sky) {
     iconUrl = `/icons/metar/${flightCategory}-${sky}.png`;
   }
-  return { iconUrl, ceiling };
+  return iconUrl;
 };
 
 const getNbmFlightCategory = (feature: GeoJSON.Feature, personalMinimums: PersonalMinimums): string => {
@@ -259,6 +269,8 @@ export const StationMarkersLayer = () => {
     layerState.stationMarkersState.flightCategory.mvfr.checked,
     layerState.stationMarkersState.flightCategory.ifr.checked,
     layerState.stationMarkersState.flightCategory.lifr.checked,
+    layerState.stationMarkersState.usePersonalMinimums.evaluationType,
+    layerState.stationMarkersState.usePersonalMinimums.routePointType,
   ]);
 
   const updateNbmStationMarkers = () => {
@@ -516,6 +528,9 @@ export const StationMarkersLayer = () => {
     let marker = null;
     if (isPast) {
       switch (layerState.stationMarkersState.markerType) {
+        case StationMarkersLayerItems.usePersonalMinimum.value:
+          marker = getPersonalMinsMarker(feature, latlng);
+          break;
         case StationMarkersLayerItems.flightCategory.value:
           marker = getFlightCatMarker(feature, latlng);
           break;
@@ -597,10 +612,114 @@ export const StationMarkersLayer = () => {
     return marker;
   };
 
+  const getPersonalMinsCategoryForCeiling = (ceiling: number): number => {
+    if (!ceiling) return 3;
+    let ceilingCategory = userSettings.ceiling_at_departure;
+    switch (layerState.stationMarkersState.usePersonalMinimums.routePointType) {
+      case 'departure':
+        ceilingCategory = userSettings.ceiling_at_departure;
+        break;
+      case 'en_route':
+        ceilingCategory = userSettings.ceiling_along_route;
+        break;
+      case 'destination':
+        ceilingCategory = userSettings.ceiling_at_destination;
+        break;
+    }
+    if (ceiling <= ceilingCategory[0]) return 0;
+    if (ceiling >= ceilingCategory[1]) return 2;
+    return 1;
+  };
+
+  const getPersonalMinsCategoryForVisibility = (visibility: number): number => {
+    if (!visibility) return;
+    let visibilityCategory = userSettings.surface_visibility_at_departure;
+    switch (layerState.stationMarkersState.usePersonalMinimums.routePointType) {
+      case 'departure':
+        visibilityCategory = userSettings.surface_visibility_at_departure;
+        break;
+      case 'en_route':
+        visibilityCategory = userSettings.surface_visibility_along_route;
+        break;
+      case 'destination':
+        visibilityCategory = userSettings.surface_visibility_at_destination;
+        break;
+    }
+    if (visibility <= visibilityCategory[0]) return 0;
+    if (visibility >= visibilityCategory[1]) return 2;
+    return 1;
+  };
+
+  const getPersonalMinsCategoryForCrosswinds = (crosswinds: number): number => {
+    let crosswindsCategory = userSettings.crosswinds_at_departure_airport;
+    switch (layerState.stationMarkersState.usePersonalMinimums.routePointType) {
+      case 'departure':
+        crosswindsCategory = userSettings.crosswinds_at_departure_airport;
+        break;
+      case 'destination':
+        crosswindsCategory = userSettings.crosswinds_at_destination_airport;
+        break;
+    }
+    if (crosswinds <= crosswindsCategory[0]) return 2;
+    if (crosswinds >= crosswindsCategory[1]) return 1;
+    return 1;
+  };
+
+  const getPersonalMinsMarker = (feature: GeoJSON.Feature, latlng: LatLng): L.Marker => {
+    const ceiling = isPast ? getCeilingFromMetars(feature) : feature.properties.ceil;
+    const visibility = isPast ? feature.properties.visibility_statute_mi : feature.properties.vis;
+    const ceilingCategory = getPersonalMinsCategoryForCeiling(ceiling);
+    const visibilityCategory = getPersonalMinsCategoryForVisibility(visibility);
+    let color = 'green';
+    switch (layerState.stationMarkersState.usePersonalMinimums.evaluationType) {
+      case 'flight_category':
+        color = personalMinsColors[Math.min(ceilingCategory, visibilityCategory)];
+        break;
+      case 'ceiling':
+        if (!ceiling) {
+          return;
+          color = 'black';
+        } else {
+          color = personalMinsColors[ceilingCategory];
+        }
+        break;
+      case 'visibility':
+        if (!visibility) {
+          return;
+          color = 'black';
+        } else {
+          color = personalMinsColors[visibilityCategory];
+        }
+        break;
+      case 'crosswind':
+        const crosswinds = isPast ? feature.properties.crosswind_component_kt : feature.properties.cross_com;
+        const windDir = isPast ? feature.properties.wind_dir_degrees : feature.properties.w_dir;
+        const windSpeed = isPast ? feature.properties.wind_speed_kt : feature.properties.w_speed;
+        if (crosswinds != null && (windDir || !windSpeed)) {
+          const crosswindsCategory = getPersonalMinsCategoryForCrosswinds(crosswinds);
+          color = personalMinsColors[crosswindsCategory];
+        } else {
+          return;
+        }
+        break;
+    }
+    const metarMarker = L.marker(latlng, {
+      icon: new L.DivIcon({
+        className: 'metar-personal-mins ' + color,
+        html: '',
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+        //popupAnchor: [0, -14]
+      }),
+      pane: 'station-markers',
+    });
+    return metarMarker;
+  };
+
   const getFlightCatMarker = (feature: GeoJSON.Feature, latlng: LatLng): L.Marker => {
     let iconUrl: string;
     if (isPast) {
-      iconUrl = getFlightCategoryIconUrl(feature).iconUrl;
+      iconUrl = getFlightCategoryIconUrl(feature);
     } else {
       iconUrl = getNbmFlightCategoryIconUrl(feature, personalMinimums);
     }
@@ -622,9 +741,8 @@ export const StationMarkersLayer = () => {
 
   const getCeilingHeightMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
     const skyConditions = getSkyConditions(feature);
-    const skyCondition = getLowestCeiling(skyConditions);
-    if (skyCondition == null) return;
-    const ceiling = skyCondition.cloudBase;
+    const ceiling = getCeilingFromMetars(feature);
+    if (!ceiling) return;
     const ceilingAmount = addLeadingZeroes(ceiling / 100, 3);
     const worstSkyCondition = getWorstSkyCondition(skyConditions);
     let iconUrl = '';

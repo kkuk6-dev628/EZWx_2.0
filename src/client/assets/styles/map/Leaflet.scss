@@ -167,6 +167,24 @@ z-index: 400!important;
     line-height: 26px;
 }
 
+.metar-personal-mins {
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  &.red {
+    background-color: red;
+  }
+  &.green {
+    background-color: green;
+  }
+  &.yellow {
+    background-color: yellow;
+  }
+  &.blue {
+    background-color: blue;
+  }
+}
+
 .metar-weather-icon {
     text-align: center;
 }

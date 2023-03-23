@@ -183,6 +183,9 @@
   .MuiIconButton-root{
     padding: 0;
   }
+  .Mui-disabled{
+    color: #999 !important;
+  }
   .personal-mins{
     display: flex;
     flex-direction: column;

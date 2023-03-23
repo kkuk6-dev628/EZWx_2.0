@@ -312,7 +312,6 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             id={UsePersonalMinsLayerItems.departure.value}
                             value={UsePersonalMinsLayerItems.departure.value}
                             title={UsePersonalMinsLayerItems.departure.text}
-                            name="max_takeoff_weight_category"
                             selectedValue={layerControlState.stationMarkersState.usePersonalMinimums.routePointType}
                             description=""
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -328,7 +327,9 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                             id={UsePersonalMinsLayerItems.enRoute.value}
                             value={UsePersonalMinsLayerItems.enRoute.value}
                             title={UsePersonalMinsLayerItems.enRoute.text}
-                            name="max_takeoff_weight_category"
+                            disabled={
+                              layerControlState.stationMarkersState.usePersonalMinimums.evaluationType === 'crosswind'
+                            }
                             selectedValue={layerControlState.stationMarkersState.usePersonalMinimums.routePointType}
                             description=""
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -390,7 +391,14 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                         />
                         <FormControlLabel
                           value={UsePersonalMinsLayerItems.crosswind.value}
-                          control={<Radio color="primary" />}
+                          control={
+                            <Radio
+                              color="primary"
+                              disabled={
+                                layerControlState.stationMarkersState.usePersonalMinimums.routePointType === 'en_route'
+                              }
+                            />
+                          }
                           label={UsePersonalMinsLayerItems.crosswind.text}
                         />
                       </RadioGroup>
