@@ -178,13 +178,13 @@ const StationForecastPopup = ({
           <span>{windGust}</span>
         </Typography>
       )}
-      {feature.properties.cross_com != null && (feature.properties.w_dir || !feature.properties.w_speed) && (
+      {feature.properties.cross_com != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Crosswind component: </b>
           <span>{crossWind}</span>
         </Typography>
       )}
-      {feature.properties.cross_com != null && (feature.properties.w_dir || !feature.properties.w_speed) && (
+      {feature.properties.cross_com != null && (
         <Typography variant="body2" style={{ margin: 3 }}>
           <b>Crosswind runway: </b>
           <span>{feature.properties.cross_r_id}</span>
