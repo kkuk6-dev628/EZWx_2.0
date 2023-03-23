@@ -574,6 +574,9 @@ export const StationMarkersLayer = () => {
       }
     } else {
       switch (layerState.stationMarkersState.markerType) {
+        case StationMarkersLayerItems.usePersonalMinimum.value:
+          marker = getPersonalMinsMarker(feature, latlng);
+          break;
         case StationMarkersLayerItems.flightCategory.value:
           marker = getFlightCatMarker(feature, latlng);
           break;
