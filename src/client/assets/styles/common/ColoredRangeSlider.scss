@@ -53,8 +53,11 @@
     margin-top: 0.75rem !important;
     margin-bottom: 1rem !important;
   }
-  .noUi-marker-horizontal.noUi-marker-large {
+  .noUi-marker-horizontal.noUi-marker-large, .noUi-marker-horizontal.noUi-marker-sub {
     height: 0px;
+  }
+  .noUi-value-sub {
+    font-size: rem($fs-base);
   }
   .noUi-horizontal .noUi-handle {
     width: 16px;

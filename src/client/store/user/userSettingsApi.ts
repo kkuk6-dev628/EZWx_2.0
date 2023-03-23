@@ -41,10 +41,10 @@ const userSettingsApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
           if (result.data) {
-            toast.success('Settings Restored!', {
-              position: 'top-right',
-              duration: 3000,
-            });
+            // toast.success('Settings Restored!', {
+            //   position: 'top-right',
+            //   duration: 3000,
+            // });
             const settings = { ...result.data };
             if (!result.data.observation_time) {
               settings.observation_time = initialUserSettingsState.settings.observation_time;

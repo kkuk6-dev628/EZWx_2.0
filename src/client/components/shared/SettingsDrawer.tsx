@@ -12,7 +12,7 @@ import {
 import { StyledSlider } from './Slider';
 import RangeSlider from './RangeSlider';
 import { useSelector } from 'react-redux';
-import { selectSettings } from '../../store/user/UserSettings';
+import { initialUserSettingsState, selectSettings } from '../../store/user/UserSettings';
 import {
   useGetUserSettingsQuery,
   useRestoreSettingsMutation,
@@ -66,11 +66,15 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   };
 
   const handleChange = (name, value) => {
-    setSettings({ ...settings, [name]: value });
+    setSettings((prevSettings) => {
+      return { ...prevSettings, [name]: value };
+    });
   };
 
   const handleToggle = (e) => {
-    setSettings({ ...settings, [e.target.name]: e.target.checked });
+    setSettings((prevSettings) => {
+      return { ...prevSettings, [e.target.name]: e.target.checked };
+    });
   };
 
   const handleSaveSettings = async (isCloseDrawer = false) => {
@@ -119,7 +123,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 <div className="input__container">
                   <AutoCompleteInput
                     name="default_home_airport"
-                    selectedValue={settings.default_home_airport}
+                    selectedValue={settings.default_home_airport as any}
                     handleAutoComplete={(name, value) => {
                       setSettings({ ...settings, [name]: value && value.key ? value.key : value });
                     }}
@@ -259,7 +263,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     start={settings.ceiling_at_departure}
                     step={100}
                     connect={[true, true, true]}
-                    range={{ min: 100, max: 6000 }}
+                    range={{ min: 0, max: 6000 }}
                     tooltips={[true, true]}
                     format={formatForInteger}
                     pips={{
@@ -268,7 +272,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     }}
                     direction="rtl"
                     margin={1000}
-                    connectClasses={['green', 'yellow', 'red']}
+                    connectClasses={['red', 'yellow', 'green']}
                     onChange={(values) => {
                       handleChange('ceiling_at_departure', values);
                     }}
@@ -290,11 +294,11 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     format={formatForDecimal}
                     pips={{
                       mode: 'range',
-                      density: 0.5,
+                      density: 100,
                     }}
                     direction="rtl"
                     margin={1}
-                    connectClasses={['green', 'yellow', 'red']}
+                    connectClasses={['red', 'yellow', 'green']}
                     onChange={(values) => {
                       handleChange('surface_visibility_at_departure', values);
                     }}
@@ -316,9 +320,8 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     format={formatForDecimal}
                     pips={{
                       mode: 'range',
-                      density: 1,
+                      density: 100,
                     }}
-                    direction="rtl"
                     margin={1}
                     connectClasses={['green', 'yellow', 'red']}
                     onChange={(values) => {
@@ -347,7 +350,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     }}
                     direction="rtl"
                     margin={1000}
-                    connectClasses={['green', 'yellow', 'red']}
+                    connectClasses={['red', 'yellow', 'green']}
                     onChange={(values) => {
                       handleChange('ceiling_along_route', values);
                     }}
@@ -370,11 +373,11 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     format={formatForDecimal}
                     pips={{
                       mode: 'range',
-                      density: 0.5,
+                      density: 100,
                     }}
                     direction="rtl"
                     margin={1}
-                    connectClasses={['green', 'yellow', 'red']}
+                    connectClasses={['red', 'yellow', 'green']}
                     onChange={(values) => {
                       handleChange('surface_visibility_along_route', values);
                     }}
@@ -394,9 +397,8 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     format={formatForInteger}
                     pips={{
                       mode: 'range',
-                      density: 1,
+                      density: 100,
                     }}
-                    direction="rtl"
                     margin={1}
                     connectClasses={['green', 'yellow', 'red']}
                     onChange={(values) => {
@@ -411,20 +413,26 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 <div className="range__slider">
                   <ColoredRangeSlider
                     start={settings.en_route_icing_intensity}
-                    step={2}
+                    step={1}
                     connect={[true, true, true]}
-                    range={{ min: 2, max: 10 }}
-                    tooltips={[true, true]}
-                    format={formatForDecimal}
+                    range={{ min: -1, max: 5 }}
+                    format={formatForInteger}
+                    padding={[1, 1]}
                     pips={{
-                      mode: 'range',
-                      values: [2, 4, 6, 8, 10],
-                      density: 2,
+                      mode: 'steps',
+                      format: {
+                        to: (value: number) => {
+                          if (value < 0 || value > 4) {
+                            return '';
+                          }
+                          return ['None', 'Trc', 'Lgt', 'Mod', 'Hvy'][value];
+                        },
+                      },
+                      density: 20,
                     }}
-                    direction="rtl"
-                    margin={2}
+                    margin={1}
                     connectClasses={['green', 'yellow', 'red']}
-                    onChange={(values) => {
+                    onChange={(values: [number, number]) => {
                       handleChange('en_route_icing_intensity', values);
                     }}
                   />
@@ -446,9 +454,8 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     format={formatForInteger}
                     pips={{
                       mode: 'range',
-                      density: 1,
+                      density: 100,
                     }}
-                    direction="rtl"
                     margin={1}
                     connectClasses={['green', 'yellow', 'red']}
                     onChange={(values) => {
@@ -466,42 +473,29 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 <div className="range__slider">
                   <ColoredRangeSlider
                     start={settings.en_route_convective_potential}
-                    step={2}
+                    step={1}
+                    padding={[1, 1]}
                     connect={[true, true, true]}
-                    range={{ min: 2, max: 12 }}
-                    tooltips={[true, true]}
-                    format={formatForDecimal}
+                    range={{ min: -1, max: 6 }}
+                    format={formatForInteger}
                     pips={{
-                      mode: 'range',
-                      density: 2,
+                      mode: 'steps',
+                      format: {
+                        to: (value: number) => {
+                          if (value < 0 || value > 5) {
+                            return '';
+                          }
+                          return ['None', 'Very Lo', 'Lo', 'M3d', 'Hi', 'Very Hi'][value];
+                        },
+                      },
+                      density: 20,
                     }}
-                    direction="rtl"
-                    margin={2}
+                    margin={1}
                     connectClasses={['green', 'yellow', 'red']}
                     onChange={(values) => {
                       handleChange('en_route_convective_potential', values);
                     }}
                   />
-                  {/* <RangeSlider
-                    name="en_route_convective_potential"
-                    value={settings.en_route_convective_potential}
-                    onChange={handleChange}
-                    mindistance={2}
-                    marks={[
-                      { label: 'Vry Hi', value: 12 },
-                      { label: 'Hi', value: 10 },
-                      { label: 'M3d', value: 8 },
-                      { label: 'Lo', value: 6 },
-                      { label: 'Vry Lo', value: 4 },
-                      { label: 'None', value: 2 },
-                    ]}
-                    step={2}
-                    max={12}
-                    min={2}
-                    valueLabelDisplay="off"
-                    component={null}
-                    disableSwap
-                  /> */}
                 </div>
               </InputFieldWrapper>
 
@@ -524,7 +518,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     }}
                     direction="rtl"
                     margin={1000}
-                    connectClasses={['green', 'yellow', 'red']}
+                    connectClasses={['red', 'yellow', 'green']}
                     onChange={(values) => {
                       handleChange('ceiling_at_destination', values);
                     }}
@@ -547,11 +541,11 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     format={formatForDecimal}
                     pips={{
                       mode: 'range',
-                      density: 0.5,
+                      density: 100,
                     }}
                     direction="rtl"
                     margin={1}
-                    connectClasses={['green', 'yellow', 'red']}
+                    connectClasses={['red', 'yellow', 'green']}
                     onChange={(values) => {
                       handleChange('surface_visibility_at_destination', values);
                     }}
@@ -573,9 +567,8 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     format={formatForInteger}
                     pips={{
                       mode: 'range',
-                      density: 1,
+                      density: 100,
                     }}
-                    direction="rtl"
                     margin={2}
                     connectClasses={['green', 'yellow', 'red']}
                     onChange={(values) => {
