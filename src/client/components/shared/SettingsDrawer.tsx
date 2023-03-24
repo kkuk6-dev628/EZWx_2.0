@@ -21,6 +21,7 @@ import {
 import { selectAuth } from '../../store/auth/authSlice';
 import { AutoCompleteInput, Modal, PrimaryButton, SecondaryButton } from '../common';
 import { ColoredRangeSlider, formatForDecimal, formatForInteger } from '../common/ColoredRangeSlider';
+import { toast } from 'react-hot-toast';
 
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;
@@ -38,12 +39,22 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const [settings, setSettings] = useState(settingsState);
 
   useGetUserSettingsQuery(id);
-  const [updateUserSettings, { isLoading: isUpdating, isSuccess }] = useUpdateUserSettingsMutation();
+  const [updateUserSettings, { isLoading: isUpdating, isSuccess: isSuccessUpdate, error: updateError }] =
+    useUpdateUserSettingsMutation();
   const [restoreSettings, { isLoading: isRestoring }] = useRestoreSettingsMutation();
 
   useEffect(() => {
     if (settingsState) setSettings(settingsState);
   }, [settingsState]);
+
+  useEffect(() => {
+    if (isSuccessUpdate) {
+      toast.success('Saved your settings!');
+    } else if (updateError && 'data' in updateError) {
+      console.log('Error in save settings', updateError.data);
+      toast.error(updateError.data.message);
+    }
+  }, [isSuccessUpdate]);
 
   useEffect(() => {
     if (!isRestoring || isUpdating) {

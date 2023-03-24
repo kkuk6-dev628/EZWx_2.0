@@ -208,12 +208,30 @@ const WFSLayer = React.forwardRef(
       if (feature.properties) {
         if (getLabel) {
           const zoom = map.getZoom();
+          const label = getLabel(feature);
+          if (label === 'Ontario' && feature.id !== 'canadian_province.13') {
+            return;
+          }
+
           layer.bindTooltip(getLabel(feature), {
             permanent: zoom > showLabelZoom,
             direction: 'center',
             className: 'my-labels',
             opacity: 1,
           });
+          const tooltip = layer.getTooltip();
+          switch (label) {
+            case 'Ontario':
+              layer.on('tooltipopen', (t, l) => {
+                tooltip.setLatLng([51.38618232920632, -86.62995945187947]);
+              });
+              break;
+            case 'Nunavut':
+              layer.on('tooltipopen', (t, l) => {
+                tooltip.setLatLng([65.69453068687591, -94.78918016983596]);
+              });
+              break;
+          }
         }
       }
     };

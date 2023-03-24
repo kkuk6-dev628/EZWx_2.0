@@ -732,10 +732,10 @@ export const StationMarkersLayer = () => {
         className: 'metar-icon',
         html: ReactDOMServer.renderToString(
           <>
-            <Image src={iconUrl} alt={''} width={16} height={16} />
+            <Image src={iconUrl} alt={''} width={20} height={20} />
           </>,
         ),
-        iconSize: [16, 16],
+        iconSize: [20, 20],
       }),
       pane: 'station-markers',
     });
