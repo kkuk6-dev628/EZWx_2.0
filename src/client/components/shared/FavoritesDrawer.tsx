@@ -125,7 +125,7 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
             <Collapse in={showFolders} timeout="auto" className="root__collapse">
               <div className="collapse__container__body">
                 {folders.map((el, ind) => (
-                  <Droppable droppableId={el.id}>
+                  <Droppable droppableId={el.id} key={el.id}>
                     {(provided) => (
                       <div ref={provided.innerRef} {...provided.droppableProps}>
                         <div onClick={() => toggleCollapse(el.name)} className="folder__title__container">
@@ -156,7 +156,6 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
                                           <div ref={provided.innerRef} {...provided.droppableProps}>
                                             {item &&
                                               item?.['subItems'].map((subItem, subIndex) => {
-                                                console.log('subItem', subItem);
                                                 return (
                                                   <Draggable key={subItem.id} draggableId={subItem.id} index={subIndex}>
                                                     {(provided) => (

@@ -50,7 +50,7 @@ export const routeApi = createApi({
         try {
           const result = await queryFulfilled;
           if (JSON.parse(JSON.stringify(result)).data) {
-            toast.success('Route Saved!', {
+            toast.success('Active route saved!', {
               position: 'top-right',
               duration: 3000,
             });
@@ -71,7 +71,7 @@ export const routeApi = createApi({
         try {
           const result = await queryFulfilled;
           if (result.data) {
-            toast.success(`Route ${result.data.id} has been deleted!`, {
+            toast.success(`Active route deleted!`, {
               position: 'top-right',
               duration: 3000,
             });

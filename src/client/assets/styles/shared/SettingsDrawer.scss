@@ -116,6 +116,11 @@
   border-radius: 5px;
   margin: 0.5rem 0;
 }
+
+#convective-slider div[data-value="0"]{
+  left: 10% !important;
+}
+
 .range__slider {
   margin: 0;
   .MuiSlider-valueLabel {

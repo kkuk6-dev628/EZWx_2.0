@@ -664,7 +664,7 @@ export const StationMarkersLayer = () => {
         break;
     }
     if (crosswinds <= crosswindsCategory[0]) return 2;
-    if (crosswinds >= crosswindsCategory[1]) return 1;
+    if (crosswinds >= crosswindsCategory[1]) return 0;
     return 1;
   };
 

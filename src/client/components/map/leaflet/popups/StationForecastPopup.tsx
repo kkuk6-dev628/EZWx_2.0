@@ -87,14 +87,14 @@ const StationForecastPopup = ({
     feature.properties.w_speed === 0
       ? 'Calm'
       : !userSettings.default_wind_speed_unit
-      ? feature.properties.w_speed + ' knots'
+      ? feature.properties.w_speed + (feature.properties.w_speed <= 1 ? ' knot' : ' knots')
       : knotsToMph(feature.properties.w_speed) + ' mph';
   const windGust = !userSettings.default_wind_speed_unit
-    ? feature.properties.w_gust + ' knots'
+    ? feature.properties.w_gust + (feature.properties.w_gust ? ' knot' : ' knots')
     : knotsToMph(feature.properties.w_gust) + ' mph';
 
   const crossWind = !userSettings.default_wind_speed_unit
-    ? feature.properties.cross_com + ' knots'
+    ? feature.properties.cross_com + (feature.properties.cross_com <= 1 ? ' knot' : ' knots')
     : knotsToMph(feature.properties.cross_com) + ' mph';
 
   return (

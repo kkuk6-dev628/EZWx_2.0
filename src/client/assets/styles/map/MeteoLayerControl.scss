@@ -84,8 +84,8 @@
   .PrivateRadioButtonIcon-root-5{
 
     svg{
-      height: 16px!important;
-      width: 16px!important;
+      height: 18px!important;
+      width: 18px!important;
     }
   }
 
@@ -95,7 +95,7 @@
 
   .PrivateRadioButtonIcon-root-8 > svg{
     width: 16px;
-    height: 168px;
+    height: 16px;
   }
 
   .PrivateSwitchBase-root-1{
@@ -111,8 +111,16 @@
     border: 0;
 
     .MuiSvgIcon-root{
-      height: 14px;
-      width: 14px;
+      height: 18px;
+      width: 18px;
+    }
+    &.Mui-checked {
+      margin-left: 5px;
+      margin-right: 5px;
+      .MuiSvgIcon-root{
+        height: 16px;
+        width: 16px;
+      }
     }
   }
   .MuiRadio-root{
@@ -131,7 +139,7 @@
     }
   }
   .MuiTypography-body1{
-    font-size: 13px;
+    font-size: rem($fs-md);
   }
   .MuiSlider-thumb{
     background-color: var(--color-white);

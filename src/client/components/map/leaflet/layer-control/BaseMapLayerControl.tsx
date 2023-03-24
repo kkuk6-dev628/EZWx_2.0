@@ -161,7 +161,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
               />
             </div>
             <div className="layer-control__rgt">
-              <h3>Map Layers</h3>
+              <h3>Base Maps</h3>
             </div>
           </div>
           <div

@@ -49,7 +49,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
 
   useEffect(() => {
     if (isSuccessUpdate) {
-      toast.success('Saved your settings!');
+      toast.success('Settings saved!');
     } else if (updateError && 'data' in updateError) {
       console.log('Error in save settings', updateError.data);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -281,14 +281,16 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     step={100}
                     connect={[true, true, true]}
                     range={{ min: 0, max: 6000 }}
+                    padding={[100, 100]}
                     tooltips={[true, true]}
+                    mergeTooltipThreshold={10}
                     format={formatForInteger}
                     pips={{
                       mode: 'range',
                       density: 100,
                     }}
                     direction="rtl"
-                    margin={1000}
+                    margin={200}
                     connectClasses={['red', 'yellow', 'green']}
                     onChange={(values) => {
                       handleChange('ceiling_at_departure', values);
@@ -307,6 +309,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     step={0.5}
                     connect={[true, true, true]}
                     range={{ min: 0, max: 15 }}
+                    padding={[0.5, 0.5]}
                     tooltips={[true, true]}
                     format={formatForDecimal}
                     pips={{
@@ -333,13 +336,14 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     step={1}
                     connect={[true, true, true]}
                     range={{ min: 1, max: 50 }}
+                    padding={[1, 1]}
                     tooltips={[true, true]}
                     format={formatForDecimal}
                     pips={{
                       mode: 'range',
                       density: 100,
                     }}
-                    margin={1}
+                    margin={3}
                     connectClasses={['green', 'yellow', 'red']}
                     onChange={(values) => {
                       handleChange('crosswinds_at_departure_airport', values);
@@ -359,6 +363,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     step={100}
                     connect={[true, true, true]}
                     range={{ min: 0, max: 6000 }}
+                    padding={[100, 100]}
                     tooltips={[true, true]}
                     format={formatForInteger}
                     pips={{
@@ -366,7 +371,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                       density: 100,
                     }}
                     direction="rtl"
-                    margin={1000}
+                    margin={200}
                     connectClasses={['red', 'yellow', 'green']}
                     onChange={(values) => {
                       handleChange('ceiling_along_route', values);
@@ -386,6 +391,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     step={0.5}
                     connect={[true, true, true]}
                     range={{ min: 0, max: 15 }}
+                    padding={[0.5, 0.5]}
                     tooltips={[true, true]}
                     format={formatForDecimal}
                     pips={{
@@ -416,7 +422,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                       mode: 'range',
                       density: 100,
                     }}
-                    margin={1}
+                    margin={6}
                     connectClasses={['green', 'yellow', 'red']}
                     onChange={(values) => {
                       handleChange('en_route_icing_probability', values);
@@ -473,7 +479,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                       mode: 'range',
                       density: 100,
                     }}
-                    margin={1}
+                    margin={6}
                     connectClasses={['green', 'yellow', 'red']}
                     onChange={(values) => {
                       handleChange('en_route_turbulence_intensity', values);
@@ -487,7 +493,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                   title="En Route Convective Potential"
                   description="acceptable convective potential"
                 />
-                <div className="range__slider">
+                <div className="range__slider" id="convective-slider">
                   <ColoredRangeSlider
                     start={settings.en_route_convective_potential}
                     step={1}
@@ -502,7 +508,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                           if (value < 0 || value > 5) {
                             return '';
                           }
-                          return ['None', 'Very Lo', 'Lo', 'M3d', 'Hi', 'Very Hi'][value];
+                          return ['None', 'Very Lo', 'Lo', 'Mod', 'Hi', 'Very Hi'][value];
                         },
                       },
                       density: 20,
@@ -527,6 +533,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     step={100}
                     connect={[true, true, true]}
                     range={{ min: 0, max: 6000 }}
+                    padding={[100, 100]}
                     tooltips={[true, true]}
                     format={formatForInteger}
                     pips={{
@@ -534,7 +541,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                       density: 100,
                     }}
                     direction="rtl"
-                    margin={1000}
+                    margin={200}
                     connectClasses={['red', 'yellow', 'green']}
                     onChange={(values) => {
                       handleChange('ceiling_at_destination', values);
@@ -554,6 +561,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     step={0.5}
                     connect={[true, true, true]}
                     range={{ min: 0, max: 15 }}
+                    padding={[0.5, 0.5]}
                     tooltips={[true, true]}
                     format={formatForDecimal}
                     pips={{
@@ -586,7 +594,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                       mode: 'range',
                       density: 100,
                     }}
-                    margin={2}
+                    margin={3}
                     connectClasses={['green', 'yellow', 'red']}
                     onChange={(values) => {
                       handleChange('crosswinds_at_destination_airport', values);

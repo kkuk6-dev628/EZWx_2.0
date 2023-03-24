@@ -353,10 +353,10 @@ function Route({ setIsShowModal }: Props) {
         title="Delete route confirmation"
         description="Are you sure you want to delete the active route?"
         footer={
-          <div>
+          <>
             <SecondaryButton onClick={() => setIsShowDeleteRouteModal(false)} text="No" isLoading={false} />
             <PrimaryButton text="Yes" onClick={() => deleteActiveRoute()} isLoading={false} />
-          </div>
+          </>
         }
       />
       <Modal
