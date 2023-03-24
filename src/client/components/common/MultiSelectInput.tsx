@@ -6,6 +6,8 @@ import { RouteOfFlight, RoutePoint } from '../../interfaces/route';
 import { useGetAirportQuery } from '../../store/route/airportApi';
 import { useGetWaypointsQuery } from '../../store/route/waypointApi';
 import { matchLowerCaseRegex } from '../utils/RegexUtils';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+
 interface Props {
   name: string;
   handleAutoComplete: (name: string, value: RouteOfFlight[]) => void;
@@ -13,15 +15,36 @@ interface Props {
 }
 
 const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) => {
+  console.log('selectedValues', selectedValues);
   const [inputValue, setInputValue] = useState('');
   const [showSuggestion, setShowSuggestion] = useState(false);
   const [currentFocus, setCurrentFocus] = useState(0);
   const parentRef = useRef(null);
-  const dragElementsParentRef = useRef(null);
-  const dragItem = useRef();
-  const dragOverItem = useRef();
+  // const dragElementsParentRef = useRef(null);
   const { isLoading, data: airports } = useGetAirportQuery('');
   const { isLoading: isLoadingWaypoints, data: waypoints } = useGetWaypointsQuery('');
+
+  const getRenderDraggableItem = (items) => (provided, snapshot, rubric) =>
+    (
+      <span
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        ref={provided.innerRef}
+        className="draggable-route-point"
+      >
+        {items[rubric.source.index].routePoint.key}
+        <AiOutlineClose
+          className="close__btn"
+          onClick={() =>
+            handleAutoComplete(
+              name,
+              selectedValues.filter((value) => value !== items[rubric.source.index]),
+            )
+          }
+        />
+      </span>
+    );
+  const draggableRenderItem = getRenderDraggableItem(selectedValues);
 
   const renderItem = (name: string, val: string) => {
     try {
@@ -49,7 +72,10 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
         return (
           <span
             onClick={() => {
-              handleAutoComplete(name, [...selectedValues, { routePoint: obj }]);
+              handleAutoComplete(name, [
+                ...selectedValues,
+                { routePoint: obj, id: Math.floor(1000 + Math.random() * 9000) },
+              ]);
               setShowSuggestion(false);
               setInputValue('');
             }}
@@ -69,34 +95,19 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
     }
   };
 
-  const dragStart = (e, position) => {
-    dragItem.current = position;
-  };
+  const onDragEnd = (params) => {
+    if (!params?.destination) return;
+    console.log('params', params);
+    const items: RouteOfFlight[] = reorder(selectedValues, params.source.index, params.destination.index);
 
-  const dragEnter = (e, position) => {
-    dragOverItem.current = position;
+    handleAutoComplete(name, [...items]);
   };
-  const onTouchMove = (e, position) => {
-    // need to fix
-    console.log('e', e);
-    const box = dragElementsParentRef.current.children[position];
-    console.log('box?.className', box?.className);
-    console.log('box', box);
-    const touchLocation = e.targetTouches[0];
+  const reorder = (list: RouteOfFlight[], startIndex, endIndex): RouteOfFlight[] => {
+    const result: RouteOfFlight[] = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
 
-    // assign box new coordinates based on the touch.
-    box.style.left = touchLocation.pageX + 'px';
-    box.style.top = touchLocation.pageY + 'px';
-  };
-
-  const drop = () => {
-    const copyListItems = [...selectedValues];
-    const dragItemContent = copyListItems[dragItem.current || 0];
-    copyListItems.splice(dragItem.current, 1);
-    copyListItems.splice(dragOverItem.current, 0, dragItemContent);
-    dragItem.current = null;
-    dragOverItem.current = null;
-    handleAutoComplete(name, copyListItems);
+    return result;
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -126,7 +137,13 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
         case 'Enter':
           const filteredResult = renderItem(name, inputValue);
           if (filteredResult.length > 0 && currentFocus + 1 <= filteredResult.length && inputValue !== '') {
-            handleAutoComplete(name, [...selectedValues, { routePoint: filteredResult[currentFocus].props.obj }]);
+            handleAutoComplete(name, [
+              ...selectedValues,
+              {
+                routePoint: filteredResult[currentFocus].props.obj,
+                id: Math.floor(1000 + Math.random() * 9000),
+              },
+            ]);
             setInputValue('');
           }
 
@@ -167,43 +184,32 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
   return (
     <>
       <div className="multi__input__container">
-        <div className="multi_values__container" ref={dragElementsParentRef}>
-          {selectedValues.map((el, ind) => (
-            <span
-              draggable
-              onDragStart={(e) => dragStart(e, ind)}
-              onTouchStart={(e) => dragStart(e, ind)}
-              onDragEnter={(e) => dragEnter(e, ind)}
-              onTouchMove={(e) => onTouchMove(e, ind)}
-              onDragEnd={drop}
-              onTouchEnd={drop}
-              key={'route-of-flight-' + el.routePoint.key + ind}
-              // style={{ touchAction: 'none' }}
-            >
-              {el.routePoint.key}
-              <AiOutlineClose
-                className="close__btn"
-                onClick={() =>
-                  handleAutoComplete(
-                    name,
-                    selectedValues.filter((value) => value !== el),
-                  )
-                }
-              />
-            </span>
-          ))}
-
-          <input
-            type="text"
-            value={inputValue}
-            name={name}
-            onChange={handleChange}
-            id="route-name"
-            onKeyDown={handleKeyDown}
-            placeholder="ENTER WAYPOINT ID(S)"
-            autoComplete="off"
-          />
-        </div>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId={'root'} renderClone={draggableRenderItem} direction="horizontal">
+            {(provided, snapshot) => (
+              <div className="multi_values__container" ref={provided.innerRef} {...provided.droppableProps}>
+                {selectedValues.map((el, ind) => (
+                  <>
+                    <Draggable key={el.id} draggableId={'' + el.id} index={ind}>
+                      {draggableRenderItem}
+                    </Draggable>
+                  </>
+                ))}
+                {provided.placeholder}
+                <input
+                  type="text"
+                  value={inputValue}
+                  name={name}
+                  onChange={handleChange}
+                  id="route-name"
+                  onKeyDown={handleKeyDown}
+                  placeholder="ENTER WAYPOINT ID(S)"
+                  autoComplete="off"
+                />
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
 
         {isLoading && showSuggestion ? (
           <CircularProgress className="multi__input__icon multi__input__loading" size="sm" value={7} />
