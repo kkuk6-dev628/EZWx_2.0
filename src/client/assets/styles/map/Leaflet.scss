@@ -60,6 +60,8 @@ z-index: 400!important;
   font-size: 0.9rem;
   text-align: center;
   @include stroke(#FFFFFF, 1px);
+  white-space: pre-line;
+  width: 100px;
 }
 
 
