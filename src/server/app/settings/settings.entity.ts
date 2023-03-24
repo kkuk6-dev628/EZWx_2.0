@@ -33,9 +33,9 @@ export class UserSettings {
   @Column()
   ceiling_at_departure_max: number;
 
-  @Column()
+  @Column({ type: 'decimal' })
   surface_visibility_at_departure_min: number;
-  @Column()
+  @Column({ type: 'decimal' })
   surface_visibility_at_departure_max: number;
 
   @Column()
@@ -48,9 +48,9 @@ export class UserSettings {
   @Column()
   ceiling_along_route_max: number;
 
-  @Column()
+  @Column({ type: 'decimal' })
   surface_visibility_along_route_min: number;
-  @Column()
+  @Column({ type: 'decimal' })
   surface_visibility_along_route_max: number;
 
   @Column()

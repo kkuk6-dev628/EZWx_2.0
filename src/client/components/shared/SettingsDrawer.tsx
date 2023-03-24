@@ -52,6 +52,8 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
       toast.success('Saved your settings!');
     } else if (updateError && 'data' in updateError) {
       console.log('Error in save settings', updateError.data);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
       toast.error(updateError.data.message);
     }
   }, [isSuccessUpdate]);
