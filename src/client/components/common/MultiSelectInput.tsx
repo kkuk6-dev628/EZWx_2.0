@@ -24,6 +24,28 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
   const { isLoading, data: airports } = useGetAirportQuery('');
   const { isLoading: isLoadingWaypoints, data: waypoints } = useGetWaypointsQuery('');
 
+  const getRenderDraggableItem = (items) => (provided, snapshot, rubric) =>
+    (
+      <span
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        ref={provided.innerRef}
+        className="draggable-route-point"
+      >
+        {items[rubric.source.index].routePoint.key}
+        <AiOutlineClose
+          className="close__btn"
+          onClick={() =>
+            handleAutoComplete(
+              name,
+              selectedValues.filter((value) => value !== items[rubric.source.index]),
+            )
+          }
+        />
+      </span>
+    );
+  const draggableRenderItem = getRenderDraggableItem(selectedValues);
+
   const renderItem = (name: string, val: string) => {
     try {
       let filteredItems = [];
@@ -52,7 +74,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
             onClick={() => {
               handleAutoComplete(name, [
                 ...selectedValues,
-                { routePoint: obj, id: String(Math.floor(1000 + Math.random() * 9000)) },
+                { routePoint: obj, id: Math.floor(1000 + Math.random() * 9000) },
               ]);
               setShowSuggestion(false);
               setInputValue('');
@@ -119,7 +141,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
               ...selectedValues,
               {
                 routePoint: filteredResult[currentFocus].props.obj,
-                id: String(Math.floor(1000 + Math.random() * 9000)),
+                id: Math.floor(1000 + Math.random() * 9000),
               },
             ]);
             setInputValue('');
@@ -163,49 +185,27 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
     <>
       <div className="multi__input__container">
         <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId={'root'}>
+          <Droppable droppableId={'root'} renderClone={draggableRenderItem} direction="horizontal">
             {(provided, snapshot) => (
               <div className="multi_values__container" ref={provided.innerRef} {...provided.droppableProps}>
                 {selectedValues.map((el, ind) => (
                   <>
-                    <Draggable key={ind} draggableId={el.id} index={ind}>
-                      {(provided, snapshot) => (
-                        <span
-                          style={{
-                            ...provided.draggableProps.style,
-                          }}
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                        >
-                          {el.routePoint.key}
-                          <AiOutlineClose
-                            className="close__btn"
-                            onClick={() =>
-                              handleAutoComplete(
-                                name,
-                                selectedValues.filter((value) => value !== el),
-                              )
-                            }
-                          />
-                        </span>
-                      )}
+                    <Draggable key={el.id} draggableId={'' + el.id} index={ind}>
+                      {draggableRenderItem}
                     </Draggable>
                   </>
                 ))}
                 {provided.placeholder}
-                {!snapshot.isDraggingOver && (
-                  <input
-                    type="text"
-                    value={inputValue}
-                    name={name}
-                    onChange={handleChange}
-                    id="route-name"
-                    onKeyDown={handleKeyDown}
-                    placeholder="ENTER WAYPOINT ID(S)"
-                    autoComplete="off"
-                  />
-                )}
+                <input
+                  type="text"
+                  value={inputValue}
+                  name={name}
+                  onChange={handleChange}
+                  id="route-name"
+                  onKeyDown={handleKeyDown}
+                  placeholder="ENTER WAYPOINT ID(S)"
+                  autoComplete="off"
+                />
               </div>
             )}
           </Droppable>
