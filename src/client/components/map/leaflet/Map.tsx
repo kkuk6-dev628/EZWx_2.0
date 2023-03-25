@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MapContainer, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import styles from './Map.module.css';
@@ -45,14 +45,7 @@ import {
 import { jsonClone } from '../../utils/ObjectUtil';
 import { BaseMapLayerControlState, LayerControlState } from '../../../interfaces/layerControl';
 import { selectLayerControlState, setLayerControlState } from '../../../store/layers/LayerControl';
-
-const PaperComponent = (props) => {
-  return (
-    <Draggable handle="#draggable-dialog-title" cancel={'[class*="MuiDialogContent-root"]'}>
-      <Paper {...props} />
-    </Draggable>
-  );
-};
+import { recursiveMap } from '../../common/ColoredRangeSlider';
 
 const maxScreenDimension = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
 const minZoom = maxScreenDimension > 1280 ? 4 : 2;
@@ -71,6 +64,7 @@ const LeafletMap = () => {
   const layerControlState = useSelector(selectLayerControlState);
   const [updateLayerControlState] = useUpdateLayerControlStateMutation();
   const [updateBaseLayerControlState] = useUpdateBaseLayerControlStateMutation();
+  const routeDialogRef = useRef();
 
   if (auth.id) {
     useGetLayerControlStateQuery('');
@@ -88,6 +82,47 @@ const LeafletMap = () => {
       setIsShowTabs(true);
     }
   }, [pathname]);
+
+  const PaperComponent = (props) => {
+    return (
+      <Draggable
+        handle="#draggable-dialog-title"
+        cancel={'[class*="MuiDialogContent-root"]'}
+        onStop={(e) => {
+          if (routeDialogRef.current) {
+            recursiveMap(routeDialogRef.current.children, (el) => {
+              if (typeof el.className === 'string' && el.className.indexOf('react-draggable') > -1) {
+                const rect = el.getBoundingClientRect();
+                const prevDisplay = el.style.display;
+                el.style.display = 'none';
+                el.style.position = 'fixed';
+                el.style.transform = null;
+                el.style.left = rect.x + 'px';
+                el.style.top = rect.y + 'px';
+                el.style.display = prevDisplay;
+              }
+            });
+          }
+        }}
+        onStart={(e) => {
+          if (routeDialogRef.current) {
+            recursiveMap(routeDialogRef.current.children, (el) => {
+              if (typeof el.className === 'string' && el.className.indexOf('react-draggable') > -1) {
+                const prevDisplay = el.style.display;
+                el.style.display = 'none';
+                el.style.position = 'relative';
+                el.style.left = null;
+                el.style.top = null;
+                el.style.display = prevDisplay;
+              }
+            });
+          }
+        }}
+      >
+        <Paper {...props} />
+      </Draggable>
+    );
+  };
 
   const setLayerControlShow = (layerControlShow: boolean) => {
     const cloned = jsonClone(layerControlState) as LayerControlState;
@@ -215,6 +250,7 @@ const LeafletMap = () => {
           open={isShowModal}
           onClose={() => setIsShowModal(false)}
           aria-labelledby="draggable-dialog-title"
+          ref={routeDialogRef}
         >
           <Route setIsShowModal={setIsShowModal} />
         </Dialog>

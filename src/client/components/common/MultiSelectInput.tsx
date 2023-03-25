@@ -15,7 +15,6 @@ interface Props {
 }
 
 const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) => {
-  console.log('selectedValues', selectedValues);
   const [inputValue, setInputValue] = useState('');
   const [showSuggestion, setShowSuggestion] = useState(false);
   const [currentFocus, setCurrentFocus] = useState(0);
@@ -26,10 +25,11 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
 
   const getRenderDraggableItem = (items) => (provided, snapshot, rubric) =>
     (
-      <span
+      <div
         {...provided.draggableProps}
         {...provided.dragHandleProps}
         ref={provided.innerRef}
+        style={provided.draggableProps.style}
         className="draggable-route-point"
       >
         {items[rubric.source.index].routePoint.key}
@@ -42,7 +42,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
             )
           }
         />
-      </span>
+      </div>
     );
   const draggableRenderItem = getRenderDraggableItem(selectedValues);
 
@@ -185,15 +185,13 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
     <>
       <div className="multi__input__container">
         <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId={'root'} renderClone={draggableRenderItem} direction="horizontal">
+          <Droppable key="route-droppable" droppableId={'root'} direction="horizontal">
             {(provided, snapshot) => (
               <div className="multi_values__container" ref={provided.innerRef} {...provided.droppableProps}>
                 {selectedValues.map((el, ind) => (
-                  <>
-                    <Draggable key={el.id} draggableId={'' + el.id} index={ind}>
-                      {draggableRenderItem}
-                    </Draggable>
-                  </>
+                  <Draggable key={el.id} draggableId={'draggable-' + el.id} index={ind} shouldRespectForcePress={true}>
+                    {draggableRenderItem}
+                  </Draggable>
                 ))}
                 {provided.placeholder}
                 <input

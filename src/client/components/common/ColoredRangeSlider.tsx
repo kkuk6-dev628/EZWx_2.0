@@ -26,7 +26,7 @@ interface ColoredRangeSliderProps extends NouisliderProps {
   mergeTooltipSeparator?: string;
 }
 
-function recursiveMap(children, fn) {
+export function recursiveMap(children, fn) {
   const arr = [].slice.call(children);
   return arr.map((child: any) => {
     if (child.children) {
