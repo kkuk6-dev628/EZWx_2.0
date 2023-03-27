@@ -209,9 +209,9 @@ const WFSLayer = React.forwardRef(
         if (getLabel) {
           const zoom = map.getZoom();
           const label = getLabel(feature);
-          // if (feature.id.indexOf('canadian_province') > -1) {
-          //   console.log(feature.id, label);
-          // }
+          if (feature.id.indexOf('canadian_province') > -1) {
+            console.log(feature.id, label);
+          }
           if (label === 'Ontario' && feature.id !== 'canadian_province.13') {
             return;
           }
@@ -247,6 +247,11 @@ const WFSLayer = React.forwardRef(
             case 'canadian_province.12': // Nova scotia
               layer.on('tooltipopen', (t, l) => {
                 tooltip.setLatLng([44.85387773982307, -63.76924782162695]);
+              });
+              break;
+            case 'canadian_province.9': // British Columbia
+              layer.on('tooltipopen', (t, l) => {
+                tooltip.setLatLng([54.352781266660024, -125.18142039625991]);
               });
               break;
             case 'canadian_province.10': // Prince Edward Island

@@ -240,17 +240,16 @@ export const validateRoute = (route: Route): boolean | string => {
       if (!route.routeOfFlight || route.routeOfFlight.length === 0) {
         return routeErrorMessages.en.noWaypointsError;
       }
-      const wayPoints = [
-        route.departure,
-        ...route.routeOfFlight.map((routeOfFlight) => routeOfFlight.routePoint),
-        route.destination,
-      ];
-      for (let i = 0; i < wayPoints.length - 1; i++) {
-        if (isSameRoutePoints(wayPoints[i], wayPoints[i + 1])) {
-          return routeErrorMessages.en.zeroLengthLegError;
-        }
+    }
+    const wayPoints = [
+      route.departure,
+      ...route.routeOfFlight.map((routeOfFlight) => routeOfFlight.routePoint),
+      route.destination,
+    ];
+    for (let i = 0; i < wayPoints.length - 1; i++) {
+      if (isSameRoutePoints(wayPoints[i], wayPoints[i + 1])) {
+        return routeErrorMessages.en.zeroLengthLegError;
       }
-      return true;
     }
     return true;
   }

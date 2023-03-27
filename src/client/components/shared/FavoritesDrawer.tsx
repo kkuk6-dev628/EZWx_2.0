@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useState } from 'react';
 import { Collapse, Drawer } from '@mui/material';
 import { RxCross2 } from 'react-icons/rx';
@@ -6,6 +7,7 @@ import { selectAuth } from '../../store/auth/authSlice';
 import { FiFilter } from 'react-icons/fi';
 import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { FaFolder, FaFolderOpen } from 'react-icons/fa';
+//@ts-ignore
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 interface Props {

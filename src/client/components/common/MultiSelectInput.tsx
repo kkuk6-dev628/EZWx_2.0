@@ -6,6 +6,7 @@ import { RouteOfFlight, RoutePoint } from '../../interfaces/route';
 import { useGetAirportQuery } from '../../store/route/airportApi';
 import { useGetWaypointsQuery } from '../../store/route/waypointApi';
 import { matchLowerCaseRegex } from '../utils/RegexUtils';
+//@ts-ignore
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 interface Props {
@@ -27,6 +28,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
   const getRenderDraggableItem = (items) => (provided, snapshot, rubric) =>
     (
       <span
+        key={'draggable-' + rubric.source.index + '-' + snapshot.isClone}
         {...provided.draggableProps}
         {...provided.dragHandleProps}
         ref={provided.innerRef}
@@ -184,16 +186,24 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
   return (
     <>
       <div className="multi__input__container">
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId={'root'} renderClone={draggableRenderItem} direction="horizontal">
-            {(provided, snapshot) => (
-              <div className="multi_values__container" ref={provided.innerRef} {...provided.droppableProps}>
+        <DragDropContext onDragEnd={onDragEnd} key="route-dragdrop-context">
+          <Droppable
+            key="route-droppable"
+            droppableId={'route-droppable'}
+            renderClone={draggableRenderItem}
+            direction="horizontal"
+          >
+            {(provided) => (
+              <div
+                key={'route-droppable-div'}
+                className="multi_values__container"
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
                 {selectedValues.map((el, ind) => (
-                  <>
-                    <Draggable key={el.id} draggableId={'' + el.id} index={ind}>
-                      {draggableRenderItem}
-                    </Draggable>
-                  </>
+                  <Draggable key={el.id} draggableId={'' + el.id} index={ind}>
+                    {draggableRenderItem}
+                  </Draggable>
                 ))}
                 {provided.placeholder}
                 <input
