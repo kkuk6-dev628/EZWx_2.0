@@ -1,13 +1,43 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
-import React, { KeyboardEvent, useRef, useState } from 'react';
+import React, { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { RouteOfFlight, RoutePoint } from '../../interfaces/route';
 import { useGetAirportQuery } from '../../store/route/airportApi';
 import { useGetWaypointsQuery } from '../../store/route/waypointApi';
 import { matchLowerCaseRegex } from '../utils/RegexUtils';
+import * as ReactDOM from 'react-dom';
 //@ts-ignore
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+
+let portal;
+
+// ---------------------------------------------------------------------------
+// Dragging Item
+
+const PortalAwareItem = ({ provided, snapshot, item, removeItemHandler }) => {
+  const usePortal = snapshot.isDragging;
+
+  const child = (
+    <div
+      key={'draggable-' + item.id}
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+      ref={provided.innerRef}
+      className="draggable-route-point"
+    >
+      {item ? item.routePoint.key : ''}
+      <AiOutlineClose className="close__btn" onClick={() => removeItemHandler(item)} />
+    </div>
+  );
+
+  if (!usePortal) {
+    return child;
+  }
+
+  // if dragging - put the item in a portal
+  return ReactDOM.createPortal(child, portal);
+};
 
 interface Props {
   name: string;
@@ -25,28 +55,10 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
   const { isLoading, data: airports } = useGetAirportQuery('');
   const { isLoading: isLoadingWaypoints, data: waypoints } = useGetWaypointsQuery('');
 
-  const getRenderDraggableItem = (items) => (provided, snapshot, rubric) =>
-    (
-      <span
-        key={'draggable-' + rubric.source.index + '-' + snapshot.isClone}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-        ref={provided.innerRef}
-        className="draggable-route-point"
-      >
-        {items[rubric.source.index] ? items[rubric.source.index].routePoint.key : ''}
-        <AiOutlineClose
-          className="close__btn"
-          onClick={() =>
-            handleAutoComplete(
-              name,
-              selectedValues.filter((value) => value !== items[rubric.source.index]),
-            )
-          }
-        />
-      </span>
-    );
-  const draggableRenderItem = getRenderDraggableItem(selectedValues);
+  useEffect(() => {
+    portal = document?.createElement('div');
+    document?.body?.appendChild(portal);
+  }, []);
 
   const renderItem = (name: string, val: string) => {
     try {
@@ -187,25 +199,32 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
     <>
       <div className="multi__input__container">
         <DragDropContext onDragEnd={onDragEnd} key="route-dragdrop-context">
-          <Droppable
-            key="route-droppable"
-            droppableId={'route-droppable'}
-            renderClone={draggableRenderItem}
-            direction="horizontal"
-          >
-            {(provided) => (
+          <Droppable key="route-droppable" droppableId={'route-droppable'} direction="horizontal">
+            {(droppableProvided) => (
               <div
                 key={'route-droppable-div'}
                 className="multi_values__container"
-                ref={provided.innerRef}
-                {...provided.droppableProps}
+                ref={droppableProvided.innerRef}
+                {...droppableProvided.droppableProps}
               >
                 {selectedValues.map((el, ind) => (
                   <Draggable key={el.id} draggableId={'' + el.id} index={ind}>
-                    {draggableRenderItem}
+                    {(draggableProvided, draggableSnapshot) => (
+                      <PortalAwareItem
+                        item={el}
+                        provided={draggableProvided}
+                        snapshot={draggableSnapshot}
+                        removeItemHandler={(item) =>
+                          handleAutoComplete(
+                            name,
+                            selectedValues.filter((value) => value !== item),
+                          )
+                        }
+                      />
+                    )}
                   </Draggable>
                 ))}
-                {provided.placeholder}
+                {droppableProvided.placeholder}
                 <input
                   type="text"
                   value={inputValue}
