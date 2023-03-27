@@ -32,7 +32,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
         ref={provided.innerRef}
         className="draggable-route-point"
       >
-        {items[rubric.source.index].routePoint.key}
+        {items[rubric.source.index] ? items[rubric.source.index].routePoint.key : ''}
         <AiOutlineClose
           className="close__btn"
           onClick={() =>
