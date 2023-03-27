@@ -283,7 +283,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     range={{ min: 0, max: 6000 }}
                     padding={[100, 100]}
                     tooltips={[true, true]}
-                    mergeTooltipThreshold={10}
+                    mergeTooltipThreshold={15}
                     format={formatForInteger}
                     pips={{
                       mode: 'range',
@@ -365,6 +365,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     range={{ min: 0, max: 6000 }}
                     padding={[100, 100]}
                     tooltips={[true, true]}
+                    mergeTooltipThreshold={15}
                     format={formatForInteger}
                     pips={{
                       mode: 'range',
@@ -535,6 +536,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     range={{ min: 0, max: 6000 }}
                     padding={[100, 100]}
                     tooltips={[true, true]}
+                    mergeTooltipThreshold={15}
                     format={formatForInteger}
                     pips={{
                       mode: 'range',

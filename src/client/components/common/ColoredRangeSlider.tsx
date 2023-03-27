@@ -1,4 +1,5 @@
-import React, { isValidElement, ReactElement, useCallback, useEffect, useRef } from 'react';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import React, { useCallback } from 'react';
 import Nouislider, { NouisliderProps } from 'nouislider-react';
 import 'nouislider/distribute/nouislider.css';
 
@@ -22,7 +23,7 @@ export const formatForDecimal = {
 
 interface ColoredRangeSliderProps extends NouisliderProps {
   connectClasses: string[];
-  mergeTooltipThreshold?: number;
+  mergeTooltipThreshold?: number; // as percent
   mergeTooltipSeparator?: string;
 }
 
@@ -43,7 +44,8 @@ export const ColoredRangeSlider = ({
   mergeTooltipSeparator = '-',
   ...props
 }: ColoredRangeSliderProps) => {
-  const mergeTooltips = useCallback((slider) => {
+  const direction = props.direction;
+  const initConnects = useCallback((slider) => {
     if (!slider || !slider.noUiSlider) {
       return;
     }
@@ -54,12 +56,15 @@ export const ColoredRangeSlider = ({
         i++;
       }
     });
+  }, []);
+
+  const mergeTooltips = (values, handle, unencoded, tap, positions, slider) => {
     if (!mergeTooltipThreshold) return;
-    const textIsRtl = getComputedStyle(slider).direction === 'rtl';
-    const isRtl = slider.noUiSlider.options.direction === 'rtl';
-    const isVertical = slider.noUiSlider.options.orientation === 'vertical';
-    const tooltips = slider.noUiSlider.getTooltips();
-    const origins = slider.noUiSlider.getOrigins();
+    const textIsRtl = props.direction === 'rtl';
+    const isRtl = slider.options.direction === 'rtl';
+    const isVertical = slider.options.orientation === 'vertical';
+    const tooltips = slider.getTooltips();
+    const origins = slider.getOrigins();
 
     if (!tooltips) return;
     // Move tooltips into the origin element. The default stylesheet handles this.
@@ -69,66 +74,69 @@ export const ColoredRangeSlider = ({
       }
     });
 
-    slider.noUiSlider.on('update', function (values, handle, unencoded, tap, positions) {
-      const pools = [[]];
-      const poolPositions = [[]];
-      const poolValues = [[]];
-      let atPool = 0;
+    const pools = [[]];
+    const poolPositions = [[]];
+    const poolValues = [[]];
+    let atPool = 0;
 
-      // Assign the first tooltip to the first pool, if the tooltip is configured
-      if (tooltips[0]) {
-        pools[0][0] = 0;
-        poolPositions[0][0] = positions[0];
-        poolValues[0][0] = values[0];
+    // Assign the first tooltip to the first pool, if the tooltip is configured
+    if (tooltips[0]) {
+      pools[0][0] = 0;
+      poolPositions[0][0] = positions[0];
+      poolValues[0][0] = values[0];
+    }
+
+    for (let i = 1; i < positions.length; i++) {
+      if (!tooltips[i] || positions[i] - positions[i - 1] > mergeTooltipThreshold) {
+        atPool++;
+        pools[atPool] = [];
+        poolValues[atPool] = [];
+        poolPositions[atPool] = [];
       }
+      if (tooltips[i]) {
+        pools[atPool].push(i);
+        poolValues[atPool].push(values[i]);
+        poolPositions[atPool].push(positions[i]);
+      }
+    }
 
-      for (let i = 1; i < positions.length; i++) {
-        if (!tooltips[i] || positions[i] - positions[i - 1] > mergeTooltipThreshold) {
-          atPool++;
-          pools[atPool] = [];
-          poolValues[atPool] = [];
-          poolPositions[atPool] = [];
+    pools.forEach(function (pool, poolIndex) {
+      const handlesInPool = pool.length;
+
+      for (let j = 0; j < handlesInPool; j++) {
+        const handleNumber = pool[j];
+
+        if (j === handlesInPool - 1) {
+          let offset = 0;
+
+          poolPositions[poolIndex].forEach(function (value) {
+            offset += 1000 - value;
+          });
+
+          const direction = isVertical ? 'bottom' : 'right';
+          const last = isRtl ? 0 : handlesInPool - 1;
+          const lastOffset = 1000 - poolPositions[poolIndex][last];
+          offset = (textIsRtl && !isVertical ? 100 : 0) + offset / handlesInPool - lastOffset;
+
+          // Center this tooltip over the affected handles
+          tooltips[handleNumber].innerHTML = (isRtl ? poolValues[poolIndex].reverse() : poolValues[poolIndex]).join(
+            mergeTooltipSeparator,
+          );
+          tooltips[handleNumber].style.display = 'block';
+          tooltips[handleNumber].style[direction] = offset + '%';
         } else {
-          pools[atPool].push(i);
-          poolValues[atPool].push(values[i]);
-          poolPositions[atPool].push(positions[i]);
+          // Hide this tooltip
+          tooltips[handleNumber].style.display = 'none';
         }
       }
-
-      pools.forEach(function (pool, poolIndex) {
-        const handlesInPool = pool.length;
-
-        for (let j = 0; j < handlesInPool; j++) {
-          const handleNumber = pool[j];
-
-          if (j === handlesInPool - 1) {
-            let offset = 0;
-
-            poolPositions[poolIndex].forEach(function (value) {
-              offset += 1000 - value;
-            });
-
-            const direction = isVertical ? 'bottom' : 'right';
-            const last = isRtl ? 0 : handlesInPool - 1;
-            const lastOffset = 1000 - poolPositions[poolIndex][last];
-            offset = (textIsRtl && !isVertical ? 100 : 0) + offset / handlesInPool - lastOffset;
-
-            // Center this tooltip over the affected handles
-            tooltips[handleNumber].innerHTML = poolValues[poolIndex].join(mergeTooltipSeparator);
-            tooltips[handleNumber].style.display = 'block';
-            tooltips[handleNumber].style[direction] = offset + '%';
-          } else {
-            // Hide this tooltip
-            tooltips[handleNumber].style.display = 'none';
-          }
-        }
-      });
     });
-  }, []);
+  };
 
   return (
     <div className="colored-range-slider">
-      <Nouislider {...props} className="slider-margin" instanceRef={mergeTooltips}></Nouislider>
+      {/* 
+      // @ts-ignore */}
+      <Nouislider {...props} className="slider-margin" instanceRef={initConnects} onUpdate={mergeTooltips}></Nouislider>
     </div>
   );
 };

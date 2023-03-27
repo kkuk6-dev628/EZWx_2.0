@@ -209,9 +209,9 @@ const WFSLayer = React.forwardRef(
         if (getLabel) {
           const zoom = map.getZoom();
           const label = getLabel(feature);
-          if (feature.id.indexOf('canadian_province') > -1) {
-            console.log(feature.id, label);
-          }
+          // if (feature.id.indexOf('canadian_province') > -1) {
+          //   console.log(feature.id, label);
+          // }
           if (label === 'Ontario' && feature.id !== 'canadian_province.13') {
             return;
           }
@@ -225,37 +225,37 @@ const WFSLayer = React.forwardRef(
           const tooltip = layer.getTooltip();
           switch (feature.id) {
             case 'canadian_province.13': // Ontario
-              layer.on('tooltipopen', (t, l) => {
+              layer.on('tooltipopen', (_t, _l) => {
                 tooltip.setLatLng([51.38618232920632, -86.62995945187947]);
               });
               break;
             case 'canadian_province.2': // Nunavut
-              layer.on('tooltipopen', (t, l) => {
+              layer.on('tooltipopen', (_t, _l) => {
                 tooltip.setLatLng([65.69453068687591, -94.78918016983596]);
               });
               break;
             case 'canadian_province.1': // Northwest Territories canadian_province.8 Newfoundland and Labrado
-              layer.on('tooltipopen', (t, l) => {
+              layer.on('tooltipopen', (_t, _l) => {
                 tooltip.setLatLng([63.66887925342884, -119.86859756117303]);
               });
               break;
             case 'canadian_province.8': // Newfoundland and Labrado
-              layer.on('tooltipopen', (t, l) => {
+              layer.on('tooltipopen', (_t, _l) => {
                 tooltip.setLatLng([53.58961734060831, -61.489673782957254]);
               });
               break;
             case 'canadian_province.12': // Nova scotia
-              layer.on('tooltipopen', (t, l) => {
+              layer.on('tooltipopen', (_t, _l) => {
                 tooltip.setLatLng([44.85387773982307, -63.76924782162695]);
               });
               break;
             case 'canadian_province.9': // British Columbia
-              layer.on('tooltipopen', (t, l) => {
+              layer.on('tooltipopen', (_t, _l) => {
                 tooltip.setLatLng([54.352781266660024, -125.18142039625991]);
               });
               break;
             case 'canadian_province.10': // Prince Edward Island
-              layer.on('tooltipopen', (t, l) => {
+              layer.on('tooltipopen', (_t, _l) => {
                 tooltip.setLatLng([46.311809920768496, -63.13277395149652]);
               });
               break;
