@@ -172,6 +172,7 @@ const LeafletMap = () => {
   ];
   return (
     <div className="map__container">
+      {isShowTabs && <MapTabs tabMenus={tabMenus} />}
       <MapContainer
         className={styles.map}
         bounds={baseMapLayerControl.bounds}
@@ -210,8 +211,6 @@ const LeafletMap = () => {
           <Route setIsShowModal={setIsShowModal} />
         </Dialog>
       </MapContainer>
-
-      {isShowTabs && <MapTabs tabMenus={tabMenus} />}
       {isShowDateModal && <DateSliderModal setIsShowDateModal={setIsShowDateModal} />}
       <CollapsibleBar />
     </div>

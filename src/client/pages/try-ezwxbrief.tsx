@@ -8,7 +8,13 @@ const Home: NextPage<{ data: string }> = () => {
     <div>
       <Head>
         <title>EZWxBrief 2.0</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui"
+        />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
       </Head>
       <Map />
     </div>

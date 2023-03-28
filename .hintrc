@@ -16,7 +16,8 @@
       "default",
       {
         "ignore": [
-          "-ms-filter"
+          "-ms-filter",
+          "-webkit-overflow-scrolling"
         ]
       }
     ],

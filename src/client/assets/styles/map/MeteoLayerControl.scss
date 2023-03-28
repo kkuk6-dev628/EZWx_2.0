@@ -28,7 +28,7 @@
   }
   .btn-close{
     position: absolute;
-    font-size: 18px;
+    font-size: 1.4rem;
     color: white;
     right: 8px;
     top: 4px;
@@ -37,7 +37,7 @@
   &-contents{
     margin: 8px 2px;
     overflow-y: scroll;
-    max-height: calc(100vh - 300px);
+    max-height: calc(100vh - 365px);
   }
   ::-webkit-scrollbar{
     width: 8px;
@@ -74,7 +74,7 @@
   }
 
   .MuiAccordionSummary-expandIcon{
-    height: 8px!important;
+    // height: 8px!important;
     // width: 20px!important;
     .MuiSvgIcon-root{
       color: var(--color-white);
@@ -84,18 +84,18 @@
   .PrivateRadioButtonIcon-root-5{
 
     svg{
-      height: 18px!important;
-      width: 18px!important;
+      // height: 18px!important;
+      // width: 18px!important;
     }
   }
 
   .MuiFormControlLabel-root{
-    height: 22px;
+    // height: 22px;
   }
 
   .PrivateRadioButtonIcon-root-8 > svg{
-    width: 16px;
-    height: 16px;
+    // width: 16px;
+    // height: 16px;
   }
 
   .PrivateSwitchBase-root-1{
@@ -111,15 +111,15 @@
     border: 0;
 
     .MuiSvgIcon-root{
-      height: 18px;
-      width: 18px;
+      // height: 18px;
+      // width: 18px;
     }
     &.Mui-checked {
-      margin-left: 5px;
-      margin-right: 5px;
+      // margin-left: 5px;
+      // margin-right: 5px;
       .MuiSvgIcon-root{
-        height: 16px;
-        width: 16px;
+        // height: 16px;
+        // width: 16px;
       }
     }
   }
@@ -139,7 +139,7 @@
     }
   }
   .MuiTypography-body1{
-    font-size: rem($fs-md);
+    font-size: 1rem;
   }
   .MuiSlider-thumb{
     background-color: var(--color-white);

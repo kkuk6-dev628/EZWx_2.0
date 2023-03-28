@@ -11,7 +11,8 @@
   p {
     font-size: rem($fs-xl);
   }
-  @media screen and (max-width: 1024px) {
+  @media screen and (max-width: 500px) {
+    position: relative;
     flex-direction: row;
     height: auto;
     max-width: 100%;
@@ -29,7 +30,7 @@
     min-height: 88px;
     cursor: pointer;
 
-    @media screen and (max-width: 1024px) {
+    @media screen and (max-width: 500px) {
       min-height: 50px;
 
       svg{
@@ -37,7 +38,7 @@
         height: 18px;
       }
     }
-    @media screen and (max-width: 1024px) {
+    @media screen and (max-width: 500px) {
     font-size: 16px;
     }
 
@@ -54,7 +55,7 @@
       border-bottom: 0;
     }
 
-    @media screen and (max-width: 1024px) {
+    @media screen and (max-width: 500px) {
       border: 0;
       padding: 0;
       border-right: 1px solid #C4C4C4;
@@ -71,7 +72,7 @@
     }
     &--more{
       display: none;
-      @media screen and (max-width: 1024px) {
+      @media screen and (max-width: 500px) {
         border:0px;
         display: block;
       }
@@ -79,7 +80,7 @@
 
     &--hide{
       display: block;
-      @media screen and (max-width: 1024px) {
+      @media screen and (max-width: 500px) {
         display: none;
       }
 
@@ -92,7 +93,7 @@
     z-index: 999;
     display: none;
     background-color: var(--color-white);
-    @media screen and (max-width: 1024px) {
+    @media screen and (max-width: 500px) {
       display: flex;
       flex-direction: column;
       right: 0;
