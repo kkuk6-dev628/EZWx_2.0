@@ -27,7 +27,7 @@ export const layerControlApi = createApi({
         try {
           const result = await queryFulfilled;
           if (result.data) {
-            dispatch(setLayerControlState(result.data));
+            dispatch(setLayerControlState({ ...result.data }));
           }
         } catch (err) {
           console.error('LayerControl state cannot be pulled out.', err);
@@ -64,7 +64,7 @@ export const layerControlApi = createApi({
         try {
           const result = await queryFulfilled;
           if (result.data) {
-            dispatch(setBaseMapLayerControl(result.data));
+            dispatch(setBaseMapLayerControl({ ...result.data }));
           }
         } catch (err) {
           console.error('Base LayerControl state cannot be pulled out.', err);

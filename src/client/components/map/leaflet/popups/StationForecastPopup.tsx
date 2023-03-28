@@ -1,7 +1,6 @@
 import { Divider, Typography } from '@material-ui/core';
 import Image from 'next/image';
-import { useSelector } from 'react-redux';
-import { PersonalMinimums, selectSettings } from '../../../../store/user/UserSettings';
+import { PersonalMinimums } from '../../../../store/user/UserSettings';
 import { MetarSkyValuesToString } from '../../common/AreoConstants';
 import {
   addLeadingZeroes,

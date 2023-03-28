@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CircularProgress, Collapse, Drawer } from '@mui/material';
 import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { RxCross2 } from 'react-icons/rx';
@@ -10,9 +10,8 @@ import {
   ToggleFieldWrapper,
 } from '../settings-drawer';
 import { StyledSlider } from './Slider';
-import RangeSlider from './RangeSlider';
 import { useSelector } from 'react-redux';
-import { initialUserSettingsState, selectSettings } from '../../store/user/UserSettings';
+import { selectSettings } from '../../store/user/UserSettings';
 import {
   useGetUserSettingsQuery,
   useRestoreSettingsMutation,

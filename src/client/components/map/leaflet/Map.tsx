@@ -32,13 +32,10 @@ import { selectBaseMapLayerControl, setBaseMapLayerControl } from '../../../stor
 import { selectAuth } from '../../../store/auth/authSlice';
 import { toast } from 'react-hot-toast';
 import { useGetAirportQuery } from '../../../store/route/airportApi';
-import { useGetRoutesQuery } from '../../../store/route/routeApi';
 import { useGetWaypointsQuery } from '../../../store/route/waypointApi';
 import { simpleTimeOnlyFormat } from '../common/AreoFunctions';
 import MapSideButtons from '../../shared/MapSideButtons';
 import {
-  useGetBaseLayerControlStateQuery,
-  useGetLayerControlStateQuery,
   useUpdateBaseLayerControlStateMutation,
   useUpdateLayerControlStateMutation,
 } from '../../../store/layers/layerControlApi';
@@ -71,12 +68,6 @@ const LeafletMap = () => {
   const layerControlState = useSelector(selectLayerControlState);
   const [updateLayerControlState] = useUpdateLayerControlStateMutation();
   const [updateBaseLayerControlState] = useUpdateBaseLayerControlStateMutation();
-
-  if (auth.id) {
-    useGetLayerControlStateQuery('');
-    useGetRoutesQuery(null);
-    useGetBaseLayerControlStateQuery('');
-  }
 
   useEffect(() => {
     const interval = setInterval(() => setZuluTime(simpleTimeOnlyFormat(new Date(), false)), 1000);

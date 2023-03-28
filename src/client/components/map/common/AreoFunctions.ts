@@ -9,7 +9,6 @@ import axios from 'axios';
 import { db } from '../../caching/dexieDb';
 import { Route, RoutePoint } from '../../../interfaces/route';
 import { route as routeErrorMessages } from '../../lang/messages';
-import ReactDOMServer from 'react-dom/server';
 
 export const getAltitudeString = (value: string, isHundred = true, fzlbase?: string, fzltop?: string): string => {
   if (value === 'SFC' || value == '0') {
@@ -181,7 +180,6 @@ export const getCacheVersion = (updateInterval: number): number => {
 };
 
 export const getTimeRangeStart = () => {
-  const currentDate = new Date();
   const origin = new Date();
   origin.setHours(origin.getHours() - 12, 0, 0);
   origin.setMinutes(0);

@@ -19,7 +19,6 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
   const { id } = useSelector(selectAuth);
   const [showFolders, setShowFolders] = useState(false);
   const [collapseState, setCollapseState] = useState({});
-  const [indexes, setIndexes] = useState({ folderIndex: '', folderItemIndex: '' });
 
   const [folders, setFolders] = useState([
     {
@@ -126,7 +125,7 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
           <DragDropContext onDragEnd={onDragEnd}>
             <Collapse in={showFolders} timeout="auto" className="root__collapse">
               <div className="collapse__container__body">
-                {folders.map((el, ind) => (
+                {folders.map((el) => (
                   <Droppable droppableId={el.id} key={el.id}>
                     {(provided) => (
                       <div ref={provided.innerRef} {...provided.droppableProps}>

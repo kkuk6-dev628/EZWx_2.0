@@ -44,7 +44,6 @@ export const ColoredRangeSlider = ({
   mergeTooltipSeparator = '-',
   ...props
 }: ColoredRangeSliderProps) => {
-  const direction = props.direction;
   const initConnects = useCallback((slider) => {
     if (!slider || !slider.noUiSlider) {
       return;

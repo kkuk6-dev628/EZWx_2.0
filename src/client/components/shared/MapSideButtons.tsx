@@ -1,10 +1,15 @@
 import { DomEvent } from 'leaflet';
 import React, { useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectAuth } from '../../store/auth/authSlice';
 import { setDataLoadTime } from '../../store/layers/DataLoadTimeSlice';
+import { useGetLayerControlStateQuery, useGetBaseLayerControlStateQuery } from '../../store/layers/layerControlApi';
+import { useGetRoutesQuery } from '../../store/route/routeApi';
+import { useGetUserSettingsQuery } from '../../store/user/userSettingsApi';
 import { SvgRefresh } from '../utils/SvgIcons';
 
 const MapSideButtons = () => {
+  const auth = useSelector(selectAuth);
   const dispatch = useDispatch();
   const ref = useRef();
   useEffect(() => {
@@ -15,21 +20,32 @@ const MapSideButtons = () => {
     }
   }, [ref?.current]);
 
+  let refetchAllSettings;
+  if (auth.id) {
+    const { refetch: refetchLayerControl } = useGetLayerControlStateQuery('');
+    const { refetch: refetchRoutes } = useGetRoutesQuery(null);
+    const { refetch: refetchBaseLayerControl } = useGetBaseLayerControlStateQuery('');
+    const { refetch: refetchUserSettings } = useGetUserSettingsQuery(auth.id);
+    refetchAllSettings = () => {
+      refetchLayerControl();
+      refetchRoutes();
+      refetchBaseLayerControl();
+      refetchUserSettings();
+    };
+  }
+
   return (
     <div className="pos_relative" ref={ref}>
       <div className="map__btns__container">
-        <div className="user__action__btns" onClick={() => dispatch(setDataLoadTime(Date.now()))}>
+        <div
+          className="user__action__btns"
+          onClick={() => {
+            if (refetchAllSettings) refetchAllSettings();
+            dispatch(setDataLoadTime(Date.now()));
+          }}
+        >
           <SvgRefresh />
         </div>
-        {/* <div className="user__action__btns" onClick={openUserSettingDrawer}>
-          <MdSettings />
-        </div>
-        <div className="user__action__btns">
-          <FaInfoCircle />
-        </div>
-        <div className="user__action__btns">
-          <FaListUl />
-        </div> */}
       </div>
     </div>
   );

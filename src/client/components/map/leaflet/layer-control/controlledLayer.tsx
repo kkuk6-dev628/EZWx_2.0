@@ -2,7 +2,7 @@ import { LeafletProvider, useLeafletContext } from '@react-leaflet/core';
 import { Layer } from 'leaflet';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ReactNode } from 'react';
-import { useLayerControlContext } from './layerControlContext';
+import { useMeteoLayersContext } from './MeteoLayerControlContext';
 import { useMap } from 'react-leaflet';
 
 export interface OrderedLayerProps {
@@ -16,7 +16,7 @@ const createControlledLayer = (
 ) => {
   const ControlledLayer = (props: OrderedLayerProps) => {
     const context = useLeafletContext();
-    const layerContext = useLayerControlContext();
+    const layerContext = useMeteoLayersContext();
     const propsRef = useRef(props);
     const parentMap = useMap();
 

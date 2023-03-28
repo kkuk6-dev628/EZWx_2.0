@@ -3,14 +3,15 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { useGetAirportQuery } from '../../store/route/airportApi';
-import { useGetRoutesQuery } from '../../store/route/routeApi';
-import { useGetWaypointsQuery } from '../../store/route/waypointApi';
-import { simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
 import ProfileModal from '../shared/ProfileModal';
 import SettingsDrawer from '../shared/SettingsDrawer';
 import { SvgDropDown, SvgMenuBurger, SvgProfile, SvgRoundClose, SvgSave, SvgSetting, SvgWarn } from '../utils/SvgIcons';
 import dynamic from 'next/dynamic';
+import { useSelector } from 'react-redux';
+import { selectAuth } from '../../store/auth/authSlice';
+import { useGetLayerControlStateQuery, useGetBaseLayerControlStateQuery } from '../../store/layers/layerControlApi';
+import { useGetRoutesQuery } from '../../store/route/routeApi';
+import { useGetUserSettingsQuery } from '../../store/user/userSettingsApi';
 const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
 const links = [
@@ -105,7 +106,21 @@ export default function Header() {
   const [isUserLoginUser, setIsUserLoginUser] = useState(false);
   const [userSettingDrawer, setIsShowSettingsDrawer] = useState(false);
   const [favoritesDrawer, setFavoritesDrawer] = useState(false);
+  const auth = useSelector(selectAuth);
 
+  let refetchAllSettings;
+  if (auth.id) {
+    const { refetch: refetchLayerControl } = useGetLayerControlStateQuery('');
+    const { refetch: refetchRoutes } = useGetRoutesQuery(null);
+    const { refetch: refetchBaseLayerControl } = useGetBaseLayerControlStateQuery('');
+    const { refetch: refetchUserSettings } = useGetUserSettingsQuery(auth.id);
+    refetchAllSettings = () => {
+      refetchLayerControl();
+      refetchRoutes();
+      refetchBaseLayerControl();
+      refetchUserSettings();
+    };
+  }
   useEffect(() => {
     if (pathname === '/try-ezwxbrief' || pathname === '/imagery') {
       setMapMenu(true);
@@ -151,7 +166,16 @@ export default function Header() {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  const closeAllModals = () => {
+    setIsShowProfileModal(false);
+    setIsShowSettingsDrawer(false);
+    setFavoritesDrawer(false);
+    if (refetchAllSettings) refetchAllSettings();
+  };
+
   const handleProfileModal = () => {
+    if (isShowProfileModal) closeAllModals();
     setIsShowProfileModal(!isShowProfileModal);
   };
   return (
@@ -225,17 +249,29 @@ export default function Header() {
                   </button>
                   <button
                     className="header__rgt__btn header__rgt__btn--icon btn"
-                    onClick={() => setFavoritesDrawer(true)}
+                    onClick={() => {
+                      closeAllModals();
+                      setFavoritesDrawer(true);
+                    }}
                   >
                     <SvgSave />
                   </button>
                   <button
                     className="header__rgt__btn header__rgt__btn--icon btn"
-                    onClick={() => setIsShowSettingsDrawer(true)}
+                    onClick={() => {
+                      closeAllModals();
+                      setIsShowSettingsDrawer(true);
+                    }}
                   >
                     <SvgSetting />
                   </button>
-                  <button onClick={handleProfileModal} className="header__rgt__btn header__rgt__btn--icon btn">
+                  <button
+                    onClick={() => {
+                      closeAllModals();
+                      handleProfileModal();
+                    }}
+                    className="header__rgt__btn header__rgt__btn--icon btn"
+                  >
                     <SvgProfile />
                   </button>
                 </div>

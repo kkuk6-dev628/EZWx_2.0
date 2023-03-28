@@ -109,9 +109,7 @@ export const LayerControlSlidersSlice = createSlice({
   name: 'layerControlState',
   initialState: initialLayerControlState,
   reducers: {
-    setLayerControlState: (state, action) => {
-      return action.payload;
-    },
+    setLayerControlState: (state, action) => action.payload,
   },
 });
 

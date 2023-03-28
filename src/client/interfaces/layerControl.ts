@@ -1,5 +1,3 @@
-import { LatLngBounds } from 'leaflet';
-
 export interface SkyCondition {
   skyCover: string;
   cloudBase: number;

@@ -32,15 +32,31 @@ function MapTabs({ tabMenus }: TabMenus) {
 
       {showDropDown && (
         <div className="tabs__dropdown">
-          <button className=" tabs__btn--dropdown">
+          <button
+            className=" tabs__btn--dropdown"
+            onClick={() => {
+              setShowDropDown(false);
+            }}
+          >
             <SvgAir />
             <p className="btn__text">Airport</p>
           </button>
-          <button className="tabs__btn--dropdown">
+          <button
+            className="tabs__btn--dropdown"
+            onClick={() => {
+              tabMenus[5].handler(tabMenus[5].id);
+              setShowDropDown(false);
+            }}
+          >
             <SvgMap />
             <p className=" btn__text">Base map</p>
           </button>
-          <button className=" tabs__btn--dropdown">
+          <button
+            className=" tabs__btn--dropdown"
+            onClick={() => {
+              setShowDropDown(false);
+            }}
+          >
             <SvgTemperature />
             <p className="btn__text">7 days</p>
           </button>
