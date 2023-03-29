@@ -52,7 +52,11 @@ const PaperComponent = (props) => {
 };
 
 const maxScreenDimension = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
-const minZoom = maxScreenDimension > 1280 ? 4 : 2;
+const minZoom = maxScreenDimension > 1024 ? 4 : 3;
+const defaultBounds = [
+  [55.0, -130.0],
+  [20.0, -60.0],
+];
 
 const LeafletMap = () => {
   const { pathname } = useRouter();
@@ -175,7 +179,9 @@ const LeafletMap = () => {
       {isShowTabs && <MapTabs tabMenus={tabMenus} />}
       <MapContainer
         className={styles.map}
-        bounds={baseMapLayerControl.bounds}
+        bounds={
+          baseMapLayerControl.bounds && baseMapLayerControl.bounds.length ? baseMapLayerControl.bounds : defaultBounds
+        }
         // @ts-ignore
         // timeDimension={true}
         // timeDimensionOptions={{

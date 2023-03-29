@@ -114,8 +114,10 @@ export const ColoredRangeSlider = ({
 
           const direction = isVertical ? 'bottom' : 'right';
           const last = isRtl ? 0 : handlesInPool - 1;
+          const first = isRtl ? handlesInPool - 1 : 0;
           const lastOffset = 1000 - poolPositions[poolIndex][last];
-          offset = (textIsRtl && !isVertical ? 100 : 0) + offset / handlesInPool - lastOffset;
+          const firstOffset = 1000 - poolPositions[poolIndex][first];
+          offset = (textIsRtl && !isVertical ? 100 : 0) + firstOffset - lastOffset;
 
           // Center this tooltip over the affected handles
           tooltips[handleNumber].innerHTML = (isRtl ? poolValues[poolIndex].reverse() : poolValues[poolIndex]).join(
@@ -123,6 +125,14 @@ export const ColoredRangeSlider = ({
           );
           tooltips[handleNumber].style.display = 'block';
           tooltips[handleNumber].style[direction] = offset + '%';
+          tooltips[handleNumber].style['margin-bottom'] = '6px';
+          if (poolValues[poolIndex].length > 1) {
+            const margin = 30 + (mergeTooltipThreshold - (lastOffset - firstOffset)) * -5;
+            tooltips[handleNumber].style['margin-left'] = margin + '%';
+            console.log(poolValues[poolIndex].length);
+          } else {
+            tooltips[handleNumber].style['margin-left'] = 0;
+          }
         } else {
           // Hide this tooltip
           tooltips[handleNumber].style.display = 'none';

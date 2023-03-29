@@ -208,15 +208,18 @@ const WFSLayer = React.forwardRef(
       if (feature.properties) {
         if (getLabel) {
           const zoom = map.getZoom();
-          const label = getLabel(feature);
-          // if (feature.id.indexOf('canadian_province') > -1) {
-          //   console.log(feature.id, label);
-          // }
+          let label = getLabel(feature);
+          if (feature.id.indexOf('canadian_province') > -1) {
+            console.log(feature.id, label);
+          }
           if (label === 'Ontario' && feature.id !== 'canadian_province.13') {
             return;
           }
+          if (feature.id === 'canadian_province.8') {
+            label = 'Newfoundland and Labrador';
+          }
 
-          layer.bindTooltip(getLabel(feature), {
+          layer.bindTooltip(label, {
             permanent: zoom > showLabelZoom,
             direction: 'center',
             className: 'my-labels',
@@ -234,12 +237,12 @@ const WFSLayer = React.forwardRef(
                 tooltip.setLatLng([65.69453068687591, -94.78918016983596]);
               });
               break;
-            case 'canadian_province.1': // Northwest Territories canadian_province.8 Newfoundland and Labrado
+            case 'canadian_province.1': // Northwest Territories
               layer.on('tooltipopen', (_t, _l) => {
                 tooltip.setLatLng([63.66887925342884, -119.86859756117303]);
               });
               break;
-            case 'canadian_province.8': // Newfoundland and Labrado
+            case 'canadian_province.8': // Newfoundland and Labrador
               layer.on('tooltipopen', (_t, _l) => {
                 tooltip.setLatLng([53.58961734060831, -61.489673782957254]);
               });

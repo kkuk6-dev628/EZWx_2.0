@@ -69,6 +69,28 @@ export const UserSettingsSlice = createSlice({
   },
 });
 
+export interface SettingsLoadTimeState {
+  settingsLoadTimeState: number;
+}
+
+const initialSettingsLoadTimeState: SettingsLoadTimeState = {
+  settingsLoadTimeState: Date.now(),
+};
+
+export const SettingsLoadTimeSlice = createSlice({
+  name: 'settingsLoadTime',
+  initialState: initialSettingsLoadTimeState,
+  reducers: {
+    setSettingsLoadTime: (state, action) => {
+      state.settingsLoadTimeState = action.payload;
+    },
+  },
+});
+
+export const { setSettingsLoadTime } = SettingsLoadTimeSlice.actions;
+
+export const selectSettingsLoadTime = (state: AppState) => state.settingsLoadTime.settingsLoadTimeState;
+
 export const { setUserSettings, setPersonalMinimums } = UserSettingsSlice.actions;
 
 export const selectPersonalMinimums = (state: AppState) => state.userSettings.personalMinimumsState;

@@ -37,6 +37,8 @@ import { useSelector } from 'react-redux';
 import { selectLayerControlState, setLayerControlState } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';
 import { selectAuth } from '../../../../store/auth/authSlice';
+import { setSettingsLoadTime } from '../../../../store/user/UserSettings';
+import { useGetUserSettingsQuery } from '../../../../store/user/userSettingsApi';
 
 interface IProps {
   children?: ReactElement[];
@@ -66,10 +68,18 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
   const [updateLayerControlStateAPI] = useUpdateLayerControlStateMutation();
   const layerControlState = useSelector(selectLayerControlState);
   const dispatch = useDispatch();
+  let refetchUserSettings;
+  if (auth.id) {
+    const { refetch } = useGetUserSettingsQuery(auth.id);
+    refetchUserSettings = () => {
+      refetch();
+    };
+  }
 
   const map = useMap();
 
   const updateLayerControl = (cloned: LayerControlState, commit = true) => {
+    refetchUserSettings();
     dispatch(setLayerControlState(cloned));
     if (commit && auth.id) updateLayerControlStateAPI(cloned);
   };

@@ -2,7 +2,7 @@ import { layerControlApi } from './layers/layerControlApi';
 import { routeApi } from './route/routeApi';
 import { RoutesSlice } from './route/routes';
 import BaseMapLayerControlSlice from './layers/BaseMapLayerControl';
-import UserSettingsSlice from './user/UserSettings';
+import UserSettingsSlice, { SettingsLoadTimeSlice } from './user/UserSettings';
 import { LayerControlSlidersSlice } from './layers/LayerControl';
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import { createWrapper } from 'next-redux-wrapper';
@@ -26,6 +26,7 @@ const makeStore = () =>
       [LayerControlSlidersSlice.name]: LayerControlSlidersSlice.reducer,
       [UserSettingsSlice.name]: UserSettingsSlice.reducer,
       [BaseMapLayerControlSlice.name]: BaseMapLayerControlSlice.reducer,
+      [SettingsLoadTimeSlice.name]: SettingsLoadTimeSlice.reducer,
     },
     devTools: process.env.NODE_ENV !== 'production',
     middleware: (getDefaultMiddlewares) => {

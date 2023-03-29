@@ -42,8 +42,8 @@ const SigmetLayer = () => {
       case 'TURB':
         label = `TURB`;
         break;
-      case 'ICING':
-        label = `Icing`;
+      case 'ICE':
+        label = `ICE`;
         break;
       case 'IFR':
         label = `IFR`;

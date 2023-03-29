@@ -33,7 +33,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
   const { data: serverData } = auth.id ? useGetBaseLayerControlStateQuery('') : { data: undefined };
 
   useEffect(() => {
-    if (serverData) map.fitBounds(serverData.bounds);
+    if (serverData && serverData.bounds.length) map.fitBounds(serverData.bounds);
   }, [serverData]);
 
   const map = useMapEvent('moveend', () => {
@@ -167,7 +167,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
           <div
             className="btn-close"
             onClick={() => {
-              dispatch(setBaseMapLayerControl({ ...baseMapLayerStatus, show: false }));
+              setBaseLayerControlState({ ...baseMapLayerStatus, show: false });
               disableMapInteraction(false);
             }}
           >
