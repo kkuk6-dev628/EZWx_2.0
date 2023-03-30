@@ -15,11 +15,6 @@ export class ViewController {
     await this.viewService.getNextServer().render(req, res, parsedUrl.pathname, parsedUrl.query);
   }
 
-  @Get('pwa-serviceworker.js')
-  public async getServiceWorkerJS1(@Req() req: Request, @Res() res: Response) {
-    const buffer = fs.readFileSync('./src/public/pwa-serviceworker.js');
-    res.type('text/javascript').send(buffer);
-  }
   @Get('favicon.ico')
   public async getFavicon(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);
@@ -28,9 +23,12 @@ export class ViewController {
   }
   @Get('offline.html')
   public async getOfflineHtml(@Req() req: Request, @Res() res: Response) {
-    const parsedUrl = parse(req.url, true);
-
     res.send('You are offline!');
+  }
+
+  @Get('')
+  public async showIndex(@Req() req: Request, @Res() res: Response) {
+    await this.viewService.getNextServer().render(req, res, '/home');
   }
 
   @Get('home')

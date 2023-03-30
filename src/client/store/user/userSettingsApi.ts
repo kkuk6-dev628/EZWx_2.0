@@ -12,7 +12,10 @@ const userSettingsApi = apiSlice.injectEndpoints({
         method: 'GET',
       }),
       transformResponse: (response: UserSettings) => {
-        return { ...response, observation_time: parseInt(response.observation_time as unknown as string) };
+        if (response) {
+          return { ...response, observation_time: parseInt(response.observation_time as unknown as string) };
+        }
+        return initialUserSettingsState.settings;
       },
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {

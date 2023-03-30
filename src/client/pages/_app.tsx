@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 import { wrapper } from '../store/store';
 import * as serviceWorkerRegistration from '../app/serviceWorkerRegistration';
 import { Provider } from 'react-redux';
+import Head from 'next/head';
 
 const App = ({ Component, ...rest }: AppProps) => {
   const { store, props } = wrapper.useWrappedStore(rest);
@@ -42,6 +43,14 @@ const App = ({ Component, ...rest }: AppProps) => {
               gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
             `}
       </Script>
+      <Head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icon-192x192.png"></link>
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/favicon/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon/favicon-48x48.png" />
+        <link rel="mask-icon" href="/icons/favicon/safari-pinned-tab.svg" color="#5bbad5"></link>
+        <meta name="theme-color" content="#3D0D68" />
+      </Head>
       <Header />
       <Component {...pageProps} />
       {!showFooter && <Footer />}

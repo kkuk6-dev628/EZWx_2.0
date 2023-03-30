@@ -108,19 +108,6 @@ export default function Header() {
   const [favoritesDrawer, setFavoritesDrawer] = useState(false);
   const auth = useSelector(selectAuth);
 
-  let refetchAllSettings;
-  if (auth.id) {
-    const { refetch: refetchLayerControl } = useGetLayerControlStateQuery('');
-    const { refetch: refetchRoutes } = useGetRoutesQuery(null);
-    const { refetch: refetchBaseLayerControl } = useGetBaseLayerControlStateQuery('');
-    const { refetch: refetchUserSettings } = useGetUserSettingsQuery(auth.id);
-    refetchAllSettings = () => {
-      refetchLayerControl();
-      refetchRoutes();
-      refetchBaseLayerControl();
-      refetchUserSettings();
-    };
-  }
   useEffect(() => {
     if (pathname === '/try-ezwxbrief' || pathname === '/imagery') {
       setMapMenu(true);
@@ -171,7 +158,6 @@ export default function Header() {
     setIsShowProfileModal(false);
     setIsShowSettingsDrawer(false);
     setFavoritesDrawer(false);
-    if (refetchAllSettings) refetchAllSettings();
   };
 
   const handleProfileModal = () => {
@@ -235,7 +221,7 @@ export default function Header() {
           </div>
           <div className="header__rgt">
             <div className="header__rgt__btns flex flex-align-center">
-              <Link href="/login">
+              <Link href="/home">
                 {mapMenu ? (
                   <button className="header__rgt__btn header__rgt__btn--map btn">Home</button>
                 ) : (

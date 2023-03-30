@@ -405,3 +405,8 @@ cypress/videos
 cypress/screenshots
 src/schema.gql
 .yarn/**/*
+src/client/public/sw.js
+src/client/public/sw.js.map
+src/client/public/workbox-327c579b.js
+src/client/public/workbox-327c579b.js.map
+src/client/public/worker-development.js

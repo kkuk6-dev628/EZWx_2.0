@@ -22,6 +22,15 @@ import { AutoCompleteInput, Modal, PrimaryButton, SecondaryButton } from '../com
 import { ColoredRangeSlider, formatForDecimal, formatForInteger } from '../common/ColoredRangeSlider';
 import { toast } from 'react-hot-toast';
 
+const FetchData = () => {
+  const { id } = useSelector(selectAuth);
+  useGetUserSettingsQuery(id, { refetchOnMountOrArgChange: true });
+  useEffect(() => {
+    console.log('Settings panel mounted!');
+  }, []);
+  return <></>;
+};
+
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;
   isShowSettingsDrawer: boolean;
@@ -37,7 +46,6 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const [isShowSaveSettingModal, setIsShowSaveSettingModal] = useState(false);
   const [settings, setSettings] = useState(settingsState);
 
-  useGetUserSettingsQuery(id);
   const [updateUserSettings, { isLoading: isUpdating, isSuccess: isSuccessUpdate, error: updateError }] =
     useUpdateUserSettingsMutation();
   const [restoreSettings, { isLoading: isRestoring }] = useRestoreSettingsMutation();
@@ -100,6 +108,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
 
   return (
     <Drawer anchor={'right'} open={isShowSettingsDrawer} onClose={handleCloseDrawer}>
+      <FetchData />
       <div className="drawer__container">
         <div className="drawer__sticky__header">
           <div className="drawer__header">
