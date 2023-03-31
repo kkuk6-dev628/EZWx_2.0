@@ -16,6 +16,7 @@ export class ViewService implements OnModuleInit {
         dir: './src/client',
       });
       await this.server.prepare();
+      console.log('nextjs server created with following options.', this.server.options);
     } catch (error) {
       console.error(error);
     }
