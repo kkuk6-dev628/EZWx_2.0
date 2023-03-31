@@ -407,6 +407,7 @@ src/schema.gql
 .yarn/**/*
 src/client/public/sw.js
 src/client/public/sw.js.map
-src/client/public/workbox-327c579b.js
-src/client/public/workbox-327c579b.js.map
-src/client/public/worker-development.js
+src/client/public/workbox-*.js
+src/client/public/workbox-*.js.map
+src/client/public/worker-*.js
+src/client/public/worker-*.js.map
