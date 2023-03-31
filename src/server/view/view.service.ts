@@ -11,6 +11,7 @@ export class ViewService implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     try {
+      console.log('node env config', this.configService.get<string>('NODE_ENV'));
       this.server = createServer({
         dev: this.configService.get<string>('NODE_ENV') !== 'production',
         dir: './src/client',
