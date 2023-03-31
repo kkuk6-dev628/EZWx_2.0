@@ -45,30 +45,32 @@ const GairmetPopup = ({ feature, userSettings }) => {
 
   return (
     <BasePopupFrame title={title}>
-      <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Valid:</b> {convertTimeFormat(feature.properties.validtime, userSettings.default_time_display_unit)}
-      </Typography>
-      <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Issued:</b> {convertTimeFormat(feature.properties.issuetime, userSettings.default_time_display_unit)}
-      </Typography>
-      <Typography variant="body2" style={{ margin: 3 }}>
-        <b>Lead time:</b> {feature.properties.forecast == 0 ? 'Initial' : feature.properties.forecast + ' hours'}
-      </Typography>
-      {top && (
-        <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Top:</b> {top}
-        </Typography>
-      )}
-      {base && (
-        <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Base:</b> {base}
-        </Typography>
-      )}
-      {feature.properties.hazard !== 'M_FZLVL' && (
-        <Typography variant="body2" style={{ margin: 3 }}>
-          <b>Due to:</b> {dueto}
-        </Typography>
-      )}
+      <div style={{ maxHeight: 320 }}>
+        <div style={{ margin: 3 }}>
+          <b>Valid:</b> {convertTimeFormat(feature.properties.validtime, userSettings.default_time_display_unit)}
+        </div>
+        <div style={{ margin: 3 }}>
+          <b>Issued:</b> {convertTimeFormat(feature.properties.issuetime, userSettings.default_time_display_unit)}
+        </div>
+        <div style={{ margin: 3 }}>
+          <b>Lead time:</b> {feature.properties.forecast == 0 ? 'Initial' : feature.properties.forecast + ' hours'}
+        </div>
+        {top && (
+          <div style={{ margin: 3 }}>
+            <b>Top:</b> {top}
+          </div>
+        )}
+        {base && (
+          <div style={{ margin: 3 }}>
+            <b>Base:</b> {base}
+          </div>
+        )}
+        {feature.properties.hazard !== 'M_FZLVL' && (
+          <div style={{ margin: 3 }}>
+            <b>Due to:</b> {dueto}
+          </div>
+        )}
+      </div>
     </BasePopupFrame>
   );
 };

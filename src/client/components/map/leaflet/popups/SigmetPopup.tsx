@@ -40,26 +40,24 @@ const SigmetPopup = ({ feature, userSettings }) => {
 
   return (
     <BasePopupFrame title={title}>
-      <Typography variant="body2" style={{ margin: 3 }}>
+      <div style={{ margin: 3 }}>
         <b>Valid:</b> {convertTimeFormat(feature.properties.validtimefrom, userSettings.default_time_display_unit)}
-      </Typography>
-      <Typography variant="body2" style={{ margin: 3 }}>
+      </div>
+      <div style={{ margin: 3 }}>
         <b>Through:</b> {convertTimeFormat(feature.properties.validtimeto, userSettings.default_time_display_unit)}
-      </Typography>
+      </div>
       {top && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Top:</b> {top}
-        </Typography>
+        </div>
       )}
       {base && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Base:</b> {base}
-        </Typography>
+        </div>
       )}
       <Divider></Divider>
-      <Typography variant="body2" style={{ margin: 3, whiteSpace: 'pre-line' }}>
-        {feature.properties.rawairsigmet}
-      </Typography>
+      <div style={{ margin: 3, whiteSpace: 'pre-line' }}>{feature.properties.rawairsigmet}</div>
     </BasePopupFrame>
   );
 };

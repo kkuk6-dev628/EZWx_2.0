@@ -5,16 +5,14 @@ import { convertTimeFormat } from '../../common/AreoFunctions';
 const ConvectiveOutlookPopup = ({ feature, userSettings }: { feature: any; userSettings: any }) => {
   return (
     <BasePopupFrame title={'Convective OUTLOOK'}>
-      <Typography variant="body2" style={{ margin: 3 }}>
+      <div style={{ margin: 3 }}>
         <b>Valid:</b> {convertTimeFormat(feature.properties.valid_time_from, userSettings.default_time_display_unit)}
-      </Typography>
-      <Typography variant="body2" style={{ margin: 3 }}>
+      </div>
+      <div style={{ margin: 3 }}>
         <b>Through:</b> {convertTimeFormat(feature.properties.valid_time_to, userSettings.default_time_display_unit)}
-      </Typography>
+      </div>
       <Divider></Divider>
-      <Typography variant="body2" style={{ margin: 3, whiteSpace: 'pre-line' }}>
-        {feature.properties.raw_text}
-      </Typography>
+      <div style={{ margin: 3, whiteSpace: 'pre-line' }}>{feature.properties.raw_text}</div>
     </BasePopupFrame>
   );
 };

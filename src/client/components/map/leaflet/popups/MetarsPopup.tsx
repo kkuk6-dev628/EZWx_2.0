@@ -72,25 +72,25 @@ const MetarsPopup = ({
       </div>
       <Divider></Divider>
       {airportName && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Airport name: </b>
           <span>{airportName}</span>
-        </Typography>
+        </div>
       )}
-      <Typography variant="body2" style={{ margin: 3 }}>
+      <div style={{ margin: 3 }}>
         <b>Time: </b> {convertTimeFormat(feature.properties.observation_time, userSettings.default_time_display_unit)}
-      </Typography>
+      </div>
       {isFinite(ceiling) && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Ceiling: </b>
           <span style={{ color: ceilingColor }}>{ceiling} feet</span>
-        </Typography>
+        </div>
       )}
       {feature.properties.visibility_statute_mi != null && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Visibility: </b>
           <span style={{ color: visibilityColor }}>{visibility}</span>
-        </Typography>
+        </div>
       )}
       {skyConditionsAsc.length > 0 && (
         <div style={{ display: 'flex', lineHeight: 1, color: 'black' }} className="MuiTypography-body2">
@@ -112,95 +112,95 @@ const MetarsPopup = ({
         </div>
       )}
       {weatherString && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Weather: </b>
           <span>{weatherString}</span>
-        </Typography>
+        </div>
       )}
       {feature.properties.wind_speed_kt != null && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Wind speed: </b>
           <span>{windSpeed}</span>
-        </Typography>
+        </div>
       )}
       {feature.properties.wind_dir_degrees !== null &&
         feature.properties.wind_dir_degrees !== 0 &&
         feature.properties.wind_speed_kt !== 0 &&
         feature.properties.wind_speed_kt !== null && (
-          <Typography variant="body2" style={{ margin: 3 }}>
+          <div style={{ margin: 3 }}>
             <b>Wind direction: </b>
             <span>{addLeadingZeroes(feature.properties.wind_dir_degrees, 3)}&deg;</span>
-          </Typography>
+          </div>
         )}
       {(feature.properties.wind_dir_degrees === null || feature.properties.wind_dir_degrees === 0) &&
         feature.properties.wind_speed_kt !== 0 &&
         feature.properties.wind_speed_kt !== null && (
-          <Typography variant="body2" style={{ margin: 3 }}>
+          <div style={{ margin: 3 }}>
             <b>Wind direction: </b>
             <span>Variable</span>
-          </Typography>
+          </div>
         )}
       {feature.properties.wind_gust_kt != null && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Wind gust: </b>
           <span>{windGust}</span>
-        </Typography>
+        </div>
       )}
       {feature.properties.crosswind_component_kt != null && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Crosswind component: </b>
           <span>{crossWind}</span>
-        </Typography>
+        </div>
       )}
       {feature.properties.crosswind_component_kt != null && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Crosswind runway: </b>
           <span>{feature.properties.crosswind_runway_id}</span>
-        </Typography>
+        </div>
       )}
       {feature.properties.temp_c != null && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Temperature: </b>
           <span>
             {!userSettings.default_temperature_unit
               ? feature.properties.temp_c + ' \u00B0C'
               : celsiusToFahrenheit(feature.properties.temp_c) + ' \u00B0F'}
           </span>
-        </Typography>
+        </div>
       )}
       {feature.properties.dewpoint_c != null && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Dewpoint: </b>
           <span>
             {!userSettings.default_temperature_unit
               ? feature.properties.dewpoint_c + ' \u00B0C'
               : celsiusToFahrenheit(feature.properties.dewpoint_c) + ' \u00B0F'}
           </span>
-        </Typography>
+        </div>
       )}
       {feature.properties.relativehumiditypercent != null && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Relative humidity: </b>
           <span>{feature.properties.relativehumiditypercent} %</span>
-        </Typography>
+        </div>
       )}
       {feature.properties.densityaltitudefeet != null && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Density altitude: </b>
           <span>{feature.properties.densityaltitudefeet} feet</span>
-        </Typography>
+        </div>
       )}
       {feature.properties.altim_in_hg != null && (
-        <Typography variant="body2" style={{ margin: 3 }}>
+        <div style={{ margin: 3 }}>
           <b>Altimeter: </b>
           <span>{feature.properties.altim_in_hg}" Hg</span>
-        </Typography>
+        </div>
       )}
       <Divider></Divider>
-      <Typography variant="body2" style={{ margin: 3, whiteSpace: 'pre-line' }}>
+      <div style={{ margin: 3, whiteSpace: 'pre-line' }}>
         <b>METAR: </b>
         {feature.properties.raw_text}
-      </Typography>
+      </div>
     </>
   );
 };
