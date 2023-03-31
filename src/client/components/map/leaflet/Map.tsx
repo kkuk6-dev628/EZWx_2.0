@@ -182,6 +182,7 @@ const LeafletMap = () => {
         bounds={
           baseMapLayerControl.bounds && baseMapLayerControl.bounds.length ? baseMapLayerControl.bounds : defaultBounds
         }
+        bounceAtZoomLimits={false}
         // @ts-ignore
         // timeDimension={true}
         // timeDimensionOptions={{
