@@ -7,6 +7,7 @@ import BaseMapLayerControl from '../layer-control/BaseMapLayerControl';
 import { useSelector } from 'react-redux';
 import { selectBaseMapLayerControl } from '../../../../store/layers/BaseMapLayerControl';
 import { db } from '../../../caching/dexieDb';
+import { wfsUrl2 } from '../../common/AreoConstants';
 
 const BaseMapLayers = () => {
   const baseMapLayers = useBaseMapLayersContext();
@@ -41,7 +42,7 @@ const BaseMapLayers = () => {
         }}
       >
         <WFSLayer
-          url="http://3.95.80.120:8080/geoserver/topp/ows"
+          url={wfsUrl2}
           maxFeatures={256}
           typeName="topp:states"
           interactive={false}
@@ -65,7 +66,7 @@ const BaseMapLayers = () => {
         }}
       >
         <WFSLayer
-          url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
+          url={wfsUrl2}
           maxFeatures={256}
           typeName="EZWxBrief:canadian_province"
           interactive={false}
@@ -92,7 +93,7 @@ const BaseMapLayers = () => {
         }}
       >
         <WFSLayer
-          url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
+          url={wfsUrl2}
           maxFeatures={256}
           typeName="EZWxBrief:county_warning_areas"
           interactive={false}

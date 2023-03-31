@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectLayerControlState } from '../../../../store/layers/LayerControl';
 import { db } from '../../../caching/dexieDb';
+import { wfsUrl1 } from '../../common/AreoConstants';
 import WFSLayer from './WFSLayer';
 
 const SigmetLayer = () => {
@@ -95,7 +96,7 @@ const SigmetLayer = () => {
   return (
     <WFSLayer
       key={renderedTime}
-      url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
+      url={wfsUrl1}
       maxFeatures={256}
       typeName="EZWxBrief:sigmet"
       initData={jsonData}

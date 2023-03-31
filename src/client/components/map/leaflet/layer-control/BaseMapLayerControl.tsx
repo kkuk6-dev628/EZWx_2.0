@@ -21,6 +21,14 @@ export const InBaseLayerControl = createContext<{ value: boolean }>({
   value: false,
 });
 
+const FetchData = () => {
+  const { id } = useSelector(selectAuth);
+  if (id) {
+    useGetBaseLayerControlStateQuery(null, { refetchOnMountOrArgChange: true });
+  }
+  return <></>;
+};
+
 const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]; position: string }) => {
   const positionClass = (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright;
 
@@ -150,6 +158,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
     <div className={positionClass + ' layer-control-container'} ref={ref}>
       {baseMapLayerStatus.show && (
         <div id="layer-control" className="leaflet-control leaflet-bar layer-control">
+          <FetchData />
           <div className="layer-control__header">
             <div className="layer-control__img__area">
               <Image

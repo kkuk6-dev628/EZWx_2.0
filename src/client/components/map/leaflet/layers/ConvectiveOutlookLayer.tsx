@@ -1,5 +1,6 @@
 import { PathOptions } from 'leaflet';
 import { db } from '../../../caching/dexieDb';
+import { wfsUrl1 } from '../../common/AreoConstants';
 import WFSLayer from './WFSLayer';
 
 const ConvectiveOutlookLayer = () => {
@@ -44,7 +45,7 @@ const ConvectiveOutlookLayer = () => {
 
   return (
     <WFSLayer
-      url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
+      url={wfsUrl1}
       maxFeatures={256}
       typeName="EZWxBrief:conv_outlook"
       propertyNames={['wkb_geometry', 'ogc_fid', 'valid_time_from', 'valid_time_to', 'raw_text']}

@@ -209,9 +209,9 @@ const WFSLayer = React.forwardRef(
         if (getLabel) {
           const zoom = map.getZoom();
           let label = getLabel(feature);
-          if (feature.id.indexOf('canadian_province') > -1) {
-            console.log(feature.id, label);
-          }
+          // if (feature.id.indexOf('canadian_province') > -1) {
+          //   console.log(feature.id, label);
+          // }
           if (label === 'Ontario' && feature.id !== 'canadian_province.13') {
             return;
           }

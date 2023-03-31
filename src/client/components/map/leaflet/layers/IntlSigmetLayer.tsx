@@ -1,5 +1,6 @@
 import { PathOptions } from 'leaflet';
 import { db } from '../../../caching/dexieDb';
+import { wfsUrl1 } from '../../common/AreoConstants';
 import WFSLayer from './WFSLayer';
 
 const IntlSigmetLayer = () => {
@@ -26,7 +27,7 @@ const IntlSigmetLayer = () => {
 
   return (
     <WFSLayer
-      url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
+      url={wfsUrl1}
       maxFeatures={256}
       typeName="EZWxBrief:intl_sigmet"
       propertyNames={[

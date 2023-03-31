@@ -5,7 +5,7 @@ import { Pane, useMap } from 'react-leaflet';
 import { addLeadingZeroes, loadFeaturesFromCache, loadFeaturesFromWeb } from '../../common/AreoFunctions';
 import { useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
-import { paneOrders, wfsUrl } from '../../common/AreoConstants';
+import { paneOrders, wfsUrl2 } from '../../common/AreoConstants';
 import { SimplifiedMarkersLayer } from './SimplifiedMarkersLayer';
 import { selectDataLoadTime } from '../../../../store/layers/DataLoadTimeSlice';
 import { selectLayerControlState } from '../../../../store/layers/LayerControl';
@@ -50,7 +50,7 @@ const PirepLayer = () => {
 
   useEffect(() => {
     loadFeaturesFromCache('pireps', setPireps);
-    loadFeaturesFromWeb(wfsUrl, 'EZWxBrief:pirep', properties, 'pireps', setPireps);
+    loadFeaturesFromWeb(wfsUrl2, 'EZWxBrief:pirep', properties, 'pireps', setPireps);
   }, [dataLoadTime]);
 
   useEffect(() => {

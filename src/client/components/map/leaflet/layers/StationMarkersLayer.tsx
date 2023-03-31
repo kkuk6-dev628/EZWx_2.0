@@ -13,7 +13,7 @@ import {
   StationMarkersLayerItems,
   paneOrders,
   timeSliderInterval,
-  wfsUrl,
+  wfsUrl4,
   windIconLimit,
 } from '../../common/AreoConstants';
 import {
@@ -316,7 +316,7 @@ export const StationMarkersLayer = () => {
       }
       const serverFilter = `observation_time DURING ${getQueryTime(time)}`;
       loadFeaturesFromWeb(
-        wfsUrl,
+        wfsUrl4,
         'EZWxBrief:metar',
         metarsProperties,
         'metars',
@@ -372,7 +372,7 @@ export const StationMarkersLayer = () => {
           }
           const [stationTime] = stationTimesWeb.splice(0, 1);
           loadFeaturesFromWeb(
-            wfsUrl,
+            wfsUrl4,
             `EZWxBrief:${stationTime.station_table_name}`,
             nbmStationProperties,
             stationTime.station_table_name,

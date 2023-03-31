@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectLayerControlState } from '../../../../store/layers/LayerControl';
 import { db } from '../../../caching/dexieDb';
+import { wfsUrl1 } from '../../common/AreoConstants';
 import { addLeadingZeroes } from '../../common/AreoFunctions';
 import WFSLayer from './WFSLayer';
 
@@ -158,7 +159,7 @@ const GairmetLayer = () => {
       key={renderedTime}
       ref={layerRef}
       initData={jsonData}
-      url="http://3.95.80.120:8080/geoserver/EZWxBrief/ows"
+      url={wfsUrl1}
       maxFeatures={256}
       typeName="EZWxBrief:gairmet"
       propertyNames={[
