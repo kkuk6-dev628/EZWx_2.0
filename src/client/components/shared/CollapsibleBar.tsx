@@ -12,7 +12,7 @@ function CollapsibleBar() {
   const dispatch = useDispatch();
   const settingsState = useSelector(selectSettings);
   const obsInterval = settingsState.observation_interval;
-  let defaultTime = new Date();
+  let defaultTime;
   const [updateUserSettingsAPI] = useUpdateUserSettingsMutation();
   const auth = useSelector(selectAuth);
 
@@ -33,6 +33,8 @@ function CollapsibleBar() {
     settingsState.observation_time <= valueToTime(84 * 12).getTime()
   ) {
     defaultTime = new Date(settingsState.observation_time);
+  } else {
+    defaultTime = new Date();
   }
   const marks = [
     {

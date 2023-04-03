@@ -87,6 +87,15 @@ const nbmStationProperties = [
   'l_cloud',
   'cross_r_id',
   'cross_com',
+  'wx_1',
+  'wx_2',
+  'wx_3',
+  'wx_prob_cov_1',
+  'wx_prob_cov_2',
+  'wx_prob_cov_3',
+  'wx_inten_1',
+  'wx_inten_2',
+  'wx_inten_3',
   'valid_date',
   'geom',
   'pub',
@@ -605,7 +614,7 @@ export const StationMarkersLayer = () => {
           marker = getDewpointDepressionMarker(feature, latlng, feature.properties.temp_c, feature.properties.dewp_c);
           break;
         case StationMarkersLayerItems.weather.value:
-          marker = getFlightCatMarker(feature, latlng);
+          marker = getNbmWeatherMarker(feature, latlng);
           break;
       }
     }
@@ -1428,6 +1437,90 @@ export const StationMarkersLayer = () => {
       icon: new L.DivIcon({
         className: 'metar-weather-icon',
         html: "<i style='color:" + iconColor + "' class='" + weatherIconClass + " fa-2x'></i>",
+        iconSize: [32, 26],
+        iconAnchor: [16, 13],
+        //popupAnchor: [0, -13]
+      }),
+      pane: 'station-markers',
+    });
+    return metarMarker;
+  };
+
+  const getNbmWeatherMarker = (feature: GeoJSON.Feature, latlng: LatLng) => {
+    const flightCategory = getNbmFlightCategory(feature, personalMinimums);
+    let iconColor = 'lightslategrey';
+    if (flightCategory in personalMinimums) {
+      iconColor = personalMinimums[flightCategory].color;
+    }
+    let isDayTime = true;
+    const sunsetSunriseTime = SunCalc.getTimes(new Date(observationTime), latlng.lat, latlng.lng);
+    if (Date.parse(sunsetSunriseTime.sunrise) && Date.parse(sunsetSunriseTime.sunset)) {
+      isDayTime =
+        observationTime >= sunsetSunriseTime.sunrise.getTime() && observationTime <= sunsetSunriseTime.sunset.getTime();
+    }
+    let iconType = 'fa-solid fa-square-question';
+    const wx_1 = feature.properties.wx_1;
+    const wx_prov_cov_1 = feature.properties.wx_prob_cov_1;
+    const wx_inten_1 = feature.properties.wx_inten_1;
+    const w_speed = feature.properties.w_speed;
+    const w_gust = feature.properties.w_gust;
+    const skycov = feature.properties.skycov;
+    if (!wx_1) {
+      if (w_speed > 20 && w_gust > 25) {
+        iconType = 'fa-solid fa-wind';
+      } else {
+        if (skycov < 6) {
+          iconType = isDayTime ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        } else if (skycov < 31) {
+          iconType = isDayTime ? 'fa-solid fa-sun-cloud' : 'fas fa-moon-cloud';
+        } else if (skycov < 58) {
+          iconType = isDayTime ? 'fa-solid fa-cloud-sun' : 'fa-solid fa-cloud-moon';
+        } else if (skycov < 88) {
+          iconType = isDayTime ? 'fas fa-clouds-sun' : 'fas fa-clouds-moon';
+        } else {
+          iconType = 'fa-solid fa-cloud';
+        }
+      }
+    } else {
+      switch (wx_1) {
+        case 1:
+          iconType = 'fa-solid fa-cloud-rain';
+          break;
+        case 2:
+          iconType = 'fa-solid fa-icicles';
+          break;
+        case 3:
+          iconType = 'fas fa-cloud-snow';
+          break;
+        case 4:
+          if (skycov < 88) {
+            iconType = isDayTime ? 'fa-cloud-bolt-sun' : 'fa-cloud-bolt-moon';
+          } else {
+            iconType = 'fa-solid fa-cloud-bolt';
+          }
+          break;
+        case 5:
+          if (skycov < 88) {
+            iconType = isDayTime ? 'fa-solid fa-cloud-sun-rain' : 'fa-cloud-moon-rain';
+          } else {
+            iconType = 'fa-solid fa-cloud-showers-heavy';
+          }
+          break;
+        case 6:
+          iconType = 'fa-solid fa-cloud-sleet';
+          break;
+        case 7:
+          iconType = 'fa-solid fa-cloud-snow';
+          break;
+        case 8:
+          iconType = 'fa-solid fa-fog';
+          break;
+      }
+    }
+    const metarMarker = L.marker(latlng, {
+      icon: new L.DivIcon({
+        className: 'metar-weather-icon',
+        html: "<i style='color:" + iconColor + "' class='" + iconType + " fa-2x'></i>",
         iconSize: [32, 26],
         iconAnchor: [16, 13],
         //popupAnchor: [0, -13]

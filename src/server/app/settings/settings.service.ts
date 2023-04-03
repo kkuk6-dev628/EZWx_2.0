@@ -35,6 +35,7 @@ export class SettingsService {
       }
       const { id, ...rest } = res;
       const modifiedData = getModifiedData(rest);
+      console.log(modifiedData);
       return modifiedData;
     } catch (error) {
       console.log('error', error);
@@ -90,7 +91,7 @@ export class SettingsService {
         crosswinds_at_destination_airport_max: crosswinds_at_destination_airport[1],
         ...rest,
       };
-      let res = await this.userSettingsRepository.findOne({ where: { user_id: dto.user_id } });
+      let res = await this.userSettingsRepository.findOne({ where: { user_id: user.id } });
       if (res) {
         res = await this.userSettingsRepository.save({ id: res.id, ...modified_dto });
       } else {

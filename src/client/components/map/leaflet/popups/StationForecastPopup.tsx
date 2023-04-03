@@ -28,6 +28,7 @@ const StationForecastPopup = ({
   airportsData: any;
   userSettings: any;
 }) => {
+  console.log(layer.feature.properties);
   const feature = layer.feature;
   const iconUrl = getNbmFlightCategoryIconUrl(layer.feature, personalMinimums);
   const ceiling = layer.feature.properties.ceil;
