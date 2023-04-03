@@ -27,7 +27,7 @@ function signin() {
   } else if (!isLoading && responseError) {
     console.log(responseError);
   } else if (!isLoading && !responseError && data) {
-    router.push('/profile');
+    router.push('/map');
   }
   return (
     <div className="sign">

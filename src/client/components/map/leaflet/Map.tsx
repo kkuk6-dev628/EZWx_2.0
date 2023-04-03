@@ -79,7 +79,7 @@ const LeafletMap = () => {
   }, []);
 
   useEffect(() => {
-    if (pathname === '/try-ezwxbrief') {
+    if (pathname === '/map') {
       setIsShowTabs(true);
     }
   }, [pathname]);

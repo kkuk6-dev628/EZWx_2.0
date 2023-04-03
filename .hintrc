@@ -27,6 +27,13 @@
         "duplicate-id-aria": "off"
       }
     ],
-    "apple-touch-icons": "off"
+    "apple-touch-icons": "off",
+    "axe/time-and-media": [
+      "default",
+      {
+        "meta-refresh": "off"
+      }
+    ],
+    "meta-viewport": "off"
   }
 }

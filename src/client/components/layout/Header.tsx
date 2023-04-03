@@ -40,7 +40,7 @@ const links = [
   {
     id: 5,
     name: 'Try EZWxBrief',
-    link: '/try-ezwxbrief',
+    link: '/map',
   },
   {
     id: 6,
@@ -109,19 +109,15 @@ export default function Header() {
   const auth = useSelector(selectAuth);
 
   useEffect(() => {
-    if (pathname === '/try-ezwxbrief' || pathname === '/imagery') {
+    if (pathname === '/map' || pathname === '/imagery') {
       setMapMenu(true);
     } else {
       setMapMenu(false);
     }
-    if (pathname === '/profile') {
+    if (auth.id) {
       setIsUserLoginUser(true);
-    } else if (pathname === '/home') {
-      if (localStorage.getItem('auth')) {
-        setIsUserLoginUser(true);
-      } else {
-        setIsUserLoginUser(false);
-      }
+    } else {
+      setIsUserLoginUser(false);
     }
   }, [pathname]);
   const handleActiveMenu = (id) => {

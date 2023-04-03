@@ -22,7 +22,7 @@ const App = ({ Component, ...rest }: AppProps) => {
   }, []);
 
   useEffect(() => {
-    if (pathname === '/try-ezwxbrief' || pathname === '/imagery') {
+    if (pathname === '/map' || pathname === '/imagery') {
       setShowFooter(true);
     } else {
       setShowFooter(false);

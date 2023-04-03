@@ -15,12 +15,6 @@ export class ViewController {
     await this.viewService.getNextServer().render(req, res, parsedUrl.pathname, parsedUrl.query);
   }
 
-  @Get('favicon.ico')
-  public async getFavicon(@Req() req: Request, @Res() res: Response) {
-    const parsedUrl = parse(req.url, true);
-
-    await this.viewService.getNextServer().render(req, res, parsedUrl.pathname, parsedUrl.query);
-  }
   @Get('offline.html')
   public async getOfflineHtml(@Req() req: Request, @Res() res: Response) {
     res.send('You are offline!');
@@ -28,6 +22,11 @@ export class ViewController {
 
   @Get('')
   public async showIndex(@Req() req: Request, @Res() res: Response) {
+    await this.viewService.getNextServer().render(req, res, '/home');
+  }
+
+  @Get('index.html')
+  public async showIndexHtml(@Req() req: Request, @Res() res: Response) {
     await this.viewService.getNextServer().render(req, res, '/home');
   }
 

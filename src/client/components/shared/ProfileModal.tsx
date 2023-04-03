@@ -22,7 +22,7 @@ function ProfileModal({ handleProfileModal, setIsUserLoginUser }: ProfileModalPr
   const changeRoute = () => {
     handleProfileModal();
     setIsUserLoginUser(false);
-    router.push('/profile');
+    router.push('/map');
   };
 
   const handleSignout = () => {
