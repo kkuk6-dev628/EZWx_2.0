@@ -54,11 +54,11 @@ export class AuthService {
 
     console.log('user is ', user ? user.displayName : 'none');
 
-    if (!user) throw new ForbiddenException('email incorrect');
+    if (!user) throw new ForbiddenException('Email incorrect!');
 
     const pwMatches = await bcrypt.compare(dto.password, user.hash);
 
-    if (!pwMatches) throw new ForbiddenException('password incorrect');
+    if (!pwMatches) throw new ForbiddenException('Password incorrect!');
 
     const accessToken = await this.jwtService.login({
       id: user.id,

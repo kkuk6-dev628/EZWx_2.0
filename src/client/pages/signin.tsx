@@ -5,6 +5,7 @@ import { BsInstagram } from 'react-icons/bs';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useSigninMutation } from '../store/auth/authApi';
 import { useRouter } from 'next/router';
+import { toast } from 'react-hot-toast';
 interface IFormInput {
   email: string;
   password: string;
@@ -25,7 +26,7 @@ function signin() {
   if (isLoading) {
     console.log('loading');
   } else if (!isLoading && responseError) {
-    console.log(responseError);
+    toast.error((responseError as any).data.message);
   } else if (!isLoading && !responseError && data) {
     router.push('/map');
   }
