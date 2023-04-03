@@ -107,114 +107,116 @@ const StationForecastPopup = ({
         </b>
       </div>
       <Divider></Divider>
-      {airportName && (
+      <div className="popup-content">
+        {airportName && (
+          <div style={{ margin: 3 }}>
+            <b>Name: </b>
+            <span>{airportName}</span>
+          </div>
+        )}
         <div style={{ margin: 3 }}>
-          <b>Name: </b>
-          <span>{airportName}</span>
+          <b>Time: </b> {convertTimeFormat(feature.properties.valid_date, userSettings.default_time_display_unit)}
         </div>
-      )}
-      <div style={{ margin: 3 }}>
-        <b>Time: </b> {convertTimeFormat(feature.properties.valid_date, userSettings.default_time_display_unit)}
+        {ceiling && (
+          <div style={{ margin: 3 }}>
+            <b>Ceiling: </b>
+            <span style={{ color: ceilingColor }}>{ceiling} feet</span>
+          </div>
+        )}
+        {feature.properties.vis != null && (
+          <div style={{ margin: 3 }}>
+            <b>Visibility: </b>
+            <span style={{ color: visibilityColor }}>{visibility}</span>
+          </div>
+        )}
+        {skyConditionsAsc.length > 0 && (
+          <div style={{ display: 'flex', lineHeight: 1, color: 'black' }} className="MuiTypography-body2">
+            <div>
+              <p style={{ margin: 3 }}>
+                <b>Clouds: </b>
+              </p>
+            </div>
+            <div style={{ margin: 3, marginTop: -5 }}>
+              {skyConditionsAsc.map((skyCondition) => {
+                return (
+                  <div key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`} style={{ marginTop: 8 }}>
+                    {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
+                    {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false &&
+                      skyCondition.cloudBase + ' feet'}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        {feature.properties.w_speed != null && (
+          <div style={{ margin: 3 }}>
+            <b>Wind speed: </b>
+            <span>{windSpeed}</span>
+          </div>
+        )}
+        {feature.properties.w_dir !== null &&
+          feature.properties.w_dir !== 0 &&
+          feature.properties.w_speed !== 0 &&
+          feature.properties.w_speed !== null && (
+            <div style={{ margin: 3 }}>
+              <b>Wind direction: </b>
+              <span>{addLeadingZeroes(feature.properties.w_dir, 3)}&deg;</span>
+            </div>
+          )}
+        {(feature.properties.w_dir === null || feature.properties.w_dir === 0) &&
+          feature.properties.w_speed !== 0 &&
+          feature.properties.w_speed !== null && (
+            <div style={{ margin: 3 }}>
+              <b>Wind direction: </b>
+              <span>Variable</span>
+            </div>
+          )}
+        {feature.properties.w_gust != null && (
+          <div style={{ margin: 3 }}>
+            <b>Wind gust: </b>
+            <span>{windGust}</span>
+          </div>
+        )}
+        {feature.properties.cross_com != null && (
+          <div style={{ margin: 3 }}>
+            <b>Crosswind component: </b>
+            <span>{crossWind}</span>
+          </div>
+        )}
+        {feature.properties.cross_com != null && (
+          <div style={{ margin: 3 }}>
+            <b>Crosswind runway: </b>
+            <span>{feature.properties.cross_r_id}</span>
+          </div>
+        )}
+        {feature.properties.temp_c != null && (
+          <div style={{ margin: 3 }}>
+            <b>Temperature: </b>
+            <span>
+              {!userSettings.default_temperature_unit
+                ? feature.properties.temp_c + ' \u00B0C'
+                : celsiusToFahrenheit(feature.properties.temp_c) + ' \u00B0F'}
+            </span>
+          </div>
+        )}
+        {feature.properties.dewp_c != null && (
+          <div style={{ margin: 3 }}>
+            <b>Dewpoint: </b>
+            <span>
+              {!userSettings.default_temperature_unit
+                ? feature.properties.dewp_c + ' \u00B0C'
+                : celsiusToFahrenheit(feature.properties.dewp_c) + ' \u00B0F'}
+            </span>
+          </div>
+        )}
+        {feature.properties.temp_c != null && feature.properties.dewp_c != null && (
+          <div style={{ margin: 3 }}>
+            <b>Relative humidity: </b>
+            <span>{Math.round(calcRelativeHumidity(feature.properties.temp_c, feature.properties.dewp_c))} %</span>
+          </div>
+        )}
       </div>
-      {ceiling && (
-        <div style={{ margin: 3 }}>
-          <b>Ceiling: </b>
-          <span style={{ color: ceilingColor }}>{ceiling} feet</span>
-        </div>
-      )}
-      {feature.properties.vis != null && (
-        <div style={{ margin: 3 }}>
-          <b>Visibility: </b>
-          <span style={{ color: visibilityColor }}>{visibility}</span>
-        </div>
-      )}
-      {skyConditionsAsc.length > 0 && (
-        <div style={{ display: 'flex', lineHeight: 1, color: 'black' }} className="MuiTypography-body2">
-          <div>
-            <p style={{ margin: 3 }}>
-              <b>Clouds: </b>
-            </p>
-          </div>
-          <div style={{ margin: 3, marginTop: -5 }}>
-            {skyConditionsAsc.map((skyCondition) => {
-              return (
-                <div key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`} style={{ marginTop: 8 }}>
-                  {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
-                  {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false &&
-                    skyCondition.cloudBase + ' feet'}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-      {feature.properties.w_speed != null && (
-        <div style={{ margin: 3 }}>
-          <b>Wind speed: </b>
-          <span>{windSpeed}</span>
-        </div>
-      )}
-      {feature.properties.w_dir !== null &&
-        feature.properties.w_dir !== 0 &&
-        feature.properties.w_speed !== 0 &&
-        feature.properties.w_speed !== null && (
-          <div style={{ margin: 3 }}>
-            <b>Wind direction: </b>
-            <span>{addLeadingZeroes(feature.properties.w_dir, 3)}&deg;</span>
-          </div>
-        )}
-      {(feature.properties.w_dir === null || feature.properties.w_dir === 0) &&
-        feature.properties.w_speed !== 0 &&
-        feature.properties.w_speed !== null && (
-          <div style={{ margin: 3 }}>
-            <b>Wind direction: </b>
-            <span>Variable</span>
-          </div>
-        )}
-      {feature.properties.w_gust != null && (
-        <div style={{ margin: 3 }}>
-          <b>Wind gust: </b>
-          <span>{windGust}</span>
-        </div>
-      )}
-      {feature.properties.cross_com != null && (
-        <div style={{ margin: 3 }}>
-          <b>Crosswind component: </b>
-          <span>{crossWind}</span>
-        </div>
-      )}
-      {feature.properties.cross_com != null && (
-        <div style={{ margin: 3 }}>
-          <b>Crosswind runway: </b>
-          <span>{feature.properties.cross_r_id}</span>
-        </div>
-      )}
-      {feature.properties.temp_c != null && (
-        <div style={{ margin: 3 }}>
-          <b>Temperature: </b>
-          <span>
-            {!userSettings.default_temperature_unit
-              ? feature.properties.temp_c + ' \u00B0C'
-              : celsiusToFahrenheit(feature.properties.temp_c) + ' \u00B0F'}
-          </span>
-        </div>
-      )}
-      {feature.properties.dewp_c != null && (
-        <div style={{ margin: 3 }}>
-          <b>Dewpoint: </b>
-          <span>
-            {!userSettings.default_temperature_unit
-              ? feature.properties.dewp_c + ' \u00B0C'
-              : celsiusToFahrenheit(feature.properties.dewp_c) + ' \u00B0F'}
-          </span>
-        </div>
-      )}
-      {feature.properties.temp_c != null && feature.properties.dewp_c != null && (
-        <div style={{ margin: 3 }}>
-          <b>Relative humidity: </b>
-          <span>{Math.round(calcRelativeHumidity(feature.properties.temp_c, feature.properties.dewp_c))} %</span>
-        </div>
-      )}
     </>
   );
 };

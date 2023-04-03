@@ -71,135 +71,137 @@ const MetarsPopup = ({
         &nbsp;<b>{feature.properties.station_id}&nbsp;Surface observation</b>
       </div>
       <Divider></Divider>
-      {airportName && (
-        <div style={{ margin: 3 }}>
-          <b>Airport name: </b>
-          <span>{airportName}</span>
-        </div>
-      )}
-      <div style={{ margin: 3 }}>
-        <b>Time: </b> {convertTimeFormat(feature.properties.observation_time, userSettings.default_time_display_unit)}
-      </div>
-      {isFinite(ceiling) && (
-        <div style={{ margin: 3 }}>
-          <b>Ceiling: </b>
-          <span style={{ color: ceilingColor }}>{ceiling} feet</span>
-        </div>
-      )}
-      {feature.properties.visibility_statute_mi != null && (
-        <div style={{ margin: 3 }}>
-          <b>Visibility: </b>
-          <span style={{ color: visibilityColor }}>{visibility}</span>
-        </div>
-      )}
-      {skyConditionsAsc.length > 0 && (
-        <div style={{ display: 'flex', lineHeight: 1, color: 'black' }} className="MuiTypography-body2">
-          <div>
-            <p style={{ margin: 3 }}>
-              <b>Clouds: </b>
-            </p>
-          </div>
-          <div style={{ margin: 3, marginTop: -5 }}>
-            {skyConditionsAsc.map((skyCondition) => {
-              return (
-                <div key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`} style={{ marginTop: 8 }}>
-                  {MetarSkyValuesToString[skyCondition.skyCover]} {skyCondition.cloudBase}{' '}
-                  {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false && 'feet'}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-      {weatherString && (
-        <div style={{ margin: 3 }}>
-          <b>Weather: </b>
-          <span>{weatherString}</span>
-        </div>
-      )}
-      {feature.properties.wind_speed_kt != null && (
-        <div style={{ margin: 3 }}>
-          <b>Wind speed: </b>
-          <span>{windSpeed}</span>
-        </div>
-      )}
-      {feature.properties.wind_dir_degrees !== null &&
-        feature.properties.wind_dir_degrees !== 0 &&
-        feature.properties.wind_speed_kt !== 0 &&
-        feature.properties.wind_speed_kt !== null && (
+      <div className="popup-content">
+        {airportName && (
           <div style={{ margin: 3 }}>
-            <b>Wind direction: </b>
-            <span>{addLeadingZeroes(feature.properties.wind_dir_degrees, 3)}&deg;</span>
+            <b>Airport name: </b>
+            <span>{airportName}</span>
           </div>
         )}
-      {(feature.properties.wind_dir_degrees === null || feature.properties.wind_dir_degrees === 0) &&
-        feature.properties.wind_speed_kt !== 0 &&
-        feature.properties.wind_speed_kt !== null && (
+        <div style={{ margin: 3 }}>
+          <b>Time: </b> {convertTimeFormat(feature.properties.observation_time, userSettings.default_time_display_unit)}
+        </div>
+        {isFinite(ceiling) && (
           <div style={{ margin: 3 }}>
-            <b>Wind direction: </b>
-            <span>Variable</span>
+            <b>Ceiling: </b>
+            <span style={{ color: ceilingColor }}>{ceiling} feet</span>
           </div>
         )}
-      {feature.properties.wind_gust_kt != null && (
-        <div style={{ margin: 3 }}>
-          <b>Wind gust: </b>
-          <span>{windGust}</span>
+        {feature.properties.visibility_statute_mi != null && (
+          <div style={{ margin: 3 }}>
+            <b>Visibility: </b>
+            <span style={{ color: visibilityColor }}>{visibility}</span>
+          </div>
+        )}
+        {skyConditionsAsc.length > 0 && (
+          <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
+            <div>
+              <p style={{ margin: 3 }}>
+                <b>Clouds: </b>
+              </p>
+            </div>
+            <div style={{ margin: 3, marginTop: -5 }}>
+              {skyConditionsAsc.map((skyCondition) => {
+                return (
+                  <div key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`} style={{ marginTop: 8 }}>
+                    {MetarSkyValuesToString[skyCondition.skyCover]} {skyCondition.cloudBase}{' '}
+                    {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false && 'feet'}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        {weatherString && (
+          <div style={{ margin: 3 }}>
+            <b>Weather: </b>
+            <span>{weatherString}</span>
+          </div>
+        )}
+        {feature.properties.wind_speed_kt != null && (
+          <div style={{ margin: 3 }}>
+            <b>Wind speed: </b>
+            <span>{windSpeed}</span>
+          </div>
+        )}
+        {feature.properties.wind_dir_degrees !== null &&
+          feature.properties.wind_dir_degrees !== 0 &&
+          feature.properties.wind_speed_kt !== 0 &&
+          feature.properties.wind_speed_kt !== null && (
+            <div style={{ margin: 3 }}>
+              <b>Wind direction: </b>
+              <span>{addLeadingZeroes(feature.properties.wind_dir_degrees, 3)}&deg;</span>
+            </div>
+          )}
+        {(feature.properties.wind_dir_degrees === null || feature.properties.wind_dir_degrees === 0) &&
+          feature.properties.wind_speed_kt !== 0 &&
+          feature.properties.wind_speed_kt !== null && (
+            <div style={{ margin: 3 }}>
+              <b>Wind direction: </b>
+              <span>Variable</span>
+            </div>
+          )}
+        {feature.properties.wind_gust_kt != null && (
+          <div style={{ margin: 3 }}>
+            <b>Wind gust: </b>
+            <span>{windGust}</span>
+          </div>
+        )}
+        {feature.properties.crosswind_component_kt != null && (
+          <div style={{ margin: 3 }}>
+            <b>Crosswind component: </b>
+            <span>{crossWind}</span>
+          </div>
+        )}
+        {feature.properties.crosswind_component_kt != null && (
+          <div style={{ margin: 3 }}>
+            <b>Crosswind runway: </b>
+            <span>{feature.properties.crosswind_runway_id}</span>
+          </div>
+        )}
+        {feature.properties.temp_c != null && (
+          <div style={{ margin: 3 }}>
+            <b>Temperature: </b>
+            <span>
+              {!userSettings.default_temperature_unit
+                ? feature.properties.temp_c + ' \u00B0C'
+                : celsiusToFahrenheit(feature.properties.temp_c) + ' \u00B0F'}
+            </span>
+          </div>
+        )}
+        {feature.properties.dewpoint_c != null && (
+          <div style={{ margin: 3 }}>
+            <b>Dewpoint: </b>
+            <span>
+              {!userSettings.default_temperature_unit
+                ? feature.properties.dewpoint_c + ' \u00B0C'
+                : celsiusToFahrenheit(feature.properties.dewpoint_c) + ' \u00B0F'}
+            </span>
+          </div>
+        )}
+        {feature.properties.relativehumiditypercent != null && (
+          <div style={{ margin: 3 }}>
+            <b>Relative humidity: </b>
+            <span>{feature.properties.relativehumiditypercent} %</span>
+          </div>
+        )}
+        {feature.properties.densityaltitudefeet != null && (
+          <div style={{ margin: 3 }}>
+            <b>Density altitude: </b>
+            <span>{feature.properties.densityaltitudefeet} feet</span>
+          </div>
+        )}
+        {feature.properties.altim_in_hg != null && (
+          <div style={{ margin: 3 }}>
+            <b>Altimeter: </b>
+            <span>{feature.properties.altim_in_hg}" Hg</span>
+          </div>
+        )}
+        <Divider></Divider>
+        <div style={{ margin: 3, whiteSpace: 'pre-line' }}>
+          <b>METAR: </b>
+          {feature.properties.raw_text}
         </div>
-      )}
-      {feature.properties.crosswind_component_kt != null && (
-        <div style={{ margin: 3 }}>
-          <b>Crosswind component: </b>
-          <span>{crossWind}</span>
-        </div>
-      )}
-      {feature.properties.crosswind_component_kt != null && (
-        <div style={{ margin: 3 }}>
-          <b>Crosswind runway: </b>
-          <span>{feature.properties.crosswind_runway_id}</span>
-        </div>
-      )}
-      {feature.properties.temp_c != null && (
-        <div style={{ margin: 3 }}>
-          <b>Temperature: </b>
-          <span>
-            {!userSettings.default_temperature_unit
-              ? feature.properties.temp_c + ' \u00B0C'
-              : celsiusToFahrenheit(feature.properties.temp_c) + ' \u00B0F'}
-          </span>
-        </div>
-      )}
-      {feature.properties.dewpoint_c != null && (
-        <div style={{ margin: 3 }}>
-          <b>Dewpoint: </b>
-          <span>
-            {!userSettings.default_temperature_unit
-              ? feature.properties.dewpoint_c + ' \u00B0C'
-              : celsiusToFahrenheit(feature.properties.dewpoint_c) + ' \u00B0F'}
-          </span>
-        </div>
-      )}
-      {feature.properties.relativehumiditypercent != null && (
-        <div style={{ margin: 3 }}>
-          <b>Relative humidity: </b>
-          <span>{feature.properties.relativehumiditypercent} %</span>
-        </div>
-      )}
-      {feature.properties.densityaltitudefeet != null && (
-        <div style={{ margin: 3 }}>
-          <b>Density altitude: </b>
-          <span>{feature.properties.densityaltitudefeet} feet</span>
-        </div>
-      )}
-      {feature.properties.altim_in_hg != null && (
-        <div style={{ margin: 3 }}>
-          <b>Altimeter: </b>
-          <span>{feature.properties.altim_in_hg}" Hg</span>
-        </div>
-      )}
-      <Divider></Divider>
-      <div style={{ margin: 3, whiteSpace: 'pre-line' }}>
-        <b>METAR: </b>
-        {feature.properties.raw_text}
       </div>
     </>
   );

@@ -38,6 +38,9 @@
     margin: 8px 2px;
     overflow-y: scroll;
     max-height: calc(100vh - 365px);
+    @media screen and (max-height: 500px) {
+      max-height: calc(100vh - 200px);
+    }
   }
   ::-webkit-scrollbar{
     width: 8px;
