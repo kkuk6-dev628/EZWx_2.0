@@ -130,7 +130,7 @@ const StationForecastPopup = ({
           </div>
         )}
         {skyConditionsAsc.length > 0 && (
-          <div style={{ display: 'flex', lineHeight: 1, color: 'black' }} className="MuiTypography-body2">
+          <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
             <div>
               <p style={{ margin: 3 }}>
                 <b>Clouds: </b>

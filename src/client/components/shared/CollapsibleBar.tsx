@@ -80,7 +80,8 @@ function CollapsibleBar() {
         className="time-slider"
         key={`time-range-slider`}
         aria-label="Time Slider"
-        defaultValue={timeToValue(defaultTime)}
+        // defaultValue={timeToValue(defaultTime)}
+        value={timeToValue(defaultTime)}
         max={84 * 12}
         valueLabelFormat={valuetext}
         step={1}
