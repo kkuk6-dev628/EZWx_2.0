@@ -43,7 +43,7 @@ const SigmetLayer = () => {
       case 'TURB':
         label = `TURB`;
         break;
-      case 'ICE':
+      case 'ICING':
         label = `ICE`;
         break;
       case 'IFR':

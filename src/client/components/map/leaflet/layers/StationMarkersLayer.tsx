@@ -206,7 +206,7 @@ const nbmStations = {};
 
 export const StationMarkersLayer = () => {
   const [displayedGeojson, setDisplayedGeojson] = useState<GeoJSON.FeatureCollection>();
-  const [stationTime, setStationTime] = useState<any[]>([]);
+  const stationTimeRef = useRef<any[]>([]);
   const [clusterRadius, setClusterRadius] = useState(20);
   const layerState = useSelector(selectLayerControlState);
   const personalMinimums = useSelector(selectPersonalMinimums);
@@ -283,13 +283,18 @@ export const StationMarkersLayer = () => {
   ]);
 
   const updateNbmStationMarkers = () => {
+    const nbmStationData = getNbmStationDataForObservationTime();
+    setDisplayedData(nbmStationData);
+  };
+
+  const getNbmStationDataForObservationTime = (): GeoJSON.Feature[] => {
+    const stationTime = stationTimeRef.current;
     if (stationTime.length > 0) {
       const obsHour = getAbsoluteHours(observationTime);
       const lastTime = new Date(stationTime[stationTime.length - 1].valid_date);
       lastTime.setHours(lastTime.getHours() + 3);
       if (getAbsoluteHours(lastTime) < obsHour) {
-        setDisplayedData([]);
-        return;
+        return [];
       }
       const validStation = stationTime.reduce((acc, cur) => {
         const prevDiff = Math.abs(getAbsoluteHours(acc.valid_date) - obsHour);
@@ -301,12 +306,12 @@ export const StationMarkersLayer = () => {
       });
       if (nbmStations[validStation.station_table_name]) {
         const filtered = stationForecastFilter(nbmStations[validStation.station_table_name]);
-        setDisplayedData(filtered);
+        return filtered;
       }
-    } else {
-      setDisplayedData([]);
     }
+    return [];
   };
+
   const setDisplayedData = (features: GeoJSON.Feature[]) => {
     setDisplayedGeojson({
       type: 'FeatureCollection',
@@ -351,7 +356,7 @@ export const StationMarkersLayer = () => {
           console.log(result.data);
           return;
         }
-        setStationTime(result.data);
+        stationTimeRef.current = result.data;
 
         const stationTimes = [...result.data].filter((stationTime) => {
           const stationValidHour = getAbsoluteHours(stationTime.valid_date);
@@ -388,6 +393,18 @@ export const StationMarkersLayer = () => {
             (features) => {
               addNbmStation(stationTime.station_table_name, features);
               queuedLoadWeb();
+              setDisplayedGeojson((prevState) => {
+                if (!prevState || prevState.features.length === 0) {
+                  const nbmStationData = getNbmStationDataForObservationTime();
+                  if (nbmStationData.length > 0) {
+                    return {
+                      type: 'FeatureCollection',
+                      features: nbmStationData,
+                    };
+                  }
+                }
+                return prevState;
+              });
             },
             (a, b) =>
               b.properties.pub - a.properties.pub || (a.properties.faaid as string).localeCompare(b.properties.faaid),
