@@ -31,10 +31,10 @@ const wxStrings = {
   1: 'rain',
   2: 'freezing rain',
   3: 'snow',
-  4: 'thunderstorm',
-  5: 'rain shower',
+  4: 'thunderstorms',
+  5: 'rain showers',
   6: 'ice pellets',
-  7: 'snow shower',
+  7: 'snow showers',
   8: 'fog',
 };
 
@@ -44,8 +44,31 @@ const intenStrings = {
   3: 'heavy',
 };
 
-const makeWeatherString = (wx: number, prob: number, inten: number, skyCov: number): string => {
-  if (wx != 4) {
+const makeWeatherString = (
+  wx: number,
+  prob: number,
+  inten: number,
+  skyCov: number,
+  w_speed: number,
+  w_gust: number,
+): string => {
+  if (!wx) {
+    if (w_speed > 20 && w_gust > 25) {
+      return 'Wind over 20 knots and/or wind gust over 25 knots';
+    } else {
+      if (skyCov < 6) {
+        return 'Fair/clear';
+      } else if (skyCov < 31) {
+        return 'Mostly clear';
+      } else if (skyCov < 58) {
+        return 'Partly cloudy';
+      } else if (skyCov < 88) {
+        return 'Mostly cloudy';
+      } else {
+        return 'Cloudy';
+      }
+    }
+  } else if (wx != 4) {
     if (wx in wxStrings && prob in probStrings && inten in intenStrings) {
       return `${probStrings[prob]} of ${intenStrings[inten]} ${wxStrings[wx]}`;
     }
@@ -78,19 +101,19 @@ const StationForecastPopup = ({
   userSettings: any;
 }) => {
   const properties = layer.feature.properties;
-  console.log(
-    properties.icaoid,
-    properties.faaid,
-    properties.wx_1,
-    properties.wx_prob_cov_1,
-    properties.wx_inten_1,
-    properties.wx_2,
-    properties.wx_prob_cov_2,
-    properties.wx_inten_2,
-    properties.wx_3,
-    properties.wx_prob_cov_3,
-    properties.wx_inten_3,
-  );
+  // console.log(
+  //   properties.icaoid,
+  //   properties.faaid,
+  //   properties.wx_1,
+  //   properties.wx_prob_cov_1,
+  //   properties.wx_inten_1,
+  //   properties.wx_2,
+  //   properties.wx_prob_cov_2,
+  //   properties.wx_inten_2,
+  //   properties.wx_3,
+  //   properties.wx_prob_cov_3,
+  //   properties.wx_inten_3,
+  // );
   const iconUrl = getNbmFlightCategoryIconUrl(layer.feature, personalMinimums);
   const ceiling = properties.ceil;
   const [, ceilingColor] = getMetarCeilingCategory(ceiling, personalMinimums);
@@ -151,7 +174,7 @@ const StationForecastPopup = ({
       ? properties.w_speed + (properties.w_speed <= 1 ? ' knot' : ' knots')
       : knotsToMph(properties.w_speed) + ' mph';
   const windGust = !userSettings.default_wind_speed_unit
-    ? properties.w_gust + (properties.w_gust ? ' knot' : ' knots')
+    ? properties.w_gust + (properties.w_gust <= 1 ? ' knot' : ' knots')
     : knotsToMph(properties.w_gust) + ' mph';
 
   const crossWind = !userSettings.default_wind_speed_unit
@@ -160,13 +183,40 @@ const StationForecastPopup = ({
 
   const weatherLines = [];
   if (properties.wx_1) {
-    weatherLines.push(makeWeatherString(properties.wx_1, properties.wx_prob_cov_1, properties.wx_inten_1, skyCover));
+    weatherLines.push(
+      makeWeatherString(
+        properties.wx_1,
+        properties.wx_prob_cov_1,
+        properties.wx_inten_1,
+        skyCover,
+        properties.w_speed,
+        properties.w_gust,
+      ),
+    );
   }
   if (properties.wx_2) {
-    weatherLines.push(makeWeatherString(properties.wx_2, properties.wx_prob_cov_2, properties.wx_inten_2, skyCover));
+    weatherLines.push(
+      makeWeatherString(
+        properties.wx_2,
+        properties.wx_prob_cov_2,
+        properties.wx_inten_2,
+        skyCover,
+        properties.w_speed,
+        properties.w_gust,
+      ),
+    );
   }
   if (properties.wx_3) {
-    weatherLines.push(makeWeatherString(properties.wx_3, properties.wx_prob_cov_3, properties.wx_inten_3, skyCover));
+    weatherLines.push(
+      makeWeatherString(
+        properties.wx_3,
+        properties.wx_prob_cov_3,
+        properties.wx_inten_3,
+        skyCover,
+        properties.w_speed,
+        properties.w_gust,
+      ),
+    );
   }
 
   return (
@@ -196,12 +246,6 @@ const StationForecastPopup = ({
             <span style={{ color: ceilingColor }}>{ceiling} feet</span>
           </div>
         )}
-        {properties.vis != null && (
-          <div style={{ margin: 3 }}>
-            <b>Visibility: </b>
-            <span style={{ color: visibilityColor }}>{visibility}</span>
-          </div>
-        )}
         {skyConditionsAsc.length > 0 && (
           <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
             <div>
@@ -222,24 +266,28 @@ const StationForecastPopup = ({
             </div>
           </div>
         )}
-        {properties.wx_1 && (
-          <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
-            <div>
-              <p style={{ margin: 3 }}>
-                <b>Weather: </b>
-              </p>
-            </div>
-            <div style={{ margin: 3, marginTop: -5 }}>
-              {weatherLines.map((weatherLine, index) => {
-                return (
-                  <div key={`${weatherLine}-${index}`} style={{ marginTop: 8 }}>
-                    {weatherLine}
-                  </div>
-                );
-              })}
-            </div>
+        {properties.vis != null && (
+          <div style={{ margin: 3 }}>
+            <b>Visibility: </b>
+            <span style={{ color: visibilityColor }}>{visibility}</span>
           </div>
         )}
+        <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
+          <div>
+            <p style={{ margin: 3 }}>
+              <b>Weather: </b>
+            </p>
+          </div>
+          <div style={{ margin: 3, marginTop: -5 }}>
+            {weatherLines.map((weatherLine, index) => {
+              return (
+                <div key={`${weatherLine}-${index}`} style={{ marginTop: 8 }}>
+                  {weatherLine}
+                </div>
+              );
+            })}
+          </div>
+        </div>
         {properties.w_speed != null && (
           <div style={{ margin: 3 }}>
             <b>Wind speed: </b>

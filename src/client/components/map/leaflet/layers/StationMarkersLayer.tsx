@@ -216,6 +216,7 @@ export const StationMarkersLayer = () => {
   const [isPast, setIsPast] = useState(true);
   const activeRoute = useSelector(selectActiveRoute);
   const dataLoadTime = useSelector(selectDataLoadTime);
+  const [fetchedNbmStationData, setFetchedNbmStationData] = useState('');
 
   const geojsonLayerRef = useRef();
 
@@ -229,9 +230,9 @@ export const StationMarkersLayer = () => {
   useEffect(() => {
     if (!indexedData || !isPast) return;
     if (Object.keys(indexedData).length > 0) {
-      const filteredFeatures = metarsFilter(new Date(observationTime));
       setDisplayedGeojson((prevState) => {
-        if (!prevState) {
+        if (!prevState || prevState.features.length === 0) {
+          const filteredFeatures = metarsFilter(new Date(observationTime));
           return {
             type: 'FeatureCollection',
             features: filteredFeatures,
@@ -241,6 +242,22 @@ export const StationMarkersLayer = () => {
       });
     }
   }, [indexedData]);
+
+  useEffect(() => {
+    if (isPast) return;
+    setDisplayedGeojson((prevState) => {
+      if (!prevState || prevState.features.length === 0) {
+        const nbmStationData = getNbmStationDataForObservationTime();
+        if (nbmStationData.length > 0) {
+          return {
+            type: 'FeatureCollection',
+            features: nbmStationData,
+          };
+        }
+      }
+      return prevState;
+    });
+  }, [fetchedNbmStationData]);
 
   useEffect(() => {
     if (layerState && layerState.stationMarkersState.checked === false) return;
@@ -393,18 +410,7 @@ export const StationMarkersLayer = () => {
             (features) => {
               addNbmStation(stationTime.station_table_name, features);
               queuedLoadWeb();
-              setDisplayedGeojson((prevState) => {
-                if (!prevState || prevState.features.length === 0) {
-                  const nbmStationData = getNbmStationDataForObservationTime();
-                  if (nbmStationData.length > 0) {
-                    return {
-                      type: 'FeatureCollection',
-                      features: nbmStationData,
-                    };
-                  }
-                }
-                return prevState;
-              });
+              setFetchedNbmStationData(stationTime.station_table_name);
             },
             (a, b) =>
               b.properties.pub - a.properties.pub || (a.properties.faaid as string).localeCompare(b.properties.faaid),
@@ -1497,7 +1503,7 @@ export const StationMarkersLayer = () => {
         }
       }
     } else {
-      console.log(feature.properties.icaoid, feature.properties.faaid, wx_1);
+      // console.log(feature.properties.icaoid, feature.properties.faaid, wx_1);
       switch (wx_1) {
         case 1:
           iconType = 'fa-solid fa-cloud-rain';
@@ -1529,7 +1535,7 @@ export const StationMarkersLayer = () => {
           iconType = 'fa-solid fa-cloud-snow';
           break;
         case 8:
-          iconType = 'fa-solid fa-fog';
+          iconType = 'fas fa-fog';
           break;
       }
     }

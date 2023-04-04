@@ -87,12 +87,6 @@ const MetarsPopup = ({
             <span style={{ color: ceilingColor }}>{ceiling} feet</span>
           </div>
         )}
-        {feature.properties.visibility_statute_mi != null && (
-          <div style={{ margin: 3 }}>
-            <b>Visibility: </b>
-            <span style={{ color: visibilityColor }}>{visibility}</span>
-          </div>
-        )}
         {skyConditionsAsc.length > 0 && (
           <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
             <div>
@@ -110,6 +104,12 @@ const MetarsPopup = ({
                 );
               })}
             </div>
+          </div>
+        )}
+        {feature.properties.visibility_statute_mi != null && (
+          <div style={{ margin: 3 }}>
+            <b>Visibility: </b>
+            <span style={{ color: visibilityColor }}>{visibility}</span>
           </div>
         )}
         {weatherString && (

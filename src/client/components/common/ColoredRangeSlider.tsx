@@ -127,7 +127,8 @@ export const ColoredRangeSlider = ({
           tooltips[handleNumber].style[direction] = offset + '%';
           tooltips[handleNumber].style['margin-bottom'] = '6px';
           if (poolValues[poolIndex].length > 1) {
-            const margin = 30 + (mergeTooltipThreshold - (lastOffset - firstOffset)) * -5;
+            const va = poolValues[poolIndex][last] < 1000 ? 3 : 5;
+            const margin = 30 - (mergeTooltipThreshold - (lastOffset - firstOffset)) * va;
             tooltips[handleNumber].style['margin-left'] = margin + '%';
             console.log(poolValues[poolIndex].length);
           } else {

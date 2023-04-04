@@ -1,9 +1,9 @@
-import { Divider, Typography } from '@material-ui/core';
+import { Divider } from '@material-ui/core';
 import BasePopupFrame from './BasePopupFrame';
 import { convertTimeFormat, getAltitudeString } from '../../common/AreoFunctions';
 
 const SigmetPopup = ({ feature, userSettings }) => {
-  let title = 'G_AIRMET';
+  let title = 'SIGMET';
   let base;
   if (isNaN(parseInt(feature.properties.altitudelow)) || feature.properties.altitudelow == '0') {
     base = 'Surface';
@@ -27,8 +27,8 @@ const SigmetPopup = ({ feature, userSettings }) => {
     case 'CONVECTIVE':
       title = `SIGMET for Convection`;
       break;
-    case 'ICE':
-      title = `SIGMET for Severe Icing`;
+    case 'ICING':
+      title = `SIGMET for Severe Ice`;
       break;
     case 'IFR':
       title = `SIGMET for Dust/Sandstorms`;
