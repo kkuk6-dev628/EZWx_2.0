@@ -1506,7 +1506,7 @@ export const StationMarkersLayer = () => {
           }
           break;
         case 6:
-          iconType = 'fa-solid fa-cloud-sleet';
+          iconType = 'fas fa-cloud-sleet';
           break;
         case 7:
           iconType = 'fa-solid fa-cloud-snow';
