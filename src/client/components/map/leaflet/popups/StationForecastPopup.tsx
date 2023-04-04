@@ -51,6 +51,7 @@ const makeWeatherString = (
   skyCov: number,
   w_speed: number,
   w_gust: number,
+  addCloudCover: boolean,
 ): string => {
   if (!wx) {
     if (w_speed > 20 && w_gust > 25) {
@@ -68,11 +69,7 @@ const makeWeatherString = (
         return 'Cloudy';
       }
     }
-  } else if (wx != 4) {
-    if (wx in wxStrings && prob in probStrings && inten in intenStrings) {
-      return `${probStrings[prob]} of ${intenStrings[inten]} ${wxStrings[wx]}`;
-    }
-  } else {
+  } else if (wx === 4) {
     let skyString = 'Cloudy';
     if (skyCov < 6) {
       skyString = 'Fair/clear';
@@ -85,7 +82,29 @@ const makeWeatherString = (
     } else {
       skyString = 'Cloudy';
     }
-    return `${skyString} with ${probStrings[prob].toLowerCase()} ${wxStrings[wx]}`;
+    return addCloudCover
+      ? `${skyString} with ${probStrings[prob].toLowerCase()} ${wxStrings[wx]}`
+      : `${probStrings[prob]} ${wxStrings[wx]}`;
+  } else if (wx === 5) {
+    let skyString = 'Cloudy';
+    if (skyCov < 6) {
+      skyString = 'Fair/clear';
+    } else if (skyCov < 31) {
+      skyString = 'Mostly clear';
+    } else if (skyCov < 58) {
+      skyString = 'Partly cloudy';
+    } else if (skyCov < 88) {
+      skyString = 'Mostly cloudy';
+    } else {
+      skyString = 'Cloudy';
+    }
+    return addCloudCover
+      ? `${skyString} with a ${probStrings[prob].toLowerCase()} of ${intenStrings[inten]} ${wxStrings[wx]}`
+      : `${probStrings[prob]} ${wxStrings[wx]}`;
+  } else {
+    if (wx in wxStrings && prob in probStrings && inten in intenStrings) {
+      return `${probStrings[prob]} of ${intenStrings[inten]} ${wxStrings[wx]}`;
+    }
   }
 };
 
@@ -191,6 +210,7 @@ const StationForecastPopup = ({
         skyCover,
         properties.w_speed,
         properties.w_gust,
+        true,
       ),
     );
   }
@@ -203,6 +223,7 @@ const StationForecastPopup = ({
         skyCover,
         properties.w_speed,
         properties.w_gust,
+        false,
       ),
     );
   }
@@ -215,6 +236,7 @@ const StationForecastPopup = ({
         skyCover,
         properties.w_speed,
         properties.w_gust,
+        false,
       ),
     );
   }
