@@ -1,4 +1,4 @@
-import { Divider, Typography } from '@material-ui/core';
+import { Divider } from '@material-ui/core';
 import Image from 'next/image';
 import { PersonalMinimums } from '../../../../store/user/UserSettings';
 import { MetarSkyValuesToString } from '../../common/AreoConstants';
@@ -17,6 +17,55 @@ import {
 } from '../../common/AreoFunctions';
 import { getNbmFlightCategoryIconUrl } from '../layers/StationMarkersLayer';
 
+const probStrings = {
+  1: 'Slight chance',
+  2: 'Chance',
+  3: 'Likely chance',
+  4: 'Definite chance',
+  5: 'Isolated',
+  6: 'Scattered',
+  7: 'Numerous',
+};
+
+const wxStrings = {
+  1: 'rain',
+  2: 'freezing rain',
+  3: 'snow',
+  4: 'thunderstorm',
+  5: 'rain shower',
+  6: 'ice pellets',
+  7: 'snow shower',
+  8: 'fog',
+};
+
+const intenStrings = {
+  1: 'light',
+  2: 'moderate',
+  3: 'heavy',
+};
+
+const makeWeatherString = (wx: number, prob: number, inten: number, skyCov: number): string => {
+  if (wx != 4) {
+    if (wx in wxStrings && prob in probStrings && inten in intenStrings) {
+      return `${probStrings[prob]} of ${intenStrings[inten]} ${wxStrings[wx]}`;
+    }
+  } else {
+    let skyString = 'Cloudy';
+    if (skyCov < 6) {
+      skyString = 'Fair/clear';
+    } else if (skyCov < 31) {
+      skyString = 'Mostly clear';
+    } else if (skyCov < 58) {
+      skyString = 'Partly cloudy';
+    } else if (skyCov < 88) {
+      skyString = 'Mostly cloudy';
+    } else {
+      skyString = 'Cloudy';
+    }
+    return `${skyString} with ${probStrings[prob].toLowerCase()} ${wxStrings[wx]}`;
+  }
+};
+
 const StationForecastPopup = ({
   layer,
   personalMinimums,
@@ -28,15 +77,27 @@ const StationForecastPopup = ({
   airportsData: any;
   userSettings: any;
 }) => {
-  console.log(layer.feature.properties);
-  const feature = layer.feature;
+  const properties = layer.feature.properties;
+  console.log(
+    properties.icaoid,
+    properties.faaid,
+    properties.wx_1,
+    properties.wx_prob_cov_1,
+    properties.wx_inten_1,
+    properties.wx_2,
+    properties.wx_prob_cov_2,
+    properties.wx_inten_2,
+    properties.wx_3,
+    properties.wx_prob_cov_3,
+    properties.wx_inten_3,
+  );
   const iconUrl = getNbmFlightCategoryIconUrl(layer.feature, personalMinimums);
-  const ceiling = layer.feature.properties.ceil;
+  const ceiling = properties.ceil;
   const [, ceilingColor] = getMetarCeilingCategory(ceiling, personalMinimums);
-  const [, visibilityColor] = getMetarVisibilityCategory(feature.properties.vis, personalMinimums);
+  const [, visibilityColor] = getMetarVisibilityCategory(properties.vis, personalMinimums);
   const skyConditions = [];
-  const skyCover = feature.properties.skycov;
-  const lowestCloud = layer.feature.properties.l_cloud;
+  const skyCover = properties.skycov;
+  const lowestCloud = properties.l_cloud;
   if (ceiling) {
     skyConditions.push({
       skyCover: skyCover >= 88 ? 'OVC' : 'BKN',
@@ -72,11 +133,11 @@ const StationForecastPopup = ({
     return a.cloudBase > b.cloudBase ? 1 : -1;
   });
   const airportName = toTitleCase(
-    feature.properties.icaoid
-      ? getAirportNameById(feature.properties.icaoid, airportsData)
-      : getAirportNameById(feature.properties.faaid, airportsData),
+    properties.icaoid
+      ? getAirportNameById(properties.icaoid, airportsData)
+      : getAirportNameById(properties.faaid, airportsData),
   );
-  let vimi = feature.properties.vis;
+  let vimi = properties.vis;
   if (vimi >= 4) {
     vimi = Math.ceil(vimi);
   }
@@ -84,18 +145,29 @@ const StationForecastPopup = ({
     ? `${visibilityMileToFraction(vimi)} statute ${vimi <= 1 ? 'mile' : 'miles'}`
     : `${visibilityMileToMeter(vimi)} meters`;
   const windSpeed =
-    feature.properties.w_speed === 0
+    properties.w_speed === 0
       ? 'Calm'
       : !userSettings.default_wind_speed_unit
-      ? feature.properties.w_speed + (feature.properties.w_speed <= 1 ? ' knot' : ' knots')
-      : knotsToMph(feature.properties.w_speed) + ' mph';
+      ? properties.w_speed + (properties.w_speed <= 1 ? ' knot' : ' knots')
+      : knotsToMph(properties.w_speed) + ' mph';
   const windGust = !userSettings.default_wind_speed_unit
-    ? feature.properties.w_gust + (feature.properties.w_gust ? ' knot' : ' knots')
-    : knotsToMph(feature.properties.w_gust) + ' mph';
+    ? properties.w_gust + (properties.w_gust ? ' knot' : ' knots')
+    : knotsToMph(properties.w_gust) + ' mph';
 
   const crossWind = !userSettings.default_wind_speed_unit
-    ? feature.properties.cross_com + (feature.properties.cross_com <= 1 ? ' knot' : ' knots')
-    : knotsToMph(feature.properties.cross_com) + ' mph';
+    ? properties.cross_com + (properties.cross_com <= 1 ? ' knot' : ' knots')
+    : knotsToMph(properties.cross_com) + ' mph';
+
+  const weatherLines = [];
+  if (properties.wx_1) {
+    weatherLines.push(makeWeatherString(properties.wx_1, properties.wx_prob_cov_1, properties.wx_inten_1, skyCover));
+  }
+  if (properties.wx_2) {
+    weatherLines.push(makeWeatherString(properties.wx_2, properties.wx_prob_cov_2, properties.wx_inten_2, skyCover));
+  }
+  if (properties.wx_3) {
+    weatherLines.push(makeWeatherString(properties.wx_3, properties.wx_prob_cov_3, properties.wx_inten_3, skyCover));
+  }
 
   return (
     <>
@@ -103,7 +175,7 @@ const StationForecastPopup = ({
         <Image src={iconUrl} alt={''} width={16} height={16} />
         &nbsp;
         <b>
-          {feature.properties.icaoid ? feature.properties.icaoid : feature.properties.faaid}
+          {properties.icaoid ? properties.icaoid : properties.faaid}
           &nbsp;EZForecast
         </b>
       </div>
@@ -116,7 +188,7 @@ const StationForecastPopup = ({
           </div>
         )}
         <div style={{ margin: 3 }}>
-          <b>Time: </b> {convertTimeFormat(feature.properties.valid_date, userSettings.default_time_display_unit)}
+          <b>Time: </b> {convertTimeFormat(properties.valid_date, userSettings.default_time_display_unit)}
         </div>
         {ceiling && (
           <div style={{ margin: 3 }}>
@@ -124,7 +196,7 @@ const StationForecastPopup = ({
             <span style={{ color: ceilingColor }}>{ceiling} feet</span>
           </div>
         )}
-        {feature.properties.vis != null && (
+        {properties.vis != null && (
           <div style={{ margin: 3 }}>
             <b>Visibility: </b>
             <span style={{ color: visibilityColor }}>{visibility}</span>
@@ -150,71 +222,89 @@ const StationForecastPopup = ({
             </div>
           </div>
         )}
-        {feature.properties.w_speed != null && (
+        {properties.wx_1 && (
+          <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
+            <div>
+              <p style={{ margin: 3 }}>
+                <b>Weather: </b>
+              </p>
+            </div>
+            <div style={{ margin: 3, marginTop: -5 }}>
+              {weatherLines.map((weatherLine, index) => {
+                return (
+                  <div key={`${weatherLine}-${index}`} style={{ marginTop: 8 }}>
+                    {weatherLine}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        {properties.w_speed != null && (
           <div style={{ margin: 3 }}>
             <b>Wind speed: </b>
             <span>{windSpeed}</span>
           </div>
         )}
-        {feature.properties.w_dir !== null &&
-          feature.properties.w_dir !== 0 &&
-          feature.properties.w_speed !== 0 &&
-          feature.properties.w_speed !== null && (
+        {properties.w_dir !== null &&
+          properties.w_dir !== 0 &&
+          properties.w_speed !== 0 &&
+          properties.w_speed !== null && (
             <div style={{ margin: 3 }}>
               <b>Wind direction: </b>
-              <span>{addLeadingZeroes(feature.properties.w_dir, 3)}&deg;</span>
+              <span>{addLeadingZeroes(properties.w_dir, 3)}&deg;</span>
             </div>
           )}
-        {(feature.properties.w_dir === null || feature.properties.w_dir === 0) &&
-          feature.properties.w_speed !== 0 &&
-          feature.properties.w_speed !== null && (
+        {(properties.w_dir === null || properties.w_dir === 0) &&
+          properties.w_speed !== 0 &&
+          properties.w_speed !== null && (
             <div style={{ margin: 3 }}>
               <b>Wind direction: </b>
               <span>Variable</span>
             </div>
           )}
-        {feature.properties.w_gust != null && (
+        {properties.w_gust != null && (
           <div style={{ margin: 3 }}>
             <b>Wind gust: </b>
             <span>{windGust}</span>
           </div>
         )}
-        {feature.properties.cross_com != null && (
+        {properties.cross_com != null && (
           <div style={{ margin: 3 }}>
             <b>Crosswind component: </b>
             <span>{crossWind}</span>
           </div>
         )}
-        {feature.properties.cross_com != null && (
+        {properties.cross_com != null && (
           <div style={{ margin: 3 }}>
             <b>Crosswind runway: </b>
-            <span>{feature.properties.cross_r_id}</span>
+            <span>{properties.cross_r_id}</span>
           </div>
         )}
-        {feature.properties.temp_c != null && (
+        {properties.temp_c != null && (
           <div style={{ margin: 3 }}>
             <b>Temperature: </b>
             <span>
               {!userSettings.default_temperature_unit
-                ? feature.properties.temp_c + ' \u00B0C'
-                : celsiusToFahrenheit(feature.properties.temp_c) + ' \u00B0F'}
+                ? properties.temp_c + ' \u00B0C'
+                : celsiusToFahrenheit(properties.temp_c) + ' \u00B0F'}
             </span>
           </div>
         )}
-        {feature.properties.dewp_c != null && (
+        {properties.dewp_c != null && (
           <div style={{ margin: 3 }}>
             <b>Dewpoint: </b>
             <span>
               {!userSettings.default_temperature_unit
-                ? feature.properties.dewp_c + ' \u00B0C'
-                : celsiusToFahrenheit(feature.properties.dewp_c) + ' \u00B0F'}
+                ? properties.dewp_c + ' \u00B0C'
+                : celsiusToFahrenheit(properties.dewp_c) + ' \u00B0F'}
             </span>
           </div>
         )}
-        {feature.properties.temp_c != null && feature.properties.dewp_c != null && (
+        {properties.temp_c != null && properties.dewp_c != null && (
           <div style={{ margin: 3 }}>
             <b>Relative humidity: </b>
-            <span>{Math.round(calcRelativeHumidity(feature.properties.temp_c, feature.properties.dewp_c))} %</span>
+            <span>{Math.round(calcRelativeHumidity(properties.temp_c, properties.dewp_c))} %</span>
           </div>
         )}
       </div>

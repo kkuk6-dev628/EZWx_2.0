@@ -35,7 +35,6 @@ export class SettingsService {
       }
       const { id, ...rest } = res;
       const modifiedData = getModifiedData(rest);
-      console.log(modifiedData);
       return modifiedData;
     } catch (error) {
       console.log('error', error);

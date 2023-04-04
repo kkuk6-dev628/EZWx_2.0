@@ -1460,8 +1460,6 @@ export const StationMarkersLayer = () => {
     }
     let iconType = 'fa-solid fa-square-question';
     const wx_1 = feature.properties.wx_1;
-    const wx_prov_cov_1 = feature.properties.wx_prob_cov_1;
-    const wx_inten_1 = feature.properties.wx_inten_1;
     const w_speed = feature.properties.w_speed;
     const w_gust = feature.properties.w_gust;
     const skycov = feature.properties.skycov;
@@ -1472,7 +1470,7 @@ export const StationMarkersLayer = () => {
         if (skycov < 6) {
           iconType = isDayTime ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         } else if (skycov < 31) {
-          iconType = isDayTime ? 'fa-solid fa-sun-cloud' : 'fas fa-moon-cloud';
+          iconType = isDayTime ? 'fas fa-sun-cloud' : 'fas fa-moon-cloud';
         } else if (skycov < 58) {
           iconType = isDayTime ? 'fa-solid fa-cloud-sun' : 'fa-solid fa-cloud-moon';
         } else if (skycov < 88) {
@@ -1482,6 +1480,7 @@ export const StationMarkersLayer = () => {
         }
       }
     } else {
+      console.log(feature.properties.icaoid, feature.properties.faaid, wx_1);
       switch (wx_1) {
         case 1:
           iconType = 'fa-solid fa-cloud-rain';

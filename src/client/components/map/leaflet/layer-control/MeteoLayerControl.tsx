@@ -231,24 +231,24 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
             <div
               className="layer-control__img__area"
               onDoubleClick={() => {
-                // const stationId = prompt('Input Station ID');
-                // const markers = new FeatureGroup();
-                // //@ts-ignore
-                // meteoLayers.metar.eachLayer((layer) => {
-                //   if (layer.feature.properties.station_id == stationId) {
-                //     const coords = layer.feature.geometry.coordinates;
-                //     const marker = new CircleMarker([coords[1], coords[0]]);
-                //     markers.addLayer(marker);
-                //   }
-                // });
-                // if (markers.getLayers().length > 0) {
-                //   markers.addTo(map);
-                //   map.fitBounds(markers.getBounds());
-                // }
-                map.fitBounds([
-                  [55.0, -130.0],
-                  [20.0, -60.0],
-                ]);
+                const stationId = prompt('Input Station ID');
+                const markers = new FeatureGroup();
+                //@ts-ignore
+                meteoLayers.metar.eachLayer((layer) => {
+                  if (layer.feature.properties.faaid == stationId) {
+                    const coords = layer.feature.geometry.coordinates;
+                    const marker = new CircleMarker([coords[1], coords[0]]);
+                    markers.addLayer(marker);
+                  }
+                });
+                if (markers.getLayers().length > 0) {
+                  markers.addTo(map);
+                  map.fitBounds(markers.getBounds());
+                }
+                // map.fitBounds([
+                //   [55.0, -130.0],
+                //   [20.0, -60.0],
+                // ]);
               }}
             >
               <Image
