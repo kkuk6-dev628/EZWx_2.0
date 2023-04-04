@@ -201,19 +201,17 @@ const StationForecastPopup = ({
     : knotsToMph(properties.cross_com) + ' mph';
 
   const weatherLines = [];
-  if (properties.wx_1) {
-    weatherLines.push(
-      makeWeatherString(
-        properties.wx_1,
-        properties.wx_prob_cov_1,
-        properties.wx_inten_1,
-        skyCover,
-        properties.w_speed,
-        properties.w_gust,
-        true,
-      ),
-    );
-  }
+  weatherLines.push(
+    makeWeatherString(
+      properties.wx_1,
+      properties.wx_prob_cov_1,
+      properties.wx_inten_1,
+      skyCover,
+      properties.w_speed,
+      properties.w_gust,
+      true,
+    ),
+  );
   if (properties.wx_2) {
     weatherLines.push(
       makeWeatherString(
