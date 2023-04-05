@@ -1523,7 +1523,7 @@ export const StationMarkersLayer = () => {
           break;
         case 5:
           if (skycov < 88) {
-            iconType = isDayTime ? 'fa-solid fa-cloud-sun-rain' : 'fa-cloud-moon-rain';
+            iconType = isDayTime ? 'fa-solid fa-cloud-sun-rain' : 'fas fa-cloud-moon-rain';
           } else {
             iconType = 'fa-solid fa-cloud-showers-heavy';
           }

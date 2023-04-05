@@ -25,9 +25,6 @@ import { toast } from 'react-hot-toast';
 const FetchData = () => {
   const { id } = useSelector(selectAuth);
   useGetUserSettingsQuery(id, { refetchOnMountOrArgChange: true });
-  useEffect(() => {
-    console.log('Settings panel mounted!');
-  }, []);
   return <></>;
 };
 

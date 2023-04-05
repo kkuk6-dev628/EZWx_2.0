@@ -40,13 +40,12 @@ import { useSelector } from 'react-redux';
 import { selectLayerControlState, setLayerControlState } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';
 import { selectAuth } from '../../../../store/auth/authSlice';
-import { setSettingsLoadTime } from '../../../../store/user/UserSettings';
 import { useGetUserSettingsQuery } from '../../../../store/user/userSettingsApi';
 
 const FetchData = () => {
   const { id } = useSelector(selectAuth);
   if (id) {
-    useGetLayerControlStateQuery(null, { refetchOnMountOrArgChange: true });
+    useGetLayerControlStateQuery(null, { refetchOnMountOrArgChange: true, refetchOnFocus: true });
   }
   return <></>;
 };
