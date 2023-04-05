@@ -14,7 +14,7 @@ export class BaseLayerControl {
   id: number;
 
   @Index()
-  @Column()
+  @Column({ unique: true })
   userId: number;
 
   @Column()

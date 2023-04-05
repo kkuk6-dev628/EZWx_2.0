@@ -16,6 +16,7 @@ export class LayerControlController {
   @Post()
   update(@Request() request, @Body() layerControlState) {
     layerControlState.userId = request.user.id;
+    layerControlState.id = undefined;
     layerControlState.updated_at = undefined;
     layerControlState.created_at = undefined;
     return this.layerControlService.updateLayerControlState(layerControlState);
@@ -31,6 +32,7 @@ export class LayerControlController {
   @Post('base')
   updateBaseLayerControl(@Request() request, @Body() baseLayerControlState) {
     baseLayerControlState.userId = request.user.id;
+    baseLayerControlState.id = undefined;
     baseLayerControlState.updated_at = undefined;
     baseLayerControlState.created_at = undefined;
     return this.layerControlService.updateBaseLayerControlState(baseLayerControlState);

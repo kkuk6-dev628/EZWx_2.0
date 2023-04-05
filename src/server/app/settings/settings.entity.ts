@@ -88,6 +88,6 @@ export class UserSettings {
   @Column()
   crosswinds_at_destination_airport_max: number;
 
-  @Column()
+  @Column({ unique: true })
   user_id: number;
 }

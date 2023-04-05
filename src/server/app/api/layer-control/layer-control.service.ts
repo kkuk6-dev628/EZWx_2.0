@@ -24,11 +24,11 @@ export class LayerControlService {
   }
 
   async updateLayerControlState(layerControlState) {
-    if (layerControlState.id) {
-      await this.layerControlRepository.update({ id: layerControlState.id }, layerControlState);
-      return layerControlState.id;
-    }
-    return (await this.layerControlRepository.insert(layerControlState)).generatedMaps[0].id;
+    // if (layerControlState.userId) {
+    //   await this.layerControlRepository.update({ id: layerControlState.id }, layerControlState);
+    //   return layerControlState.id;
+    // }
+    return (await this.layerControlRepository.upsert(layerControlState, ['userId'])).generatedMaps[0].id;
   }
 
   async getBaseLayerControlState(user: User) {
@@ -40,10 +40,10 @@ export class LayerControlService {
   }
 
   async updateBaseLayerControlState(baseLayerControlState) {
-    if (baseLayerControlState.id) {
-      await this.baseLayerControlRepository.update({ id: baseLayerControlState.id }, baseLayerControlState);
-      return baseLayerControlState.id;
-    }
-    return (await this.baseLayerControlRepository.insert(baseLayerControlState)).generatedMaps[0].id;
+    // if (baseLayerControlState.id) {
+    //   await this.baseLayerControlRepository.update({ id: baseLayerControlState.id }, baseLayerControlState);
+    //   return baseLayerControlState.id;
+    // }
+    return (await this.baseLayerControlRepository.upsert(baseLayerControlState, ['userId'])).generatedMaps[0].id;
   }
 }

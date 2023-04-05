@@ -225,7 +225,6 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
     <div className={positionClass + ' layer-control-container'} ref={ref}>
       {layerControlState.show && (
         <div id="layer-control" className="leaflet-control leaflet-bar layer-control">
-          <FetchData />
           <div className="layer-control__header">
             <div
               className="layer-control__img__area"
