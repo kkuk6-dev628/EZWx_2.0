@@ -104,9 +104,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
     map.closePopup();
     if (!layerObj) return;
     if (checkEmptyLayer(layerObj)) {
-      toast.error(`No ${layerName}'s data displayed`, {
-        position: 'top-right',
-      });
+      toast.error(`No ${layerName}'s data displayed`);
     }
   };
 
@@ -114,9 +112,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
     map.closePopup();
     if (!layerObj) return;
     if (checkEmptyLayer(layerObj)) {
-      toast.error(`No ${layerName}'s data displayed`, {
-        position: 'top-right',
-      });
+      toast.error(`No ${layerName}'s data displayed`);
     }
   };
 
