@@ -11,12 +11,8 @@ import {
 } from '../settings-drawer';
 import { StyledSlider } from './Slider';
 import { useSelector } from 'react-redux';
-import { selectSettings } from '../../store/user/UserSettings';
-import {
-  useGetUserSettingsQuery,
-  useRestoreSettingsMutation,
-  useUpdateUserSettingsMutation,
-} from '../../store/user/userSettingsApi';
+import { initialUserSettingsState, selectSettings } from '../../store/user/UserSettings';
+import { useGetUserSettingsQuery, useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
 import { selectAuth } from '../../store/auth/authSlice';
 import { AutoCompleteInput, Modal, PrimaryButton, SecondaryButton } from '../common';
 import { ColoredRangeSlider, formatForDecimal, formatForInteger } from '../common/ColoredRangeSlider';
@@ -25,9 +21,6 @@ import { toast } from 'react-hot-toast';
 const FetchData = () => {
   const { id } = useSelector(selectAuth);
   useGetUserSettingsQuery(id, { refetchOnMountOrArgChange: true });
-  useEffect(() => {
-    console.log('Settings panel mounted!');
-  }, []);
   return <></>;
 };
 
@@ -48,7 +41,6 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
 
   const [updateUserSettings, { isLoading: isUpdating, isSuccess: isSuccessUpdate, error: updateError }] =
     useUpdateUserSettingsMutation();
-  const [restoreSettings, { isLoading: isRestoring }] = useRestoreSettingsMutation();
 
   useEffect(() => {
     if (settingsState) setSettings(settingsState);
@@ -66,11 +58,11 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   }, [isSuccessUpdate]);
 
   useEffect(() => {
-    if (!isRestoring || isUpdating) {
+    if (isUpdating) {
       setIsShowSaveSettingModal(false);
       setIsShowRestoreSettingModal(false);
     }
-  }, [isRestoring, isUpdating]);
+  }, [isUpdating]);
 
   const handleCloseDrawer = () => {
     if (JSON.stringify(settings) !== JSON.stringify(settingsState)) {
@@ -625,7 +617,14 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
         footer={
           <>
             <PrimaryButton text="Cancel" onClick={() => setIsShowRestoreSettingModal(false)} isLoading={false} />
-            <SecondaryButton text="Restore Settings" onClick={() => restoreSettings(id)} isLoading={isRestoring} />
+            <SecondaryButton
+              text="Restore Settings"
+              onClick={() => {
+                updateUserSettings({ ...initialUserSettingsState, user_id: id });
+                setIsShowRestoreSettingModal(false);
+              }}
+              isLoading={false}
+            />
           </>
         }
       />

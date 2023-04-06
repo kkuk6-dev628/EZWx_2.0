@@ -36,6 +36,8 @@ import { useGetWaypointsQuery } from '../../../store/route/waypointApi';
 import { simpleTimeOnlyFormat } from '../common/AreoFunctions';
 import MapSideButtons from '../../shared/MapSideButtons';
 import {
+  useLazyGetBaseLayerControlStateQuery,
+  useLazyGetLayerControlStateQuery,
   useUpdateBaseLayerControlStateMutation,
   useUpdateLayerControlStateMutation,
 } from '../../../store/layers/layerControlApi';
@@ -72,6 +74,8 @@ const LeafletMap = () => {
   const layerControlState = useSelector(selectLayerControlState);
   const [updateLayerControlState] = useUpdateLayerControlStateMutation();
   const [updateBaseLayerControlState] = useUpdateBaseLayerControlStateMutation();
+  const [getLayerControlState] = useLazyGetLayerControlStateQuery();
+  const [getBaseLayerControlState] = useLazyGetBaseLayerControlStateQuery();
 
   useEffect(() => {
     const interval = setInterval(() => setZuluTime(simpleTimeOnlyFormat(new Date(), false)), 1000);
@@ -84,15 +88,17 @@ const LeafletMap = () => {
     }
   }, [pathname]);
 
-  const setLayerControlShow = (layerControlShow: boolean) => {
-    const cloned = jsonClone(layerControlState) as LayerControlState;
+  const setLayerControlShow = async (layerControlShow: boolean) => {
+    const newLayerControlState = await getLayerControlState(auth.id).unwrap();
+    const cloned = jsonClone(newLayerControlState) as LayerControlState;
     cloned.show = layerControlShow;
     dispatch(setLayerControlState(cloned));
     if (auth.id) updateLayerControlState(cloned);
   };
 
-  const setBaseLayerControlShow = (baseLayerControlShow: boolean) => {
-    const cloned = jsonClone(baseMapLayerControl) as BaseMapLayerControlState;
+  const setBaseLayerControlShow = async (baseLayerControlShow: boolean) => {
+    const newBaseLayerControlState = await getBaseLayerControlState(auth.id).unwrap();
+    const cloned = jsonClone(newBaseLayerControlState) as BaseMapLayerControlState;
     cloned.show = baseLayerControlShow;
     dispatch(setBaseMapLayerControl(cloned));
     if (auth.id) updateBaseLayerControlState(cloned);

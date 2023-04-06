@@ -20,7 +20,7 @@ const userSettingsApi = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const result = await queryFulfilled;
-          if (result.data) {
+          if (result.data && 'default_home_airport' in result.data) {
             const settings = { ...result.data };
             if (!result.data.observation_time) {
               settings.observation_time = initialUserSettingsState.settings.observation_time;
@@ -32,37 +32,6 @@ const userSettingsApi = apiSlice.injectEndpoints({
           }
         } catch (err) {
           console.error('Error: ', err);
-        }
-      },
-    }),
-    restoreSettings: builder.mutation({
-      query: (id) => ({
-        url: `/settings/restore/${id}`,
-        method: 'PATCH',
-      }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const result = await queryFulfilled;
-          if (result.data) {
-            toast.success('Settings Restored!', {
-              position: 'top-right',
-              duration: 3000,
-            });
-            const settings = { ...result.data };
-            if (!result.data.observation_time) {
-              settings.observation_time = initialUserSettingsState.settings.observation_time;
-            }
-            if (!result.data.observation_interval) {
-              settings.observation_interval = initialUserSettingsState.settings.observation_interval;
-            }
-            dispatch(setUserSettings(settings));
-          }
-        } catch (error) {
-          console.error('Error: ', error);
-          toast.error(error, {
-            position: 'top-right',
-            duration: 3000,
-          });
         }
       },
     }),
@@ -97,4 +66,4 @@ const userSettingsApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetUserSettingsQuery, useUpdateUserSettingsMutation, useRestoreSettingsMutation } = userSettingsApi;
+export const { useGetUserSettingsQuery, useUpdateUserSettingsMutation } = userSettingsApi;

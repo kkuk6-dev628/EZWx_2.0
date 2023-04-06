@@ -1,4 +1,3 @@
-import { DefaultSetting } from './../default_settings/default_setting.entity';
 import { UserSettings } from './settings.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,8 +10,6 @@ export class SettingsService {
   constructor(
     @InjectRepository(UserSettings)
     private userSettingsRepository: Repository<UserSettings>,
-    @InjectRepository(DefaultSetting)
-    private defaultSettingsRepository: Repository<DefaultSetting>,
   ) {}
   async find(user_id: number) {
     try {
@@ -23,19 +20,13 @@ export class SettingsService {
             user_id,
           },
         });
+        const { id, ...rest } = res;
+        const modifiedData = getModifiedData(rest);
+        return modifiedData;
       } catch {
         console.log('No user Account');
       }
-
-      if (!res) {
-        res = await this.defaultSettingsRepository
-          .createQueryBuilder('default_setting')
-          .orderBy('default_setting.id', 'ASC')
-          .getOne();
-      }
-      const { id, ...rest } = res;
-      const modifiedData = getModifiedData(rest);
-      return modifiedData;
+      return {};
     } catch (error) {
       console.log('error', error);
     }
@@ -100,35 +91,6 @@ export class SettingsService {
       }
       const { id, ...userSettings } = res;
       const modifiedData = getModifiedData(userSettings);
-      return modifiedData;
-    } catch (error) {
-      console.log('error', error);
-    }
-  }
-
-  async restore(user_id: number) {
-    try {
-      let res;
-      try {
-        res = await this.userSettingsRepository.findOne({
-          where: {
-            user_id,
-          },
-        });
-      } catch {
-        console.log('No user Account');
-      }
-
-      if (!res) {
-        return null;
-      }
-      const { id: defaultSettingId, ...defaultSettings } = await this.defaultSettingsRepository
-        .createQueryBuilder('default_setting')
-        .orderBy('default_setting.id', 'ASC')
-        .getOne();
-      res = await this.userSettingsRepository.save({ id: res.id, user_id, ...defaultSettings });
-      const { id, ...rest } = res;
-      const modifiedData = getModifiedData(rest);
       return modifiedData;
     } catch (error) {
       console.log('error', error);

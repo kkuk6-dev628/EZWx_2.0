@@ -40,13 +40,12 @@ import { useSelector } from 'react-redux';
 import { selectLayerControlState, setLayerControlState } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';
 import { selectAuth } from '../../../../store/auth/authSlice';
-import { setSettingsLoadTime } from '../../../../store/user/UserSettings';
 import { useGetUserSettingsQuery } from '../../../../store/user/userSettingsApi';
 
 const FetchData = () => {
   const { id } = useSelector(selectAuth);
   if (id) {
-    useGetLayerControlStateQuery(null, { refetchOnMountOrArgChange: true });
+    useGetLayerControlStateQuery(null, { refetchOnMountOrArgChange: true, refetchOnFocus: true });
   }
   return <></>;
 };
@@ -222,7 +221,6 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
     <div className={positionClass + ' layer-control-container'} ref={ref}>
       {layerControlState.show && (
         <div id="layer-control" className="leaflet-control leaflet-bar layer-control">
-          <FetchData />
           <div className="layer-control__header">
             <div
               className="layer-control__img__area"

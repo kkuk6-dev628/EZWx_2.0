@@ -5,6 +5,7 @@ import {
   Entity,
   Index,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -14,7 +15,7 @@ export class LayerControl {
   id: number;
 
   @Index()
-  @Column()
+  @Column({ unique: true })
   userId: number;
 
   @Column()

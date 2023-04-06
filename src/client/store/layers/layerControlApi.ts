@@ -90,7 +90,9 @@ export const layerControlApi = createApi({
 
 export const {
   useGetLayerControlStateQuery,
+  useLazyGetLayerControlStateQuery,
   useUpdateLayerControlStateMutation,
   useGetBaseLayerControlStateQuery,
+  useLazyGetBaseLayerControlStateQuery,
   useUpdateBaseLayerControlStateMutation,
 } = layerControlApi;

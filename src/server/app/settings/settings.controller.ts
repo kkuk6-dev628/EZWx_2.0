@@ -24,9 +24,4 @@ export class SettingsController {
   update(@Request() request, @Body() updateUserSettingsDto: UpdateUserSettingsDto) {
     return this.settingService.update(request.user, updateUserSettingsDto);
   }
-
-  @Patch('/restore/:user_id')
-  restore(@Param('user_id') user_id: string) {
-    return this.settingService.restore(+user_id);
-  }
 }

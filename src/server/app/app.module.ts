@@ -14,7 +14,6 @@ import { UserModule } from './user/user.module';
 import { typeOrmConfig } from 'ormconfig';
 import { CertificationModule } from './certification/certification.module';
 import { SettingsModule } from './settings/settings.module';
-import { DefaultSettingsModule } from './default_settings/default_settings.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -32,7 +31,6 @@ import { DefaultSettingsModule } from './default_settings/default_settings.modul
     UserModule,
     CertificationModule,
     SettingsModule,
-    DefaultSettingsModule,
   ],
   providers: [AppService],
   controllers: [AppController],
