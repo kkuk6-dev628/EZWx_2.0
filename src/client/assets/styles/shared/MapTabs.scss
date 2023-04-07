@@ -61,14 +61,6 @@
       border-right: 1px solid #C4C4C4;
       height: auto;
       width: 100%;
-
-      &:first-child {
-        font-weight: 800;
-        font-size: 16px;
-        line-height: 19px;
-        color: var(--color-primary);
-        display: none;
-      }
     }
     &--more{
       display: none;
@@ -78,12 +70,11 @@
       }
     }
 
-    &--hide{
+    &--hide_responsive{
       display: block;
       @media screen and (max-width: 500px) {
         display: none;
       }
-
     }
   }
 

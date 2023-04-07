@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SvgAir, SvgMap, SvgTemperature } from '../utils/SvgIcons';
+import ZuluClock from './ZuluClock';
 
 interface TabMenusObj {
   id: string;
@@ -17,10 +18,11 @@ function MapTabs({ tabMenus }: TabMenus) {
   const [showDropDown, setShowDropDown] = useState(false);
   return (
     <div className="tabs">
+      <ZuluClock />
       {tabMenus.map((tabMenu) => (
         <button
           key={tabMenu.id}
-          className={`tabs__btn ${tabMenu.isHideResponsive && 'tabs__btn--hide'} ${
+          className={`tabs__btn ${tabMenu.isHideResponsive && 'tabs__btn--hide_responsive'} ${
             tabMenu.id === 'more' && 'tabs__btn--more'
           }`}
           onClick={tabMenu.id === 'more' ? () => setShowDropDown(!showDropDown) : () => tabMenu.handler(tabMenu.id)}

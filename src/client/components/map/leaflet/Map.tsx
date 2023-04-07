@@ -65,7 +65,6 @@ const LeafletMap = () => {
   const [isShowTabs, setIsShowTabs] = useState(false);
   const [isShowDateModal, setIsShowDateModal] = useState(false);
   const [isShowModal, setIsShowModal] = useState(false);
-  const [zuluTime, setZuluTime] = useState(simpleTimeOnlyFormat(new Date(), false));
   const dispatch = useDispatch();
   const baseMapLayerControl = useSelector(selectBaseMapLayerControl);
   const auth = useSelector(selectAuth);
@@ -76,11 +75,7 @@ const LeafletMap = () => {
   const [updateBaseLayerControlState] = useUpdateBaseLayerControlStateMutation();
   const [getLayerControlState] = useLazyGetLayerControlStateQuery();
   const [getBaseLayerControlState] = useLazyGetBaseLayerControlStateQuery();
-
-  useEffect(() => {
-    const interval = setInterval(() => setZuluTime(simpleTimeOnlyFormat(new Date(), false)), 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const router = useRouter();
 
   useEffect(() => {
     if (pathname === '/map') {
@@ -122,7 +117,7 @@ const LeafletMap = () => {
         }
         break;
       case 'profile':
-        setIsShowDateModal(!isShowDateModal);
+        router.push('/route_profile');
         break;
       default:
         break;
@@ -130,13 +125,6 @@ const LeafletMap = () => {
   };
 
   const tabMenus = [
-    {
-      id: '1040Z',
-      name: zuluTime,
-      handler: handler,
-      svg: null,
-      isHideResponsive: true,
-    },
     {
       id: 'layer',
       name: 'Layer',

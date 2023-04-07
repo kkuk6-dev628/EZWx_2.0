@@ -1,0 +1,41 @@
+.route-profile{
+  position: relative;
+  height: calc(100vh - 256px);
+  display: flex;
+
+  .tabs{
+    position: relative;
+  }
+  .route-profile-container{
+    height: 100%;
+    width: 100%;
+    background-color: var(--color-primary);
+    border-radius: 8px;
+    margin-top: 2px;
+    margin-right: 40px;
+
+    .route-profile-header{
+      display: flex;
+      justify-content: space-between;
+
+      .select-chart-type{
+        color: whitesmoke;
+        margin: 8px 24px;
+        display: flex;
+        flex-direction: row;
+
+        .MuiRadio-colorPrimary{
+          color: whitesmoke;
+        }
+      }
+      .header-right{
+        display: flex;
+        flex-direction: row;
+        margin-right: 24px;
+      }
+      .input_radio_container{
+        margin: 16px;
+      }
+    }
+  }
+}

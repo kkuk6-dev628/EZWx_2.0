@@ -46,7 +46,7 @@ export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
   latlngs.reduce((a, b) => {
     if (a.lat !== b.lat || a.lng !== b.lng) {
       //@ts-ignore
-      const polyline = L.Polyline.Arc(a, b, { color: '#f0fa', weight: 6, pane: 'route-line' });
+      const polyline = L.Polyline.Arc(a, b, { color: '#f0fa', weight: 6, pane: 'route-line', vertices: 20 });
       routeGroupLayer.addLayer(polyline);
     }
     return b;
