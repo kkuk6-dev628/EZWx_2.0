@@ -92,7 +92,7 @@ export class ViewController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('orders')
+  @Get('route-profile')
   public async indexOrders(@Req() req: Request, @Res() res: Response) {
     await this.handler(req, res);
   }

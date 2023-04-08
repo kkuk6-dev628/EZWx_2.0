@@ -117,7 +117,7 @@ const LeafletMap = () => {
         }
         break;
       case 'profile':
-        router.push('/route_profile');
+        router.push('/route-profile');
         break;
       default:
         break;

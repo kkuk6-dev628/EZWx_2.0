@@ -180,7 +180,7 @@ function profile({ setIsShowModal }: Props) {
                 <h3 className="profile__name">{userInfo.displayName}</h3>
               </div>
               <div className="profile__left__img__upload">
-                <input type="file" name="" id="" />
+                <input type="file" aria-label="file" name="" id="" />
               </div>
               <div className="profile__left__btn__area">
                 <button

@@ -3,6 +3,10 @@
   height: calc(100vh - 256px);
   display: flex;
 
+  @media screen and (max-width: 500px) {
+    flex-direction: column;
+  }
+
   .tabs{
     position: relative;
   }
@@ -17,12 +21,26 @@
     .route-profile-header{
       display: flex;
       justify-content: space-between;
+      @media screen and (max-width: 500px) {
+        flex-direction: column;
+      }
 
       .select-chart-type{
         color: whitesmoke;
         margin: 8px 24px;
         display: flex;
         flex-direction: row;
+
+        @media screen and (max-width: 900px) {
+          justify-content: space-evenly;
+          margin: 8px 8px;
+        }
+
+        .css-j204z7-MuiFormControlLabel-root{
+          @media screen and (max-width: 900px) {
+            margin: 2px 2px;
+          }          
+        }
 
         .MuiRadio-colorPrimary{
           color: whitesmoke;
@@ -31,10 +49,37 @@
       .header-right{
         display: flex;
         flex-direction: row;
+        justify-content: space-evenly;
         margin-right: 24px;
+        @media screen and (max-width: 900px) {
+          margin-right: 4px;
+        }
       }
       .input_radio_container{
         margin: 16px;
+        @media screen and (max-width: 900px) {
+          margin: 16px 4px;
+        }
+      }
+      .MuiToggleButtonGroup-root{
+        margin: 16px;
+        border: 1px solid white;
+        border-radius: 5px;
+      }
+      .MuiToggleButton-root{
+        padding: 8px 4px;
+        min-width: 36px;
+        color: whitesmoke;
+        line-height: 1;
+        font-weight: 400;
+      }
+      .MuiToggleButton-root.Mui-selected{
+        background-color: var(--color-yellow);
+        color: var(--color-dark);
+      }
+      .RadioButton_radio__label__container__mLRn4 {
+        padding: 8px 4px;
+        min-width: 36px;
       }
     }
   }

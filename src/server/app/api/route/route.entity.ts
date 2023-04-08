@@ -6,8 +6,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   ManyToOne,
-  JoinTable,
-  ManyToMany,
   DeleteDateColumn,
   Index,
 } from 'typeorm';

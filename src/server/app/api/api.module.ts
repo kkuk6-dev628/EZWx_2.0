@@ -4,10 +4,11 @@ import { StationTimeModule } from './station-time/station-time.module';
 import { ApiService } from './api.service';
 import { ApiController } from './api.controller';
 import { Module } from '@nestjs/common';
+import { RouteProfileModule } from './route-profile/route-profile.module';
 
 @Module({
   controllers: [ApiController],
-  imports: [StationTimeModule, RouteModule, LayerControlModule],
+  imports: [StationTimeModule, RouteModule, LayerControlModule, RouteProfileModule],
   providers: [ApiService],
 })
 export class ApiModule {}

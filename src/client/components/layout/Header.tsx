@@ -73,7 +73,7 @@ const responsiveLink = [
   {
     id: 2,
     name: 'Plan a route',
-    link: '/plan-route',
+    link: '/route-profile',
   },
   {
     id: 3,
@@ -109,7 +109,7 @@ export default function Header() {
   const auth = useSelector(selectAuth);
 
   useEffect(() => {
-    if (pathname === '/map' || pathname === '/imagery') {
+    if (pathname === '/map' || pathname === '/imagery' || pathname === '/route-profile') {
       setMapMenu(true);
     } else {
       setMapMenu(false);

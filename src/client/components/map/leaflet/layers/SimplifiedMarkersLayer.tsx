@@ -1,10 +1,56 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { forwardRef, useEffect, useState } from 'react';
 import { GeoJSON as GeoJSONLayer, useMapEvents } from 'react-leaflet';
 import { useSelector } from 'react-redux';
 import { selectActiveRoute } from '../../../../store/route/routes';
 import { selectSettings } from '../../../../store/user/UserSettings';
 import { emptyGeoJson } from '../../common/AreoConstants';
-import { simplifyPoints } from '../../common/AreoFunctions';
+import { LatLng } from 'leaflet';
+import { Route } from '../../../../interfaces/route';
+import RBush from 'rbush';
+
+export const simplifyPoints = (
+  map: L.Map,
+  features: GeoJSON.Feature[],
+  radius: number,
+  route: Route,
+  unSimplifyFilter?: (feature: GeoJSON.Feature) => boolean,
+): GeoJSON.Feature[] => {
+  if (!map) return [];
+
+  const getBoxFromGeometry = (map: L.Map, geometry) => {
+    const latlng = new LatLng(geometry.coordinates[1], geometry.coordinates[0]);
+    const layerPoint = map.latLngToLayerPoint(latlng);
+    return {
+      minX: layerPoint.x - radius,
+      minY: layerPoint.y - radius,
+      maxX: layerPoint.x + radius,
+      maxY: layerPoint.y + radius,
+    };
+  };
+
+  const results: GeoJSON.Feature[] = [];
+  const rbush = new RBush();
+  if (route) {
+    [
+      route.departure.position,
+      route.destination.position,
+      ...route.routeOfFlight.map((item) => item.routePoint.position),
+    ].forEach((position) => rbush.insert(getBoxFromGeometry(map, position)));
+  }
+  features.forEach((feature) => {
+    // @ts-ignore
+    const latlng = new LatLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+    if (map.getBounds().contains(latlng)) {
+      const box = getBoxFromGeometry(map, feature.geometry);
+      if ((unSimplifyFilter && unSimplifyFilter(feature)) || !rbush.collides(box)) {
+        rbush.insert(box);
+        results.push(feature);
+      }
+    }
+  });
+  return results;
+};
 
 export const SimplifiedMarkersLayer = forwardRef(
   ({ data, simplifyRadius, visible, unSimplifyFilter, ...props }: any, ref) => {

@@ -21,11 +21,3 @@ export interface Route {
   altitude: number;
   useForecastWinds: boolean;
 }
-
-export type RouteProfileChartType = 'Wind' | 'Clouds' | 'Icing' | 'Turb';
-
-export type RouteProfileWindDataType = 'Temp' | 'Wind' | 'Course';
-
-export type RouteProfileIcingDataType = 'Prob' | 'Sev' | 'SLD' | 'Sev+SLD';
-
-export type RouteProfileTurbDataType = 'CAT' | 'MTW' | 'Combined';

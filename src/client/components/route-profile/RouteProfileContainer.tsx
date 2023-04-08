@@ -1,12 +1,20 @@
-import { FormControlLabel, RadioGroup, Radio } from '@mui/material';
-import { ChangeEvent } from 'react';
-import { LayerControlState, RoutePointType } from '../../interfaces/layerControl';
-import { UsePersonalMinsLayerItems } from '../map/common/AreoConstants';
+import { FormControlLabel, RadioGroup, Radio, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { InputFieldWrapper, RadioButton } from '../settings-drawer';
-import { jsonClone } from '../utils/ObjectUtil';
 import CheckBoxOutlineBlankOutlined from '@material-ui/icons/CheckBoxOutlineBlankOutlined';
 import CheckBoxOutlinedIcon from '@material-ui/icons/CheckBoxOutlined';
-import { RouteProfileChartType, RouteProfileIcingDataType, RouteProfileWindDataType } from '../../interfaces/route';
+import {
+  RouteProfileChartType,
+  RouteProfileIcingDataType,
+  RouteProfileMaxAltitudes,
+  RouteProfileState,
+  RouteProfileTurbDataType,
+  RouteProfileWindDataType,
+} from '../../interfaces/route-profile';
+import {
+  useGetRouteProfileStateQuery,
+  useUpdateRouteProfileStateMutation,
+} from '../../store/route-profile/routeProfileApi';
 
 const routeProfileChartTypes: {
   wind: RouteProfileChartType;
@@ -21,93 +29,173 @@ const routeProfileChartTypes: {
 };
 
 const routeProfileWindDataTypes: {
-  temp: RouteProfileWindDataType;
-  wind: RouteProfileWindDataType;
-  course: RouteProfileWindDataType;
+  windspeed: RouteProfileWindDataType;
+  headtail: RouteProfileWindDataType;
 } = {
-  temp: 'Temp',
-  wind: 'Wind',
-  course: 'Course',
+  windspeed: 'Windspeed',
+  headtail: 'Head/tailwind',
 };
 
 const routeProfileIcingDataTypes: {
   prob: RouteProfileIcingDataType;
   sev: RouteProfileIcingDataType;
   sld: RouteProfileIcingDataType;
-  sevsld: RouteProfileIcingDataType;
 } = {
   prob: 'Prob',
   sev: 'Sev',
   sld: 'SLD',
-  sevsld: 'Sev+SLD',
 };
 
+const routeProfileTurbDataTypes: {
+  cat: RouteProfileTurbDataType;
+  mtw: RouteProfileTurbDataType;
+} = {
+  cat: 'CAT',
+  mtw: 'MTW',
+};
+
+const routeProfileMaxAltitudes: RouteProfileMaxAltitudes[] = [500, 250, 150];
+
 const RouteProfileContainer = () => {
+  const { data: routeProfileApiState, isLoading } = useGetRouteProfileStateQuery(null, {
+    refetchOnMountOrArgChange: true,
+  });
+  const [routeProfileState, setRouteProfileState] = useState<RouteProfileState>(routeProfileApiState);
+  const [updateRouteProfileState] = useUpdateRouteProfileStateMutation();
+
+  useEffect(() => {
+    setRouteProfileState({ ...routeProfileApiState });
+  }, [routeProfileApiState]);
+
+  const handleUpdateState = (state: RouteProfileState) => {
+    setRouteProfileState(state);
+    updateRouteProfileState(state);
+  };
+
   return (
-    <div className="route-profile-container">
-      <div className="route-profile-header">
-        <RadioGroup className="select-chart-type" value={routeProfileChartTypes.wind}>
-          {Object.entries(routeProfileChartTypes).map(([key, value]) => {
-            return (
-              <FormControlLabel
-                key={key}
-                value={value}
-                control={
-                  <Radio
-                    color="primary"
-                    icon={<CheckBoxOutlineBlankOutlined />}
-                    checkedIcon={<CheckBoxOutlinedIcon />}
-                  />
-                }
-                label={value}
-              />
-            );
-          })}
-        </RadioGroup>
-        <div className="header-right">
-          <div className="select-data-type">
-            <InputFieldWrapper>
-              <div className="input_radio_container">
-                {Object.entries(routeProfileWindDataTypes).map(([key, value]) => {
-                  return (
-                    <RadioButton
-                      id={key}
-                      value={value}
-                      title={value}
-                      selectedValue={routeProfileWindDataTypes.wind}
-                      description=""
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                        console.log(e.target.value as RouteProfileWindDataType);
-                      }}
+    !isLoading && (
+      <div className="route-profile-container">
+        <div className="route-profile-header">
+          <RadioGroup
+            className="select-chart-type"
+            value={routeProfileState.chartType ? routeProfileState.chartType : routeProfileChartTypes.wind}
+            onChange={(_e, value) => {
+              handleUpdateState({
+                ...routeProfileState,
+                chartType: value as unknown as RouteProfileChartType,
+              });
+            }}
+          >
+            {Object.entries(routeProfileChartTypes).map(([key, value]) => {
+              return (
+                <FormControlLabel
+                  key={value}
+                  value={value}
+                  control={
+                    <Radio
+                      color="primary"
+                      icon={<CheckBoxOutlineBlankOutlined />}
+                      checkedIcon={<CheckBoxOutlinedIcon />}
                     />
-                  );
-                })}
+                  }
+                  label={value}
+                />
+              );
+            })}
+          </RadioGroup>
+          <div className="header-right">
+            {routeProfileState.chartType === routeProfileChartTypes.wind && (
+              <div className="select-data-type">
+                <InputFieldWrapper>
+                  <div className="input_radio_container">
+                    {Object.entries(routeProfileWindDataTypes).map(([key, value]) => {
+                      return (
+                        <RadioButton
+                          id={key}
+                          key={value}
+                          value={value}
+                          title={value}
+                          selectedValue={routeProfileState.windLayer}
+                          description=""
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            handleUpdateState({
+                              ...routeProfileApiState,
+                              windLayer: e.target.value as unknown as RouteProfileWindDataType,
+                            });
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                </InputFieldWrapper>
               </div>
-            </InputFieldWrapper>
-          </div>
-          <div className="select-altitude">
-            <InputFieldWrapper>
-              <div className="input_radio_container">
-                {Object.entries(routeProfileIcingDataTypes).map(([key, value]) => {
-                  return (
-                    <RadioButton
-                      id={key}
-                      value={value}
-                      title={value}
-                      selectedValue={routeProfileIcingDataTypes.sev}
-                      description=""
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                        console.log(e.target.value as RouteProfileIcingDataType);
-                      }}
-                    />
-                  );
-                })}
+            )}
+            {routeProfileState.chartType === routeProfileChartTypes.icing && (
+              <div className="select-data-type">
+                <ToggleButtonGroup
+                  value={routeProfileState.icingLayers}
+                  onChange={(_, value) => {
+                    handleUpdateState({ ...routeProfileState, icingLayers: value });
+                  }}
+                  aria-label="Icing Data Layers"
+                >
+                  {Object.entries(routeProfileIcingDataTypes).map(([key, value]) => {
+                    return (
+                      <ToggleButton key={value} value={value} aria-label={value}>
+                        {value}
+                      </ToggleButton>
+                    );
+                  })}
+                </ToggleButtonGroup>
               </div>
-            </InputFieldWrapper>
+            )}
+            {routeProfileState.chartType === routeProfileChartTypes.turb && (
+              <div className="select-data-type">
+                <ToggleButtonGroup
+                  value={routeProfileState.turbLayers}
+                  onChange={(_, value) => {
+                    handleUpdateState({ ...routeProfileState, turbLayers: value });
+                  }}
+                  aria-label="Icing Data Layers"
+                >
+                  {Object.entries(routeProfileTurbDataTypes).map(([key, value]) => {
+                    return (
+                      <ToggleButton key={value} value={value} aria-label={value}>
+                        {value}
+                      </ToggleButton>
+                    );
+                  })}
+                </ToggleButtonGroup>
+              </div>
+            )}
+            <div className="select-altitude">
+              <InputFieldWrapper>
+                <div className="input_radio_container">
+                  {routeProfileMaxAltitudes.map((value) => {
+                    return (
+                      <RadioButton
+                        id={value}
+                        key={value}
+                        value={value}
+                        title={value}
+                        selectedValue={routeProfileState.maxAltitude}
+                        description=""
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                          handleUpdateState({
+                            ...routeProfileState,
+                            maxAltitude: parseInt(e.target.value) as RouteProfileMaxAltitudes,
+                          });
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              </InputFieldWrapper>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    )
   );
 };
 

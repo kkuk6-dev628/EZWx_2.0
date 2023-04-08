@@ -3,8 +3,6 @@ import { PersonalMinimums } from './../../../store/user/UserSettings';
 import { cacheStartTime, WeatherCausings } from './AreoConstants';
 import geojson2svg from 'geojson-to-svg';
 import { SkyCondition } from '../../../interfaces/layerControl';
-import RBush from 'rbush';
-import { LatLng } from 'leaflet';
 import axios from 'axios';
 import { db } from '../../caching/dexieDb';
 import { Route, RoutePoint } from '../../../interfaces/route';
@@ -104,49 +102,6 @@ export const celsiusToFahrenheit = (celsius: number): number => {
 
 export const knotsToMph = (knots: number): number => {
   return Math.round(knots * 1.15078);
-};
-
-export const simplifyPoints = (
-  map: L.Map,
-  features: GeoJSON.Feature[],
-  radius: number,
-  route: Route,
-  unSimplifyFilter?: (feature: GeoJSON.Feature) => boolean,
-): GeoJSON.Feature[] => {
-  if (!map) return [];
-
-  const getBoxFromGeometry = (map: L.Map, geometry) => {
-    const latlng = new LatLng(geometry.coordinates[1], geometry.coordinates[0]);
-    const layerPoint = map.latLngToLayerPoint(latlng);
-    return {
-      minX: layerPoint.x - radius,
-      minY: layerPoint.y - radius,
-      maxX: layerPoint.x + radius,
-      maxY: layerPoint.y + radius,
-    };
-  };
-
-  const results: GeoJSON.Feature[] = [];
-  const rbush = new RBush();
-  if (route) {
-    [
-      route.departure.position,
-      route.destination.position,
-      ...route.routeOfFlight.map((item) => item.routePoint.position),
-    ].forEach((position) => rbush.insert(getBoxFromGeometry(map, position)));
-  }
-  features.forEach((feature) => {
-    // @ts-ignore
-    const latlng = new LatLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-    if (map.getBounds().contains(latlng)) {
-      const box = getBoxFromGeometry(map, feature.geometry);
-      if ((unSimplifyFilter && unSimplifyFilter(feature)) || !rbush.collides(box)) {
-        rbush.insert(box);
-        results.push(feature);
-      }
-    }
-  });
-  return results;
 };
 
 export const createElementFromHTML = (htmlString) => {
