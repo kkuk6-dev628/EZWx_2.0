@@ -4,6 +4,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ClearAirTurb } from './route-profile.gisdb-entity';
 import { RouteProfileQueryDto } from './route-profile-query.dto';
 import { dynamicImport } from 'tsimportlib';
+
+const rasterDataDir = '/usr/share/geoserver/data_dir/data/EZWxBrief';
+
 @Injectable()
 export class RouteProfileQueryDataService {
   constructor(
@@ -13,8 +16,14 @@ export class RouteProfileQueryDataService {
 
   async findAll(query: RouteProfileQueryDto) {
     const clearAirTurbFileTimes = await this.clearAirTubRepository.find();
+    const results = [];
+    clearAirTurbFileTimes.forEach((clearAirTurbFileTime) => {
+      const filePath = rasterDataDir + '/cat/' + clearAirTurbFileTime.location;
+      const data = this.queryRaster(query.queryPoints, filePath);
+      results.push({ time: clearAirTurbFileTime.ingestion, elevation: clearAirTurbFileTime.elevation, ...data });
+    });
 
-    return {};
+    return results;
   }
 
   async queryRaster(positions: GeoJSON.Position[], rasterFileName: string) {

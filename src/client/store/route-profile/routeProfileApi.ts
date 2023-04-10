@@ -32,8 +32,15 @@ export const routeProfileApi = createApi({
     updateRouteProfileState: builder.mutation({
       query: (data) => ({ url: '', method: 'Post', body: data }),
     }),
+    queryRouteProfileData: builder.mutation({
+      query: (data) => ({ url: 'data/findAll', method: 'Post', body: data }),
+    }),
   }),
 });
 
-export const { useGetRouteProfileStateQuery, useLazyGetRouteProfileStateQuery, useUpdateRouteProfileStateMutation } =
-  routeProfileApi;
+export const {
+  useGetRouteProfileStateQuery,
+  useLazyGetRouteProfileStateQuery,
+  useUpdateRouteProfileStateMutation,
+  useQueryRouteProfileDataMutation,
+} = routeProfileApi;

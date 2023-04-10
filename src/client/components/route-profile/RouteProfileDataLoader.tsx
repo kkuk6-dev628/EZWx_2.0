@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import 'leaflet-arc';
 import { useGetRoutesQuery } from '../../store/route/routeApi';
 import { selectAuth } from '../../store/auth/authSlice';
+import { useQueryRouteProfileDataMutation } from '../../store/route-profile/routeProfileApi';
 
 const totalDivideNumber = 30;
 
@@ -47,6 +48,7 @@ export const interpolateRoute = (route: Route, returnAsLeaflet = false): L.LatLn
 
 const RouteProfileDataLoader = () => {
   const auth = useSelector(selectAuth);
+  const [queryRouteProfileData, queryDataResult] = useQueryRouteProfileDataMutation();
   if (auth.id) {
     useGetRoutesQuery('');
   }
@@ -55,15 +57,15 @@ const RouteProfileDataLoader = () => {
   useEffect(() => {
     if (activeRoute) {
       const routeVertices = interpolateRoute(activeRoute);
-      routeVertices.reduce((a, b) => {
-        if (a.lat !== b.lat || a.lng !== b.lng) {
-          const segmentLength = a.distanceTo(b);
-          console.log(segmentLength);
-        }
-        return b;
-      });
+      queryRouteProfileData({ queryPoints: routeVertices });
     }
   }, [activeRoute]);
+
+  useEffect(() => {
+    if (queryDataResult.data) {
+      console.log(queryDataResult.data);
+    }
+  }, [queryDataResult.isSuccess]);
 
   return <></>;
 };

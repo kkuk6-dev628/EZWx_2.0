@@ -2,10 +2,7 @@
 const withPWA = require('next-pwa')({
   dest: 'public',
 });
-const pwaConfig = withPWA({
-  swcMinify: true,
-});
-module.exports = {
+const settings = {
   // distDir: '../../.next',
   serverRuntimeConfig: {
     PROJECT_ROOT: __dirname,
@@ -13,5 +10,7 @@ module.exports = {
   eslint: {
     dirs: ['src/client'], // https://github.com/thisismydesign/nestjs-starter/issues/82
   },
-  ...pwaConfig,
+  swcMinify: true,
 };
+
+module.exports = process.env.NODE_ENV === 'production' ? withPWA(settings) : settings;
