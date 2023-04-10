@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 @Entity('cat')
 export class ClearAirTurb {
   @PrimaryColumn()
-  id: number;
+  fid: number;
 
   @Column()
   location: string;
