@@ -6,24 +6,15 @@ import { FaPlayCircle } from 'react-icons/fa';
 import { BsBookmarkPlus, BsShare } from 'react-icons/bs';
 import { MdOutlineSaveAlt } from 'react-icons/md';
 import MapTabs from '../components/shared/MapTabs';
-import {
-  SvgAir,
-  SvgBookmark,
-  SvgDownload,
-  SvgDropDown,
-  SvgMap,
-  SvgRefresh,
-  SvgRoute,
-  SvgShare,
-  SvgTabs,
-  SvgZoom,
-} from '../components/utils/SvgIcons';
+import { SvgAir, SvgDropDown, SvgMap, SvgRefresh, SvgRoute, SvgTabs, SvgZoom } from '../components/utils/SvgIcons';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import Image from 'next/image';
 import RouteProfileContainer from '../components/route-profile/RouteProfileContainer';
+import { useRouter } from 'next/router';
 
 function RouteProfile() {
+  const router = useRouter();
+
   const marks = {
     0: '0',
     25: {
@@ -40,7 +31,19 @@ function RouteProfile() {
     },
   };
   const handler = (id: string) => {
-    console.log(id);
+    switch (id) {
+      case 'map':
+        router.push('/map');
+        break;
+      case 'route':
+        break;
+      case 'airport':
+        break;
+      case 'refresh':
+        break;
+      default:
+        break;
+    }
   };
   const tabMenus = [
     {

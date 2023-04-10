@@ -15,6 +15,7 @@ import {
   useGetRouteProfileStateQuery,
   useUpdateRouteProfileStateMutation,
 } from '../../store/route-profile/routeProfileApi';
+import RouteProfileDataWrapper from './RouteProfileDataWrapper';
 
 const routeProfileChartTypes: {
   wind: RouteProfileChartType;
@@ -75,6 +76,7 @@ const RouteProfileContainer = () => {
   return (
     !isLoading && (
       <div className="route-profile-container">
+        <RouteProfileDataWrapper />
         <div className="route-profile-header">
           <RadioGroup
             className="select-chart-type"
