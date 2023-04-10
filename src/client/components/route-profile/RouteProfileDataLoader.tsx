@@ -22,7 +22,7 @@ const getRouteLengthInMeter = (coordinateList: GeoJSON.Position[]): number => {
   return routeLength;
 };
 
-const interpolateRoute = (route: Route): L.LatLng[] => {
+export const interpolateRoute = (route: Route, returnAsLeaflet = false): L.LatLng[] => {
   const coordinateList = [
     route.departure.position.coordinates,
     ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
@@ -42,7 +42,7 @@ const interpolateRoute = (route: Route): L.LatLng[] => {
     }
     return b;
   });
-  return interpolatedLatlngs;
+  return returnAsLeaflet ? interpolatedLatlngs : L.GeoJSON.latLngsToCoords(interpolatedLatlngs);
 };
 
 const RouteProfileDataLoader = () => {

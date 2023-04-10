@@ -16,6 +16,7 @@ import 'leaflet-arc';
 import { Button } from '@mui/material';
 import MultipleSelect from './MultipleSelect';
 import DialogTitle from '@mui/material/DialogTitle';
+import { interpolateRoute } from '../route-profile/RouteProfileDataLoader';
 
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
@@ -61,6 +62,11 @@ export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
       }),
       pane: 'route-label',
     });
+    routeGroupLayer.addLayer(marker);
+  });
+  const points = interpolateRoute(route, true);
+  points.map((latlng) => {
+    const marker = new L.CircleMarker(latlng);
     routeGroupLayer.addLayer(marker);
   });
   // map.fitBounds(polyline.getBounds());
