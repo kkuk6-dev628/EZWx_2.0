@@ -17,11 +17,11 @@ export class RouteProfileQueryDataService {
   async findAll(query: RouteProfileQueryDto) {
     const clearAirTurbFileTimes = await this.clearAirTubRepository.find();
     const results = [];
-    clearAirTurbFileTimes.forEach((clearAirTurbFileTime) => {
+    for (const clearAirTurbFileTime of clearAirTurbFileTimes) {
       const filePath = rasterDataDir + '/cat/' + clearAirTurbFileTime.location;
-      const data = this.queryRaster(query.queryPoints, filePath);
-      results.push({ time: clearAirTurbFileTime.ingestion, elevation: clearAirTurbFileTime.elevation, ...data });
-    });
+      const data = await this.queryRaster(query.queryPoints, filePath);
+      results.push({ time: clearAirTurbFileTime.ingestion, elevation: clearAirTurbFileTime.elevation, data });
+    }
 
     return results;
   }
@@ -37,15 +37,15 @@ export class RouteProfileQueryDataService {
     const bboxHeight = bbox[3] - bbox[1];
     const lngResolution = bboxWidth / pixelWidth;
     const results = [];
-    positions.forEach(async (position) => {
+    for (const position of positions) {
       const widthPct = (position[0] - bbox[0]) / bboxWidth;
       const heightPct = (position[1] - bbox[1]) / bboxHeight;
       const xPx = Math.floor(pixelWidth * widthPct);
       const yPx = Math.floor(pixelHeight * (1 - heightPct));
       const window = [xPx, yPx, xPx + 1, yPx + 1];
       const data = await image.readRasters({ window });
-      results.push({ position, data });
-    });
+      results.push({ position, data: { ...data } });
+    }
     return results;
   }
 }

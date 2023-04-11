@@ -8,6 +8,7 @@ import 'leaflet-arc';
 import { useGetRoutesQuery } from '../../store/route/routeApi';
 import { selectAuth } from '../../store/auth/authSlice';
 import { useQueryRouteProfileDataMutation } from '../../store/route-profile/routeProfileApi';
+import { CircularProgress } from '@mui/material';
 
 const totalDivideNumber = 30;
 
@@ -63,11 +64,19 @@ const RouteProfileDataLoader = () => {
 
   useEffect(() => {
     if (queryDataResult.data) {
-      console.log(queryDataResult.data);
+      // console.log(queryDataResult.data);
     }
   }, [queryDataResult.isSuccess]);
 
-  return <></>;
+  return (
+    <>
+      {queryDataResult.isLoading && (
+        <div className="data-loading">
+          <CircularProgress color="secondary" />
+        </div>
+      )}
+    </>
+  );
 };
 
 export default RouteProfileDataLoader;
