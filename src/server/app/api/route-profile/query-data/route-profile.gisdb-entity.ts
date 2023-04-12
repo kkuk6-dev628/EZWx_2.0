@@ -14,3 +14,27 @@ export class ClearAirTurb {
   @Column()
   elevation: number;
 }
+
+@Entity('nbm_cloudceiling')
+export class Ceiling {
+  @PrimaryColumn()
+  fid: number;
+
+  @Column()
+  location: string;
+
+  @Column()
+  ingestion: Date;
+}
+
+@Entity('nbm_vis')
+export class Visibility {
+  @PrimaryColumn()
+  fid: number;
+
+  @Column()
+  location: string;
+
+  @Column()
+  ingestion: Date;
+}

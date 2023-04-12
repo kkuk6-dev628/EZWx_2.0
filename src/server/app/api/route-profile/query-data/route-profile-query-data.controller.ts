@@ -6,8 +6,8 @@ import { RouteProfileQueryDto } from './route-profile-query.dto';
 export class RouteProfileQueryDataController {
   constructor(private routeProfileQueryDataService: RouteProfileQueryDataService) {}
 
-  @Post('findAll')
+  @Post('cat')
   findAll(@Body() query: RouteProfileQueryDto) {
-    return this.routeProfileQueryDataService.findAll(query);
+    return this.routeProfileQueryDataService.queryCat(query);
   }
 }

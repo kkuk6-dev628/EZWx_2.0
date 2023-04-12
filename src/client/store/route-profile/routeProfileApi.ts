@@ -33,7 +33,7 @@ export const routeProfileApi = createApi({
       query: (data) => ({ url: '', method: 'Post', body: data }),
     }),
     queryRouteProfileData: builder.mutation({
-      query: (data) => ({ url: 'data/findAll', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/cat', method: 'Post', body: data }),
     }),
   }),
 });
