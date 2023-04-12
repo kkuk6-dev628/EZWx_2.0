@@ -17,3 +17,14 @@ export interface RouteProfileState {
   turbLayers: RouteProfileTurbDataType[];
   maxAltitude: RouteProfileMaxAltitudes;
 }
+
+export interface ElevationApiResult {
+  results: {
+    dataset: string;
+    elevation: number;
+    location: {
+      lat: number;
+      lng: number;
+    };
+  }[];
+}

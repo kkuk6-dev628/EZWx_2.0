@@ -12,6 +12,7 @@ import { airportApi } from './route/airportApi';
 import { waypointApi } from './route/waypointApi';
 import DataLoadTimeSlice from './layers/DataLoadTimeSlice';
 import { routeProfileApi } from './route-profile/routeProfileApi';
+import { elevationApi } from './route-profile/elevationApi';
 
 const makeStore = () =>
   configureStore({
@@ -22,6 +23,7 @@ const makeStore = () =>
       [routeApi.reducerPath]: routeApi.reducer,
       [layerControlApi.reducerPath]: layerControlApi.reducer,
       [routeProfileApi.reducerPath]: routeProfileApi.reducer,
+      [elevationApi.reducerPath]: elevationApi.reducer,
       [RoutesSlice.name]: RoutesSlice.reducer,
       [apiSlice.reducerPath]: apiSlice.reducer,
       [authSlice.name]: authSlice.reducer,
@@ -40,6 +42,7 @@ const makeStore = () =>
         routeApi.middleware,
         layerControlApi.middleware,
         routeProfileApi.middleware,
+        elevationApi.middleware,
       );
       return middleWares;
     },

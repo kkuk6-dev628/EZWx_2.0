@@ -9,6 +9,8 @@ import { useGetRoutesQuery } from '../../store/route/routeApi';
 import { selectAuth } from '../../store/auth/authSlice';
 import { useQueryRouteProfileDataMutation } from '../../store/route-profile/routeProfileApi';
 import { CircularProgress } from '@mui/material';
+import { useQueryElevationsQuery } from '../../store/route-profile/elevationApi';
+import { skipToken } from '@reduxjs/toolkit/query';
 
 const totalDivideNumber = 30;
 
@@ -50,10 +52,13 @@ export const interpolateRoute = (route: Route, returnAsLeaflet = false): L.LatLn
 const RouteProfileDataLoader = () => {
   const auth = useSelector(selectAuth);
   const [queryRouteProfileData, queryDataResult] = useQueryRouteProfileDataMutation();
+  const activeRoute = useSelector(selectActiveRoute);
+  const { data: elevations, isLoading: isLoadingElevations } = useQueryElevationsQuery(
+    activeRoute ? interpolateRoute(activeRoute, true).map((latlng) => ({ ...latlng })) : skipToken,
+  );
   if (auth.id) {
     useGetRoutesQuery('');
   }
-  const activeRoute = useSelector(selectActiveRoute);
 
   useEffect(() => {
     if (activeRoute) {
