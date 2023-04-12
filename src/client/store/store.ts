@@ -13,6 +13,7 @@ import { waypointApi } from './route/waypointApi';
 import DataLoadTimeSlice from './layers/DataLoadTimeSlice';
 import { routeProfileApi } from './route-profile/routeProfileApi';
 import { elevationApi } from './route-profile/elevationApi';
+import RouteProfileSlice from './route-profile/RouteProfile';
 
 const makeStore = () =>
   configureStore({
@@ -31,6 +32,7 @@ const makeStore = () =>
       [UserSettingsSlice.name]: UserSettingsSlice.reducer,
       [BaseMapLayerControlSlice.name]: BaseMapLayerControlSlice.reducer,
       [SettingsLoadTimeSlice.name]: SettingsLoadTimeSlice.reducer,
+      [RouteProfileSlice.name]: RouteProfileSlice.reducer,
     },
     devTools: process.env.NODE_ENV !== 'production',
     middleware: (getDefaultMiddlewares) => {

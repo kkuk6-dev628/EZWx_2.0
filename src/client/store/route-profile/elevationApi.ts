@@ -11,6 +11,7 @@ export const elevationApi = createApi({
   endpoints: (builder) => ({
     queryElevations: builder.mutation({
       query: (data) => ({ url: '', method: 'Post', body: data }),
+      transformResponse: (response: ElevationApiResult) => response,
     }),
   }),
 });

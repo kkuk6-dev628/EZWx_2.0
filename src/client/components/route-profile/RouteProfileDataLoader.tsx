@@ -11,8 +11,10 @@ import { useQueryRouteProfileDataMutation } from '../../store/route-profile/rout
 import { CircularProgress } from '@mui/material';
 import { useQueryElevationsMutation } from '../../store/route-profile/elevationApi';
 import { skipToken } from '@reduxjs/toolkit/query';
+import { useDispatch } from 'react-redux';
+import { setRouteSegments } from '../../store/route-profile/RouteProfile';
 
-const totalDivideNumber = 30;
+const totalDivideNumber = 90;
 
 const getRouteLengthInMeter = (coordinateList: GeoJSON.Position[]): number => {
   let routeLength = 0;
@@ -53,6 +55,8 @@ const RouteProfileDataLoader = () => {
   const auth = useSelector(selectAuth);
   const [queryRouteProfileData, queryDataResult] = useQueryRouteProfileDataMutation();
   const activeRoute = useSelector(selectActiveRoute);
+  const dispatch = useDispatch();
+
   if (auth.id) {
     useGetRoutesQuery('');
   }
@@ -60,6 +64,7 @@ const RouteProfileDataLoader = () => {
   useEffect(() => {
     if (activeRoute) {
       const routeVertices = interpolateRoute(activeRoute);
+      dispatch(setRouteSegments(routeVertices));
       // queryRouteProfileData({ queryPoints: routeVertices });
     }
   }, [activeRoute]);
