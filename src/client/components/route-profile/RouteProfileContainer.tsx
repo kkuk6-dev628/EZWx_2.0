@@ -16,6 +16,10 @@ import {
   useUpdateRouteProfileStateMutation,
 } from '../../store/route-profile/routeProfileApi';
 import RouteProfileDataWrapper from './RouteProfileDataWrapper';
+import { useQueryElevationsMutation } from '../../store/route-profile/elevationApi';
+import { useSelector } from 'react-redux';
+import { selectActiveRoute } from '../../store/route/routes';
+import { interpolateRoute } from './RouteProfileDataLoader';
 
 const routeProfileChartTypes: {
   wind: RouteProfileChartType;
@@ -63,6 +67,15 @@ const RouteProfileContainer = () => {
   });
   const [routeProfileState, setRouteProfileState] = useState<RouteProfileState>(routeProfileApiState);
   const [updateRouteProfileState] = useUpdateRouteProfileStateMutation();
+  const [queryElevations, queryElevationsResult] = useQueryElevationsMutation();
+  const activeRoute = useSelector(selectActiveRoute);
+
+  useEffect(() => {
+    if (activeRoute) {
+      const routeVertices = interpolateRoute(activeRoute);
+      queryElevations({ queryPoints: routeVertices });
+    }
+  }, [activeRoute]);
 
   useEffect(() => {
     setRouteProfileState({ ...routeProfileApiState });
