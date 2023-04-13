@@ -11,7 +11,7 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import RouteProfileContainer from '../components/route-profile/RouteProfileContainer';
 import { useRouter } from 'next/router';
-import RouteProfileWrapper from '../components/route-profile/RouteProfileDataWrapper';
+import RouteProfileWrapper from '../components/route-profile/RouteProfileWrapper';
 
 function RouteProfile() {
   const router = useRouter();
@@ -31,57 +31,9 @@ function RouteProfile() {
       label: <p className="igry__range__txt">1200Z Feb 27 - 0000Z Feb 28</p>,
     },
   };
-  const handler = (id: string) => {
-    switch (id) {
-      case 'map':
-        router.push('/map');
-        break;
-      case 'route':
-        break;
-      case 'airport':
-        break;
-      case 'refresh':
-        break;
-      default:
-        break;
-    }
-  };
-  const tabMenus = [
-    {
-      id: 'map',
-      name: 'Map',
-      svg: <SvgMap />,
-      handler: handler,
-      isHideResponsive: false,
-    },
-    {
-      id: 'route',
-      name: 'Route',
-      svg: <SvgRoute />,
-      handler: handler,
-      isHideResponsive: false,
-    },
-    {
-      id: 'airport',
-      name: 'Airport',
-      svg: <SvgAir />,
-      handler: handler,
-      isHideResponsive: false,
-    },
-    {
-      id: 'refresh',
-      name: 'Refresh',
-      svg: <SvgRefresh />,
-      handler: handler,
-      isHideResponsive: false,
-    },
-  ];
   return (
     <>
-      <div className="route-profile">
-        <MapTabs tabMenus={tabMenus} />
-        <RouteProfileWrapper />
-      </div>
+      <RouteProfileWrapper />
       <div className="igry__range">
         <div className="container">
           <h2 className="igry__range__title">Valid 0000Z Feb 27 to 1200Z Feb 27</h2>

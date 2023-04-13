@@ -17,6 +17,7 @@ import { Button } from '@mui/material';
 import MultipleSelect from './MultipleSelect';
 import DialogTitle from '@mui/material/DialogTitle';
 import { interpolateRoute } from '../route-profile/RouteProfileDataLoader';
+import { useRouter } from 'next/router';
 
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
@@ -37,6 +38,9 @@ const emptyFormData: Route = {
 };
 
 export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
+  if (!routeGroupLayer) {
+    return;
+  }
   const coordinateList = [
     route.departure.position.coordinates,
     ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
@@ -84,6 +88,7 @@ function Route({ setIsShowModal }: Props) {
   const [isShowErrorRouteModal, setIsShowErrorRouteModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [altitudeText, setAltitudeText] = useState(routeData.altitude.toLocaleString());
+  const router = useRouter();
 
   useEffect(() => {
     // L.DomEvent.disableClickPropagation(ref.current);
@@ -123,6 +128,7 @@ function Route({ setIsShowModal }: Props) {
     if (validity === true) {
       addRoute();
       setIsShowModal(false);
+      router.push('/map');
     } else {
       setErrorMessage(validity as string);
       setIsShowErrorRouteModal(true);
@@ -133,6 +139,7 @@ function Route({ setIsShowModal }: Props) {
     if (validity === true) {
       addRoute();
       setIsShowModal(false);
+      router.push('/route-profile');
     } else {
       setErrorMessage(validity as string);
       setIsShowErrorRouteModal(true);

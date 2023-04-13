@@ -5,6 +5,10 @@
 
   @media screen and (max-width: 500px) {
     flex-direction: column;
+    height: 690px;
+  }
+  @media screen and (max-height: 680px) {
+    height: 420px;
   }
 
   .tabs{
@@ -12,11 +16,15 @@
   }
   .route-profile-container{
     height: 100%;
-    width: 100%;
+    width: calc(100vw - 78px);
     background-color: var(--color-primary);
     border-radius: 8px;
     margin-top: 2px;
-    margin-right: 40px;
+    margin-right: 8px;
+    @media screen and (max-width: 500px) {
+      width: 100vw;
+      height: 620px;
+    }
 
     .route-profile-header{
       display: flex;
@@ -83,7 +91,26 @@
       }
     }
     .route-profile-chart-container{
-      margin: 10px 60px;
+      margin: 4px;
+      @media screen and (max-width: 500px) {
+        margin: 0;
+      }
+      .scrollable-chart-content{
+        overflow: auto;
+      }
+      ::-webkit-scrollbar{
+        width: 8px;
+        height: 8px;
+        color: var(--color-primary);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--color-secondary);
+      }
+      @media screen and (max-width: 900px) {
+        ::-webkit-scrollbar-thumb {
+          background: transparent;
+        }
+      }
     }
   }
   .data-loading{

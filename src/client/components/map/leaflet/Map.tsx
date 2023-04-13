@@ -45,7 +45,7 @@ import { jsonClone } from '../../utils/ObjectUtil';
 import { BaseMapLayerControlState, LayerControlState } from '../../../interfaces/layerControl';
 import { selectLayerControlState, setLayerControlState } from '../../../store/layers/LayerControl';
 
-const PaperComponent = (props) => {
+export const PaperComponent = (props) => {
   return (
     <Draggable handle="#draggable-dialog-title" cancel={'[class*="MuiDialogContent-root"]'}>
       <Paper {...props} />
