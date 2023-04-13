@@ -3,7 +3,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { InputFieldWrapper, RadioButton } from '../settings-drawer';
 import CheckBoxOutlineBlankOutlined from '@material-ui/icons/CheckBoxOutlineBlankOutlined';
 import CheckBoxOutlinedIcon from '@material-ui/icons/CheckBoxOutlined';
-import { XYPlot, VerticalGridLines, HorizontalGridLines, XAxis, YAxis, AreaSeries } from 'react-vis';
+import { XYPlot, VerticalGridLines, HorizontalGridLines, XAxis, YAxis, AreaSeries, Highlight } from 'react-vis';
 import 'react-vis/dist/style.css';
 import {
   RouteProfileChartType,
@@ -17,12 +17,17 @@ import {
   useGetRouteProfileStateQuery,
   useUpdateRouteProfileStateMutation,
 } from '../../store/route-profile/routeProfileApi';
-import RouteProfileDataWrapper from './RouteProfileDataWrapper';
-import { useQueryElevationsMutation } from '../../store/route-profile/elevationApi';
+import { useQueryElevationApiMutation, useQueryOpenMeteoMutation } from '../../store/route-profile/elevationApi';
 import { useSelector } from 'react-redux';
 import { selectActiveRoute } from '../../store/route/routes';
-import { interpolateRoute } from './RouteProfileDataLoader';
-import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
+import RouteProfileDataLoader, {
+  getRouteLength,
+  getSegmentsCount,
+  interpolateRoute,
+  totalNumberOfElevations,
+} from './RouteProfileDataLoader';
+import { selectRouteElevationPoints, selectRouteSegments } from '../../store/route-profile/RouteProfile';
+import { selectSettings } from '../../store/user/UserSettings';
 
 const routeProfileChartTypes: {
   wind: RouteProfileChartType;
@@ -70,26 +75,36 @@ const RouteProfileContainer = () => {
   });
   const [routeProfileState, setRouteProfileState] = useState<RouteProfileState>(routeProfileApiState);
   const [updateRouteProfileState] = useUpdateRouteProfileStateMutation();
-  const [queryElevations, queryElevationsResult] = useQueryElevationsMutation();
+  const [queryElevations, queryElevationsResult] = useQueryElevationApiMutation();
   const [elevationSeries, setElevationSeries] = useState([]);
-  const routeSegments = useSelector(selectRouteSegments);
+  const activeRoute = useSelector(selectActiveRoute);
+  const [routeLength, setRouteLength] = useState(0);
+  const userSettings = useSelector(selectSettings);
+  const [segmentsCount, setSegmentsCount] = useState(1);
+  const startMargin = segmentsCount ? routeLength / segmentsCount / 2 : 0;
+  const [lastDrawLocation, setLastDrawLocation] = useState<any>();
 
   useEffect(() => {
-    if (routeSegments) {
-      queryElevations({ queryPoints: routeSegments });
+    if (activeRoute) {
+      // userSettings.default_distance_unit == true then km, or nm
+      setRouteLength(getRouteLength(activeRoute, !userSettings.default_distance_unit));
+      const elevationPoints = interpolateRoute(activeRoute, totalNumberOfElevations);
+      queryElevations({ queryPoints: elevationPoints });
+      setSegmentsCount(getSegmentsCount(activeRoute));
     }
-  }, [routeSegments]);
+  }, [activeRoute, userSettings.default_distance_unit]);
 
   useEffect(() => {
-    if (queryElevationsResult.isSuccess && queryElevationsResult.data) {
+    if (queryElevationsResult.isSuccess && queryElevationsResult.data && routeLength) {
       const elevations = [];
       const elevationApiResults = queryElevationsResult.data.results;
+      const elSegmentLength = routeLength / totalNumberOfElevations;
       for (let i = 0; i < elevationApiResults.length; i++) {
-        elevations.push({ x: i, y: elevationApiResults[i].elevation });
+        elevations.push({ x: i * elSegmentLength, y: elevationApiResults[i].elevation });
       }
       setElevationSeries(elevations);
     }
-  }, [queryElevationsResult.isSuccess]);
+  }, [queryElevationsResult.isSuccess, routeLength]);
 
   useEffect(() => {
     setRouteProfileState({ ...routeProfileApiState });
@@ -103,7 +118,7 @@ const RouteProfileContainer = () => {
   return (
     !isLoading && (
       <div className="route-profile-container">
-        <RouteProfileDataWrapper />
+        <RouteProfileDataLoader />
         <div className="route-profile-header">
           <RadioGroup
             className="select-chart-type"
@@ -224,15 +239,23 @@ const RouteProfileContainer = () => {
           </div>
         </div>
         <div className="route-profile-chart-container">
-          <XYPlot height={600} width={1200} yDomain={[0, 50000]}>
+          <XYPlot
+            height={600}
+            width={1600}
+            yDomain={[0, routeProfileState.maxAltitude * 100]}
+            xDomain={[-startMargin, routeLength]}
+          >
             <AreaSeries
               data={[
-                { x: 0, y: 50000 },
-                { x: 90, y: 50000 },
+                { x: -startMargin, y: 50000 },
+                { x: routeLength, y: 50000 },
               ]}
               color="skyblue"
             />
             <VerticalGridLines
+              tickValues={Array.from({ length: segmentsCount * 2 + 1 }, (value, index) =>
+                Math.round((index * routeLength) / (segmentsCount * 2)),
+              )}
               style={{
                 stroke: '#22222222',
               }}
@@ -243,6 +266,10 @@ const RouteProfileContainer = () => {
               }}
             />
             <XAxis
+              tickValues={Array.from({ length: segmentsCount + 1 }, (value, index) =>
+                Math.round((index * routeLength) / segmentsCount),
+              )}
+              tickFormat={(v) => v}
               style={{
                 line: { stroke: '#ADDDE100' },
                 ticks: { stroke: '#ADDDE100' },

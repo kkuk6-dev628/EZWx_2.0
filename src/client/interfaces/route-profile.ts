@@ -18,7 +18,7 @@ export interface RouteProfileState {
   maxAltitude: RouteProfileMaxAltitudes;
 }
 
-export interface ElevationApiResult {
+export interface OpenTopoApiResult {
   results: {
     dataset: string;
     elevation: number;
@@ -26,5 +26,17 @@ export interface ElevationApiResult {
       lat: number;
       lng: number;
     };
+  }[];
+}
+
+export interface OpenMeteoApiResult {
+  elevation: number[];
+}
+
+export interface ElevationApiResult {
+  results: {
+    elevation: number;
+    latitude: number;
+    longitude: number;
   }[];
 }

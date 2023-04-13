@@ -8,6 +8,6 @@ export class ElevationsController {
 
   @Post('elevations')
   async findAll(@Body() query: ElevationsDto) {
-    return await this.elevationsService.executeGet(query.queryPoints);
+    return await this.elevationsService.queryElevationApi(query.queryPoints);
   }
 }

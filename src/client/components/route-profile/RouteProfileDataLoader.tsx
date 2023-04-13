@@ -9,14 +9,13 @@ import { useGetRoutesQuery } from '../../store/route/routeApi';
 import { selectAuth } from '../../store/auth/authSlice';
 import { useQueryRouteProfileDataMutation } from '../../store/route-profile/routeProfileApi';
 import { CircularProgress } from '@mui/material';
-import { useQueryElevationsMutation } from '../../store/route-profile/elevationApi';
 import { skipToken } from '@reduxjs/toolkit/query';
 import { useDispatch } from 'react-redux';
-import { setRouteSegments } from '../../store/route-profile/RouteProfile';
+import { setRouteElevationPoints, setRouteSegments } from '../../store/route-profile/RouteProfile';
 
-const totalDivideNumber = 90;
+export const totalNumberOfElevations = 512;
 
-const getRouteLengthInMeter = (coordinateList: GeoJSON.Position[]): number => {
+const getLineLength = (coordinateList: GeoJSON.Position[], inMile = false): number => {
   let routeLength = 0;
   const latlngs: L.LatLng[] = L.GeoJSON.coordsToLatLngs(coordinateList);
   latlngs.reduce((a, b) => {
@@ -25,30 +24,58 @@ const getRouteLengthInMeter = (coordinateList: GeoJSON.Position[]): number => {
     }
     return b;
   });
-  return routeLength;
+  return inMile ? routeLength / 1852 : routeLength / 1000;
 };
 
-export const interpolateRoute = (route: Route, returnAsLeaflet = false): L.LatLng[] => {
+export const getRouteLength = (route: Route, inMile = false): number => {
   const coordinateList = [
     route.departure.position.coordinates,
     ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
     route.destination.position.coordinates,
   ];
-  const totalLength = getRouteLengthInMeter(coordinateList);
+  const routeLengthNm = getLineLength(coordinateList, inMile);
+  return routeLengthNm;
+};
+
+export const interpolateRoute = (route: Route, divideNumber, returnAsLeaflet = false): L.LatLng[] => {
+  const coordinateList = [
+    route.departure.position.coordinates,
+    ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
+    route.destination.position.coordinates,
+  ];
+  const totalLength = getLineLength(coordinateList);
   const interpolatedLatlngs = new Array<L.LatLng>();
   const latlngs: L.LatLng[] = L.GeoJSON.coordsToLatLngs(coordinateList);
-  latlngs.reduce((a, b) => {
-    if (a.lat !== b.lat || a.lng !== b.lng) {
-      const segmentLength = a.distanceTo(b);
-      const vertices = Math.round((segmentLength * totalDivideNumber) / totalLength);
+  latlngs.map((latlng, index) => {
+    if (index < latlngs.length - 1) {
+      const nextLatlng = latlngs[index + 1];
+      const segmentLength = latlng.distanceTo(nextLatlng);
+      const vertices = Math.round((segmentLength * divideNumber) / (totalLength * 1000));
       //@ts-ignore
-      const polyline = L.Polyline.Arc(a, b, { color: '#f0fa', weight: 6, pane: 'route-line', vertices });
+      const polyline = L.Polyline.Arc(latlng, nextLatlng, { color: '#f0fa', weight: 6, pane: 'route-line', vertices });
       //@ts-ignore
       interpolatedLatlngs.push(...polyline.getLatLngs());
     }
-    return b;
   });
   return returnAsLeaflet ? interpolatedLatlngs : L.GeoJSON.latLngsToCoords(interpolatedLatlngs);
+};
+
+export const getSegmentsCount = (route: Route): number => {
+  const coordinateList = [
+    route.departure.position.coordinates,
+    ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
+    route.destination.position.coordinates,
+  ];
+  const routeLengthNm = getLineLength(coordinateList, true);
+  if (routeLengthNm <= 250) {
+    return 7;
+  } else if (routeLengthNm <= 500) {
+    return 9;
+  } else if (routeLengthNm <= 800) {
+    return 11;
+  } else {
+    return 13;
+  }
 };
 
 const RouteProfileDataLoader = () => {
@@ -63,8 +90,6 @@ const RouteProfileDataLoader = () => {
 
   useEffect(() => {
     if (activeRoute) {
-      const routeVertices = interpolateRoute(activeRoute);
-      dispatch(setRouteSegments(routeVertices));
       // queryRouteProfileData({ queryPoints: routeVertices });
     }
   }, [activeRoute]);

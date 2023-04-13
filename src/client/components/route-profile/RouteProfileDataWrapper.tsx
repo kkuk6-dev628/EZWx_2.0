@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
 
-const RouteProfileDataWrapper = dynamic(() => import('./RouteProfileDataLoader'), {
+const RouteProfileWrapper = dynamic(() => import('./RouteProfileContainer'), {
   ssr: false,
 });
 
-export default RouteProfileDataWrapper;
+export default RouteProfileWrapper;
