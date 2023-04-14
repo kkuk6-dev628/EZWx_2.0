@@ -7,7 +7,28 @@ export class RouteProfileQueryDataController {
   constructor(private routeProfileQueryDataService: RouteProfileQueryDataService) {}
 
   @Post('cat')
-  findAll(@Body() query: RouteProfileQueryDto) {
+  cat(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryCat(query);
+  }
+
+  @Post('mwturb')
+  mwturb(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryMwturb(query);
+  }
+  @Post('humidity')
+  humidity(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryHumidity(query);
+  }
+  @Post('temperature')
+  temperature(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryTemperature(query);
+  }
+  @Post('gfs-winddirection')
+  gfsWindDirection(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryGfsWindDirection(query);
+  }
+  @Post('gfs-windspeed')
+  gfsWindSpeed(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryGfsWindSpeed(query);
   }
 }

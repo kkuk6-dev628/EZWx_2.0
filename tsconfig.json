@@ -16,4 +16,7 @@
     "files": true
   },
   "include": ["src/server", "test", "ormconfig.ts", "jest.config.ts"],
+  "watchOptions": {
+    "excludeFiles": ["dist", "src/client"]
+  }
 }

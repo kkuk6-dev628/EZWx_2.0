@@ -7,11 +7,17 @@ import { useEffect } from 'react';
 import 'leaflet-arc';
 import { useGetRoutesQuery } from '../../store/route/routeApi';
 import { selectAuth } from '../../store/auth/authSlice';
-import { useQueryRouteProfileDataMutation } from '../../store/route-profile/routeProfileApi';
+import {
+  useQueryCaturbDataMutation,
+  useQueryGfsWindDirectionDataMutation,
+  useQueryGfsWindSpeedDataMutation,
+  useQueryHumidityDataMutation,
+  useQueryMwturbDataMutation,
+  useQueryTemperatureDataMutation,
+} from '../../store/route-profile/routeProfileApi';
 import { CircularProgress } from '@mui/material';
 import { skipToken } from '@reduxjs/toolkit/query';
 import { useDispatch } from 'react-redux';
-import { setRouteElevationPoints, setRouteSegments } from '../../store/route-profile/RouteProfile';
 
 export const totalNumberOfElevations = 512;
 
@@ -80,7 +86,12 @@ export const getSegmentsCount = (route: Route): number => {
 
 const RouteProfileDataLoader = () => {
   const auth = useSelector(selectAuth);
-  const [queryRouteProfileData, queryDataResult] = useQueryRouteProfileDataMutation();
+  const [queryCaturbData, queryCaturbDataResult] = useQueryCaturbDataMutation();
+  const [queryMwturbData, queryMwturbDataResult] = useQueryMwturbDataMutation();
+  const [queryHumidityData, queryhumidityDataResult] = useQueryHumidityDataMutation();
+  const [queryTemperatureData, queryTemperatureDataResult] = useQueryTemperatureDataMutation();
+  const [queryGfsWindDirectionData, queryGfsWindDirectionDataResult] = useQueryGfsWindDirectionDataMutation();
+  const [queryGfsWindSpeedData, queryGfsWindSpeedDataResult] = useQueryGfsWindSpeedDataMutation();
   const activeRoute = useSelector(selectActiveRoute);
   const dispatch = useDispatch();
 
@@ -90,19 +101,25 @@ const RouteProfileDataLoader = () => {
 
   useEffect(() => {
     if (activeRoute) {
-      // queryRouteProfileData({ queryPoints: routeVertices });
+      const routeVertices = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
+      queryCaturbData({ queryPoints: routeVertices });
+      queryMwturbData({ queryPoints: routeVertices });
+      queryHumidityData({ queryPoints: routeVertices });
+      queryTemperatureData({ queryPoints: routeVertices });
+      queryGfsWindDirectionData({ queryPoints: routeVertices });
+      queryGfsWindSpeedData({ queryPoints: routeVertices });
     }
   }, [activeRoute]);
 
   useEffect(() => {
-    if (queryDataResult.data) {
+    if (queryCaturbDataResult.data) {
       // console.log(queryDataResult.data);
     }
-  }, [queryDataResult.isSuccess]);
+  }, [queryCaturbDataResult.isSuccess]);
 
   return (
     <>
-      {queryDataResult.isLoading && (
+      {queryCaturbDataResult.isLoading && (
         <div className="data-loading">
           <CircularProgress color="secondary" />
         </div>

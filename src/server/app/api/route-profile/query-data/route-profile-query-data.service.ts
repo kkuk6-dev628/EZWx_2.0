@@ -1,41 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { FindManyOptions, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AggregatedMapping, ClearAirTurb } from './route-profile.gisdb-entity';
+import {
+  AggregatedMapping,
+  ClearAirTurb,
+  GfsHumidity,
+  GfsTemperature,
+  GfsWindDirection,
+  GfsWindSpeed,
+  Mwturb,
+} from './route-profile.gisdb-entity';
 import { RouteProfileQueryDto } from './route-profile-query.dto';
 import { dynamicImport } from 'tsimportlib';
 
 const rasterDataDir = '/data/ingest/GTG/Data';
 let geotiff;
+let pool;
 
 @Injectable()
 export class RouteProfileQueryDataService {
   constructor(
     @InjectRepository(ClearAirTurb, 'gisDB')
     private clearAirTubRepository: Repository<ClearAirTurb>,
+    @InjectRepository(Mwturb, 'gisDB')
+    private mwturbRepository: Repository<Mwturb>,
+    @InjectRepository(GfsHumidity, 'gisDB')
+    private humidityRepository: Repository<GfsHumidity>,
+    @InjectRepository(GfsTemperature, 'gisDB')
+    private temperaturRepository: Repository<GfsTemperature>,
+    @InjectRepository(GfsWindDirection, 'gisDB')
+    private gfsWindDirectionRepository: Repository<GfsWindDirection>,
+    @InjectRepository(GfsWindSpeed, 'gisDB')
+    private gfsWindSpeedRepository: Repository<GfsWindSpeed>,
   ) {}
-
-  async queryCat(query: RouteProfileQueryDto) {
-    if (!geotiff) {
-      geotiff = (await dynamicImport('geotiff', module)) as typeof import('geotiff');
-    }
-    const pool = new geotiff.Pool();
-
-    const clearAirTurbFileTimes = await this.clearAirTubRepository
-      .createQueryBuilder()
-      .select(['filename', 'array_agg (band) as bands', 'array_agg (elevation) elevations'])
-      .groupBy('filename')
-      .getRawMany<AggregatedMapping>();
-
-    const results = [];
-    for (const clearAirTurbFileTime of clearAirTurbFileTimes) {
-      const filePath = rasterDataDir + '/cat_mapping/' + clearAirTurbFileTime.filename;
-      const data = await this.queryRaster(query.queryPoints, filePath, pool);
-      results.push(data);
-      console.log(clearAirTurbFileTime.filename, new Date().toLocaleTimeString());
-    }
-    return results;
-  }
 
   async queryRaster(positions: GeoJSON.Position[], rasterFileName: string, pool) {
     const file = await geotiff.fromFile(rasterFileName);
@@ -56,5 +53,50 @@ export class RouteProfileQueryDataService {
       results.push({ position, data: { ...data } });
     }
     return results;
+  }
+
+  async queryRasterDataset(queryPoints: GeoJSON.Position[], repository: Repository<any>, folderName: string) {
+    if (!geotiff) {
+      geotiff = (await dynamicImport('geotiff', module)) as typeof import('geotiff');
+    }
+    if (!pool) pool = new geotiff.Pool();
+
+    const fileMappings = await repository
+      .createQueryBuilder()
+      .select(['filename', 'array_agg (band) as bands', 'array_agg (elevation) elevations'])
+      .groupBy('filename')
+      .getRawMany<AggregatedMapping>();
+
+    const results = [];
+    for (const fileMapping of fileMappings) {
+      const filePath = rasterDataDir + '/' + folderName + '/' + fileMapping.filename;
+      const data = await this.queryRaster(queryPoints, filePath, pool);
+      results.push(data);
+    }
+    return results;
+  }
+
+  async queryCat(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.clearAirTubRepository, 'cat');
+  }
+
+  async queryMwturb(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.mwturbRepository, 'mwturb');
+  }
+
+  async queryHumidity(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.humidityRepository, 'gfs_humidity');
+  }
+
+  async queryTemperature(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.temperaturRepository, 'gfs_temperature');
+  }
+
+  async queryGfsWindDirection(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.gfsWindDirectionRepository, 'gfs_winddirection');
+  }
+
+  async queryGfsWindSpeed(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.gfsWindSpeedRepository, 'gfs_windspeed');
   }
 }

@@ -32,8 +32,23 @@ export const routeProfileApi = createApi({
     updateRouteProfileState: builder.mutation({
       query: (data) => ({ url: '', method: 'Post', body: data }),
     }),
-    queryRouteProfileData: builder.mutation({
+    queryCaturbData: builder.mutation({
       query: (data) => ({ url: 'data/cat', method: 'Post', body: data }),
+    }),
+    queryMwturbData: builder.mutation({
+      query: (data) => ({ url: 'data/mwturb', method: 'Post', body: data }),
+    }),
+    queryHumidityData: builder.mutation({
+      query: (data) => ({ url: 'data/humidity', method: 'Post', body: data }),
+    }),
+    queryTemperatureData: builder.mutation({
+      query: (data) => ({ url: 'data/temperature', method: 'Post', body: data }),
+    }),
+    queryGfsWindDirectionData: builder.mutation({
+      query: (data) => ({ url: 'data/gfs-winddirection', method: 'Post', body: data }),
+    }),
+    queryGfsWindSpeedData: builder.mutation({
+      query: (data) => ({ url: 'data/gfs-windspeed', method: 'Post', body: data }),
     }),
   }),
 });
@@ -42,5 +57,10 @@ export const {
   useGetRouteProfileStateQuery,
   useLazyGetRouteProfileStateQuery,
   useUpdateRouteProfileStateMutation,
-  useQueryRouteProfileDataMutation,
+  useQueryCaturbDataMutation,
+  useQueryMwturbDataMutation,
+  useQueryHumidityDataMutation,
+  useQueryTemperatureDataMutation,
+  useQueryGfsWindDirectionDataMutation,
+  useQueryGfsWindSpeedDataMutation,
 } = routeProfileApi;

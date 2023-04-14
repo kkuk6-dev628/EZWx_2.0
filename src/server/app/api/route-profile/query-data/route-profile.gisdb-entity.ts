@@ -6,7 +6,7 @@ export interface AggregatedMapping {
   elevations: number[];
 }
 
-@Entity('cat')
+@Entity('cat_mapping')
 export class ClearAirTurb {
   @PrimaryColumn()
   id: number;
@@ -21,26 +21,76 @@ export class ClearAirTurb {
   elevation: number;
 }
 
-@Entity('nbm_cloudceiling')
-export class Ceiling {
+@Entity('mwturb_mapping')
+export class Mwturb {
   @PrimaryColumn()
-  fid: number;
+  id: number;
 
   @Column()
-  location: string;
+  filename: string;
 
   @Column()
-  ingestion: Date;
+  band: string;
+
+  @Column()
+  elevation: number;
 }
 
-@Entity('nbm_vis')
-export class Visibility {
+@Entity('gfs_humidity_mapping')
+export class GfsHumidity {
   @PrimaryColumn()
-  fid: number;
+  id: number;
 
   @Column()
-  location: string;
+  filename: string;
 
   @Column()
-  ingestion: Date;
+  band: string;
+
+  @Column()
+  elevation: number;
+}
+
+@Entity('gfs_temperature_mapping')
+export class GfsTemperature {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
+}
+@Entity('gfs_windspeed_mapping')
+export class GfsWindSpeed {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
+}
+
+@Entity('gfs_winddirection_mapping')
+export class GfsWindDirection {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
 }
