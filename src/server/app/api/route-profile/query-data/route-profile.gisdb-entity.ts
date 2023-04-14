@@ -1,15 +1,21 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
+export interface AggregatedMapping {
+  filename: string;
+  bands: string[];
+  elevations: number[];
+}
+
 @Entity('cat')
 export class ClearAirTurb {
   @PrimaryColumn()
-  fid: number;
+  id: number;
 
   @Column()
-  location: string;
+  filename: string;
 
   @Column()
-  ingestion: Date;
+  band: string;
 
   @Column()
   elevation: number;

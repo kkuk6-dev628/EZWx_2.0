@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { FindManyOptions, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ClearAirTurb } from './route-profile.gisdb-entity';
+import { AggregatedMapping, ClearAirTurb } from './route-profile.gisdb-entity';
 import { RouteProfileQueryDto } from './route-profile-query.dto';
 import { dynamicImport } from 'tsimportlib';
 
-const rasterDataDir = '/usr/share/geoserver/data_dir/data/EZWxBrief';
+const rasterDataDir = '/data/ingest/GTG/Data';
 let geotiff;
 
 @Injectable()
@@ -21,34 +21,18 @@ export class RouteProfileQueryDataService {
     }
     const pool = new geotiff.Pool();
 
-    const clearAirTurbFileTimes = await this.clearAirTubRepository.find();
-    const fileNames = [
-      '2t_20230411T140000.tif',
-      '2t_20230411T150000.tif',
-      '2t_20230411T160000.tif',
-      '2t_20230411T170000.tif',
-      '2t_20230411T180000.tif',
-      '2t_20230411T190000.tif',
-      '2t_20230411T200000.tif',
-      '2t_20230411T210000.tif',
-      '2t_20230411T220000.tif',
-      '2t_20230411T230000.tif',
-      '2t_20230412T000000.tif',
-      '2t_20230412T010000.tif',
-      '2t_20230412T020000.tif',
-      '2t_20230412T030000.tif',
-      '2t_20230412T040000.tif',
-      '2t_20230412T050000.tif',
-      '2t_20230412T060000.tif',
-      '2t_20230412T070000.tif',
-    ];
+    const clearAirTurbFileTimes = await this.clearAirTubRepository
+      .createQueryBuilder()
+      .select(['filename', 'array_agg (band) as bands', 'array_agg (elevation) elevations'])
+      .groupBy('filename')
+      .getRawMany<AggregatedMapping>();
+
     const results = [];
-    console.log('start', new Date().toLocaleTimeString());
-    for (const filename of fileNames) {
-      const filePath = rasterDataDir + filename;
+    for (const clearAirTurbFileTime of clearAirTurbFileTimes) {
+      const filePath = rasterDataDir + '/cat_mapping/' + clearAirTurbFileTime.filename;
       const data = await this.queryRaster(query.queryPoints, filePath, pool);
       results.push(data);
-      console.log(filename, new Date().toLocaleTimeString());
+      console.log(clearAirTurbFileTime.filename, new Date().toLocaleTimeString());
     }
     return results;
   }
