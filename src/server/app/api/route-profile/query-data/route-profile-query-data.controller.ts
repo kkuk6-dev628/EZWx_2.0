@@ -31,4 +31,16 @@ export class RouteProfileQueryDataController {
   gfsWindSpeed(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryGfsWindSpeed(query);
   }
+  @Post('icing-prob')
+  icingProv(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryIcingProb(query);
+  }
+  @Post('icing-sev')
+  icingSev(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryIcingSev(query);
+  }
+  @Post('icing-sld')
+  icingSld(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryIcingSld(query);
+  }
 }

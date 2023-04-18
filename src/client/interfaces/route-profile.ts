@@ -40,3 +40,20 @@ export interface ElevationApiResult {
     longitude: number;
   }[];
 }
+
+export interface RouteProfileDataset {
+  time: string;
+  data: {
+    position: GeoJSON.Position;
+    data: {
+      elevation: number;
+      value: number;
+    }[];
+  }[];
+}
+
+export interface RouteSegment {
+  position: { lat: number; lng: number };
+  accDistance: number;
+  arriveTime: number;
+}

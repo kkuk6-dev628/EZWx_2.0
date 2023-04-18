@@ -2,8 +2,9 @@
 import { useSelector } from 'react-redux';
 import { selectActiveRoute } from '../../store/route/routes';
 import L from 'leaflet';
+import * as fly from 'fly-js';
 import { Route } from '../../interfaces/route';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'leaflet-arc';
 import { useGetRoutesQuery } from '../../store/route/routeApi';
 import { selectAuth } from '../../store/auth/authSlice';
@@ -12,12 +13,18 @@ import {
   useQueryGfsWindDirectionDataMutation,
   useQueryGfsWindSpeedDataMutation,
   useQueryHumidityDataMutation,
+  useQueryIcingProbDataMutation,
+  useQueryIcingSevDataMutation,
+  useQueryIcingSldDataMutation,
   useQueryMwturbDataMutation,
   useQueryTemperatureDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { CircularProgress } from '@mui/material';
 import { skipToken } from '@reduxjs/toolkit/query';
 import { useDispatch } from 'react-redux';
+import { RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
+import { selectSettings } from '../../store/user/UserSettings';
+import { setRouteSegments } from '../../store/route-profile/RouteProfile';
 
 export const totalNumberOfElevations = 512;
 
@@ -31,6 +38,29 @@ const getLineLength = (coordinateList: GeoJSON.Position[], inMile = false): numb
     return b;
   });
   return inMile ? routeLength / 1852 : routeLength / 1000;
+};
+
+const getValueFromDataset = (
+  datasetAll: RouteProfileDataset[],
+  time: Date,
+  elevation: number,
+  segmentIndex,
+): number => {
+  let speedData: RouteProfileDataset;
+  for (const dataset of datasetAll) {
+    const diff = time.getTime() - new Date(dataset.time).getTime();
+    if (diff >= 0 && diff < 3600 * 1000) {
+      speedData = dataset;
+      break;
+    }
+  }
+
+  let speedValue;
+  for (const dataset of speedData.data[segmentIndex].data) {
+    if (dataset.elevation == elevation) {
+      return dataset.value;
+    }
+  }
 };
 
 export const getRouteLength = (route: Route, inMile = false): number => {
@@ -56,11 +86,11 @@ export const interpolateRoute = (route: Route, divideNumber, returnAsLeaflet = f
     if (index < latlngs.length - 1) {
       const nextLatlng = latlngs[index + 1];
       const segmentLength = latlng.distanceTo(nextLatlng);
-      const vertices = Math.round((segmentLength * divideNumber) / (totalLength * 1000));
+      const vertices = Math.round((segmentLength * divideNumber) / (totalLength * 1000)) + 1;
       //@ts-ignore
       const polyline = L.Polyline.Arc(latlng, nextLatlng, { color: '#f0fa', weight: 6, pane: 'route-line', vertices });
       //@ts-ignore
-      interpolatedLatlngs.push(...polyline.getLatLngs());
+      interpolatedLatlngs.push(...(index > 0 ? polyline.getLatLngs().slice(1) : polyline.getLatLngs()));
     }
   });
   return returnAsLeaflet ? interpolatedLatlngs : L.GeoJSON.latLngsToCoords(interpolatedLatlngs);
@@ -86,14 +116,20 @@ export const getSegmentsCount = (route: Route): number => {
 
 const RouteProfileDataLoader = () => {
   const auth = useSelector(selectAuth);
+  const userSettings = useSelector(selectSettings);
+  const observationTime = userSettings.observation_time;
   const [queryCaturbData, queryCaturbDataResult] = useQueryCaturbDataMutation();
   const [queryMwturbData, queryMwturbDataResult] = useQueryMwturbDataMutation();
   const [queryHumidityData, queryhumidityDataResult] = useQueryHumidityDataMutation();
   const [queryTemperatureData, queryTemperatureDataResult] = useQueryTemperatureDataMutation();
   const [queryGfsWindDirectionData, queryGfsWindDirectionDataResult] = useQueryGfsWindDirectionDataMutation();
   const [queryGfsWindSpeedData, queryGfsWindSpeedDataResult] = useQueryGfsWindSpeedDataMutation();
+  const [queryIcingProbData, queryIcingProbDataResult] = useQueryIcingProbDataMutation();
+  const [queryIcingSevData, queryIcingSevDataResult] = useQueryIcingSevDataMutation();
+  const [queryIcingSldData, queryIcingSldDataResult] = useQueryIcingSldDataMutation();
   const activeRoute = useSelector(selectActiveRoute);
   const dispatch = useDispatch();
+  const [segmentPositions, setSegmentPositions] = useState<L.LatLng[]>();
 
   if (auth.id) {
     useGetRoutesQuery('');
@@ -101,15 +137,90 @@ const RouteProfileDataLoader = () => {
 
   useEffect(() => {
     if (activeRoute) {
-      const routeVertices = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
-      queryCaturbData({ queryPoints: routeVertices });
-      queryMwturbData({ queryPoints: routeVertices });
-      queryHumidityData({ queryPoints: routeVertices });
-      queryTemperatureData({ queryPoints: routeVertices });
-      queryGfsWindDirectionData({ queryPoints: routeVertices });
-      queryGfsWindSpeedData({ queryPoints: routeVertices });
+      const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
+      setSegmentPositions(positions);
+      if (!queryGfsWindDirectionDataResult.isLoading && !queryGfsWindDirectionDataResult.isSuccess)
+        queryGfsWindDirectionData({ queryPoints: positions });
+      if (!queryGfsWindSpeedDataResult.isLoading && !queryGfsWindSpeedDataResult.isSuccess)
+        queryGfsWindSpeedData({ queryPoints: positions });
+      if (
+        !queryhumidityDataResult.isLoading &&
+        !queryhumidityDataResult.isSuccess &&
+        queryGfsWindDirectionDataResult.isSuccess
+      )
+        queryHumidityData({ queryPoints: positions });
+      if (
+        !queryTemperatureDataResult.isSuccess &&
+        !queryTemperatureDataResult.isLoading &&
+        queryGfsWindDirectionDataResult.isSuccess
+      )
+        queryTemperatureData({ queryPoints: positions });
+      if (!queryCaturbDataResult.isLoading && !queryCaturbDataResult.isSuccess && queryhumidityDataResult.isSuccess)
+        queryCaturbData({ queryPoints: positions });
+      if (!queryMwturbDataResult.isLoading && !queryMwturbDataResult.isSuccess && queryhumidityDataResult.isSuccess)
+        queryMwturbData({ queryPoints: positions });
+      if (
+        !queryIcingProbDataResult.isLoading &&
+        !queryIcingProbDataResult.isSuccess &&
+        queryhumidityDataResult.isSuccess
+      )
+        queryIcingProbData({ queryPoints: positions });
+      if (!queryIcingSevDataResult.isLoading && !queryIcingSevDataResult.isSuccess && queryhumidityDataResult.isSuccess)
+        queryIcingSevData({ queryPoints: positions });
+      if (!queryIcingSldDataResult.isLoading && !queryIcingSldDataResult.isSuccess && queryhumidityDataResult.isSuccess)
+        queryIcingSldData({ queryPoints: positions });
     }
-  }, [activeRoute]);
+  }, [activeRoute, queryGfsWindDirectionDataResult.isSuccess, queryhumidityDataResult.isSuccess]);
+
+  useEffect(() => {
+    if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess) {
+      const initialSegment = {
+        position: { lat: segmentPositions[0][1], lng: segmentPositions[0][0] },
+        accDistance: 0,
+        arriveTime: new Date(observationTime).getTime(),
+      };
+      const segments: RouteSegment[] = [initialSegment];
+      segmentPositions.reduce((acc: RouteSegment, curr: L.LatLng, index) => {
+        try {
+          const dist = fly.distanceTo(acc.position.lat, acc.position.lng, curr[1], curr[0]);
+          if (!dist) return acc;
+          const course = fly.trueCourse(acc.position.lat, acc.position.lng, curr[1], curr[0]);
+          const speedValue = getValueFromDataset(
+            queryGfsWindSpeedDataResult.data,
+            new Date(observationTime),
+            activeRoute.altitude,
+            index,
+          );
+          const dirValue = getValueFromDataset(
+            queryGfsWindDirectionDataResult.data,
+            new Date(observationTime),
+            activeRoute.altitude,
+            index,
+          );
+          const { groundSpeed } = fly.calculateCourseAndGroundSpeed(
+            userSettings.true_airspeed,
+            course,
+            speedValue,
+            dirValue,
+            2,
+          );
+          const newTime = new Date(acc.arriveTime).getTime() + (3600 * 1000 * dist) / groundSpeed;
+          const segment = {
+            position: { lat: curr[1], lng: curr[0] },
+            accDistance: acc.accDistance + dist,
+            arriveTime: newTime,
+          };
+          segments.push(segment);
+          return { ...segment };
+        } catch (err) {
+          console.warn(err);
+          return acc;
+        }
+      }, initialSegment);
+
+      dispatch(setRouteSegments(segments));
+    }
+  }, [queryGfsWindSpeedDataResult.isSuccess, queryGfsWindDirectionDataResult.isSuccess, observationTime]);
 
   useEffect(() => {
     if (queryCaturbDataResult.data) {
@@ -119,7 +230,7 @@ const RouteProfileDataLoader = () => {
 
   return (
     <>
-      {queryCaturbDataResult.isLoading && (
+      {queryGfsWindSpeedDataResult.isLoading && (
         <div className="data-loading">
           <CircularProgress color="secondary" />
         </div>

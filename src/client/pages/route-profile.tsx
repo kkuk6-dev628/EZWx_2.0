@@ -5,17 +5,12 @@ import { GrFormClose } from 'react-icons/gr';
 import { FaPlayCircle } from 'react-icons/fa';
 import { BsBookmarkPlus, BsShare } from 'react-icons/bs';
 import { MdOutlineSaveAlt } from 'react-icons/md';
-import MapTabs from '../components/shared/MapTabs';
-import { SvgAir, SvgDropDown, SvgMap, SvgRefresh, SvgRoute, SvgTabs, SvgZoom } from '../components/utils/SvgIcons';
+import { SvgRefresh, SvgTabs, SvgZoom } from '../components/utils/SvgIcons';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import RouteProfileContainer from '../components/route-profile/RouteProfileContainer';
-import { useRouter } from 'next/router';
 import RouteProfileWrapper from '../components/route-profile/RouteProfileWrapper';
 
 function RouteProfile() {
-  const router = useRouter();
-
   const marks = {
     0: '0',
     25: {

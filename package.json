@@ -59,6 +59,7 @@
     "dexie": "^3.2.3",
     "dexie-react-hooks": "^1.1.1",
     "express": "^4.18.2",
+    "fly-js": "^0.0.5",
     "fs": "^0.0.1-security",
     "geojson-to-svg": "^1.1.4",
     "geotiff": "^2.0.7",

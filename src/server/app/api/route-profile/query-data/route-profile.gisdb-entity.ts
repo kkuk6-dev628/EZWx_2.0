@@ -94,3 +94,48 @@ export class GfsWindDirection {
   @Column()
   elevation: number;
 }
+
+@Entity('icingprob_mapping')
+export class IcingProb {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
+}
+
+@Entity('icingsev_mapping')
+export class IcingSev {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
+}
+
+@Entity('icingsld_mapping')
+export class IcingSld {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
+}

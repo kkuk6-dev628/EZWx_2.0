@@ -1,8 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AppState } from '../store';
+import { RouteSegment } from '../../interfaces/route-profile';
 
 export interface RouteProfileState {
-  routeSegments: GeoJSON.Position[];
+  routeSegments: RouteSegment[];
   routeElevationPoints: GeoJSON.Position[];
 }
 

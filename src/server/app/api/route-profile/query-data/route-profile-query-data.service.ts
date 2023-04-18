@@ -8,14 +8,18 @@ import {
   GfsTemperature,
   GfsWindDirection,
   GfsWindSpeed,
+  IcingProb,
+  IcingSev,
+  IcingSld,
   Mwturb,
 } from './route-profile.gisdb-entity';
 import { RouteProfileQueryDto } from './route-profile-query.dto';
 import { dynamicImport } from 'tsimportlib';
 
-const rasterDataDir = '/data/ingest/GTG/Data';
+const rasterDataDir = '/data/ingest';
 let geotiff;
 let pool;
+const regex = /\_([\d]+T[\d]+)./gm;
 
 @Injectable()
 export class RouteProfileQueryDataService {
@@ -32,6 +36,12 @@ export class RouteProfileQueryDataService {
     private gfsWindDirectionRepository: Repository<GfsWindDirection>,
     @InjectRepository(GfsWindSpeed, 'gisDB')
     private gfsWindSpeedRepository: Repository<GfsWindSpeed>,
+    @InjectRepository(IcingProb, 'gisDB')
+    private icingProbRepository: Repository<IcingProb>,
+    @InjectRepository(IcingSev, 'gisDB')
+    private icingSevRepository: Repository<IcingSev>,
+    @InjectRepository(IcingSld, 'gisDB')
+    private icingSldRepository: Repository<IcingSld>,
   ) {}
 
   async queryRaster(positions: GeoJSON.Position[], rasterFileName: string, pool) {
@@ -55,7 +65,7 @@ export class RouteProfileQueryDataService {
     return results;
   }
 
-  async queryRasterDataset(queryPoints: GeoJSON.Position[], repository: Repository<any>, folderName: string) {
+  async queryRasterDataset(queryPoints: GeoJSON.Position[], repository: Repository<any>, folderPath: string) {
     if (!geotiff) {
       geotiff = (await dynamicImport('geotiff', module)) as typeof import('geotiff');
     }
@@ -65,38 +75,56 @@ export class RouteProfileQueryDataService {
       .createQueryBuilder()
       .select(['filename', 'array_agg (band) as bands', 'array_agg (elevation) elevations'])
       .groupBy('filename')
+      .orderBy('filename')
       .getRawMany<AggregatedMapping>();
 
     const results = [];
     for (const fileMapping of fileMappings) {
-      const filePath = rasterDataDir + '/' + folderName + '/' + fileMapping.filename;
+      const filePath = rasterDataDir + '/' + folderPath + '/' + fileMapping.filename;
       const data = await this.queryRaster(queryPoints, filePath, pool);
-      results.push(data);
+      const time = fileMapping.filename.slice(fileMapping.filename.indexOf('_') + 1).replace('.tif', '');
+      results.push({ time, data, elevations: fileMapping.elevations });
     }
     return results;
   }
 
   async queryCat(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.clearAirTubRepository, 'cat');
+    return await this.queryRasterDataset(query.queryPoints, this.clearAirTubRepository, 'GTG/Data/cat');
   }
 
   async queryMwturb(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.mwturbRepository, 'mwturb');
+    return await this.queryRasterDataset(query.queryPoints, this.mwturbRepository, 'GTG/Data/mwturb');
   }
 
   async queryHumidity(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.humidityRepository, 'gfs_humidity');
+    return await this.queryRasterDataset(query.queryPoints, this.humidityRepository, 'GFS/Data/gfs_humidity');
   }
 
   async queryTemperature(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.temperaturRepository, 'gfs_temperature');
+    return await this.queryRasterDataset(query.queryPoints, this.temperaturRepository, 'GFS/Data/gfs_temperature');
   }
 
   async queryGfsWindDirection(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.gfsWindDirectionRepository, 'gfs_winddirection');
+    return await this.queryRasterDataset(
+      query.queryPoints,
+      this.gfsWindDirectionRepository,
+      'GFS/Data/gfs_winddirection',
+    );
   }
 
   async queryGfsWindSpeed(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.gfsWindSpeedRepository, 'gfs_windspeed');
+    return await this.queryRasterDataset(query.queryPoints, this.gfsWindSpeedRepository, 'GFS/Data/gfs_windspeed');
+  }
+
+  async queryIcingProb(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.icingProbRepository, 'NBM/Data/icingprob');
+  }
+
+  async queryIcingSev(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.icingSevRepository, 'NBM/Data/icingsev');
+  }
+
+  async queryIcingSld(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.icingSldRepository, 'NBM/Data/icingsld');
   }
 }
