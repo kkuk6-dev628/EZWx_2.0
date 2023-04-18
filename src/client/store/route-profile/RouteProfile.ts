@@ -8,8 +8,8 @@ export interface RouteProfileState {
 }
 
 const initialState: RouteProfileState = {
-  routeSegments: null,
-  routeElevationPoints: null,
+  routeSegments: [],
+  routeElevationPoints: [],
 };
 export const RouteProfileSlice = createSlice({
   name: 'routeProfile',

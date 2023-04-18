@@ -28,6 +28,18 @@ import { setRouteSegments } from '../../store/route-profile/RouteProfile';
 
 export const totalNumberOfElevations = 512;
 
+export const cacheKeys = {
+  gfsWindspeed: 'gfs-windspeed',
+  gfsWinddirection: 'gfs-winddirection',
+  gfsTemperature: 'gfs-temperature',
+  gfsHumidity: 'gfs-humidity',
+  caturb: 'caturb',
+  mwturb: 'mwturb',
+  icingProb: 'icing-prob',
+  icingSev: 'icing-sev',
+  icingSld: 'icing-sld',
+};
+
 const getLineLength = (coordinateList: GeoJSON.Position[], inMile = false): number => {
   let routeLength = 0;
   const latlngs: L.LatLng[] = L.GeoJSON.coordsToLatLngs(coordinateList);
@@ -40,7 +52,7 @@ const getLineLength = (coordinateList: GeoJSON.Position[], inMile = false): numb
   return inMile ? routeLength / 1852 : routeLength / 1000;
 };
 
-const getValueFromDataset = (
+export const getValueFromDataset = (
   datasetAll: RouteProfileDataset[],
   time: Date,
   elevation: number,
@@ -55,7 +67,6 @@ const getValueFromDataset = (
     }
   }
 
-  let speedValue;
   for (const dataset of speedData.data[segmentIndex].data) {
     if (dataset.elevation == elevation) {
       return dataset.value;
@@ -118,15 +129,29 @@ const RouteProfileDataLoader = () => {
   const auth = useSelector(selectAuth);
   const userSettings = useSelector(selectSettings);
   const observationTime = userSettings.observation_time;
-  const [queryCaturbData, queryCaturbDataResult] = useQueryCaturbDataMutation();
-  const [queryMwturbData, queryMwturbDataResult] = useQueryMwturbDataMutation();
-  const [queryHumidityData, queryhumidityDataResult] = useQueryHumidityDataMutation();
-  const [queryTemperatureData, queryTemperatureDataResult] = useQueryTemperatureDataMutation();
-  const [queryGfsWindDirectionData, queryGfsWindDirectionDataResult] = useQueryGfsWindDirectionDataMutation();
-  const [queryGfsWindSpeedData, queryGfsWindSpeedDataResult] = useQueryGfsWindSpeedDataMutation();
-  const [queryIcingProbData, queryIcingProbDataResult] = useQueryIcingProbDataMutation();
-  const [queryIcingSevData, queryIcingSevDataResult] = useQueryIcingSevDataMutation();
-  const [queryIcingSldData, queryIcingSldDataResult] = useQueryIcingSldDataMutation();
+  const [queryCaturbData, queryCaturbDataResult] = useQueryCaturbDataMutation({ fixedCacheKey: cacheKeys.caturb });
+  const [queryMwturbData, queryMwturbDataResult] = useQueryMwturbDataMutation({ fixedCacheKey: cacheKeys.mwturb });
+  const [queryHumidityData, queryhumidityDataResult] = useQueryHumidityDataMutation({
+    fixedCacheKey: cacheKeys.gfsHumidity,
+  });
+  const [queryTemperatureData, queryTemperatureDataResult] = useQueryTemperatureDataMutation({
+    fixedCacheKey: cacheKeys.gfsTemperature,
+  });
+  const [queryGfsWindDirectionData, queryGfsWindDirectionDataResult] = useQueryGfsWindDirectionDataMutation({
+    fixedCacheKey: cacheKeys.gfsWinddirection,
+  });
+  const [queryGfsWindSpeedData, queryGfsWindSpeedDataResult] = useQueryGfsWindSpeedDataMutation({
+    fixedCacheKey: cacheKeys.gfsWindspeed,
+  });
+  const [queryIcingProbData, queryIcingProbDataResult] = useQueryIcingProbDataMutation({
+    fixedCacheKey: cacheKeys.icingProb,
+  });
+  const [queryIcingSevData, queryIcingSevDataResult] = useQueryIcingSevDataMutation({
+    fixedCacheKey: cacheKeys.icingSev,
+  });
+  const [queryIcingSldData, queryIcingSldDataResult] = useQueryIcingSldDataMutation({
+    fixedCacheKey: cacheKeys.icingSld,
+  });
   const activeRoute = useSelector(selectActiveRoute);
   const dispatch = useDispatch();
   const [segmentPositions, setSegmentPositions] = useState<L.LatLng[]>();

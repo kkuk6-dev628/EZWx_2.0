@@ -11,21 +11,39 @@ import {
   CustomSVGSeries,
 } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
-import { getRouteLength, getSegmentsCount, interpolateRoute, totalNumberOfElevations } from './RouteProfileDataLoader';
+import {
+  cacheKeys,
+  getRouteLength,
+  getSegmentsCount,
+  getValueFromDataset,
+  interpolateRoute,
+  totalNumberOfElevations,
+} from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';
-import { useGetRouteProfileStateQuery } from '../../store/route-profile/routeProfileApi';
+import {
+  useGetRouteProfileStateQuery,
+  useQueryGfsWindDirectionDataMutation,
+  useQueryGfsWindSpeedDataMutation,
+  useQueryTemperatureDataMutation,
+} from '../../store/route-profile/routeProfileApi';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import { meterToFeet, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
 
-export const calcChartWidth = (viewWidth: number, viewHeight: number) => {
+export const windDataElevations = {
+  500: [50, 100, 150, 200, 250, 300, 350, 400, 450],
+  250: [30, 60, 90, 120, 150, 180, 210, 240],
+  150: [20, 40, 60, 80, 100, 120, 140],
+};
+
+export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
   if (viewWidth < 900) {
     return 900;
   } else {
     return viewWidth - 128;
   }
 };
-export const calcChartHeight = (viewWidth: number, viewHeight: number) => {
+export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
   if (viewHeight < 680) {
     return 320;
   } else {
@@ -47,6 +65,62 @@ const WindChart = () => {
   const startMargin = segmentsCount ? routeLength / segmentsCount / 2 : 0;
   const [viewW, setViewW] = useState<number>(window.innerWidth);
   const [viewH, setViewH] = useState<number>(window.innerHeight);
+
+  const [windSpeedSeries, setWindSpeedSeries] = useState([]);
+  const [queryTemperatureData, queryTemperatureDataResult] = useQueryTemperatureDataMutation({
+    fixedCacheKey: cacheKeys.gfsTemperature,
+  });
+  const [queryGfsWindDirectionData, queryGfsWindDirectionDataResult] = useQueryGfsWindDirectionDataMutation({
+    fixedCacheKey: cacheKeys.gfsWinddirection,
+  });
+  const [queryGfsWindSpeedData, queryGfsWindSpeedDataResult] = useQueryGfsWindSpeedDataMutation({
+    fixedCacheKey: cacheKeys.gfsWindspeed,
+  });
+
+  useEffect(() => {
+    if (queryGfsWindSpeedDataResult.isSuccess && segments.length > 0) {
+      const windSpeedData = [];
+      const dataset = queryGfsWindSpeedDataResult.data;
+      segments.forEach((segment, index) => {
+        const x = segment.accDistance;
+        const elevations = windDataElevations[routeProfileApiState.maxAltitude];
+        for (const el of elevations) {
+          const windSpeed = getValueFromDataset(dataset, new Date(segment.arriveTime), el, index);
+          windSpeedData.push({
+            x,
+            y: el,
+            customComponent: (_row, _positionInPixels) => {
+              return (
+                <g className="inner-inner-component">
+                  <circle cx="0" cy="0" r={10} fill="red" stroke="white" />
+                  <marker
+                    id="arrow"
+                    viewBox="0 0 10 10"
+                    refX="5"
+                    refY="5"
+                    markerWidth="4"
+                    markerHeight="4"
+                    orient="auto-start-reverse"
+                    stroke="white"
+                    fill="white"
+                  >
+                    <path d="M 0 0 L 10 5 L 0 10 z" />
+                  </marker>
+                  <line x1="0" y1="0" x2="0" y2="-20" stroke="white" marker-end="url(#arrow)" stroke-width="3" />
+                  <text x={0} y={0}>
+                    <tspan x="0" y="0">
+                      {windSpeed}
+                    </tspan>
+                  </text>
+                </g>
+              );
+            },
+          });
+        }
+        setWindSpeedSeries(windSpeedData);
+      });
+    }
+  }, [queryGfsWindSpeedDataResult.isSuccess, segments.length]);
 
   useEffect(() => {
     window.addEventListener('resize', handleWindowSizeChange);
@@ -97,7 +171,7 @@ const WindChart = () => {
         color="skyblue"
       />
       <VerticalGridLines
-        tickValues={Array.from({ length: segmentsCount * 2 + 1 }, (value, index) =>
+        tickValues={Array.from({ length: segmentsCount * 2 + 1 }, (_value, index) =>
           Math.round((index * routeLength) / (segmentsCount * 2)),
         )}
         style={{
@@ -110,11 +184,11 @@ const WindChart = () => {
         }}
       />
       <XAxis
-        tickValues={Array.from({ length: segmentsCount + 1 }, (value, index) =>
+        tickValues={Array.from({ length: segmentsCount + 1 }, (_value, index) =>
           Math.round((index * routeLength) / segmentsCount),
         )}
         tickFormat={(v, index) => {
-          if (segments) {
+          if (segments.length > 0) {
             const dist = Math.round(segments[index].accDistance / 10) * 10;
             return (
               <tspan className="chart-label">
@@ -153,42 +227,7 @@ const WindChart = () => {
         ></ContourSeries>
       )}
       <AreaSeries data={elevationSeries} color="#9e8f85" curve={'curveMonotoneX'} />
-      <CustomSVGSeries
-        customComponent="square"
-        data={Array.from({ length: segmentsCount * 4 }, (value, index) => {
-          const x = Math.round((Math.round(index / 4) * routeLength) / segmentsCount);
-          const y = (index % 4) * 10000;
-          return {
-            x,
-            y,
-            customComponent: (row, positionInPixels) => {
-              return (
-                <g className="inner-inner-component">
-                  <circle cx="0" cy="0" r={10} fill="red" stroke="white" />
-                  <marker
-                    id="arrow"
-                    viewBox="0 0 10 10"
-                    refX="5"
-                    refY="5"
-                    markerWidth="4"
-                    markerHeight="4"
-                    orient="auto-start-reverse"
-                    stroke="white"
-                    fill="white"
-                  >
-                    <path d="M 0 0 L 10 5 L 0 10 z" />
-                  </marker>
-                  <line x1="0" y1="0" x2="0" y2="-20" stroke="white" marker-end="url(#arrow)" stroke-width="3" />
-                  <text x={0} y={0}>
-                    <tspan x="0" y="0">{`x: ${x}`}</tspan>
-                    <tspan x="0" y="1em">{`y: ${y}`}</tspan>
-                  </text>
-                </g>
-              );
-            },
-          };
-        })}
-      />
+      <CustomSVGSeries customComponent="square" data={windSpeedSeries} />
     </XYPlot>
   );
 };
