@@ -31,9 +31,9 @@ import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import { meterToFeet, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
 
 export const windDataElevations = {
-  500: [50, 100, 150, 200, 250, 300, 350, 400, 450],
-  250: [30, 60, 90, 120, 150, 180, 210, 240],
-  150: [20, 40, 60, 80, 100, 120, 140],
+  500: [5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000],
+  250: [3000, 6000, 9000, 12000, 15000, 18000, 21000, 24000],
+  150: [2000, 4000, 6000, 8000, 10000, 12000, 14000],
 };
 
 export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
@@ -106,10 +106,10 @@ const WindChart = () => {
                   >
                     <path d="M 0 0 L 10 5 L 0 10 z" />
                   </marker>
-                  <line x1="0" y1="0" x2="0" y2="-20" stroke="white" marker-end="url(#arrow)" stroke-width="3" />
+                  <line x1="0" y1="0" x2="0" y2="-20" stroke="white" markerEnd="url(#arrow)" strokeWidth="3" />
                   <text x={0} y={0}>
-                    <tspan x="0" y="0">
-                      {windSpeed}
+                    <tspan x="0" y="0" className="windspeed-text">
+                      {Math.round(windSpeed)}
                     </tspan>
                   </text>
                 </g>
