@@ -35,6 +35,7 @@ const transformDataset = (response: any[]): RouteProfileDataset[] => {
             .filter((n) => n),
         };
       }),
+      elevations: row.elevations,
     };
   });
   return results;
