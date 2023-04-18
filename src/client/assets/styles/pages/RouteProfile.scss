@@ -1,6 +1,6 @@
 .route-profile{
   position: relative;
-  height: calc(100vh - 256px);
+  height: calc(100vh - 128px);
   display: flex;
 
   @media screen and (max-width: 500px) {
@@ -15,12 +15,12 @@
     position: relative;
   }
   .route-profile-container{
-    height: 100%;
     width: calc(100vw - 78px);
     background-color: var(--color-primary);
     border-radius: 8px;
     margin-top: 2px;
     margin-right: 8px;
+    margin-bottom: 24px;
     @media screen and (max-width: 500px) {
       width: 100vw;
       height: 620px;

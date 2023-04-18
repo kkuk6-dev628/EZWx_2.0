@@ -52,9 +52,9 @@ const MeteoLayers = () => {
       const groupLayer = new L.LayerGroup();
       map.addLayer(groupLayer);
       meteoLayers.routeGroupLayer = groupLayer;
-      if (activeRoute) {
-        addRouteToMap(activeRoute, meteoLayers.routeGroupLayer);
-      }
+    }
+    if (activeRoute) {
+      addRouteToMap(activeRoute, meteoLayers.routeGroupLayer);
     }
   }, [activeRoute]);
 

@@ -42,14 +42,6 @@ import { useDispatch } from 'react-redux';
 import { selectAuth } from '../../../../store/auth/authSlice';
 import { useGetUserSettingsQuery } from '../../../../store/user/userSettingsApi';
 
-const FetchData = () => {
-  const { id } = useSelector(selectAuth);
-  if (id) {
-    useGetLayerControlStateQuery(null, { refetchOnMountOrArgChange: true, refetchOnFocus: true });
-  }
-  return <></>;
-};
-
 interface IProps {
   children?: ReactElement[];
   position: string;

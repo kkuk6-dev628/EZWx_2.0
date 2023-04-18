@@ -85,19 +85,19 @@ const FeatureSelector = ({ features, userSettings }: FeatureSelectorProps) => {
               }
               switch (layer.feature.properties.hazard) {
                 case 'TS':
-                  text = `CWA: Thunderstorms` + top === '000' ? '' : ` to ${top}`;
+                  text = `CWA: Thunderstorms` + (top === '000' ? '' : ` to ${top}`);
                   break;
                 case 'TURB':
-                  text = `CWA: Turbulence` + top === '000' ? '' : ` ${base} to ${top}`;
+                  text = `CWA: Turbulence` + (top === '000' ? '' : ` ${base} to ${top}`);
                   break;
                 case 'ICE':
-                  text = `CWA: Icing` + top === '000' ? '' : ` ${base} to ${top}`;
+                  text = `CWA: Icing` + (top === '000' ? '' : ` ${base} to ${top}`);
                   break;
                 case 'IFR':
                   text = `CWA: IFR`;
                   break;
                 case 'PCPN':
-                  text = `CWA: Heavy precipitation` + top === '000' ? '' : ` to ${top}`;
+                  text = `CWA: Heavy precipitation` + (top === '000' ? '' : ` to ${top}`);
                   break;
                 default:
                   text = `CWA: Unknown`;

@@ -9,9 +9,6 @@ import { SvgDropDown, SvgMenuBurger, SvgProfile, SvgRoundClose, SvgSave, SvgSett
 import dynamic from 'next/dynamic';
 import { useSelector } from 'react-redux';
 import { selectAuth } from '../../store/auth/authSlice';
-import { useGetLayerControlStateQuery, useGetBaseLayerControlStateQuery } from '../../store/layers/layerControlApi';
-import { useGetRoutesQuery } from '../../store/route/routeApi';
-import { useGetUserSettingsQuery } from '../../store/user/userSettingsApi';
 const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
 const links = [

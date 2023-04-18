@@ -1,13 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { XYPlot, VerticalGridLines, HorizontalGridLines, XAxis, YAxis, AreaSeries, ContourSeries } from 'react-vis';
+import {
+  XYPlot,
+  VerticalGridLines,
+  HorizontalGridLines,
+  XAxis,
+  YAxis,
+  AreaSeries,
+  ContourSeries,
+  CustomSVGSeries,
+} from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import { getRouteLength, getSegmentsCount, interpolateRoute, totalNumberOfElevations } from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';
 import { useGetRouteProfileStateQuery } from '../../store/route-profile/routeProfileApi';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
-import { simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
+import { meterToFeet, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
 
 export const calcChartWidth = (viewWidth: number, viewHeight: number) => {
   if (viewWidth < 900) {
@@ -20,7 +29,7 @@ export const calcChartHeight = (viewWidth: number, viewHeight: number) => {
   if (viewHeight < 680) {
     return 320;
   } else {
-    return viewHeight - 360;
+    return viewHeight - 240;
   }
 };
 
@@ -67,7 +76,7 @@ const WindChart = () => {
       const elevationApiResults = queryElevationsResult.data.results;
       const elSegmentLength = routeLength / totalNumberOfElevations;
       for (let i = 0; i < elevationApiResults.length; i++) {
-        elevations.push({ x: i * elSegmentLength, y: elevationApiResults[i].elevation });
+        elevations.push({ x: i * elSegmentLength, y: meterToFeet(elevationApiResults[i].elevation) });
       }
       setElevationSeries(elevations);
     }
@@ -144,6 +153,42 @@ const WindChart = () => {
         ></ContourSeries>
       )}
       <AreaSeries data={elevationSeries} color="#9e8f85" curve={'curveMonotoneX'} />
+      <CustomSVGSeries
+        customComponent="square"
+        data={Array.from({ length: segmentsCount * 4 }, (value, index) => {
+          const x = Math.round((Math.round(index / 4) * routeLength) / segmentsCount);
+          const y = (index % 4) * 10000;
+          return {
+            x,
+            y,
+            customComponent: (row, positionInPixels) => {
+              return (
+                <g className="inner-inner-component">
+                  <circle cx="0" cy="0" r={10} fill="red" stroke="white" />
+                  <marker
+                    id="arrow"
+                    viewBox="0 0 10 10"
+                    refX="5"
+                    refY="5"
+                    markerWidth="4"
+                    markerHeight="4"
+                    orient="auto-start-reverse"
+                    stroke="white"
+                    fill="white"
+                  >
+                    <path d="M 0 0 L 10 5 L 0 10 z" />
+                  </marker>
+                  <line x1="0" y1="0" x2="0" y2="-20" stroke="white" marker-end="url(#arrow)" stroke-width="3" />
+                  <text x={0} y={0}>
+                    <tspan x="0" y="0">{`x: ${x}`}</tspan>
+                    <tspan x="0" y="1em">{`y: ${y}`}</tspan>
+                  </text>
+                </g>
+              );
+            },
+          };
+        })}
+      />
     </XYPlot>
   );
 };

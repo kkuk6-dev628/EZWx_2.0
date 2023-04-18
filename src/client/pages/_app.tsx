@@ -6,9 +6,7 @@ import '../assets/styles/globals.scss';
 import Footer from '../components/layout/Footer';
 import { useRouter } from 'next/router';
 import { wrapper } from '../store/store';
-import * as serviceWorkerRegistration from '../app/serviceWorkerRegistration';
 import { Provider } from 'react-redux';
-import Head from 'next/head';
 
 const App = ({ Component, ...rest }: AppProps) => {
   const { store, props } = wrapper.useWrappedStore(rest);
@@ -22,10 +20,10 @@ const App = ({ Component, ...rest }: AppProps) => {
   }, []);
 
   useEffect(() => {
-    if (pathname === '/map' || pathname === '/imagery') {
-      setShowFooter(true);
-    } else {
+    if (['/map', '/imagery', '/route-profile'].includes(pathname)) {
       setShowFooter(false);
+    } else {
+      setShowFooter(true);
     }
   }, [pathname]);
 
@@ -45,7 +43,7 @@ const App = ({ Component, ...rest }: AppProps) => {
       </Script>
       <Header />
       <Component {...pageProps} />
-      {!showFooter && <Footer />}
+      {showFooter && <Footer />}
     </Provider>
   );
 };

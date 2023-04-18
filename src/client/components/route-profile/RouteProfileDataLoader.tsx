@@ -197,7 +197,7 @@ const RouteProfileDataLoader = () => {
             activeRoute.altitude,
             index,
           );
-          const { groundSpeed } = fly.calculateCourseAndGroundSpeed(
+          const { groundSpeed } = fly.calculateHeadingAndGroundSpeed(
             userSettings.true_airspeed,
             course,
             speedValue,

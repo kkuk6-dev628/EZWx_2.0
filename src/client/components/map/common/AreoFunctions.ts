@@ -104,6 +104,10 @@ export const knotsToMph = (knots: number): number => {
   return Math.round(knots * 1.15078);
 };
 
+export const meterToFeet = (meter: number): number => {
+  return Math.round(meter * 3.28084);
+};
+
 export const createElementFromHTML = (htmlString) => {
   const div = document.createElement('div');
   div.innerHTML = htmlString.trim();
