@@ -4946,13 +4946,6 @@ flatted@^3.1.0:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.7.tgz#609f39207cb614b89d0765b477cb2d437fbf9787"
   integrity sha512-5nqDSxl8nn5BSNxyR3n4I6eDmbolI6WT+QqR547RwxQapgjQBmtktdP+HTBb/a/zLsbzERTONyUB5pefh5TtjQ==
 
-fly-js@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/fly-js/-/fly-js-0.0.5.tgz#4fe64addbd6d66c2adc08c0ca28db1256eaeccfb"
-  integrity sha512-3iAAq/5Fw7GSl8CSS1GOTSEZO+wYWrnFTkEeZNKEMidqnKxf/+eMB1GQFEZCnKDSzOqttnscM0I4s1n7IQ3BMA==
-  dependencies:
-    lodash "3.0.x"
-
 follow-redirects@^1.15.0:
   version "1.15.2"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.2.tgz#b460864144ba63f2681096f274c4e57026da2c13"
@@ -6862,11 +6855,6 @@ lodash.sortby@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
   integrity sha512-HDWXG8isMntAyRF5vZ7xKuEvOhT4AhlRt/3czTSjvGUxjYCBVRQY48ViDHyfYz9VIoBkW4TMGQNapx+l3RUwdA==
-
-lodash@3.0.x:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.0.1.tgz#14d49028a38bc740241d11e2ecd57ec06d73c19a"
-  integrity sha512-Hw4nFcX+LaJVkNNhjLgAlK82Q1/8DgCdaXQm2ZDQsZlqC6DiZcGhNSfguEesBBrITt8ZOgoMBUzUyWi1TaqLkg==
 
 lodash@4.17.21, lodash@^4.17.11, lodash@^4.17.19, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.5:
   version "4.17.21"

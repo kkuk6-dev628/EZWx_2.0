@@ -2,7 +2,7 @@
 import { useSelector } from 'react-redux';
 import { selectActiveRoute } from '../../store/route/routes';
 import L from 'leaflet';
-import * as fly from 'fly-js';
+import * as fly from '../../fly-js/fly';
 import { Route } from '../../interfaces/route';
 import { useEffect, useState } from 'react';
 import 'leaflet-arc';
@@ -207,9 +207,9 @@ const RouteProfileDataLoader = () => {
       const segments: RouteSegment[] = [initialSegment];
       segmentPositions.reduce((acc: RouteSegment, curr: L.LatLng, index) => {
         try {
-          const dist = fly.distanceTo(acc.position.lat, acc.position.lng, curr[1], curr[0]);
+          const dist = fly.distanceTo(acc.position.lat, acc.position.lng, curr[1], curr[0], 2);
           if (!dist) return acc;
-          const course = fly.trueCourse(acc.position.lat, acc.position.lng, curr[1], curr[0]);
+          const course = fly.trueCourse(acc.position.lat, acc.position.lng, curr[1], curr[0], 2);
           const speedValue = getValueFromDataset(
             queryGfsWindSpeedDataResult.data,
             new Date(observationTime),
