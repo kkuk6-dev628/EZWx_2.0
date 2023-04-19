@@ -29,7 +29,13 @@ import {
 } from '../../store/route-profile/routeProfileApi';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
-import { convertTimeFormat, meterToFeet, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
+import {
+  celsiusToFahrenheit,
+  convertTimeFormat,
+  meterToFeet,
+  round,
+  simpleTimeOnlyFormat,
+} from '../map/common/AreoFunctions';
 import flyjs from '../../fly-js/fly';
 
 export const windDataElevations = {
@@ -82,7 +88,12 @@ const WindChart = () => {
   });
 
   useEffect(() => {
-    if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess && segments.length > 0) {
+    if (
+      queryGfsWindSpeedDataResult.isSuccess &&
+      queryGfsWindDirectionDataResult.isSuccess &&
+      queryTemperatureDataResult.isSuccess &&
+      segments.length > 0
+    ) {
       const windSpeedData = [];
       const dataset = queryGfsWindSpeedDataResult.data;
       segments.forEach((segment, index) => {
@@ -98,13 +109,32 @@ const WindChart = () => {
             el,
             index,
           );
+          if (!windspeedTime) {
+            continue;
+          }
           const { value: windDir } = getValueFromDataset(
             queryGfsWindDirectionDataResult.data,
             new Date(segment.arriveTime),
             el,
             index,
           );
+          const { value: temperature } = getValueFromDataset(
+            queryTemperatureDataResult.data,
+            new Date(segment.arriveTime),
+            el,
+            index,
+          );
           const headwind = flyjs.HeadWindCalculator(windSpeed, windDir, segment.course, 2);
+          let backgroundColor = 'blue';
+          if (routeProfileApiState.windLayer === 'Head/tailwind') {
+            if (headwind < 0) {
+              backgroundColor = 'green';
+            } else if (headwind < 0.5) {
+              backgroundColor = 'black';
+            } else {
+              backgroundColor = 'red';
+            }
+          }
           windSpeedData.push({
             x,
             y: el,
@@ -113,11 +143,14 @@ const WindChart = () => {
               windSpeed: Math.round(windSpeed),
               windDir: Math.round(windDir),
               course: Math.round(segment.course),
+              temp: userSettings.default_temperature_unit
+                ? celsiusToFahrenheit(temperature, 1) + ' \u00B0F'
+                : round(temperature, 1) + ' \u00B0C',
             },
             customComponent: (_row, _positionInPixels) => {
               return (
                 <g className="inner-inner-component">
-                  <circle cx="0" cy="0" r={10} fill="red" stroke="white" />
+                  <circle cx="0" cy="0" r={10} fill={backgroundColor} stroke="white" />
                   <marker
                     id="wind-arrow"
                     viewBox="0 0 10 10"
@@ -166,7 +199,9 @@ const WindChart = () => {
                   />
                   <text x={0} y={0}>
                     <tspan x="0" y="0" dominantBaseline="middle" textAnchor="middle" className="windspeed-text">
-                      {Math.round(headwind)}
+                      {routeProfileApiState.windLayer === 'Windspeed'
+                        ? Math.round(windSpeed)
+                        : Math.abs(Math.round(headwind))}
                     </tspan>
                   </text>
                 </g>
@@ -180,9 +215,11 @@ const WindChart = () => {
   }, [
     queryGfsWindSpeedDataResult.isSuccess,
     queryGfsWindDirectionDataResult.isSuccess,
+    queryTemperatureDataResult.isSuccess,
     segments,
     routeProfileApiState.maxAltitude,
     routeProfileApiState.windLayer,
+    userSettings.default_temperature_unit,
   ]);
 
   useEffect(() => {
@@ -254,7 +291,7 @@ const WindChart = () => {
           Math.round((index * routeLength) / segmentsCount),
         )}
         tickFormat={(v, index) => {
-          if (segments.length > 0) {
+          if (segments.length > 0 && segments[index]) {
             const dist = Math.round(segments[index].accDistance / 10) * 10;
             return (
               <tspan className="chart-label">
@@ -265,6 +302,7 @@ const WindChart = () => {
               </tspan>
             );
           }
+          console.log('invalid segment index', index, segments);
           return v;
         }}
         style={{
@@ -305,6 +343,9 @@ const WindChart = () => {
             </span>
             <span>
               <b>Course:</b>&nbsp;{windHintValue.tooltip.course}&deg;
+            </span>
+            <span>
+              <b>Temperature:</b>&nbsp;{windHintValue.tooltip.temp}
             </span>
           </div>
         </Hint>

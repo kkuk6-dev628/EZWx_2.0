@@ -115,11 +115,6 @@ const CWALayer = () => {
       getLabel={getLabel}
       clientFilter={clientFilter}
       layerStateName={'cwaState'}
-      readDb={() => db.cwa.toArray()}
-      writeDb={(features) => {
-        db.cwa.clear();
-        db.cwa.bulkAdd(features);
-      }}
     ></WFSLayer>
   );
 };

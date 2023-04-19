@@ -68,12 +68,6 @@ export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
     });
     routeGroupLayer.addLayer(marker);
   });
-  const points = interpolateRoute(route, true);
-  points.map((latlng) => {
-    const marker = new L.CircleMarker(latlng);
-    routeGroupLayer.addLayer(marker);
-  });
-  // map.fitBounds(polyline.getBounds());
 };
 
 function Route({ setIsShowModal }: Props) {

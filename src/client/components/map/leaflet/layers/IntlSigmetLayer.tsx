@@ -49,11 +49,6 @@ const IntlSigmetLayer = () => {
       getLabel={getLabel}
       clientFilter={clientFilter}
       layerStateName="sigmetState"
-      readDb={() => db.intlSigmet.toArray()}
-      writeDb={(features) => {
-        db.intlSigmet.clear();
-        db.intlSigmet.bulkAdd(features);
-      }}
     ></WFSLayer>
   );
 };

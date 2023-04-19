@@ -180,11 +180,6 @@ const GairmetLayer = () => {
       getLabel={getLabel}
       clientFilter={clientFilter}
       layerStateName={'gairmetState'}
-      readDb={() => db.gairmet.toArray()}
-      writeDb={(features) => {
-        db.gairmet.clear();
-        db.gairmet.bulkAdd(features).catch((error) => console.log(error));
-      }}
     ></WFSLayer>
   );
 };

@@ -96,16 +96,20 @@ export const getThumbnail = (feature, style) => {
   return svgString;
 };
 
-export const celsiusToFahrenheit = (celsius: number): number => {
-  return Math.round((celsius * 9) / 5 + 32);
+export const round = (value, places) => {
+  return Math.round(value * Math.pow(10, places)) / Math.pow(10, places);
 };
 
-export const knotsToMph = (knots: number): number => {
-  return Math.round(knots * 1.15078);
+export const celsiusToFahrenheit = (celsius: number, place = 0): number => {
+  return round((celsius * 9) / 5 + 32, place);
 };
 
-export const meterToFeet = (meter: number): number => {
-  return Math.round(meter * 3.28084);
+export const knotsToMph = (knots: number, place = 0): number => {
+  return round(knots * 1.15078, place);
+};
+
+export const meterToFeet = (meter: number, place = 0): number => {
+  return round(meter * 3.28084, place);
 };
 
 export const createElementFromHTML = (htmlString) => {
@@ -328,7 +332,7 @@ export const loadFeaturesFromWeb = (
   setFeaturesFunc?: (features: GeoJSON.Feature[]) => void,
   sortFunc?: (a: GeoJSON.Feature, b: GeoJSON.Feature) => number,
   filter?: string,
-  storeCache = true,
+  // storeCache = true,
 ) => {
   const params = {
     outputFormat: 'application/json',
@@ -354,7 +358,7 @@ export const loadFeaturesFromWeb = (
         if (sortFunc) {
           features = features.sort(sortFunc);
         }
-        if (storeCache) storeFeaturesToCache(datasetName, features);
+        // if (storeCache) storeFeaturesToCache(datasetName, features);
         if (setFeaturesFunc) setFeaturesFunc(features);
       }
     })

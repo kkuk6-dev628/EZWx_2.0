@@ -25,8 +25,6 @@ interface WFSLayerProps {
   pointToLayer?: (feature: GeoJSON.Feature, latlng: LatLng) => L.Layer;
   serverFilter?: string;
   clientFilter?: (features: GeoJSON.Feature[], obsTime: Date) => GeoJSON.Feature[];
-  readDb: () => any;
-  writeDb: (features: GeoJSON.Feature[]) => void;
   layerStateName?: string;
   cacheVersion?: number;
 }
@@ -48,8 +46,6 @@ const WFSLayer = React.forwardRef(
       pointToLayer,
       serverFilter: filter,
       clientFilter,
-      readDb,
-      writeDb,
       layerStateName: layerStateSelector,
       cacheVersion,
     }: WFSLayerProps,
@@ -131,14 +127,6 @@ const WFSLayer = React.forwardRef(
     });
     useEffect(() => {
       if (initData.features.length == 0) {
-        readDb().then((cachedFeatures) => {
-          if (cachedFeatures && cachedFeatures.length > 0) {
-            setGeoJSON({
-              type: 'FeatureCollection',
-              features: cachedFeatures,
-            });
-          }
-        });
         fetchGeoJSON();
       }
     }, [dataLoadTime]);
@@ -191,7 +179,6 @@ const WFSLayer = React.forwardRef(
             console.log(typeName + ': Invalid json data!', data.data);
           } else {
             if (localRef.current && map.hasLayer(localRef.current)) map.removeLayer(localRef.current);
-            writeDb(data.data.features);
             setGeoJSON(data.data);
           }
         })

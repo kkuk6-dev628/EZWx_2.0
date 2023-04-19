@@ -49,7 +49,6 @@ const PirepLayer = () => {
   const geojsonLayerRef = useRef();
 
   useEffect(() => {
-    loadFeaturesFromCache('pireps', setPireps);
     loadFeaturesFromWeb(wfsUrl2, 'EZWxBrief:pirep', properties, 'pireps', setPireps);
   }, [dataLoadTime]);
 

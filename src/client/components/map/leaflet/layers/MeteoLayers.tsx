@@ -49,9 +49,10 @@ const MeteoLayers = () => {
 
   useEffect(() => {
     if (!meteoLayers.routeGroupLayer) {
-      const groupLayer = new L.LayerGroup();
-      map.addLayer(groupLayer);
-      meteoLayers.routeGroupLayer = groupLayer;
+      meteoLayers.routeGroupLayer = new L.LayerGroup();
+    }
+    if (!map.hasLayer(meteoLayers.routeGroupLayer)) {
+      map.addLayer(meteoLayers.routeGroupLayer);
     }
     if (activeRoute) {
       addRouteToMap(activeRoute, meteoLayers.routeGroupLayer);

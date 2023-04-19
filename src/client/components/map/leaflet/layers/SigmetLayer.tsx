@@ -114,11 +114,6 @@ const SigmetLayer = () => {
       getLabel={getLabel}
       clientFilter={clientFilter}
       layerStateName={'sigmetState'}
-      readDb={() => db.sigmet.toArray()}
-      writeDb={(features) => {
-        db.sigmet.clear();
-        db.sigmet.bulkAdd(features);
-      }}
     ></WFSLayer>
   );
 };

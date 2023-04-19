@@ -359,7 +359,6 @@ export const StationMarkersLayer = () => {
         },
         undefined,
         serverFilter,
-        false,
       );
     };
     queuedLoadWeb(currentTime);
@@ -382,16 +381,16 @@ export const StationMarkersLayer = () => {
         const stationTimesWeb = [...stationTimes];
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const queuedLoadCache = () => {
-          if (stationTimes.length === 0) {
-            return;
-          }
-          const [stationTime] = stationTimes.splice(0, 1);
-          loadFeaturesFromCache(stationTime.station_table_name, (features) => {
-            addNbmStation(stationTime.station_table_name, features);
-            queuedLoadCache();
-          });
-        };
+        // const queuedLoadCache = () => {
+        //   if (stationTimes.length === 0) {
+        //     return;
+        //   }
+        //   const [stationTime] = stationTimes.splice(0, 1);
+        //   loadFeaturesFromCache(stationTime.station_table_name, (features) => {
+        //     addNbmStation(stationTime.station_table_name, features);
+        //     queuedLoadCache();
+        //   });
+        // };
         // limit number of requests to 3 at the same time.
         // queuedLoadCache();
         // queuedLoadCache();
@@ -415,7 +414,6 @@ export const StationMarkersLayer = () => {
             (a, b) =>
               b.properties.pub - a.properties.pub || (a.properties.faaid as string).localeCompare(b.properties.faaid),
             undefined,
-            false,
           );
         };
         queuedLoadWeb();

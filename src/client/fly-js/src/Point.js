@@ -95,33 +95,30 @@ Point.prototype.trueCourse = function (to, roundTo) {
 
     var distanceRadians = this.distanceInRadians(to);
 
-    var lat2 = this.latitude.getRadians();
-    var lon2 = this.longitude.getRadians();
+    var startLat = this.latitude.getRadians();
+    var startLng = this.longitude.getRadians();
 
-    var lat1 = to.latitude.getRadians();
-    var lon1 = to.longitude.getRadians();
+    var destLat = to.latitude.getRadians();
+    var destLng = to.longitude.getRadians();
 
     var trueCourse = NaN;
 
-    if (Math.cos(lat1) < 0.001) {
-
-        if (lat1 > 0) {
-            // starting from N pole
-            trueCourse = Math.PI;
-        } else {
-            // starting from S pole
-            trueCourse = 2 * Math.PI;
-        }
-
+    if (Math.cos(startLat) < 0.001) {
+      if (lat1 > 0) {
+        // starting from N pole
+        trueCourse = Math.PI;
+      } else {
+        // starting from S pole
+        trueCourse = 2 * Math.PI;
+      }
     } else {
-
-        if (Math.sin(lon2 - lon1) < 0) {  
-            trueCourse = Math.acos((Math.sin(lat2) - Math.sin(lat1) * 
-                Math.cos(distanceRadians)) / (Math.sin(distanceRadians) * Math.cos(lat1)));
-        } else {
-            trueCourse = 2 * Math.PI - Math.acos((Math.sin(lat2) - Math.sin(lat1) * 
-                Math.cos(distanceRadians)) / (Math.sin(distanceRadians) * Math.cos(lat1)));
-        }
+      const y = Math.sin(destLng - startLng) * Math.cos(destLat);
+      const x =
+        Math.cos(startLat) * Math.sin(destLat) - Math.sin(startLat) * Math.cos(destLat) * Math.cos(destLng - startLng);
+        trueCourse = Math.atan2(y, x);
+      if (trueCourse < 0) {
+          trueCourse += 2 * Math.PI;
+      }
     }
 
     return AngleConverter.radToDeg(trueCourse, roundTo);

@@ -74,6 +74,7 @@ export const getValueFromDataset = (
       return { value: dataset.value, time: new Date(referencedTime) };
     }
   }
+  return { value: null, time: null };
 };
 
 export const getRouteLength = (route: Route, inMile = false): number => {
@@ -165,23 +166,18 @@ const RouteProfileDataLoader = () => {
   useEffect(() => {
     if (activeRoute) {
       const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
-      setSegmentPositions(positions);
       if (!queryGfsWindDirectionDataResult.isLoading && !queryGfsWindDirectionDataResult.isSuccess)
         queryGfsWindDirectionData({ queryPoints: positions });
       if (!queryGfsWindSpeedDataResult.isLoading && !queryGfsWindSpeedDataResult.isSuccess)
         queryGfsWindSpeedData({ queryPoints: positions });
+      if (!queryTemperatureDataResult.isSuccess && !queryTemperatureDataResult.isLoading)
+        queryTemperatureData({ queryPoints: positions });
       if (
         !queryhumidityDataResult.isLoading &&
         !queryhumidityDataResult.isSuccess &&
         queryGfsWindDirectionDataResult.isSuccess
       )
         queryHumidityData({ queryPoints: positions });
-      if (
-        !queryTemperatureDataResult.isSuccess &&
-        !queryTemperatureDataResult.isLoading &&
-        queryGfsWindDirectionDataResult.isSuccess
-      )
-        queryTemperatureData({ queryPoints: positions });
       if (!queryCaturbDataResult.isLoading && !queryCaturbDataResult.isSuccess && queryhumidityDataResult.isSuccess)
         queryCaturbData({ queryPoints: positions });
       if (!queryMwturbDataResult.isLoading && !queryMwturbDataResult.isSuccess && queryhumidityDataResult.isSuccess)
@@ -201,13 +197,7 @@ const RouteProfileDataLoader = () => {
 
   useEffect(() => {
     if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess) {
-      let positions;
-      if (!segmentPositions) {
-        positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
-        setSegmentPositions(positions);
-      } else {
-        positions = segmentPositions;
-      }
+      const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
 
       const initialSegment = {
         position: { lat: positions[0][1], lng: positions[0][0] },
@@ -241,9 +231,6 @@ const RouteProfileDataLoader = () => {
               speedValue,
               dirValue,
               2,
-            );
-            console.log(
-              `true_airspeed: ${userSettings.true_airspeed}, course: ${course}, windspeed: ${speedValue}, winddir: ${dirValue}, groundspeed: ${groundSpeed}`,
             );
             speed = groundSpeed;
           } else {
