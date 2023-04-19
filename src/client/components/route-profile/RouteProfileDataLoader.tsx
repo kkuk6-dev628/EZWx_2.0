@@ -57,11 +57,13 @@ export const getValueFromDataset = (
   time: Date,
   elevation: number,
   segmentIndex,
-): number => {
+): { value: number; time: Date } => {
   let speedData: RouteProfileDataset;
+  let referencedTime;
   for (const dataset of datasetAll) {
     const diff = time.getTime() - new Date(dataset.time).getTime();
     if (diff >= 0 && diff < 3600 * 1000) {
+      referencedTime = dataset.time;
       speedData = dataset;
       break;
     }
@@ -69,7 +71,7 @@ export const getValueFromDataset = (
 
   for (const dataset of speedData.data[segmentIndex].data) {
     if (dataset.elevation == elevation) {
-      return dataset.value;
+      return { value: dataset.value, time: new Date(referencedTime) };
     }
   }
 };
@@ -221,13 +223,13 @@ const RouteProfileDataLoader = () => {
           if (!dist) return acc;
           let speed: number;
           if (activeRoute.useForecastWinds) {
-            const speedValue = getValueFromDataset(
+            const { value: speedValue } = getValueFromDataset(
               queryGfsWindSpeedDataResult.data,
               new Date(acc.arriveTime),
               activeRoute.altitude,
               index,
             );
-            const dirValue = getValueFromDataset(
+            const { value: dirValue } = getValueFromDataset(
               queryGfsWindDirectionDataResult.data,
               new Date(acc.arriveTime),
               activeRoute.altitude,

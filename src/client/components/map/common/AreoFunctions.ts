@@ -45,7 +45,7 @@ export const translateWeatherClausings = (dueto: string): string => {
     .replace(/,(?=[^,]+$)/, ' and');
 };
 
-export const convertTimeFormat = (time: string, useLocalTime: boolean) => {
+export const convertTimeFormat = (time: string | number | Date, useLocalTime: boolean) => {
   const dateObj = new Date(time);
   if (useLocalTime) {
     return `${dateObj.toLocaleDateString('en-US', {

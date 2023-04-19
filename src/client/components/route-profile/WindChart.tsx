@@ -29,7 +29,7 @@ import {
 } from '../../store/route-profile/routeProfileApi';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
-import { meterToFeet, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
+import { convertTimeFormat, meterToFeet, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
 import flyjs from '../../fly-js/fly';
 
 export const windDataElevations = {
@@ -68,6 +68,7 @@ const WindChart = () => {
   const endMargin = segmentsCount ? routeLength / segmentsCount / 4 : 0;
   const [viewW, setViewW] = useState<number>(window.innerWidth);
   const [viewH, setViewH] = useState<number>(window.innerHeight);
+  const [windHintValue, setWindHintValue] = useState(null);
 
   const [windSpeedSeries, setWindSpeedSeries] = useState([]);
   const [queryTemperatureData, queryTemperatureDataResult] = useQueryTemperatureDataMutation({
@@ -91,8 +92,13 @@ const WindChart = () => {
           return;
         }
         for (const el of elevations) {
-          const windSpeed = getValueFromDataset(dataset, new Date(segment.arriveTime), el, index);
-          const windDir = getValueFromDataset(
+          const { value: windSpeed, time: windspeedTime } = getValueFromDataset(
+            dataset,
+            new Date(segment.arriveTime),
+            el,
+            index,
+          );
+          const { value: windDir } = getValueFromDataset(
             queryGfsWindDirectionDataResult.data,
             new Date(segment.arriveTime),
             el,
@@ -102,6 +108,12 @@ const WindChart = () => {
           windSpeedData.push({
             x,
             y: el,
+            tooltip: {
+              time: convertTimeFormat(windspeedTime, false),
+              windSpeed: Math.round(windSpeed),
+              windDir: Math.round(windDir),
+              course: Math.round(segment.course),
+            },
             customComponent: (_row, _positionInPixels) => {
               return (
                 <g className="inner-inner-component">
@@ -134,9 +146,9 @@ const WindChart = () => {
                   </marker>
                   <line
                     x1="0"
-                    y1="34"
+                    y1="-34"
                     x2="0"
-                    y2="14"
+                    y2="-14"
                     stroke="white"
                     markerEnd="url(#wind-arrow)"
                     strokeWidth="3"
@@ -272,25 +284,31 @@ const WindChart = () => {
           text: { stroke: 'none', fill: 'white', fontWeight: 600 },
         }}
       />
-      {routeProfileApiState.chartType === 'Wind' && (
-        <ContourSeries
-          data={elevationSeries.map((row) => ({ ...row, z: Math.round(Math.random() * 10) }))}
-          style={{
-            stroke: '#125C7788',
-            strokeLinejoin: 'round',
-          }}
-          colorRange={['#79C7E300', '#FF983300']}
-        ></ContourSeries>
-      )}
-      <AreaSeries data={elevationSeries} color="#9e8f85" curve={'curveMonotoneX'} />
-      <CustomSVGSeries customComponent="square" data={windSpeedSeries}>
-        <Hint value={{ x: 1000, y: 10000 }}>
-          <div style={{ background: 'black' }}>
-            <h3>Value of hint</h3>
-            <p></p>
+      <CustomSVGSeries
+        customComponent="square"
+        data={windSpeedSeries}
+        onValueMouseOver={(value) => setWindHintValue(value)}
+        // onValueMouseOut={() => setWindHintValue(null)}
+      ></CustomSVGSeries>
+      <AreaSeries data={elevationSeries} color="#9e8f85" curve={'curveMonotoneX'} stroke="#908177" />
+      {windHintValue && (
+        <Hint value={windHintValue}>
+          <div className="wind-tooltip">
+            <span>
+              <b>Time:</b>&nbsp;{windHintValue.tooltip.time}
+            </span>
+            <span>
+              <b>Wind speed:</b>&nbsp;{windHintValue.tooltip.windSpeed}&nbsp;knots
+            </span>
+            <span>
+              <b>Wind direction:</b>&nbsp;{windHintValue.tooltip.windDir}&deg;
+            </span>
+            <span>
+              <b>Course:</b>&nbsp;{windHintValue.tooltip.course}&deg;
+            </span>
           </div>
         </Hint>
-      </CustomSVGSeries>
+      )}
     </XYPlot>
   );
 };

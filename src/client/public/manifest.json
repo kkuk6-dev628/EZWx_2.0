@@ -3,7 +3,7 @@
     "background_color": "#3D0D68",
     "display": "standalone",
     "scope": "/",
-    "start_url": "/",
+    "start_url": "/home",
     "name": "EZWxBrief 2.0",
     "short_name": "EZWxBrief_2.0",
     "description": "EZWxBrief",

@@ -114,6 +114,14 @@
       .windspeed-text {
         fill: white;
       }
+      .wind-tooltip {
+        background-color: whitesmoke;
+        border-radius: 2px;
+        display: flex;
+        flex-direction: column;
+        padding: 4px;
+        color: darkslategrey;
+      }
     }
   }
   .data-loading{
