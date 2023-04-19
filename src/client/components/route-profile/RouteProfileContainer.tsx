@@ -67,7 +67,7 @@ const routeProfileTurbDataTypes: {
   mtw: 'MTW',
 };
 
-const routeProfileMaxAltitudes: RouteProfileMaxAltitudes[] = [500, 250, 150];
+const routeProfileMaxAltitudes: RouteProfileMaxAltitudes[] = [500, 300, 200];
 
 const RouteProfileContainer = () => {
   const { data: routeProfileApiState, isLoading } = useGetRouteProfileStateQuery(null, {

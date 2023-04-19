@@ -9,6 +9,7 @@ import {
   AreaSeries,
   ContourSeries,
   CustomSVGSeries,
+  Hint,
 } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
@@ -29,11 +30,12 @@ import {
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import { meterToFeet, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
+import flyjs from '../../fly-js/fly';
 
 export const windDataElevations = {
   500: [5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000],
-  250: [3000, 6000, 9000, 12000, 15000, 18000, 21000, 24000],
-  150: [2000, 4000, 6000, 8000, 10000, 12000, 14000],
+  300: [3000, 6000, 9000, 12000, 15000, 18000, 21000, 23000, 25000, 28000],
+  200: [2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000],
 };
 
 export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
@@ -63,6 +65,7 @@ const WindChart = () => {
   const [segmentsCount, setSegmentsCount] = useState(1);
   const [routeLength, setRouteLength] = useState(0);
   const startMargin = segmentsCount ? routeLength / segmentsCount / 2 : 0;
+  const endMargin = segmentsCount ? routeLength / segmentsCount / 4 : 0;
   const [viewW, setViewW] = useState<number>(window.innerWidth);
   const [viewH, setViewH] = useState<number>(window.innerHeight);
 
@@ -78,14 +81,24 @@ const WindChart = () => {
   });
 
   useEffect(() => {
-    if (queryGfsWindSpeedDataResult.isSuccess && segments.length > 0) {
+    if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess && segments.length > 0) {
       const windSpeedData = [];
       const dataset = queryGfsWindSpeedDataResult.data;
       segments.forEach((segment, index) => {
         const x = segment.accDistance;
         const elevations = windDataElevations[routeProfileApiState.maxAltitude];
+        if (!elevations) {
+          return;
+        }
         for (const el of elevations) {
           const windSpeed = getValueFromDataset(dataset, new Date(segment.arriveTime), el, index);
+          const windDir = getValueFromDataset(
+            queryGfsWindDirectionDataResult.data,
+            new Date(segment.arriveTime),
+            el,
+            index,
+          );
+          const headwind = flyjs.HeadWindCalculator(windSpeed, windDir, segment.course, 2);
           windSpeedData.push({
             x,
             y: el,
@@ -94,7 +107,7 @@ const WindChart = () => {
                 <g className="inner-inner-component">
                   <circle cx="0" cy="0" r={10} fill="red" stroke="white" />
                   <marker
-                    id="arrow"
+                    id="wind-arrow"
                     viewBox="0 0 10 10"
                     refX="5"
                     refY="5"
@@ -106,10 +119,42 @@ const WindChart = () => {
                   >
                     <path d="M 0 0 L 10 5 L 0 10 z" />
                   </marker>
-                  <line x1="0" y1="0" x2="0" y2="-20" stroke="white" markerEnd="url(#arrow)" strokeWidth="3" />
+                  <marker
+                    id="course-arrow"
+                    viewBox="0 0 10 10"
+                    refX="5"
+                    refY="5"
+                    markerWidth="4"
+                    markerHeight="4"
+                    orient="auto-start-reverse"
+                    stroke="magenta"
+                    fill="magenta"
+                  >
+                    <path d="M 0 0 L 10 5 L 0 10 z" />
+                  </marker>
+                  <line
+                    x1="0"
+                    y1="34"
+                    x2="0"
+                    y2="14"
+                    stroke="white"
+                    markerEnd="url(#wind-arrow)"
+                    strokeWidth="3"
+                    transform={`rotate(${windDir})`}
+                  />
+                  <line
+                    x1="0"
+                    y1="-10"
+                    x2="0"
+                    y2="-30"
+                    stroke="magenta"
+                    markerEnd="url(#course-arrow)"
+                    strokeWidth="3"
+                    transform={`rotate(${segment.course})`}
+                  />
                   <text x={0} y={0}>
-                    <tspan x="0" y="0" className="windspeed-text">
-                      {Math.round(windSpeed)}
+                    <tspan x="0" y="0" dominantBaseline="middle" textAnchor="middle" className="windspeed-text">
+                      {Math.round(headwind)}
                     </tspan>
                   </text>
                 </g>
@@ -120,7 +165,13 @@ const WindChart = () => {
         setWindSpeedSeries(windSpeedData);
       });
     }
-  }, [queryGfsWindSpeedDataResult.isSuccess, segments.length]);
+  }, [
+    queryGfsWindSpeedDataResult.isSuccess,
+    queryGfsWindDirectionDataResult.isSuccess,
+    segments,
+    routeProfileApiState.maxAltitude,
+    routeProfileApiState.windLayer,
+  ]);
 
   useEffect(() => {
     window.addEventListener('resize', handleWindowSizeChange);
@@ -161,7 +212,7 @@ const WindChart = () => {
       height={calcChartHeight(viewW, viewH)}
       width={calcChartWidth(viewW, viewH)}
       yDomain={[0, routeProfileApiState.maxAltitude * 100]}
-      xDomain={[-startMargin, routeLength]}
+      xDomain={[-startMargin, routeLength + endMargin]}
     >
       <AreaSeries
         data={[
@@ -179,6 +230,9 @@ const WindChart = () => {
         }}
       />
       <HorizontalGridLines
+        tickValues={Array.from({ length: 10 + 1 }, (_value, index) =>
+          Math.round((index * routeProfileApiState.maxAltitude * 100) / 10),
+        )}
         style={{
           stroke: '#22222222',
         }}
@@ -208,7 +262,9 @@ const WindChart = () => {
         }}
       />
       <YAxis
-        tickValues={[0, 10000, 20000, 30000, 40000, 50000]}
+        tickValues={Array.from({ length: 10 + 1 }, (_value, index) =>
+          Math.round((index * routeProfileApiState.maxAltitude * 100) / 5),
+        )}
         tickFormat={(v) => v / 100}
         style={{
           line: { stroke: '#ADDDE100' },
@@ -227,7 +283,14 @@ const WindChart = () => {
         ></ContourSeries>
       )}
       <AreaSeries data={elevationSeries} color="#9e8f85" curve={'curveMonotoneX'} />
-      <CustomSVGSeries customComponent="square" data={windSpeedSeries} />
+      <CustomSVGSeries customComponent="square" data={windSpeedSeries}>
+        <Hint value={{ x: 1000, y: 10000 }}>
+          <div style={{ background: 'black' }}>
+            <h3>Value of hint</h3>
+            <p></p>
+          </div>
+        </Hint>
+      </CustomSVGSeries>
     </XYPlot>
   );
 };

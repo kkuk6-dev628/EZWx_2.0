@@ -46,7 +46,6 @@ interface Props {
 }
 
 const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) => {
-  console.log('selectedValues', selectedValues);
   const [inputValue, setInputValue] = useState('');
   const [showSuggestion, setShowSuggestion] = useState(false);
   const [currentFocus, setCurrentFocus] = useState(0);
@@ -111,7 +110,6 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
 
   const onDragEnd = (params) => {
     if (!params?.destination) return;
-    console.log('params', params);
     const items: RouteOfFlight[] = reorder(selectedValues, params.source.index, params.destination.index);
 
     handleAutoComplete(name, [...items]);

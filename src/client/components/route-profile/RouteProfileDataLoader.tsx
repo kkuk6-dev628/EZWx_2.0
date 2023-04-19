@@ -199,41 +199,60 @@ const RouteProfileDataLoader = () => {
 
   useEffect(() => {
     if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess) {
+      let positions;
+      if (!segmentPositions) {
+        positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
+        setSegmentPositions(positions);
+      } else {
+        positions = segmentPositions;
+      }
+
       const initialSegment = {
-        position: { lat: segmentPositions[0][1], lng: segmentPositions[0][0] },
+        position: { lat: positions[0][1], lng: positions[0][0] },
         accDistance: 0,
         arriveTime: new Date(observationTime).getTime(),
+        course: fly.trueCourse(positions[0][1], positions[0][0], positions[1][1], positions[1][0], 2),
       };
       const segments: RouteSegment[] = [initialSegment];
-      segmentPositions.reduce((acc: RouteSegment, curr: L.LatLng, index) => {
+      positions.reduce((acc: RouteSegment, curr: L.LatLng, index) => {
         try {
           const dist = fly.distanceTo(acc.position.lat, acc.position.lng, curr[1], curr[0], 2);
-          if (!dist) return acc;
           const course = fly.trueCourse(acc.position.lat, acc.position.lng, curr[1], curr[0], 2);
-          const speedValue = getValueFromDataset(
-            queryGfsWindSpeedDataResult.data,
-            new Date(observationTime),
-            activeRoute.altitude,
-            index,
-          );
-          const dirValue = getValueFromDataset(
-            queryGfsWindDirectionDataResult.data,
-            new Date(observationTime),
-            activeRoute.altitude,
-            index,
-          );
-          const { groundSpeed } = fly.calculateHeadingAndGroundSpeed(
-            userSettings.true_airspeed,
-            course,
-            speedValue,
-            dirValue,
-            2,
-          );
-          const newTime = new Date(acc.arriveTime).getTime() + (3600 * 1000 * dist) / groundSpeed;
+          if (!dist) return acc;
+          let speed: number;
+          if (activeRoute.useForecastWinds) {
+            const speedValue = getValueFromDataset(
+              queryGfsWindSpeedDataResult.data,
+              new Date(acc.arriveTime),
+              activeRoute.altitude,
+              index,
+            );
+            const dirValue = getValueFromDataset(
+              queryGfsWindDirectionDataResult.data,
+              new Date(acc.arriveTime),
+              activeRoute.altitude,
+              index,
+            );
+            const { groundSpeed } = fly.calculateHeadingAndGroundSpeed(
+              userSettings.true_airspeed,
+              course,
+              speedValue,
+              dirValue,
+              2,
+            );
+            console.log(
+              `true_airspeed: ${userSettings.true_airspeed}, course: ${course}, windspeed: ${speedValue}, winddir: ${dirValue}, groundspeed: ${groundSpeed}`,
+            );
+            speed = groundSpeed;
+          } else {
+            speed = userSettings.true_airspeed;
+          }
+          const newTime = new Date(acc.arriveTime).getTime() + (3600 * 1000 * dist) / speed;
           const segment = {
             position: { lat: curr[1], lng: curr[0] },
             accDistance: acc.accDistance + dist,
             arriveTime: newTime,
+            course: course,
           };
           segments.push(segment);
           return { ...segment };
@@ -245,7 +264,13 @@ const RouteProfileDataLoader = () => {
 
       dispatch(setRouteSegments(segments));
     }
-  }, [queryGfsWindSpeedDataResult.isSuccess, queryGfsWindDirectionDataResult.isSuccess, observationTime]);
+  }, [
+    queryGfsWindSpeedDataResult.isSuccess,
+    queryGfsWindDirectionDataResult.isSuccess,
+    observationTime,
+    userSettings.true_airspeed,
+    activeRoute,
+  ]);
 
   useEffect(() => {
     if (queryCaturbDataResult.data) {
