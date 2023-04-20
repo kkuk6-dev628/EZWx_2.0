@@ -104,6 +104,13 @@ export const celsiusToFahrenheit = (celsius: number, place = 0): number => {
   return round((celsius * 9) / 5 + 32, place);
 };
 
+export const getStandardTemp = (elevation: number, inFah = true) => {
+  if (inFah) {
+    return 59 - Math.round(elevation / 1000) * 3.6;
+  }
+  return 15 - Math.round(elevation / 1000) * 1.98;
+};
+
 export const knotsToMph = (knots: number, place = 0): number => {
   return round(knots * 1.15078, place);
 };

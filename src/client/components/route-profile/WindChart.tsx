@@ -7,9 +7,10 @@ import {
   XAxis,
   YAxis,
   AreaSeries,
-  ContourSeries,
+  LineSeries,
   CustomSVGSeries,
   Hint,
+  LabelSeries,
 } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
@@ -32,11 +33,13 @@ import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import {
   celsiusToFahrenheit,
   convertTimeFormat,
+  getStandardTemp,
   meterToFeet,
   round,
   simpleTimeOnlyFormat,
 } from '../map/common/AreoFunctions';
 import flyjs from '../../fly-js/fly';
+import { Conrec } from '../../conrec-js/conrec';
 
 export const windDataElevations = {
   500: [5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000],
@@ -59,6 +62,11 @@ export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
   }
 };
 
+const temperatureContourColors = {
+  positive: '#dfbb5f',
+  negative: '#5fdf84',
+};
+
 const WindChart = () => {
   const activeRoute = useSelector(selectActiveRoute);
   const userSettings = useSelector(selectSettings);
@@ -75,8 +83,11 @@ const WindChart = () => {
   const [viewW, setViewW] = useState<number>(window.innerWidth);
   const [viewH, setViewH] = useState<number>(window.innerHeight);
   const [windHintValue, setWindHintValue] = useState(null);
+  const [contourLabelData, setContourLabelData] = useState([]);
 
   const [windSpeedSeries, setWindSpeedSeries] = useState([]);
+  const [temperatureContures, setTemperatureContours] = useState([]);
+
   const [queryTemperatureData, queryTemperatureDataResult] = useQueryTemperatureDataMutation({
     fixedCacheKey: cacheKeys.gfsTemperature,
   });
@@ -87,7 +98,7 @@ const WindChart = () => {
     fixedCacheKey: cacheKeys.gfsWindspeed,
   });
 
-  useEffect(() => {
+  function buildWindSeries() {
     if (
       queryGfsWindSpeedDataResult.isSuccess &&
       queryGfsWindDirectionDataResult.isSuccess &&
@@ -135,6 +146,11 @@ const WindChart = () => {
               backgroundColor = 'red';
             }
           }
+          const gfsTemp = userSettings.default_temperature_unit
+            ? celsiusToFahrenheit(temperature, 1)
+            : round(temperature, 1);
+          const stdTemp = getStandardTemp(el, userSettings.default_temperature_unit);
+          const departure = gfsTemp - stdTemp;
           windSpeedData.push({
             x,
             y: el,
@@ -146,6 +162,7 @@ const WindChart = () => {
               temp: userSettings.default_temperature_unit
                 ? celsiusToFahrenheit(temperature, 1) + ' \u00B0F'
                 : round(temperature, 1) + ' \u00B0C',
+              departureTemp: departure,
             },
             customComponent: (_row, _positionInPixels) => {
               return (
@@ -212,6 +229,63 @@ const WindChart = () => {
         setWindSpeedSeries(windSpeedData);
       });
     }
+  }
+
+  function buildTemperatureContourSeries() {
+    if (queryTemperatureDataResult.isSuccess && segments.length > 0) {
+      const matrixData: number[][] = [];
+      const xs = [...segments.map((segment) => segment.accDistance)];
+      const elevations = Array.from({ length: 30 }, (_value, index) => index * 1000);
+      const zs = [-40, -30, -20, -10, 0, 10, 20, 30, 40];
+      segments.forEach((segment, index) => {
+        const row = [];
+        elevations.forEach((elevation) => {
+          const { value: temperature } = getValueFromDataset(
+            queryTemperatureDataResult.data,
+            new Date(segment.arriveTime),
+            elevation,
+            index,
+          );
+          if (!temperature) return;
+          row.push(temperature);
+        });
+        matrixData.push(row);
+        // if (index === 0) {
+        //   matrixData.push(row);
+        // }
+      });
+      const conrec = new Conrec(null);
+      conrec.contour(matrixData, 0, segments.length - 1, 0, elevations.length - 1, xs, elevations, zs.length, zs);
+      const contours = conrec.contourList();
+      const newContours = contours.map((contour) => ({
+        temperature: contour['level'],
+        contour: [...contour],
+      }));
+      console.log(newContours);
+      const contourLabels = [];
+      newContours.forEach((contour) => {
+        contourLabels.push({
+          x: contour.contour[0].x,
+          y: contour.contour[0].y,
+          label: userSettings.default_temperature_unit
+            ? celsiusToFahrenheit(contour.temperature, 1) + ' \u00B0F'
+            : round(contour.temperature, 1) + ' \u00B0C',
+          style: {
+            fill: contour.temperature > 0 ? temperatureContourColors.positive : temperatureContourColors.negative,
+            stroke: 'white',
+            'stroke-width': 0.1,
+            'dominant-baseline': 'text-after-edge',
+          },
+        });
+      });
+      setContourLabelData(contourLabels);
+      setTemperatureContours(newContours);
+    }
+  }
+
+  useEffect(() => {
+    buildWindSeries();
+    buildTemperatureContourSeries();
   }, [
     queryGfsWindSpeedDataResult.isSuccess,
     queryGfsWindDirectionDataResult.isSuccess,
@@ -322,11 +396,21 @@ const WindChart = () => {
           text: { stroke: 'none', fill: 'white', fontWeight: 600 },
         }}
       />
+      {temperatureContures.map((contourLine, index) => {
+        return (
+          <LineSeries
+            key={'temp-' + contourLine.temperature + '-' + index}
+            data={contourLine.contour}
+            color={contourLine.temperature > 0 ? temperatureContourColors.positive : temperatureContourColors.negative}
+            curve={'curveMonotoneX'}
+          />
+        );
+      })}
       <CustomSVGSeries
         customComponent="square"
         data={windSpeedSeries}
         onValueMouseOver={(value) => setWindHintValue(value)}
-        // onValueMouseOut={() => setWindHintValue(null)}
+        onValueMouseOut={() => setWindHintValue(null)}
       ></CustomSVGSeries>
       <AreaSeries data={elevationSeries} color="#9e8f85" curve={'curveMonotoneX'} stroke="#908177" />
       {windHintValue && (
@@ -347,9 +431,16 @@ const WindChart = () => {
             <span>
               <b>Temperature:</b>&nbsp;{windHintValue.tooltip.temp}
             </span>
+            <span>
+              <b>Departure from standard:</b>&nbsp;
+              {windHintValue.tooltip.departureTemp + (userSettings.default_temperature_unit ? ' \u00B0F' : ' \u00B0C')}
+            </span>
           </div>
         </Hint>
       )}
+      {contourLabelData.length > 0 ? (
+        <LabelSeries animation allowOffsetToBeReversed data={contourLabelData}></LabelSeries>
+      ) : null}
     </XYPlot>
   );
 };

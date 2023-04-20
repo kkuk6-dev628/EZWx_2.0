@@ -10,7 +10,7 @@ module.exports = {
   env: {
     jest: true,
   },
-  ignorePatterns: ['.eslintrc.js', 'static/*.js', 'fly-js/**/*.js'],
+  ignorePatterns: ['.eslintrc.js', 'static/*.js', 'fly-js/**/*.js', 'conrec-js/*.js'],
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',

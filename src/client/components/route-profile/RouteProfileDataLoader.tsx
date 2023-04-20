@@ -58,23 +58,29 @@ export const getValueFromDataset = (
   elevation: number,
   segmentIndex,
 ): { value: number; time: Date } => {
-  let speedData: RouteProfileDataset;
-  let referencedTime;
-  for (const dataset of datasetAll) {
-    const diff = time.getTime() - new Date(dataset.time).getTime();
-    if (diff >= 0 && diff < 3600 * 1000) {
-      referencedTime = dataset.time;
-      speedData = dataset;
-      break;
+  try {
+    let speedData: RouteProfileDataset;
+    let referencedTime;
+    for (const dataset of datasetAll) {
+      const diff = time.getTime() - new Date(dataset.time).getTime();
+      if (diff >= 0 && diff < 3600 * 1000) {
+        referencedTime = dataset.time;
+        speedData = dataset;
+        break;
+      }
     }
-  }
 
-  for (const dataset of speedData.data[segmentIndex].data) {
-    if (dataset.elevation == elevation) {
-      return { value: dataset.value, time: new Date(referencedTime) };
+    for (const dataset of speedData.data[segmentIndex].data) {
+      if (dataset.elevation == elevation) {
+        return { value: dataset.value, time: new Date(referencedTime) };
+      }
     }
+    return { value: null, time: null };
+  } catch (e) {
+    console.warn(e);
+    console.log(datasetAll, time, elevation, segmentIndex);
+    return { value: null, time: null };
   }
-  return { value: null, time: null };
 };
 
 export const getRouteLength = (route: Route, inMile = false): number => {
