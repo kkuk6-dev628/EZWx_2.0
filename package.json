@@ -115,7 +115,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
-    "@nestjs/cli": "^9.2.0",
+    "@nestjs/cli": "^9.4.1",
     "@nestjs/schematics": "^9.0.3",
     "@nestjs/testing": "^9.3.9",
     "@next/eslint-plugin-next": "^13.2.4",
