@@ -28,6 +28,7 @@ import { PaperComponent } from '../map/leaflet/Map';
 import { selectDataLoadTime, setDataLoadTime } from '../../store/layers/DataLoadTimeSlice';
 import { useDispatch } from 'react-redux';
 import WindChart from './WindChart';
+import { FetchUserSettings } from '../shared/SettingsDrawer';
 
 const routeProfileChartTypes: {
   wind: RouteProfileChartType;
@@ -144,6 +145,7 @@ const RouteProfileContainer = () => {
   return (
     !isLoading && (
       <div className="route-profile">
+        <FetchUserSettings />
         <Dialog
           PaperComponent={PaperComponent}
           hideBackdrop

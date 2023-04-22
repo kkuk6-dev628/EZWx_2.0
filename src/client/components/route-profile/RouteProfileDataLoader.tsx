@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux';
 import { selectActiveRoute } from '../../store/route/routes';
 import L from 'leaflet';
 import * as fly from '../../fly-js/fly';
+import * as d3 from 'd3-scale';
+import { getFuzzyLocalTimeFromPoint } from '@mapbox/timespace';
 import { Route } from '../../interfaces/route';
 import { useEffect, useState } from 'react';
 import 'leaflet-arc';
@@ -28,6 +30,20 @@ import { setRouteSegments } from '../../store/route-profile/RouteProfile';
 
 export const totalNumberOfElevations = 512;
 
+export const SUNSET_SUNRISE = {
+  night: {
+    start: 20,
+    end: 4,
+  },
+  day: {
+    start: 7,
+    end: 17,
+  },
+};
+
+export const NIGHT_GRADIENT_COLOR = 'rgb(24, 33, 48)';
+export const DAY_GRADIENT_COLOR = 'rgb(109, 154, 229)';
+
 export const cacheKeys = {
   gfsWindspeed: 'gfs-windspeed',
   gfsWinddirection: 'gfs-winddirection',
@@ -40,7 +56,7 @@ export const cacheKeys = {
   icingSld: 'icing-sld',
 };
 
-const getLineLength = (coordinateList: GeoJSON.Position[], inMile = false): number => {
+function getLineLength(coordinateList: GeoJSON.Position[], inMile = false): number {
   let routeLength = 0;
   const latlngs: L.LatLng[] = L.GeoJSON.coordsToLatLngs(coordinateList);
   latlngs.reduce((a, b) => {
@@ -50,14 +66,14 @@ const getLineLength = (coordinateList: GeoJSON.Position[], inMile = false): numb
     return b;
   });
   return inMile ? routeLength / 1852 : routeLength / 1000;
-};
+}
 
-export const getValueFromDataset = (
+export function getValueFromDataset(
   datasetAll: RouteProfileDataset[],
   time: Date,
   elevation: number,
   segmentIndex,
-): { value: number; time: Date } => {
+): { value: number; time: Date } {
   try {
     let speedData: RouteProfileDataset;
     let referencedTime;
@@ -81,9 +97,9 @@ export const getValueFromDataset = (
     console.log(datasetAll, time, elevation, segmentIndex);
     return { value: null, time: null };
   }
-};
+}
 
-export const getRouteLength = (route: Route, inMile = false): number => {
+export function getRouteLength(route: Route, inMile = false): number {
   const coordinateList = [
     route.departure.position.coordinates,
     ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
@@ -91,9 +107,9 @@ export const getRouteLength = (route: Route, inMile = false): number => {
   ];
   const routeLengthNm = getLineLength(coordinateList, inMile);
   return routeLengthNm;
-};
+}
 
-export const interpolateRoute = (route: Route, divideNumber, returnAsLeaflet = false): L.LatLng[] => {
+export function interpolateRoute(route: Route, divideNumber, returnAsLeaflet = false): L.LatLng[] {
   const coordinateList = [
     route.departure.position.coordinates,
     ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
@@ -114,9 +130,9 @@ export const interpolateRoute = (route: Route, divideNumber, returnAsLeaflet = f
     }
   });
   return returnAsLeaflet ? interpolatedLatlngs : L.GeoJSON.latLngsToCoords(interpolatedLatlngs);
-};
+}
 
-export const getSegmentsCount = (route: Route): number => {
+export function getSegmentsCount(route: Route): number {
   const coordinateList = [
     route.departure.position.coordinates,
     ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
@@ -132,7 +148,116 @@ export const getSegmentsCount = (route: Route): number => {
   } else {
     return 13;
   }
-};
+}
+
+export function getTimeGradientStops(times: { time: Date; hour: number; minute: number }[]) {
+  const sortingTime = [...times];
+
+  const lastTime = sortingTime[sortingTime.length - 1];
+  const startStop = {
+    level: 0,
+    stopColor: getGradientStopColor(sortingTime[0].hour, sortingTime[0].minute),
+  };
+  const finishStop = {
+    level: 100,
+    stopColor: getGradientStopColor(lastTime.hour, lastTime.minute),
+  };
+
+  const stops = [];
+  const { day, night } = SUNSET_SUNRISE;
+
+  const startHour = sortingTime[0].hour;
+  const pHours = lastTime.hour - startHour;
+
+  for (let i = startHour; i <= lastTime.hour; i++) {
+    const hour = i % 24;
+
+    const level = Math.round(((i - startHour) / pHours) * 100);
+
+    if (hour === day.start || hour === day.end) {
+      stops.push({
+        level,
+        stopColor: DAY_GRADIENT_COLOR,
+      });
+    }
+
+    if (hour === night.start || hour === night.end) {
+      stops.push({
+        level,
+        stopColor: NIGHT_GRADIENT_COLOR,
+      });
+    }
+  }
+
+  return [startStop, ...stops, finishStop];
+}
+
+function getGradientStopColor(hour: number, minutes: number) {
+  const { isDay, isNight, isEvening } = getDayStatus(hour, minutes);
+
+  if (isDay) {
+    return DAY_GRADIENT_COLOR;
+  }
+  if (isNight) {
+    return NIGHT_GRADIENT_COLOR;
+  }
+
+  const hourMinutes = hour + minutes / 60;
+
+  const { night, day } = SUNSET_SUNRISE,
+    twilightWhile = night.start - day.end;
+
+  //@ts-ignore
+  const colorTwilight = d3.scaleLinear().domain([0, twilightWhile]).range([NIGHT_GRADIENT_COLOR, DAY_GRADIENT_COLOR]);
+
+  if (isEvening) {
+    return colorTwilight(twilightWhile - (hourMinutes - day.end));
+  }
+
+  return colorTwilight(hourMinutes - night.end);
+}
+
+function getDayStatus(hour, minutes) {
+  const isDay = checkHourIsDay(hour, minutes);
+  if (isDay) {
+    return {
+      isDay: true,
+    };
+  }
+
+  const isNight = checkHourIsNight(hour, minutes);
+  if (isNight) {
+    return {
+      isNight: true,
+    };
+  }
+
+  const isEvening = checkHourIsEvening(hour, minutes);
+  if (isEvening) {
+    return {
+      isEvening: true,
+    };
+  }
+
+  return {
+    isMorning: true,
+  };
+}
+
+function checkHourIsDay(hour, minutes) {
+  const { day } = SUNSET_SUNRISE;
+  return hour >= day.start && hour < day.end;
+}
+
+function checkHourIsNight(hour, minutes) {
+  const { night, day } = SUNSET_SUNRISE;
+  return hour >= night.start || hour < night.end;
+}
+
+function checkHourIsEvening(hour, minutes) {
+  const { night, day } = SUNSET_SUNRISE;
+  return hour >= day.end && hour < night.start;
+}
 
 const RouteProfileDataLoader = () => {
   const auth = useSelector(selectAuth);
@@ -204,12 +329,20 @@ const RouteProfileDataLoader = () => {
   useEffect(() => {
     if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess) {
       const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
+      const departureTime = getFuzzyLocalTimeFromPoint(observationTime, [positions[0][0], positions[0][1]]);
 
       const initialSegment = {
         position: { lat: positions[0][1], lng: positions[0][0] },
         accDistance: 0,
         arriveTime: new Date(observationTime).getTime(),
         course: fly.trueCourse(positions[0][1], positions[0][0], positions[1][1], positions[1][0], 2),
+        departureTime: {
+          full: departureTime.format('MM/dd/YYYY hh:mm A z'),
+          date: departureTime.format('MM/dd/YYYY'),
+          time: departureTime.format('HH:mm z'),
+          hour: departureTime.hour(),
+          minute: departureTime.minute(),
+        },
       };
       const segments: RouteSegment[] = [initialSegment];
       positions.reduce((acc: RouteSegment, curr: L.LatLng, index) => {
@@ -243,11 +376,20 @@ const RouteProfileDataLoader = () => {
             speed = userSettings.true_airspeed;
           }
           const newTime = new Date(acc.arriveTime).getTime() + (3600 * 1000 * dist) / speed;
+          const departureTime = getFuzzyLocalTimeFromPoint(newTime, [curr[0], curr[1]]);
+
           const segment = {
             position: { lat: curr[1], lng: curr[0] },
             accDistance: acc.accDistance + dist,
             arriveTime: newTime,
             course: course,
+            departureTime: {
+              full: departureTime.format('MM/dd/YYYY hh:mm A z'),
+              date: departureTime.format('MM/dd/YYYY'),
+              time: departureTime.format('HH:mm z'),
+              hour: departureTime.hour(),
+              minute: departureTime.minute(),
+            },
           };
           segments.push(segment);
           return { ...segment };

@@ -18,9 +18,9 @@ import { AutoCompleteInput, Modal, PrimaryButton, SecondaryButton } from '../com
 import { ColoredRangeSlider, formatForDecimal, formatForInteger } from '../common/ColoredRangeSlider';
 import { toast } from 'react-hot-toast';
 
-const FetchData = () => {
+export const FetchUserSettings = () => {
   const { id } = useSelector(selectAuth);
-  useGetUserSettingsQuery(id, { refetchOnMountOrArgChange: true });
+  if (id !== null) useGetUserSettingsQuery(id, { refetchOnMountOrArgChange: true });
   return <></>;
 };
 
@@ -100,7 +100,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
 
   return (
     <Drawer anchor={'right'} open={isShowSettingsDrawer} onClose={handleCloseDrawer}>
-      <FetchData />
+      <FetchUserSettings />
       <div className="drawer__container">
         <div className="drawer__sticky__header">
           <div className="drawer__header">

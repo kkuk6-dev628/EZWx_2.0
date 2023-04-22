@@ -57,5 +57,12 @@ export interface RouteSegment {
   position: { lat: number; lng: number };
   accDistance: number;
   arriveTime: number;
+  departureTime: {
+    full: string;
+    date: string;
+    time: string;
+    hour: number;
+    minute: number;
+  };
   course: number;
 }
