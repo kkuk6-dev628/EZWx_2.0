@@ -29,6 +29,7 @@ import { selectDataLoadTime, setDataLoadTime } from '../../store/layers/DataLoad
 import { useDispatch } from 'react-redux';
 import WindChart from './WindChart';
 import { FetchUserSettings } from '../shared/SettingsDrawer';
+import CloudsChart from './CloudsChart';
 
 const routeProfileChartTypes: {
   wind: RouteProfileChartType;
@@ -280,7 +281,10 @@ const RouteProfileContainer = () => {
             </div>
           </div>
           <div className="route-profile-chart-container">
-            <div className="scrollable-chart-content">{<WindChart />}</div>
+            <div className="scrollable-chart-content">
+              {routeProfileApiState.chartType === 'Wind' && <WindChart />}
+              {routeProfileApiState.chartType === 'Clouds' && <CloudsChart />}
+            </div>
           </div>
         </div>
       </div>

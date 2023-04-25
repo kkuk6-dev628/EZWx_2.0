@@ -524,44 +524,6 @@ const WindChart = () => {
           })}
         />
       ) : null}
-      {temperatureContures.map((contourLine, index) => {
-        const color =
-          contourLine.temperature > 0
-            ? temperatureContourColors.positive
-            : contourLine.temperature === 0
-            ? 'red'
-            : temperatureContourColors.negative;
-        const strokeWidth = contourLine.temperature === 0 ? 2 : 1;
-        return (
-          <LineSeries
-            key={'temp-' + contourLine.temperature + '-' + index}
-            data={contourLine.contour}
-            color={color}
-            curve={'curveBasisOpen'}
-            strokeWidth={strokeWidth}
-          />
-        );
-      })}
-      {contourLabelData.length > 0 ? (
-        <LabelSeries animation allowOffsetToBeReversed data={contourLabelData}></LabelSeries>
-      ) : null}
-      {activeRoute ? (
-        <LineSeries
-          data={[
-            { x: 0, y: activeRoute.altitude },
-            { x: routeLength, y: activeRoute.altitude },
-          ]}
-          color="magenta"
-        />
-      ) : null}
-      {windSpeedSeries.length > 0 ? (
-        <CustomSVGSeries
-          customComponent="square"
-          data={windSpeedSeries}
-          onValueMouseOver={(value) => setWindHintValue(value)}
-          onValueMouseOut={() => setWindHintValue(null)}
-        ></CustomSVGSeries>
-      ) : null}
       {elevationSeries.length > 0 ? (
         <AreaSeries
           data={elevationSeries}
@@ -578,44 +540,6 @@ const WindChart = () => {
           <div style={{ background: 'white', color: 'black', padding: 4, borderRadius: 4 }}>{elevationHint.y}</div>
         </Hint>
       ) : null}
-      {windHintValue && (
-        <Hint value={windHintValue}>
-          <div className="chart-tooltip">
-            <span>
-              <b>Time:</b>&nbsp;{windHintValue.tooltip.time}
-            </span>
-            <span>
-              <b>Latitude:</b>&nbsp;{windHintValue.tooltip.position.lat}
-            </span>
-            <span>
-              <b>Longitude:</b>&nbsp;{windHintValue.tooltip.position.lng}
-            </span>
-            <span>
-              <b>Wind speed:</b>&nbsp;{windHintValue.tooltip.windSpeed}&nbsp;knots
-            </span>
-            <span>
-              <b>Wind direction:</b>&nbsp;{windHintValue.tooltip.windDir}&deg;
-            </span>
-            <span>
-              <b>Course:</b>&nbsp;{windHintValue.tooltip.course}&deg;
-            </span>
-            <span>
-              <b>Altitude:</b>&nbsp;{windHintValue.y} feet
-            </span>
-            <span>
-              <b>Temperature:</b>&nbsp;{windHintValue.tooltip.temp}
-            </span>
-            <span>
-              <b>Departure from standard:</b>&nbsp;
-              <span style={{ color: windHintValue.tooltip.departureTemp >= 0 ? 'red' : 'blue' }}>
-                {windHintValue.tooltip.departureTemp > 0 && '+'}
-                {windHintValue.tooltip.departureTemp +
-                  (userSettings.default_temperature_unit ? ' \u00B0F' : ' \u00B0C')}
-              </span>
-            </span>
-          </div>
-        </Hint>
-      )}
       {timeHint ? (
         <Hint value={timeHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
           <span>{timeHint.segment.departureTime.full}</span>

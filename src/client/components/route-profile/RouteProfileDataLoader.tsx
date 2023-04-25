@@ -418,8 +418,8 @@ const RouteProfileDataLoader = () => {
             arriveTime: newTime,
             course: course,
             departureTime: {
-              full: departureTime.format('MM/dd/YYYY hh:mm A z'),
-              date: departureTime.format('MM/dd/YYYY'),
+              full: departureTime.format('MMM DD, YYYY HH:mm z'),
+              date: departureTime.format('MM/DD/YYYY'),
               time: departureTime.format('HH:mm z'),
               hour: departureTime.hour(),
               minute: departureTime.minute(),
