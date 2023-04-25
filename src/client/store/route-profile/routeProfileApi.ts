@@ -14,14 +14,7 @@ const baseUrl = '/api/route-profile';
 const transformDataset = (response: any[]): RouteProfileDataset[] => {
   const results: RouteProfileDataset[] = response.map((row) => {
     return {
-      time:
-        row.time.substring(0, 4) +
-        '-' +
-        row.time.substring(4, 6) +
-        '-' +
-        row.time.substring(6, 11) +
-        ':' +
-        row.time.substring(11, 13),
+      time: row.time,
       data: row.data.map((seg) => {
         return {
           position: seg.position,

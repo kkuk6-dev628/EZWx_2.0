@@ -27,6 +27,22 @@ function CollapsibleBar() {
     const diff = diffMinutes(time, origin);
     return Math.floor(diff / 5);
   };
+  function valuetext(value: number) {
+    return <div>{simpleTimeFormat(valueToTime(value), settingsState.default_time_display_unit)}</div>;
+  }
+
+  const handleTimeChange = (time: Date, commit = true) => {
+    const timespan = time.getTime();
+    const newSettings = { ...settingsState, observation_time: timespan };
+    if (commit && auth.id) updateUserSettingsAPI(newSettings);
+    dispatch(setUserSettings(newSettings));
+  };
+
+  const handleIntervalChange = (minutes: number) => {
+    const newSettings = { ...settingsState, observation_interval: minutes };
+    if (auth.id) updateUserSettingsAPI(newSettings);
+    dispatch(setUserSettings(newSettings));
+  };
 
   if (
     settingsState.observation_time >= getTimeRangeStart().getTime() &&
@@ -35,6 +51,7 @@ function CollapsibleBar() {
     defaultTime = new Date(settingsState.observation_time);
   } else {
     defaultTime = new Date();
+    handleTimeChange(defaultTime, true);
   }
   const marks = [
     {
@@ -58,23 +75,6 @@ function CollapsibleBar() {
       label: simpleTimeFormat(valueToTime(84 * 12), settingsState.default_time_display_unit),
     },
   ];
-
-  function valuetext(value: number) {
-    return <div>{simpleTimeFormat(valueToTime(value), settingsState.default_time_display_unit)}</div>;
-  }
-
-  const handleTimeChange = (time: Date, commit = true) => {
-    const timespan = time.getTime();
-    const newSettings = { ...settingsState, observation_time: timespan };
-    if (commit && auth.id) updateUserSettingsAPI(newSettings);
-    dispatch(setUserSettings(newSettings));
-  };
-
-  const handleIntervalChange = (minutes: number) => {
-    const newSettings = { ...settingsState, observation_interval: minutes };
-    if (auth.id) updateUserSettingsAPI(newSettings);
-    dispatch(setUserSettings(newSettings));
-  };
 
   return (
     <div className="collps">

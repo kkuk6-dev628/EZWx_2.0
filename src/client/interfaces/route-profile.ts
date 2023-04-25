@@ -42,7 +42,7 @@ export interface ElevationApiResult {
 }
 
 export interface RouteProfileDataset {
-  time: string;
+  time: string[];
   elevations: number[];
   data: {
     position: GeoJSON.Position;

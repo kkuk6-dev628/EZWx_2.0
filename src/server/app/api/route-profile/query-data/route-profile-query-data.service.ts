@@ -12,6 +12,15 @@ import {
   IcingSev,
   IcingSld,
   Mwturb,
+  NbmCloudbase,
+  NbmCloudceiling,
+  NbmDewpoint,
+  NbmGust,
+  NbmSkycover,
+  NbmT2m,
+  NbmVis,
+  NbmWindDirection,
+  NbmWindSpeed,
 } from './route-profile.gisdb-entity';
 import { RouteProfileQueryDto } from './route-profile-query.dto';
 import { dynamicImport } from 'tsimportlib';
@@ -42,6 +51,24 @@ export class RouteProfileQueryDataService {
     private icingSevRepository: Repository<IcingSev>,
     @InjectRepository(IcingSld, 'gisDB')
     private icingSldRepository: Repository<IcingSld>,
+    @InjectRepository(NbmCloudbase, 'gisDB')
+    private nbmCloudBaseRepository: Repository<NbmCloudbase>,
+    @InjectRepository(NbmCloudceiling, 'gisDB')
+    private nbmCloudCeilingRepository: Repository<NbmCloudceiling>,
+    @InjectRepository(NbmDewpoint, 'gisDB')
+    private nbmDewpointRepository: Repository<NbmDewpoint>,
+    @InjectRepository(NbmGust, 'gisDB')
+    private nbmGustRepository: Repository<NbmGust>,
+    @InjectRepository(NbmSkycover, 'gisDB')
+    private nbmSkycoverRepository: Repository<NbmSkycover>,
+    @InjectRepository(NbmT2m, 'gisDB')
+    private nbmT2mRepository: Repository<NbmT2m>,
+    @InjectRepository(NbmVis, 'gisDB')
+    private nbmVisRepository: Repository<NbmVis>,
+    @InjectRepository(NbmWindDirection, 'gisDB')
+    private nbmWindDirectionRepository: Repository<NbmWindDirection>,
+    @InjectRepository(NbmWindSpeed, 'gisDB')
+    private nbmWindSpeedRepository: Repository<NbmWindSpeed>,
   ) {}
 
   async queryRaster(positions: GeoJSON.Position[], rasterFileName: string, pool) {
@@ -65,7 +92,7 @@ export class RouteProfileQueryDataService {
     return results;
   }
 
-  async queryRasterDataset(queryPoints: GeoJSON.Position[], repository: Repository<any>, folderPath: string) {
+  async queryRasterDataset(queryPoints: GeoJSON.Position[], repository: Repository<any>) {
     if (!geotiff) {
       geotiff = (await dynamicImport('geotiff', module)) as typeof import('geotiff');
     }
@@ -73,58 +100,93 @@ export class RouteProfileQueryDataService {
 
     const fileMappings = await repository
       .createQueryBuilder()
-      .select(['filename', 'array_agg (band) as bands', 'array_agg (elevation) elevations'])
+      .select([
+        'filename',
+        'array_agg (DISTINCT band) as bands',
+        'array_agg (DISTINCT elevation) elevations',
+        'array_agg (DISTINCT time) times',
+      ])
       .groupBy('filename')
       .orderBy('filename')
       .getRawMany<AggregatedMapping>();
 
     const results = [];
     for (const fileMapping of fileMappings) {
-      const filePath = rasterDataDir + '/' + folderPath + '/' + fileMapping.filename;
-      const data = await this.queryRaster(queryPoints, filePath, pool);
-      const time = fileMapping.filename.slice(fileMapping.filename.indexOf('_') + 1).replace('.tif', '');
-      results.push({ time, data, elevations: fileMapping.elevations });
+      const data = await this.queryRaster(queryPoints, fileMapping.filename, pool);
+      results.push({ time: fileMapping.times, data, elevations: fileMapping.elevations });
     }
     return results;
   }
 
   async queryCat(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.clearAirTubRepository, 'GTG/Data/cat');
+    return await this.queryRasterDataset(query.queryPoints, this.clearAirTubRepository);
   }
 
   async queryMwturb(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.mwturbRepository, 'GTG/Data/mwturb');
+    return await this.queryRasterDataset(query.queryPoints, this.mwturbRepository);
   }
 
   async queryHumidity(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.humidityRepository, 'GFS/Data/gfs_humidity');
+    return await this.queryRasterDataset(query.queryPoints, this.humidityRepository);
   }
 
   async queryTemperature(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.temperaturRepository, 'GFS/Data/gfs_temperature');
+    return await this.queryRasterDataset(query.queryPoints, this.temperaturRepository);
   }
 
   async queryGfsWindDirection(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(
-      query.queryPoints,
-      this.gfsWindDirectionRepository,
-      'GFS/Data/gfs_winddirection',
-    );
+    return await this.queryRasterDataset(query.queryPoints, this.gfsWindDirectionRepository);
   }
 
   async queryGfsWindSpeed(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.gfsWindSpeedRepository, 'GFS/Data/gfs_windspeed');
+    return await this.queryRasterDataset(query.queryPoints, this.gfsWindSpeedRepository);
   }
 
   async queryIcingProb(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.icingProbRepository, 'NBM/Data/icingprob');
+    return await this.queryRasterDataset(query.queryPoints, this.icingProbRepository);
   }
 
   async queryIcingSev(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.icingSevRepository, 'NBM/Data/icingsev');
+    return await this.queryRasterDataset(query.queryPoints, this.icingSevRepository);
   }
 
   async queryIcingSld(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.icingSldRepository, 'NBM/Data/icingsld');
+    return await this.queryRasterDataset(query.queryPoints, this.icingSldRepository);
+  }
+
+  async queryNbmCloudbase(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.nbmCloudBaseRepository);
+  }
+
+  async queryNbmCloudceiling(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.nbmCloudCeilingRepository);
+  }
+
+  async queryNbmDewpoint(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.nbmDewpointRepository);
+  }
+
+  async queryNbmGust(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.nbmGustRepository);
+  }
+
+  async queryNbmSkycover(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.nbmSkycoverRepository);
+  }
+
+  async queryNbmT2m(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.nbmT2mRepository);
+  }
+
+  async queryNbmVis(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.nbmVisRepository);
+  }
+
+  async queryNbmWindDirection(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.nbmWindDirectionRepository);
+  }
+
+  async queryNbmWindSpeed(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.nbmWindSpeedRepository);
   }
 }

@@ -84,10 +84,13 @@ const WindChart = () => {
   const [endMargin, setEndMargin] = useState(0);
   const [viewW, setViewW] = useState<number>(window.innerWidth);
   const [viewH, setViewH] = useState<number>(window.innerHeight);
-  const [windHintValue, setWindHintValue] = useState(null);
+
   const [contourLabelData, setContourLabelData] = useState([]);
+
+  const [windHintValue, setWindHintValue] = useState(null);
   const [elevationHint, setElevationHint] = useState(null);
   const [showElevationHint, setShowElevationHint] = useState(false);
+  const [timeHint, setTimeHint] = useState(null);
 
   const [windSpeedSeries, setWindSpeedSeries] = useState([]);
   const [temperatureContures, setTemperatureContours] = useState([]);
@@ -154,6 +157,10 @@ const WindChart = () => {
           const gfsTemp = userSettings.default_temperature_unit ? celsiusToFahrenheit(temperature, 1) : temperature;
           const stdTemp = getStandardTemp(el, userSettings.default_temperature_unit);
           const departure = round(gfsTemp - stdTemp, 1);
+          const windText =
+            routeProfileApiState.windLayer === 'Windspeed' ? Math.round(windSpeed) : Math.abs(Math.round(headwind));
+          const ry = 10;
+          const rx = windText > 99 ? ry + 4 : ry;
           windSpeedData.push({
             x,
             y: el,
@@ -171,7 +178,7 @@ const WindChart = () => {
             customComponent: (_row, _positionInPixels) => {
               return (
                 <g className="inner-inner-component">
-                  <circle cx="0" cy="0" r={10} fill={backgroundColor} stroke="white" strokeWidth={2} />
+                  <ellipse cx="0" cy="0" rx={rx} ry={ry} fill={backgroundColor} stroke="white" strokeWidth={2} />
                   <marker
                     id="wind-arrow"
                     viewBox="0 0 10 10"
@@ -200,9 +207,9 @@ const WindChart = () => {
                   </marker>
                   <line
                     x1="0"
-                    y1="-10"
+                    y1="-15"
                     x2="0"
-                    y2="-30"
+                    y2="-35"
                     stroke="magenta"
                     markerEnd="url(#course-arrow)"
                     strokeWidth="3"
@@ -210,9 +217,9 @@ const WindChart = () => {
                   />
                   <line
                     x1="0"
-                    y1="-34"
+                    y1="-38"
                     x2="0"
-                    y2="-14"
+                    y2="-18"
                     stroke="white"
                     markerEnd="url(#wind-arrow)"
                     strokeWidth="3"
@@ -220,9 +227,7 @@ const WindChart = () => {
                   />
                   <text x={0} y={0}>
                     <tspan x="0" y="0" dominantBaseline="middle" textAnchor="middle" className="windspeed-text">
-                      {routeProfileApiState.windLayer === 'Windspeed'
-                        ? Math.round(windSpeed)
-                        : Math.abs(Math.round(headwind))}
+                      {windText}
                     </tspan>
                   </text>
                 </g>
@@ -238,7 +243,7 @@ const WindChart = () => {
   function buildTemperatureContourSeries() {
     if (queryTemperatureDataResult.isSuccess && segments.length > 0) {
       const matrixData: number[][] = [];
-      const xs = [-startMargin, ...segments.map((segment) => segment.accDistance)];
+      const xs = [-startMargin, ...segments.map((segment) => segment.accDistance), routeLength + endMargin];
       const elevations = Array.from({ length: 50 }, (_value, index) => index * 1000);
       // const zs = [-40, -30, -20, -10, 0, 10, 20, 30, 40];
       const min = routeProfileApiState.maxAltitude === 500 ? -85 : routeProfileApiState.maxAltitude === 300 ? -50 : -25;
@@ -261,10 +266,18 @@ const WindChart = () => {
         matrixData.push(row);
         if (index === 0) {
           matrixData.push(row);
+        } else if (index === segments.length - 1) {
+          matrixData.push(row);
         }
       });
       const conrec = new Conrec(null);
-      conrec.contour(matrixData, 0, xs.length - 1, 0, elevations.length - 1, xs, elevations, zs.length, zs);
+      try {
+        conrec.contour(matrixData, 0, xs.length - 1, 0, elevations.length - 1, xs, elevations, zs.length, zs);
+      } catch (e) {
+        console.error(e);
+        console.debug(matrixData, xs, elevations, zs);
+      }
+
       const contours = conrec.contourList();
       const newContours = contours.map((contour) => ({
         temperature: contour['level'],
@@ -272,19 +285,40 @@ const WindChart = () => {
       }));
       const contourLabels = [];
       newContours.forEach((contour) => {
-        const minItem = contour.contour.reduce((prev, curr) => (prev.x < curr.x ? prev : curr));
+        switch (routeProfileApiState.maxAltitude) {
+          case 200:
+            if (contour.temperature % 2 !== 0) {
+              return;
+            }
+            break;
+          case 300:
+            if (contour.temperature % 4 !== 0) {
+              return;
+            }
+            break;
+        }
+        const minPos = contour.contour.reduce((prev, curr) => (prev.x < curr.x ? prev : curr));
+        const maxPos = contour.contour.reduce((prev, curr) => (prev.x > curr.x ? prev : curr));
+        const label = userSettings.default_temperature_unit
+          ? celsiusToFahrenheit(contour.temperature) + ' \u00B0F'
+          : round(contour.temperature, 1) + ' \u00B0C';
+        const style = {
+          fill: contour.temperature > 0 ? temperatureContourColors.positive : temperatureContourColors.negative,
+          stroke: 'white',
+          strokeWidth: 0.1,
+          dominantBaseline: 'text-after-edge',
+        };
         contourLabels.push({
-          x: minItem.x,
-          y: minItem.y,
-          label: userSettings.default_temperature_unit
-            ? celsiusToFahrenheit(contour.temperature) + ' \u00B0F'
-            : round(contour.temperature, 1) + ' \u00B0C',
-          style: {
-            fill: contour.temperature > 0 ? temperatureContourColors.positive : temperatureContourColors.negative,
-            stroke: 'white',
-            strokeWidth: 0.1,
-            dominantBaseline: 'text-after-edge',
-          },
+          x: minPos.x,
+          y: minPos.y,
+          label,
+          style,
+        });
+        contourLabels.push({
+          x: maxPos.x,
+          y: maxPos.y,
+          label,
+          style,
         });
       });
       setContourLabelData(contourLabels);
@@ -345,7 +379,7 @@ const WindChart = () => {
       const length = getRouteLength(activeRoute, !userSettings.default_distance_unit);
       setRouteLength(length);
       setSegmentsCount(count);
-      const start = count ? length / count / 2 : 0;
+      const start = count ? length / count / 4 : 0;
       const end = count ? length / count / 4 : 0;
       setStartMargin(start);
       setEndMargin(end);
@@ -423,11 +457,6 @@ const WindChart = () => {
             return (
               <tspan className="chart-label">
                 <tspan className="chart-label-dist">{dist}</tspan>
-                <tspan className="chart-label-hours" dx={dist < 100 ? 0 : dist < 1000 ? '-1em' : '-1.6em'} dy="1.2em">
-                  {userSettings.default_time_display_unit
-                    ? segments[index].departureTime.time
-                    : simpleTimeOnlyFormat(new Date(segments[index].arriveTime), false)}
-                </tspan>
               </tspan>
             );
           }
@@ -462,6 +491,28 @@ const WindChart = () => {
           text: { stroke: 'none', fill: 'white', fontWeight: 600 },
         }}
       />
+      {segments && segments.length ? (
+        <LabelSeries
+          animation
+          allowOffsetToBeReversed
+          onValueMouseOver={(value) => {
+            setTimeHint(value);
+          }}
+          // onValueMouseOut={() => setTimeHint(null)}
+          data={Array.from({ length: segmentsCount + 1 }, (_value, index) => ({
+            x: Math.round((index * routeLength) / segmentsCount),
+            y: -1000,
+            label: userSettings.default_time_display_unit
+              ? segments[index].departureTime.time
+              : simpleTimeOnlyFormat(new Date(segments[index].arriveTime), false),
+            style: {
+              fill: 'white',
+              dominantBaseline: 'text-after-edge',
+              textAnchor: 'start',
+            },
+          }))}
+        />
+      ) : null}
       {temperatureContures.map((contourLine, index) => {
         const color =
           contourLine.temperature > 0
@@ -486,7 +537,7 @@ const WindChart = () => {
       {activeRoute ? (
         <LineSeries
           data={[
-            { x: -startMargin, y: activeRoute.altitude },
+            { x: 0, y: activeRoute.altitude },
             { x: routeLength, y: activeRoute.altitude },
           ]}
           color="magenta"
@@ -554,6 +605,13 @@ const WindChart = () => {
           </div>
         </Hint>
       )}
+      {timeHint ? (
+        <Hint value={timeHint}>
+          <div className="time-tooltip">
+            <span>{timeHint.label}</span>
+          </div>
+        </Hint>
+      ) : null}
     </XYPlot>
   );
 };

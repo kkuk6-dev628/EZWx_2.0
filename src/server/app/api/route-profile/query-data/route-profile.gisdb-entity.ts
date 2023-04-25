@@ -2,6 +2,7 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 export interface AggregatedMapping {
   filename: string;
+  times: string[];
   bands: string[];
   elevations: number[];
 }
@@ -13,6 +14,9 @@ export class ClearAirTurb {
 
   @Column()
   filename: string;
+
+  @Column()
+  time: string;
 
   @Column()
   band: string;
@@ -30,6 +34,9 @@ export class Mwturb {
   filename: string;
 
   @Column()
+  time: string;
+
+  @Column()
   band: string;
 
   @Column()
@@ -43,6 +50,9 @@ export class GfsHumidity {
 
   @Column()
   filename: string;
+
+  @Column()
+  time: string;
 
   @Column()
   band: string;
@@ -60,6 +70,9 @@ export class GfsTemperature {
   filename: string;
 
   @Column()
+  time: string;
+
+  @Column()
   band: string;
 
   @Column()
@@ -72,6 +85,9 @@ export class GfsWindSpeed {
 
   @Column()
   filename: string;
+
+  @Column()
+  time: string;
 
   @Column()
   band: string;
@@ -89,6 +105,9 @@ export class GfsWindDirection {
   filename: string;
 
   @Column()
+  time: string;
+
+  @Column()
   band: string;
 
   @Column()
@@ -102,6 +121,9 @@ export class IcingProb {
 
   @Column()
   filename: string;
+
+  @Column()
+  time: string;
 
   @Column()
   band: string;
@@ -119,6 +141,9 @@ export class IcingSev {
   filename: string;
 
   @Column()
+  time: string;
+
+  @Column()
   band: string;
 
   @Column()
@@ -132,6 +157,171 @@ export class IcingSld {
 
   @Column()
   filename: string;
+
+  @Column()
+  time: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
+}
+
+@Entity('nbm_cloudbase')
+export class NbmCloudbase {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  time: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
+}
+
+@Entity('nbm_cloudceiling')
+export class NbmCloudceiling {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  time: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
+}
+
+@Entity('nbm_dewpoint2m_mapping')
+export class NbmDewpoint {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  time: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
+}
+
+@Entity('nbm_gust10m_mapping')
+export class NbmGust {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  time: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
+}
+
+@Entity('nbm_skycover_mapping')
+export class NbmSkycover {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  time: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
+}
+
+@Entity('nbm_tem2m_mapping')
+export class NbmT2m {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  time: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
+}
+
+@Entity('nbm_vis_mapping')
+export class NbmVis {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  time: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
+}
+
+@Entity('nbm_wd10_mapping')
+export class NbmWindDirection {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  time: string;
+
+  @Column()
+  band: string;
+
+  @Column()
+  elevation: number;
+}
+
+@Entity('nbm_ws10_mapping')
+export class NbmWindSpeed {
+  @PrimaryColumn()
+  id: number;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  time: string;
 
   @Column()
   band: string;

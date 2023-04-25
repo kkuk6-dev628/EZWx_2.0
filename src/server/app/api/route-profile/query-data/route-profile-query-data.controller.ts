@@ -43,4 +43,40 @@ export class RouteProfileQueryDataController {
   icingSld(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryIcingSld(query);
   }
+  @Post('nbm-cloudbase')
+  nbmCloudbase(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryNbmCloudbase(query);
+  }
+  @Post('nbm-cloudceiling')
+  nbmCloudceiling(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryNbmCloudceiling(query);
+  }
+  @Post('nbm-dewpoint')
+  nbmDewpoint(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryNbmDewpoint(query);
+  }
+  @Post('nbm-gust')
+  nbmGust(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryNbmGust(query);
+  }
+  @Post('nbm-skycover')
+  nbmSkycover(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryNbmSkycover(query);
+  }
+  @Post('nbm-t2m')
+  nbmT2m(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryNbmT2m(query);
+  }
+  @Post('nbm-vis')
+  nbmVis(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryNbmVis(query);
+  }
+  @Post('nbm-winddirection')
+  nbmWindDirection(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryNbmWindDirection(query);
+  }
+  @Post('nbm-windspeed')
+  nbmWindSpeed(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryNbmWindSpeed(query);
+  }
 }
