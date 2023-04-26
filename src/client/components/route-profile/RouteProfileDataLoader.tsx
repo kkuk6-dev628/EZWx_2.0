@@ -120,7 +120,7 @@ export function interpolateRoute(route: Route, divideNumber, returnAsLeaflet = f
     route.destination.position.coordinates,
   ];
   const totalLength = getLineLength(coordinateList);
-  const interpolatedLatlngs = new Array<L.LatLng>();
+  let interpolatedLatlngs = new Array<L.LatLng>();
   const latlngs: L.LatLng[] = L.GeoJSON.coordsToLatLngs(coordinateList);
   latlngs.map((latlng, index) => {
     if (index < latlngs.length - 1) {
@@ -133,6 +133,36 @@ export function interpolateRoute(route: Route, divideNumber, returnAsLeaflet = f
       interpolatedLatlngs.push(...(index > 0 ? polyline.getLatLngs().slice(1) : polyline.getLatLngs()));
     }
   });
+  if (interpolatedLatlngs.length > 2 && divideNumber === totalNumberOfElevations) {
+    const courseStart = fly.trueCourse(
+      interpolatedLatlngs[1].lat,
+      interpolatedLatlngs[1].lng,
+      interpolatedLatlngs[0].lat,
+      interpolatedLatlngs[0].lng,
+      2,
+    );
+    const courseEnd = fly.trueCourse(
+      interpolatedLatlngs[interpolatedLatlngs.length - 2].lat,
+      interpolatedLatlngs[interpolatedLatlngs.length - 2].lng,
+      interpolatedLatlngs[interpolatedLatlngs.length - 1].lat,
+      interpolatedLatlngs[interpolatedLatlngs.length - 1].lng,
+      2,
+    );
+    const extLength = totalLength / 13 / 2;
+    const extStart = fly.enroute(interpolatedLatlngs[0].lat, interpolatedLatlngs[0].lng, courseStart, extLength, 6);
+    const extEnd = fly.enroute(
+      interpolatedLatlngs[interpolatedLatlngs.length - 1].lat,
+      interpolatedLatlngs[interpolatedLatlngs.length - 1].lng,
+      courseEnd,
+      extLength,
+      6,
+    );
+    interpolatedLatlngs = [
+      L.latLng(extStart.latitude.degrees, extStart.longitude.degrees),
+      ...interpolatedLatlngs,
+      L.latLng(extEnd.latitude.degrees, extEnd.longitude.degrees),
+    ];
+  }
   return returnAsLeaflet ? interpolatedLatlngs : L.GeoJSON.latLngsToCoords(interpolatedLatlngs);
 }
 

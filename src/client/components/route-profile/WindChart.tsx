@@ -381,8 +381,8 @@ const WindChart = () => {
       const length = getRouteLength(activeRoute, !userSettings.default_distance_unit);
       setRouteLength(length);
       setSegmentsCount(count);
-      const start = count ? length / count / 4 : 0;
-      const end = count ? length / count / 4 : 0;
+      const start = count ? length / count / 2 : 0;
+      const end = count ? length / count / 2 : 0;
       setStartMargin(start);
       setEndMargin(end);
     }
@@ -390,18 +390,18 @@ const WindChart = () => {
 
   useEffect(() => {
     if (queryElevationsResult.isSuccess && queryElevationsResult.data && routeLength) {
-      const elevations = [];
       const elevationApiResults = queryElevationsResult.data.results;
+      const elevations = [{ x: -startMargin, y: meterToFeet(elevationApiResults[0].elevation) }];
       const elSegmentLength = routeLength / totalNumberOfElevations;
-      for (let i = 0; i < elevationApiResults.length; i++) {
-        elevations.push({ x: i * elSegmentLength, y: meterToFeet(elevationApiResults[i].elevation) });
+      for (let i = 1; i < elevationApiResults.length - 1; i++) {
+        elevations.push({ x: (i - 1) * elSegmentLength, y: meterToFeet(elevationApiResults[i].elevation) });
       }
+      elevations.push({
+        x: routeLength + endMargin,
+        y: meterToFeet(elevationApiResults[elevationApiResults.length - 1].elevation),
+      });
       if (elevations.length === 0) return;
-      setElevationSeries([
-        { x: -startMargin, y: elevations[0].y * 0.8 },
-        ...elevations,
-        { x: routeLength + endMargin, y: elevations[elevations.length - 1].y * 0.8 },
-      ]);
+      setElevationSeries(elevations);
     }
   }, [queryElevationsResult.isSuccess, routeLength]);
 
@@ -460,7 +460,7 @@ const WindChart = () => {
         )}
         tickFormat={(v, index) => {
           if (segments.length > 0 && segments[index]) {
-            const dist = Math.round(segments[index].accDistance / 10) * 10;
+            const dist = Math.round(segments[index].accDistance);
             return (
               <tspan className="chart-label">
                 <tspan className="chart-label-dist">{dist}</tspan>
@@ -498,7 +498,7 @@ const WindChart = () => {
           text: { stroke: 'none', fill: 'white', fontWeight: 600 },
         }}
       />
-      {segments && segments.length ? (
+      {segments && segments.length > 4 ? (
         <LabelSeries
           animation
           allowOffsetToBeReversed

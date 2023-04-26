@@ -53,11 +53,6 @@ const ConvectiveOutlookLayer = () => {
       getLabel={getLabel}
       clientFilter={clientFilter}
       layerStateName="sigmetState"
-      readDb={() => db.convectiveOutlook.toArray()}
-      writeDb={(features) => {
-        db.convectiveOutlook.clear();
-        db.convectiveOutlook.bulkAdd(features);
-      }}
     ></WFSLayer>
   );
 };

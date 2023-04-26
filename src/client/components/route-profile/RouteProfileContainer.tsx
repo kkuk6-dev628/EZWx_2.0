@@ -30,6 +30,7 @@ import { useDispatch } from 'react-redux';
 import WindChart from './WindChart';
 import { FetchUserSettings } from '../shared/SettingsDrawer';
 import CloudsChart from './CloudsChart';
+import { LineSeries } from 'react-vis';
 
 const routeProfileChartTypes: {
   wind: RouteProfileChartType;
@@ -283,7 +284,7 @@ const RouteProfileContainer = () => {
           <div className="route-profile-chart-container">
             <div className="scrollable-chart-content">
               {routeProfileApiState.chartType === 'Wind' && <WindChart />}
-              {routeProfileApiState.chartType === 'Clouds' && <CloudsChart />}
+              {routeProfileApiState.chartType === 'Clouds' && <CloudsChart></CloudsChart>}
             </div>
           </div>
         </div>

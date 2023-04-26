@@ -52,11 +52,6 @@ const BaseMapLayers = () => {
               weight: 1,
             };
           }}
-          readDb={() => db.usProvinces.toArray()}
-          writeDb={(features) => {
-            db.usProvinces.clear();
-            db.usProvinces.bulkAdd(features);
-          }}
         ></WFSLayer>
       </GroupedLayer>
       <GroupedLayer
@@ -79,11 +74,6 @@ const BaseMapLayers = () => {
           getLabel={(feature) => {
             return feature.properties.NAME;
           }}
-          readDb={() => db.usProvinces.toArray()}
-          writeDb={(features) => {
-            db.canadianProvinces.clear();
-            db.canadianProvinces.bulkAdd(features);
-          }}
         ></WFSLayer>
       </GroupedLayer>
       <GroupedLayer
@@ -105,23 +95,6 @@ const BaseMapLayers = () => {
               weight: 1,
               color: '#ff69',
             };
-          }}
-          readDb={() => db.usProvinces.toArray()}
-          writeDb={(features) => {
-            db.countyWarningAreas.clear();
-            const chunkSize = 2;
-            let i = 0;
-            const chunkedAdd = () => {
-              if (features.length <= i) return;
-              db.countyWarningAreas
-                .bulkAdd(features.slice(i, i + chunkSize))
-                .catch((error) => console.log(error))
-                .finally(() => {
-                  i += chunkSize;
-                  chunkedAdd();
-                });
-            };
-            chunkedAdd();
           }}
         ></WFSLayer>
       </GroupedLayer>

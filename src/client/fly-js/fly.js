@@ -135,7 +135,7 @@ flyjs.mphTo = function (unitOfMeasurement, unitValue, roundTo) {
 * @param  {Number} trueCourse course in degrees
 * @param  {Number} distance in nautical miles
 * @param  {Number} roundTo decimal places for rouding
-* @return {Number} Unit of measurement converted from nautical miles value
+* @return {Point} Point of Latitude and Longitude
 */
 flyjs.enroute = function (fromLat, fromLon, trueCourse, distance, roundTo) {
     var from = new Point(new Latitude(fromLat), new Longitude(fromLon));
