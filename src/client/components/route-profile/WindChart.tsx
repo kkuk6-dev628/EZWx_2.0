@@ -1,28 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import {
-  XYPlot,
-  VerticalGridLines,
-  HorizontalGridLines,
-  XAxis,
-  YAxis,
-  AreaSeries,
-  LineSeries,
-  CustomSVGSeries,
-  Hint,
-  LabelSeries,
-  GradientDefs,
-} from 'react-vis';
+import { LineSeries, CustomSVGSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
-import {
-  cacheKeys,
-  getRouteLength,
-  getSegmentsCount,
-  getTimeGradientStops,
-  getValueFromDataset,
-  interpolateRoute,
-  totalNumberOfElevations,
-} from './RouteProfileDataLoader';
+import { cacheKeys, getRouteLength, getSegmentsCount, getValueFromDataset } from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';
 import {
   useGetRouteProfileStateQuery,
@@ -30,18 +10,11 @@ import {
   useQueryGfsWindSpeedDataMutation,
   useQueryTemperatureDataMutation,
 } from '../../store/route-profile/routeProfileApi';
-import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
-import {
-  celsiusToFahrenheit,
-  convertTimeFormat,
-  getStandardTemp,
-  meterToFeet,
-  round,
-  simpleTimeOnlyFormat,
-} from '../map/common/AreoFunctions';
+import { celsiusToFahrenheit, convertTimeFormat, getStandardTemp, round } from '../map/common/AreoFunctions';
 import flyjs from '../../fly-js/fly';
 import { Conrec } from '../../conrec-js/conrec';
+import RouteProfileChart from './RouteProfileChart';
 
 export const windDataElevations = {
   500: [5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000],
@@ -72,37 +45,28 @@ const temperatureContourColors = {
 const WindChart = () => {
   const activeRoute = useSelector(selectActiveRoute);
   const userSettings = useSelector(selectSettings);
-  const { data: routeProfileApiState, isLoading } = useGetRouteProfileStateQuery(null, {
+  const { data: routeProfileApiState } = useGetRouteProfileStateQuery(null, {
     refetchOnMountOrArgChange: true,
   });
   const segments = useSelector(selectRouteSegments);
-  const [queryElevations, queryElevationsResult] = useQueryElevationApiMutation({ fixedCacheKey: 'elevation-api' });
-  const [elevationSeries, setElevationSeries] = useState([]);
-  const [segmentsCount, setSegmentsCount] = useState(1);
   const [routeLength, setRouteLength] = useState(0);
   const [startMargin, setStartMargin] = useState(0);
   const [endMargin, setEndMargin] = useState(0);
-  const [viewW, setViewW] = useState<number>(window.innerWidth);
-  const [viewH, setViewH] = useState<number>(window.innerHeight);
 
   const [contourLabelData, setContourLabelData] = useState([]);
 
   const [windHintValue, setWindHintValue] = useState(null);
-  const [elevationHint, setElevationHint] = useState(null);
-  const [showElevationHint, setShowElevationHint] = useState(false);
-  const [timeHint, setTimeHint] = useState(null);
 
   const [windSpeedSeries, setWindSpeedSeries] = useState([]);
   const [temperatureContures, setTemperatureContours] = useState([]);
-  const [gradientStops, setGradientStops] = useState([]);
 
-  const [queryTemperatureData, queryTemperatureDataResult] = useQueryTemperatureDataMutation({
+  const [, queryTemperatureDataResult] = useQueryTemperatureDataMutation({
     fixedCacheKey: cacheKeys.gfsTemperature,
   });
-  const [queryGfsWindDirectionData, queryGfsWindDirectionDataResult] = useQueryGfsWindDirectionDataMutation({
+  const [, queryGfsWindDirectionDataResult] = useQueryGfsWindDirectionDataMutation({
     fixedCacheKey: cacheKeys.gfsWinddirection,
   });
-  const [queryGfsWindSpeedData, queryGfsWindSpeedDataResult] = useQueryGfsWindSpeedDataMutation({
+  const [, queryGfsWindSpeedDataResult] = useQueryGfsWindSpeedDataMutation({
     fixedCacheKey: cacheKeys.gfsWindspeed,
   });
 
@@ -207,9 +171,9 @@ const WindChart = () => {
                   </marker>
                   <line
                     x1="0"
-                    y1="-15"
+                    y1="-12"
                     x2="0"
-                    y2="-35"
+                    y2="-32"
                     stroke="magenta"
                     markerEnd="url(#course-arrow)"
                     strokeWidth="3"
@@ -226,7 +190,7 @@ const WindChart = () => {
                     transform={`rotate(${windDir})`}
                   />
                   <text x={0} y={0}>
-                    <tspan x="0" y="0" dominantBaseline="middle" textAnchor="middle" className="windspeed-text">
+                    <tspan x="0" y="1" dominantBaseline="middle" textAnchor="middle" className="windspeed-text">
                       {windText}
                     </tspan>
                   </text>
@@ -349,38 +313,11 @@ const WindChart = () => {
   ]);
 
   useEffect(() => {
-    if (segments.length > 0) {
-      const times = segments.map((segment) => ({
-        time: new Date(segment.arriveTime),
-        hour: segment.departureTime.hour,
-        minute: segment.departureTime.minute,
-      }));
-      const stops = getTimeGradientStops(times);
-      setGradientStops(stops);
-    }
-  }, [segments]);
-
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    };
-  }, []);
-
-  const handleWindowSizeChange = () => {
-    setViewW(window.innerWidth);
-    setViewH(window.innerHeight);
-  };
-
-  useEffect(() => {
     if (activeRoute) {
       // userSettings.default_distance_unit == true then km, or nm
-      const elevationPoints = interpolateRoute(activeRoute, totalNumberOfElevations);
-      if (!queryElevationsResult.isLoading) queryElevations({ queryPoints: elevationPoints });
       const count = getSegmentsCount(activeRoute);
       const length = getRouteLength(activeRoute, !userSettings.default_distance_unit);
       setRouteLength(length);
-      setSegmentsCount(count);
       const start = count ? length / count / 2 : 0;
       const end = count ? length / count / 2 : 0;
       setStartMargin(start);
@@ -388,142 +325,8 @@ const WindChart = () => {
     }
   }, [activeRoute]);
 
-  useEffect(() => {
-    if (queryElevationsResult.isSuccess && queryElevationsResult.data && routeLength) {
-      const elevationApiResults = queryElevationsResult.data.results;
-      const elevations = [{ x: -startMargin, y: meterToFeet(elevationApiResults[0].elevation) }];
-      const elSegmentLength = routeLength / totalNumberOfElevations;
-      for (let i = 1; i < elevationApiResults.length - 1; i++) {
-        elevations.push({ x: (i - 1) * elSegmentLength, y: meterToFeet(elevationApiResults[i].elevation) });
-      }
-      elevations.push({
-        x: routeLength + endMargin,
-        y: meterToFeet(elevationApiResults[elevationApiResults.length - 1].elevation),
-      });
-      if (elevations.length === 0) return;
-      setElevationSeries(elevations);
-    }
-  }, [queryElevationsResult.isSuccess, routeLength]);
-
   return (
-    <XYPlot
-      height={calcChartHeight(viewW, viewH)}
-      width={calcChartWidth(viewW, viewH)}
-      yDomain={[0, routeProfileApiState.maxAltitude * 100]}
-      xDomain={[-startMargin, routeLength + endMargin]}
-      margin={{ right: 40 }}
-    >
-      <GradientDefs>
-        <linearGradient id="linear-gradient">
-          {gradientStops.map(({ level, stopColor }, index) => (
-            <stop key={'gradient-' + index} offset={level} stopColor={stopColor} />
-          ))}
-        </linearGradient>
-      </GradientDefs>
-      <AreaSeries
-        data={[
-          { x: -startMargin, y: 50000 },
-          { x: routeLength + endMargin, y: 50000 },
-        ]}
-        color={'url(#linear-gradient)'}
-      />
-      <VerticalGridLines
-        tickValues={Array.from({ length: segmentsCount * 2 + 1 }, (_value, index) =>
-          Math.round((index * routeLength) / (segmentsCount * 2)),
-        )}
-        style={{
-          stroke: 'grey',
-          strokeWidth: 0.2,
-        }}
-      />
-      <HorizontalGridLines
-        tickValues={Array.from({ length: 5 - 1 }, (_value, index) =>
-          Math.round(((index + 1) * routeProfileApiState.maxAltitude * 100) / 5),
-        )}
-        style={{
-          stroke: 'grey',
-          strokeWidth: 2,
-        }}
-      />
-      <HorizontalGridLines
-        tickValues={Array.from({ length: 5 }, (_value, index) =>
-          Math.round(((index + 0.5) * routeProfileApiState.maxAltitude * 100) / 5),
-        )}
-        style={{
-          stroke: 'grey',
-          strokeWidth: 0.2,
-        }}
-      />
-      <XAxis
-        tickValues={Array.from({ length: segmentsCount + 1 }, (_value, index) =>
-          Math.round((index * routeLength) / segmentsCount),
-        )}
-        tickFormat={(v, index) => {
-          if (segments.length > 0 && segments[index]) {
-            const dist = Math.round(segments[index].accDistance);
-            return (
-              <tspan className="chart-label">
-                <tspan className="chart-label-dist">{dist}</tspan>
-              </tspan>
-            );
-          }
-          return v;
-        }}
-        style={{
-          line: { stroke: '#ADDDE100' },
-          ticks: { stroke: '#ADDDE100' },
-          text: { stroke: 'none', fill: 'white', fontWeight: 600 },
-        }}
-      />
-      <YAxis
-        tickValues={Array.from({ length: 10 + 1 }, (_value, index) =>
-          Math.round((index * routeProfileApiState.maxAltitude * 100) / 5),
-        )}
-        tickFormat={(v) => v / 100}
-        style={{
-          line: { stroke: '#ADDDE100' },
-          ticks: { stroke: '#ADDDE100' },
-          text: { stroke: 'none', fill: 'white', fontWeight: 600 },
-        }}
-      />
-      <YAxis
-        tickValues={Array.from({ length: 10 + 1 }, (_value, index) =>
-          Math.round((index * routeProfileApiState.maxAltitude * 100) / 5),
-        )}
-        tickFormat={(v) => v / 100}
-        orientation="right"
-        style={{
-          line: { stroke: '#ADDDE100' },
-          ticks: { stroke: '#ADDDE100' },
-          text: { stroke: 'none', fill: 'white', fontWeight: 600 },
-        }}
-      />
-      {segments && segments.length > 4 ? (
-        <LabelSeries
-          animation
-          allowOffsetToBeReversed
-          onValueMouseOver={(value) => {
-            setTimeHint(value);
-          }}
-          onValueMouseOut={() => setTimeHint(null)}
-          data={Array.from({ length: segmentsCount + 1 }, (_value, index) => {
-            return {
-              x: Math.round((index * routeLength) / segmentsCount),
-              y: 0,
-              yOffset: 36,
-              segment: segments[index],
-              label: userSettings.default_time_display_unit
-                ? segments[index].departureTime.time
-                : simpleTimeOnlyFormat(new Date(segments[index].arriveTime), false),
-              style: {
-                fill: 'white',
-                dominantBaseline: 'text-after-edge',
-                textAnchor: 'start',
-              },
-            };
-          })}
-        />
-      ) : null}
+    <RouteProfileChart>
       {temperatureContures.map((contourLine, index) => {
         const color =
           contourLine.temperature > 0
@@ -545,15 +348,6 @@ const WindChart = () => {
       {contourLabelData.length > 0 ? (
         <LabelSeries animation allowOffsetToBeReversed data={contourLabelData}></LabelSeries>
       ) : null}
-      {activeRoute ? (
-        <LineSeries
-          data={[
-            { x: 0, y: activeRoute.altitude },
-            { x: routeLength, y: activeRoute.altitude },
-          ]}
-          color="magenta"
-        />
-      ) : null}
       {windSpeedSeries.length > 0 ? (
         <CustomSVGSeries
           customComponent="square"
@@ -561,22 +355,6 @@ const WindChart = () => {
           onValueMouseOver={(value) => setWindHintValue(value)}
           onValueMouseOut={() => setWindHintValue(null)}
         ></CustomSVGSeries>
-      ) : null}
-      {elevationSeries.length > 0 ? (
-        <AreaSeries
-          data={elevationSeries}
-          color="#9e8f85"
-          curve={'curveMonotoneX'}
-          stroke="#908177"
-          onNearestXY={(datapoint, event) => setElevationHint(datapoint)}
-          onSeriesMouseOut={() => setShowElevationHint(false)}
-          onSeriesMouseOver={() => setShowElevationHint(true)}
-        />
-      ) : null}
-      {showElevationHint ? (
-        <Hint value={elevationHint}>
-          <div style={{ background: 'white', color: 'black', padding: 4, borderRadius: 4 }}>{elevationHint.y}</div>
-        </Hint>
       ) : null}
       {windHintValue && (
         <Hint value={windHintValue}>
@@ -616,14 +394,7 @@ const WindChart = () => {
           </div>
         </Hint>
       )}
-      {timeHint ? (
-        <Hint value={timeHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
-          <span>{timeHint.segment.departureTime.full}</span>
-          <span>{convertTimeFormat(timeHint.segment.arriveTime, true)}</span>
-          <span>{convertTimeFormat(timeHint.segment.arriveTime, false)}</span>
-        </Hint>
-      ) : null}
-    </XYPlot>
+    </RouteProfileChart>
   );
 };
 export default WindChart;

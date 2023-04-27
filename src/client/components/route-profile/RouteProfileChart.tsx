@@ -6,6 +6,7 @@ import {
   HorizontalGridLines,
   XAxis,
   YAxis,
+  LineSeries,
   AreaSeries,
   Hint,
   LabelSeries,
@@ -233,12 +234,23 @@ const RouteProfileChart = (props) => {
                 fill: 'white',
                 dominantBaseline: 'text-after-edge',
                 textAnchor: 'start',
+                fontSize: 11,
+                fontWeight: 600,
               },
             };
           })}
         />
       ) : null}
       {props.children}
+      {activeRoute ? (
+        <LineSeries
+          data={[
+            { x: 0, y: activeRoute.altitude },
+            { x: routeLength, y: activeRoute.altitude },
+          ]}
+          color="magenta"
+        />
+      ) : null}
       {elevationSeries.length > 0 ? (
         <AreaSeries
           data={elevationSeries}

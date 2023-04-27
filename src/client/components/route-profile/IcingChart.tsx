@@ -16,7 +16,7 @@ import { useGetRouteProfileStateQuery } from '../../store/route-profile/routePro
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import RouteProfileChart from './RouteProfileChart';
 
-const CloudsChart = (props) => {
+const IcingChart = (props) => {
   const activeRoute = useSelector(selectActiveRoute);
   const userSettings = useSelector(selectSettings);
   const { data: routeProfileApiState } = useGetRouteProfileStateQuery(null, {
@@ -36,4 +36,4 @@ const CloudsChart = (props) => {
     </RouteProfileChart>
   );
 };
-export default CloudsChart;
+export default IcingChart;

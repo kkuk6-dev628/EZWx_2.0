@@ -75,24 +75,25 @@ export function getValueFromDataset(
   segmentIndex,
 ): { value: number; time: Date } {
   try {
-    let speedData: RouteProfileDataset;
-    let referencedTime;
-    for (const dataset of datasetAll) {
+    const filteredByTime = datasetAll.filter((dataset) => {
       if (dataset.time && dataset.time.length === 1) {
         const diff = time.getTime() - new Date(dataset.time[0]).getTime();
-        if (diff >= 0 && diff < 3600 * 1000) {
-          referencedTime = dataset.time;
-          speedData = dataset;
-          break;
-        }
+        return diff >= 0 && diff < 3600 * 1000;
       }
-    }
+      return false;
+    });
 
-    if (speedData) {
-      for (const dataset of speedData.data[segmentIndex].data) {
-        if (dataset.elevation == elevation) {
-          return { value: dataset.value, time: new Date(referencedTime) };
-        }
+    if (filteredByTime.length > 0) {
+      const filteredByElevation = filteredByTime[0].data[segmentIndex].data.filter((dataset) => {
+        return Math.abs(dataset.elevation - elevation) < 1000;
+      });
+      if (filteredByElevation.length === 1) {
+        return { value: filteredByElevation[0].value, time: new Date(filteredByTime[0].time[0]) };
+      } else if (filteredByElevation.length === 2) {
+        return {
+          value: (filteredByElevation[0].value + filteredByElevation[0].value) / 2,
+          time: new Date(filteredByTime[0].time[0]),
+        };
       }
     }
     return { value: null, time: null };
@@ -368,9 +369,9 @@ const RouteProfileDataLoader = () => {
       if (queryGfsWindDirectionDataResult.isSuccess) {
         if (!queryhumidityDataResult.isLoading && !queryhumidityDataResult.isSuccess)
           queryHumidityData({ queryPoints: positions });
-        if (!queryCaturbDataResult.isLoading && !queryCaturbDataResult.isSuccess && queryhumidityDataResult.isSuccess)
+        if (!queryCaturbDataResult.isLoading && !queryCaturbDataResult.isSuccess)
           queryCaturbData({ queryPoints: positions });
-        if (!queryMwturbDataResult.isLoading && !queryMwturbDataResult.isSuccess && queryhumidityDataResult.isSuccess)
+        if (!queryMwturbDataResult.isLoading && !queryMwturbDataResult.isSuccess)
           queryMwturbData({ queryPoints: positions });
       }
     }

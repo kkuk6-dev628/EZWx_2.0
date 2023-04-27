@@ -106,7 +106,7 @@ export const celsiusToFahrenheit = (celsius: number, place = 0): number => {
 
 export const getStandardTemp = (elevation: number, inFah = true) => {
   if (inFah) {
-    return 59 - Math.round(elevation / 1000) * 3.6;
+    return 59 - Math.round(elevation / 1000) * 3.8;
   }
   return 15 - Math.round(elevation / 1000) * 1.98;
 };

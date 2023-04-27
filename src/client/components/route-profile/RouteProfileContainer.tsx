@@ -27,10 +27,11 @@ import Route from '../shared/Route';
 import { PaperComponent } from '../map/leaflet/Map';
 import { selectDataLoadTime, setDataLoadTime } from '../../store/layers/DataLoadTimeSlice';
 import { useDispatch } from 'react-redux';
-import WindChart from './WindChart';
 import { FetchUserSettings } from '../shared/SettingsDrawer';
 import CloudsChart from './CloudsChart';
-import { LineSeries } from 'react-vis';
+import TurbChart from './TurbChart';
+import WindChart from './WindChart';
+import IcingChart from './IcingChart';
 
 const routeProfileChartTypes: {
   wind: RouteProfileChartType;
@@ -285,6 +286,8 @@ const RouteProfileContainer = () => {
             <div className="scrollable-chart-content">
               {routeProfileApiState.chartType === 'Wind' && <WindChart />}
               {routeProfileApiState.chartType === 'Clouds' && <CloudsChart></CloudsChart>}
+              {routeProfileApiState.chartType === 'Icing' && <IcingChart></IcingChart>}
+              {routeProfileApiState.chartType === 'Turb' && <TurbChart></TurbChart>}
             </div>
           </div>
         </div>
