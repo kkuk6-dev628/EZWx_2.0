@@ -130,13 +130,11 @@ const WindChart = () => {
             y: el,
             tooltip: {
               position: segment.position,
-              time: convertTimeFormat(windspeedTime, userSettings.default_time_display_unit),
+              time: windspeedTime,
               windSpeed: Math.round(windSpeed),
               windDir: Math.round(windDir),
               course: Math.round(segment.course),
-              temp: userSettings.default_temperature_unit
-                ? celsiusToFahrenheit(temperature, 1) + ' \u00B0F'
-                : round(temperature, 1) + ' \u00B0C',
+              temp: temperature,
               departureTemp: departure,
             },
             customComponent: (_row, _positionInPixels) => {
@@ -213,8 +211,6 @@ const WindChart = () => {
     segments,
     routeProfileApiState.maxAltitude,
     routeProfileApiState.windLayer,
-    userSettings.default_temperature_unit,
-    userSettings.default_time_display_unit,
   ]);
 
   function buildTemperatureContourSeries() {
@@ -360,7 +356,8 @@ const WindChart = () => {
         <Hint value={windHintValue}>
           <div className="chart-tooltip">
             <span>
-              <b>Time:</b>&nbsp;{windHintValue.tooltip.time}
+              <b>Time:</b>&nbsp;
+              {convertTimeFormat(windHintValue.tooltip.time, userSettings.default_time_display_unit)}
             </span>
             <span>
               <b>Latitude:</b>&nbsp;{windHintValue.tooltip.position.lat}
@@ -381,7 +378,10 @@ const WindChart = () => {
               <b>Altitude:</b>&nbsp;{windHintValue.y} feet
             </span>
             <span>
-              <b>Temperature:</b>&nbsp;{windHintValue.tooltip.temp}
+              <b>Temperature:</b>&nbsp;
+              {userSettings.default_temperature_unit
+                ? celsiusToFahrenheit(windHintValue.tooltip.temp, 1) + ' \u00B0F'
+                : round(windHintValue.tooltip.temp, 1) + ' \u00B0C'}
             </span>
             <span>
               <b>Departure from standard:</b>&nbsp;

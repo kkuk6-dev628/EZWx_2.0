@@ -244,7 +244,7 @@ const RouteProfileContainer = () => {
                     onChange={(_, value) => {
                       handleUpdateState({ ...routeProfileState, turbLayers: value });
                     }}
-                    aria-label="Icing Data Layers"
+                    aria-label="Turbulence Data Layers"
                   >
                     {Object.entries(routeProfileTurbDataTypes).map(([key, value]) => {
                       return (

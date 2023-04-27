@@ -221,7 +221,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                 <div className="input_radio_container">
                   <RadioButton
                     id="lightWeight"
-                    value={'light'}
+                    value="light"
                     title="Light"
                     name="max_takeoff_weight_category"
                     selectedValue={settings.max_takeoff_weight_category}

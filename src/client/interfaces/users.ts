@@ -4,6 +4,8 @@ export interface authUser {
   displayName: string;
 }
 
+export type TakeoffWeightCategory = 'light' | 'medium' | 'heavy';
+
 export interface UserSettings {
   observation_time: number;
   observation_interval: number;
@@ -13,7 +15,7 @@ export interface UserSettings {
   default_wind_speed_unit: boolean;
   default_distance_unit: boolean;
   default_visibility_unit: boolean;
-  max_takeoff_weight_category: string;
+  max_takeoff_weight_category: TakeoffWeightCategory;
   true_airspeed: number;
   ceiling_at_departure: [number, number];
   surface_visibility_at_departure: [number, number];
