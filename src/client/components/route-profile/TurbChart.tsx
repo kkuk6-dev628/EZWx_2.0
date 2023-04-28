@@ -33,6 +33,7 @@ export const colorsByEdr = {
   moderate: '#FF9900',
   severe: '#FF0000',
   extreme: '#660000',
+  na: '#333',
 };
 
 function getMaxForecastTime(): Date {
@@ -47,6 +48,7 @@ function getMaxForecastTime(): Date {
 const TurbChart = (props) => {
   const activeRoute = useSelector(selectActiveRoute);
   const userSettings = useSelector(selectSettings);
+  const observationTime = userSettings.observation_time;
   const { data: routeProfileApiState } = useGetRouteProfileStateQuery(null, {
     refetchOnMountOrArgChange: true,
   });
@@ -55,72 +57,112 @@ const TurbChart = (props) => {
   const [, queryMwturbDataResult] = useQueryMwturbDataMutation({ fixedCacheKey: cacheKeys.mwturb });
   const [turbSeries, setTurbSeries] = useState([]);
   const [turbHint, setTurbHint] = useState(null);
+  const [noForecast, setNoForecast] = useState(false);
+  const [noDepicted, setNoDepicted] = useState(false);
 
   function buildTurbSeries() {
     if (queryCaturbDataResult.isSuccess && queryMwturbDataResult.isSuccess) {
-      const routeLength = getRouteLength(activeRoute, !userSettings.default_distance_unit);
-      const segmentLength = Math.round(routeLength / segments.length);
+      const routeLength = getRouteLength(activeRoute, true);
+      const segmentCount = getSegmentsCount(activeRoute);
+      const segmentLength = routeLength / segmentCount;
       const turbData = [];
+      let existTurbulence = false;
+      if (observationTime > getMaxForecastTime().getTime()) {
+        setNoForecast(true);
+        setNoDepicted(false);
+        setTurbSeries([]);
+        return;
+      }
+      setNoForecast(false);
       segments.forEach((segment, index) => {
-        if (segment.arriveTime > getMaxForecastTime().getTime()) {
-          return;
-        }
-        for (let elevation = 1000; elevation <= 45000; elevation += 1000) {
+        const maxElevation =
+          routeProfileApiState.maxAltitude === 500 ? 45000 : routeProfileApiState.maxAltitude === 300 ? 27000 : 18000;
+        for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
           let edr = 0;
           let edrTime;
           let edrType = 'Combined EDR';
-          if (routeProfileApiState.turbLayers.includes('CAT') && routeProfileApiState.turbLayers.includes('MTW')) {
-            const caturb = getValueFromDataset(
-              queryCaturbDataResult.data,
-              new Date(segment.arriveTime),
-              elevation,
-              index,
-            );
-            const mwturb = getValueFromDataset(
-              queryMwturbDataResult.data,
-              new Date(segment.arriveTime),
-              elevation,
-              index,
-            );
-            edr = Math.max(caturb.value, mwturb.value);
-            edrTime = caturb.time;
-            edrType = 'Combined EDR';
-          } else if (routeProfileApiState.turbLayers.includes('CAT')) {
-            const data = getValueFromDataset(
-              queryCaturbDataResult.data,
-              new Date(segment.arriveTime),
-              elevation,
-              index,
-            );
-            edr = data.value;
-            edrTime = data.time;
-            edrType = 'Clear Air EDR';
-          } else if (routeProfileApiState.turbLayers.includes('MTW')) {
-            ({ value: edr, time: edrTime } = getValueFromDataset(
-              queryMwturbDataResult.data,
-              new Date(segment.arriveTime),
-              elevation,
-              index,
-            ));
-            edrType = 'Mountain Wave EDR';
-          }
-
           let color = colorsByEdr.none;
-          const edrCategory = takeoffEdrTable[userSettings.max_takeoff_weight_category];
-          if (edr >= edrCategory.extreme) {
-            color = colorsByEdr.extreme;
-          } else if (edr >= edrCategory.severe) {
-            color = colorsByEdr.severe;
-          } else if (edr >= edrCategory.moderate) {
-            color = colorsByEdr.moderate;
-          } else if (edr >= edrCategory.light) {
-            color = colorsByEdr.light;
+          let category = 'None';
+          let opacity = 0.5;
+          if (segment.arriveTime > getMaxForecastTime().getTime()) {
+            category = 'N/A';
+            color = colorsByEdr.na;
+            edr = null;
+            edrTime = segment.arriveTime;
+            if (routeProfileApiState.turbLayers.includes('CAT') && routeProfileApiState.turbLayers.includes('MWT')) {
+              edrType = 'Combined EDR';
+            } else if (routeProfileApiState.turbLayers.includes('CAT')) {
+              edrType = 'Clear Air EDR';
+            } else if (routeProfileApiState.turbLayers.includes('MWT')) {
+              edrType = 'Mountain Wave EDR';
+            }
+          } else {
+            if (routeProfileApiState.turbLayers.includes('CAT') && routeProfileApiState.turbLayers.includes('MWT')) {
+              const caturb = getValueFromDataset(
+                queryCaturbDataResult.data,
+                new Date(segment.arriveTime),
+                elevation,
+                index,
+              );
+              const mwturb = getValueFromDataset(
+                queryMwturbDataResult.data,
+                new Date(segment.arriveTime),
+                elevation,
+                index,
+              );
+              edr = Math.max(caturb.value, mwturb.value);
+              edrTime = caturb.time;
+              edrType = 'Combined EDR';
+            } else if (routeProfileApiState.turbLayers.includes('CAT')) {
+              const data = getValueFromDataset(
+                queryCaturbDataResult.data,
+                new Date(segment.arriveTime),
+                elevation,
+                index,
+              );
+              edr = data.value;
+              edrTime = data.time;
+              edrType = 'Clear Air EDR';
+            } else if (routeProfileApiState.turbLayers.includes('MWT')) {
+              ({ value: edr, time: edrTime } = getValueFromDataset(
+                queryMwturbDataResult.data,
+                new Date(segment.arriveTime),
+                elevation,
+                index,
+              ));
+              edrType = 'Mountain Wave EDR';
+            }
+
+            edr = Math.round(edr);
+            const edrCategory = takeoffEdrTable[userSettings.max_takeoff_weight_category];
+            if (edr >= edrCategory.extreme) {
+              color = colorsByEdr.extreme;
+              category = 'Extreme';
+              existTurbulence = true;
+            } else if (edr >= edrCategory.severe) {
+              color = colorsByEdr.severe;
+              category = 'Severe';
+              existTurbulence = true;
+            } else if (edr >= edrCategory.moderate) {
+              color = colorsByEdr.moderate;
+              category = 'Moderate';
+              existTurbulence = true;
+            } else if (edr >= edrCategory.light) {
+              color = colorsByEdr.light;
+              category = 'Light';
+              existTurbulence = true;
+            }
+            opacity = edr < edrCategory.light ? 0 : 0.5;
+            if (edrTime === null) {
+              edrTime = segment.arriveTime;
+              color = colorsByEdr.na;
+              category = 'N/A';
+            }
           }
-          const opacity = edr < edrCategory.light ? 0 : 0.5;
           turbData.push({
-            x0: index * segmentLength - segmentLength / 2,
+            x0: Math.round(index * segmentLength - segmentLength / 2),
             y0: elevation,
-            x: index * segmentLength + segmentLength / 2,
+            x: Math.round(index * segmentLength + segmentLength / 2),
             y: elevation + 1000,
             color: color,
             opacity: opacity,
@@ -128,10 +170,13 @@ const TurbChart = (props) => {
               edrValue: edr,
               edrType: edrType,
               time: edrTime,
+              altitude: elevation,
+              category: category,
             },
           });
         }
       });
+      setNoDepicted(!existTurbulence);
       setTurbSeries(turbData);
     }
   }
@@ -143,11 +188,12 @@ const TurbChart = (props) => {
     queryMwturbDataResult.isSuccess,
     segments,
     routeProfileApiState.turbLayers,
+    routeProfileApiState.maxAltitude,
     userSettings.max_takeoff_weight_category,
   ]);
 
   return (
-    <RouteProfileChart>
+    <RouteProfileChart showDayNightBackground={true}>
       <VerticalRectSeries
         colorType="literal"
         stroke="#AAAAAA"
@@ -155,6 +201,7 @@ const TurbChart = (props) => {
         style={{ strokeWidth: 0.1 }}
         onValueMouseOut={() => setTurbHint(null)}
         onValueMouseOver={(value) => setTurbHint(value)}
+        onValueClick={(value) => setTurbHint(value)}
       ></VerticalRectSeries>
       {turbHint ? (
         <Hint value={turbHint} className="turbulence-tooltip">
@@ -162,10 +209,47 @@ const TurbChart = (props) => {
             <b>Time:</b> {convertTimeFormat(turbHint.hint.time, userSettings.default_time_display_unit)}
           </span>
           <span>
-            <b>{turbHint.hint.edrType}:</b> {Math.round(turbHint.hint.edrValue)}
+            <b>Altitude:</b> {turbHint.hint.altitude} feet MSL
+          </span>
+          <span>
+            <b>{turbHint.hint.edrType}:</b>{' '}
+            {turbHint.hint.edrValue ? turbHint.hint.edrValue : 'No EDR forecast available for this time'}
+          </span>
+          <span>
+            <b>Category:</b> {turbHint.hint.category}
           </span>
         </Hint>
       ) : null}
+      {noDepicted && (
+        <LabelSeries
+          style={{ fontSize: 22, fontWeight: 900, strokeWidth: 1, fill: 'red', stroke: 'white' }}
+          data={[
+            {
+              x: getRouteLength(activeRoute, !userSettings.default_distance_unit) / 2,
+              y: routeProfileApiState.maxAltitude * 100 - 10000,
+              label: 'No turbulence forecast depicted for this departure time',
+              style: {
+                textAnchor: 'middle',
+              },
+            },
+          ]}
+        ></LabelSeries>
+      )}
+      {noForecast && (
+        <LabelSeries
+          style={{ fontSize: 22, fontWeight: 900, strokeWidth: 1, fill: 'red', stroke: 'white' }}
+          data={[
+            {
+              x: getRouteLength(activeRoute, !userSettings.default_distance_unit) / 2,
+              y: routeProfileApiState.maxAltitude * 100 - 10000,
+              label: 'No turbulence forecast available for this departure time',
+              style: {
+                textAnchor: 'middle',
+              },
+            },
+          ]}
+        ></LabelSeries>
+      )}
     </RouteProfileChart>
   );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { useSelector } from 'react-redux';
 import {
   XYPlot,
@@ -25,6 +25,8 @@ import { useGetRouteProfileStateQuery } from '../../store/route-profile/routePro
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import { convertTimeFormat, meterToFeet, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
+import { nauticalMilesToKilometers } from '../../fly-js/src/helpers/converters/DistanceConverter';
+import * as flyjs from '../../fly-js/fly';
 
 export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
   if (viewWidth < 900) {
@@ -41,7 +43,7 @@ export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
   }
 };
 
-const RouteProfileChart = (props) => {
+const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground: boolean }) => {
   const activeRoute = useSelector(selectActiveRoute);
   const userSettings = useSelector(selectSettings);
   const { data: routeProfileApiState } = useGetRouteProfileStateQuery(null, {
@@ -93,7 +95,7 @@ const RouteProfileChart = (props) => {
       const elevationPoints = interpolateRoute(activeRoute, totalNumberOfElevations);
       if (!queryElevationsResult.isLoading) queryElevations({ queryPoints: elevationPoints });
       const count = getSegmentsCount(activeRoute);
-      const length = getRouteLength(activeRoute, !userSettings.default_distance_unit);
+      const length = getRouteLength(activeRoute, true);
       setRouteLength(length);
       setSegmentsCount(count);
       const start = count ? length / count / 2 : 0;
@@ -128,20 +130,33 @@ const RouteProfileChart = (props) => {
       xDomain={[-startMargin, routeLength + endMargin]}
       margin={{ right: 40 }}
     >
-      <GradientDefs>
-        <linearGradient id="linear-gradient">
-          {gradientStops.map(({ level, stopColor }, index) => (
-            <stop key={'gradient-' + index} offset={level} stopColor={stopColor} />
-          ))}
-        </linearGradient>
-      </GradientDefs>
-      <AreaSeries
-        data={[
-          { x: -startMargin, y: 50000 },
-          { x: routeLength + endMargin, y: 50000 },
-        ]}
-        color={'url(#linear-gradient)'}
-      />
+      {props.showDayNightBackground && (
+        <GradientDefs>
+          <linearGradient id="linear-gradient">
+            {gradientStops.map(({ level, stopColor }, index) => (
+              <stop key={'gradient-' + index} offset={level} stopColor={stopColor} />
+            ))}
+          </linearGradient>
+        </GradientDefs>
+      )}
+      {props.showDayNightBackground && (
+        <AreaSeries
+          data={[
+            { x: -startMargin, y: 50000 },
+            { x: routeLength + endMargin, y: 50000 },
+          ]}
+          color={'url(#linear-gradient)'}
+        />
+      )}
+      {!props.showDayNightBackground && (
+        <AreaSeries
+          data={[
+            { x: -startMargin, y: 50000 },
+            { x: routeLength + endMargin, y: 50000 },
+          ]}
+          color="#DDD"
+        />
+      )}
       <VerticalGridLines
         tickValues={Array.from({ length: segmentsCount * 2 + 1 }, (_value, index) =>
           Math.round((index * routeLength) / (segmentsCount * 2)),
@@ -175,7 +190,10 @@ const RouteProfileChart = (props) => {
         )}
         tickFormat={(v, index) => {
           if (segments.length > 0 && segments[index]) {
-            const dist = Math.round(segments[index].accDistance);
+            const distInMile = segments[index].accDistance;
+            const dist = Math.round(
+              userSettings.default_distance_unit ? flyjs.nauticalMilesTo('Kilometers', distInMile, 0) : distInMile,
+            );
             return (
               <tspan className="chart-label">
                 <tspan className="chart-label-dist">{dist}</tspan>

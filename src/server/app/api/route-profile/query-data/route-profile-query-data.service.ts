@@ -118,6 +118,42 @@ export class RouteProfileQueryDataService {
     return results;
   }
 
+  async queryRasterDatasetByElevations(
+    queryPoints: GeoJSON.Position[],
+    elevations: number[],
+    repository: Repository<any>,
+  ) {
+    if (!geotiff) {
+      geotiff = (await dynamicImport('geotiff', module)) as typeof import('geotiff');
+    }
+    if (!pool) pool = new geotiff.Pool();
+
+    const fileMappings = await repository
+      .createQueryBuilder()
+      .select([
+        'filename',
+        'array_agg (DISTINCT band) as bands',
+        'array_agg (DISTINCT elevation) elevations',
+        'array_agg (DISTINCT time) times',
+      ])
+      .where('elevation IN (:...elevations)', {
+        elevations: [
+          2000, 3000, 4000, 5000, 6000, 8000, 9000, 10000, 12000, 14000, 15000, 16000, 18000, 20000, 21000, 24000,
+          27000, 30000, 35000, 40000, 45000,
+        ],
+      })
+      .groupBy('filename')
+      .orderBy('filename')
+      .getRawMany<AggregatedMapping>();
+
+    const results = [];
+    for (const fileMapping of fileMappings) {
+      const data = await this.queryRaster(queryPoints, fileMapping.filename, pool);
+      results.push({ time: fileMapping.times, data, elevations: fileMapping.elevations });
+    }
+    return results;
+  }
+
   async queryCat(query: RouteProfileQueryDto) {
     return await this.queryRasterDataset(query.queryPoints, this.clearAirTubRepository);
   }
@@ -135,11 +171,15 @@ export class RouteProfileQueryDataService {
   }
 
   async queryGfsWindDirection(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.gfsWindDirectionRepository);
+    return await this.queryRasterDatasetByElevations(
+      query.queryPoints,
+      query.elevations,
+      this.gfsWindDirectionRepository,
+    );
   }
 
   async queryGfsWindSpeed(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.gfsWindSpeedRepository);
+    return await this.queryRasterDatasetByElevations(query.queryPoints, query.elevations, this.gfsWindSpeedRepository);
   }
 
   async queryIcingProb(query: RouteProfileQueryDto) {

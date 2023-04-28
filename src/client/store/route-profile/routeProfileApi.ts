@@ -11,7 +11,7 @@ const initialRouteProfileState: RouteProfileState = {
 
 const baseUrl = '/api/route-profile';
 
-const transformDataset = (response: any[]): RouteProfileDataset[] => {
+const transformElevationBands = (response: any[]): RouteProfileDataset[] => {
   const results: RouteProfileDataset[] = response.map((row) => {
     return {
       time: row.time,
@@ -29,6 +29,29 @@ const transformDataset = (response: any[]): RouteProfileDataset[] => {
         };
       }),
       elevations: row.elevations,
+    };
+  });
+  return results;
+};
+
+const transformTimeBands = (response: any[]): RouteProfileDataset[] => {
+  const results: RouteProfileDataset[] = response.map((row) => {
+    return {
+      time: row.time,
+      elevations: row.elevations,
+      data: row.data.map((seg) => {
+        return {
+          position: seg.position,
+          data: Object.entries(seg.data)
+            .map((elevation) => {
+              if (elevation[0] === 'width' || elevation[0] === 'height') {
+                return;
+              }
+              return { elevation: row.elevations[0], value: elevation[1][0], time: row.time[elevation[0]] };
+            })
+            .filter((n) => n),
+        };
+      }),
     };
   });
   return results;
@@ -59,39 +82,39 @@ export const routeProfileApi = createApi({
     }),
     queryCaturbData: builder.mutation({
       query: (data) => ({ url: 'data/cat', method: 'Post', body: data }),
-      transformResponse: transformDataset,
+      transformResponse: transformElevationBands,
     }),
     queryMwturbData: builder.mutation({
       query: (data) => ({ url: 'data/mwturb', method: 'Post', body: data }),
-      transformResponse: transformDataset,
+      transformResponse: transformElevationBands,
     }),
     queryHumidityData: builder.mutation({
       query: (data) => ({ url: 'data/humidity', method: 'Post', body: data }),
-      transformResponse: transformDataset,
+      transformResponse: transformTimeBands,
     }),
     queryTemperatureData: builder.mutation({
       query: (data) => ({ url: 'data/temperature', method: 'Post', body: data }),
-      transformResponse: transformDataset,
+      transformResponse: transformTimeBands,
     }),
     queryGfsWindDirectionData: builder.mutation({
       query: (data) => ({ url: 'data/gfs-winddirection', method: 'Post', body: data }),
-      transformResponse: transformDataset,
+      transformResponse: transformTimeBands,
     }),
     queryGfsWindSpeedData: builder.mutation({
       query: (data) => ({ url: 'data/gfs-windspeed', method: 'Post', body: data }),
-      transformResponse: transformDataset,
+      transformResponse: transformTimeBands,
     }),
     queryIcingProbData: builder.mutation({
       query: (data) => ({ url: 'data/icing-prob', method: 'Post', body: data }),
-      transformResponse: transformDataset,
+      transformResponse: transformElevationBands,
     }),
     queryIcingSevData: builder.mutation({
       query: (data) => ({ url: 'data/icing-sev', method: 'Post', body: data }),
-      transformResponse: transformDataset,
+      transformResponse: transformElevationBands,
     }),
     queryIcingSldData: builder.mutation({
       query: (data) => ({ url: 'data/icing-sld', method: 'Post', body: data }),
-      transformResponse: transformDataset,
+      transformResponse: transformElevationBands,
     }),
   }),
 });

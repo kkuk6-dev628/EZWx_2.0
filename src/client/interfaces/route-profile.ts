@@ -4,7 +4,7 @@ export type RouteProfileWindDataType = 'Windspeed' | 'Head/tailwind';
 
 export type RouteProfileIcingDataType = 'Prob' | 'Sev' | 'SLD';
 
-export type RouteProfileTurbDataType = 'CAT' | 'MTW';
+export type RouteProfileTurbDataType = 'CAT' | 'MWT';
 
 export type RouteProfileMaxAltitudes = 500 | 300 | 200;
 

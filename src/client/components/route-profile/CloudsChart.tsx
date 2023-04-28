@@ -25,7 +25,7 @@ const CloudsChart = (props) => {
   const segments = useSelector(selectRouteSegments);
 
   return (
-    <RouteProfileChart>
+    <RouteProfileChart showDayNightBackground={true}>
       <LineSeries
         data={[
           { x: 0, y: 5000 },

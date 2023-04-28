@@ -44,6 +44,7 @@ import {
 import { jsonClone } from '../../utils/ObjectUtil';
 import { BaseMapLayerControlState, LayerControlState } from '../../../interfaces/layerControl';
 import { selectLayerControlState, setLayerControlState } from '../../../store/layers/LayerControl';
+import { selectActiveRoute } from '../../../store/route/routes';
 
 export const PaperComponent = (props) => {
   return (
@@ -68,6 +69,7 @@ const LeafletMap = () => {
   const dispatch = useDispatch();
   const baseMapLayerControl = useSelector(selectBaseMapLayerControl);
   const auth = useSelector(selectAuth);
+  const activeRoute = useSelector(selectActiveRoute);
   useGetWaypointsQuery('');
   useGetAirportQuery('');
   const layerControlState = useSelector(selectLayerControlState);
@@ -117,7 +119,9 @@ const LeafletMap = () => {
         }
         break;
       case 'profile':
-        router.push('/route-profile');
+        if (activeRoute) {
+          router.push('/route-profile');
+        }
         break;
       default:
         break;

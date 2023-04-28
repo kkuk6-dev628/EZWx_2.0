@@ -56,7 +56,7 @@ flyjs.trueCourse = function (fromLat, fromLon, toLat, toLon, roundTo) {
 /**
 * Return unit of measurement converted from nautical miles value
 *
-* @param  {Number} unitOfMeasurement to convert to
+* @param  {String} unitOfMeasurement to convert to
 * @param  {Number} unitValue is the nautical miles value one wishes to convert
 * @param  {Number} Number decimal places for rouding
 * @return {Number} Unit of measurement converted from nautical miles value

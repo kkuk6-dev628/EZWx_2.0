@@ -22,6 +22,11 @@ export const windDataElevations = {
   200: [2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000],
 };
 
+export const windQueryElevations = [
+  2000, 3000, 4000, 5000, 6000, 8000, 9000, 10000, 12000, 14000, 15000, 16000, 18000, 20000, 21000, 24000, 27000, 30000,
+  35000, 40000, 45000,
+];
+
 export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
   if (viewWidth < 900) {
     return 900;
@@ -37,7 +42,7 @@ export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
   }
 };
 
-const temperatureContourColors = {
+export const temperatureContourColors = {
   positive: '#dfbb5f',
   negative: '#5fdf84',
 };
@@ -53,11 +58,10 @@ const WindChart = () => {
   const [startMargin, setStartMargin] = useState(0);
   const [endMargin, setEndMargin] = useState(0);
 
-  const [contourLabelData, setContourLabelData] = useState([]);
-
+  const [windSpeedSeries, setWindSpeedSeries] = useState([]);
   const [windHintValue, setWindHintValue] = useState(null);
 
-  const [windSpeedSeries, setWindSpeedSeries] = useState([]);
+  const [contourLabelData, setContourLabelData] = useState([]);
   const [temperatureContures, setTemperatureContours] = useState([]);
 
   const [, queryTemperatureDataResult] = useQueryTemperatureDataMutation({
@@ -312,7 +316,7 @@ const WindChart = () => {
     if (activeRoute) {
       // userSettings.default_distance_unit == true then km, or nm
       const count = getSegmentsCount(activeRoute);
-      const length = getRouteLength(activeRoute, !userSettings.default_distance_unit);
+      const length = getRouteLength(activeRoute, true);
       setRouteLength(length);
       const start = count ? length / count / 2 : 0;
       const end = count ? length / count / 2 : 0;
@@ -322,7 +326,7 @@ const WindChart = () => {
   }, [activeRoute]);
 
   return (
-    <RouteProfileChart>
+    <RouteProfileChart showDayNightBackground={true}>
       {temperatureContures.map((contourLine, index) => {
         const color =
           contourLine.temperature > 0

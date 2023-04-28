@@ -68,13 +68,13 @@ const routeProfileTurbDataTypes: {
   mtw: RouteProfileTurbDataType;
 } = {
   cat: 'CAT',
-  mtw: 'MTW',
+  mtw: 'MWT',
 };
 
 const routeProfileMaxAltitudes: RouteProfileMaxAltitudes[] = [500, 300, 200];
 
 const RouteProfileContainer = () => {
-  const { data: routeProfileApiState, isLoading } = useGetRouteProfileStateQuery(null, {
+  const { data: routeProfileApiState, isSuccess: isRouteProfileStateLoaded } = useGetRouteProfileStateQuery(null, {
     refetchOnMountOrArgChange: true,
   });
   const dataLoadTime = useSelector(selectDataLoadTime);
@@ -146,7 +146,7 @@ const RouteProfileContainer = () => {
   ];
 
   return (
-    !isLoading && (
+    isRouteProfileStateLoaded && (
       <div className="route-profile">
         <FetchUserSettings />
         <Dialog
