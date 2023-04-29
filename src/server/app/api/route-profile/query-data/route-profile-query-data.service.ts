@@ -98,6 +98,7 @@ export class RouteProfileQueryDataService {
     }
     if (!pool) pool = new geotiff.Pool();
 
+    console.log('starting db query', new Date().toLocaleTimeString());
     const fileMappings = await repository
       .createQueryBuilder()
       .select([
@@ -110,6 +111,8 @@ export class RouteProfileQueryDataService {
       .orderBy('filename')
       .getRawMany<AggregatedMapping>();
 
+    console.log('end db query', new Date().toLocaleTimeString());
+    // console.log('query result', fileMappings);
     const results = [];
     for (const fileMapping of fileMappings) {
       const data = await this.queryRaster(queryPoints, fileMapping.filename, pool);
@@ -128,6 +131,8 @@ export class RouteProfileQueryDataService {
     }
     if (!pool) pool = new geotiff.Pool();
 
+    console.log('start db query by elevation', new Date().toLocaleTimeString());
+
     const fileMappings = await repository
       .createQueryBuilder()
       .select([
@@ -145,6 +150,8 @@ export class RouteProfileQueryDataService {
       .groupBy('filename')
       .orderBy('filename')
       .getRawMany<AggregatedMapping>();
+    console.log('end db query by evaluation', new Date().toLocaleTimeString());
+    // console.log('query result', fileMappings);
 
     const results = [];
     for (const fileMapping of fileMappings) {

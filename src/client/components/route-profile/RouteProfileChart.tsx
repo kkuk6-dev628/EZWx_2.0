@@ -93,7 +93,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     if (activeRoute) {
       // userSettings.default_distance_unit == true then km, or nm
       const elevationPoints = interpolateRoute(activeRoute, totalNumberOfElevations);
-      if (!queryElevationsResult.isLoading) queryElevations({ queryPoints: elevationPoints });
+      if (!queryElevationsResult.isSuccess) queryElevations({ queryPoints: elevationPoints });
       const count = getSegmentsCount(activeRoute);
       const length = getRouteLength(activeRoute, true);
       setRouteLength(length);

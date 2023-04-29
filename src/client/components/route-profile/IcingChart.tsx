@@ -342,7 +342,7 @@ const IcingChart = (props) => {
           stroke="#AAAAAA"
           data={icingSeries}
           style={{ strokeWidth: 0.1 }}
-          onValueMouseOut={() => setIcingHint(null)}
+          // onValueMouseOut={() => setIcingHint(null)}
           onValueMouseOver={(value) => setIcingHint(value)}
           onValueClick={(value) => setIcingHint(value)}
         ></VerticalRectSeries>
