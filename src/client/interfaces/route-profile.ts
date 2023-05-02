@@ -49,6 +49,7 @@ export interface RouteProfileDataset {
     data: {
       elevation: number;
       value: number;
+      time: string;
     }[];
   }[];
 }

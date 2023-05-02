@@ -200,8 +200,10 @@ const TurbChart = (props) => {
         data={turbSeries}
         style={{ strokeWidth: 0.1 }}
         onValueMouseOut={() => setTurbHint(null)}
-        onValueMouseOver={(value) => setTurbHint(value)}
-        onValueClick={(value) => setTurbHint(value)}
+        onValueMouseOver={(value) =>
+          setTurbHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })
+        }
+        onValueClick={(value) => setTurbHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })}
       ></VerticalRectSeries>
       {turbHint ? (
         <Hint value={turbHint} className="turbulence-tooltip">

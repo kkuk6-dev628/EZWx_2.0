@@ -23,7 +23,7 @@ const transformElevationBands = (response: any[]): RouteProfileDataset[] => {
               if (elevation[0] === 'width' || elevation[0] === 'height') {
                 return;
               }
-              return { elevation: row.elevations[elevation[0]], value: elevation[1][0] };
+              return { elevation: parseInt(row.elevations[elevation[0]]), value: elevation[1][0] };
             })
             .filter((n) => n),
         };
@@ -38,7 +38,7 @@ const transformTimeBands = (response: any[]): RouteProfileDataset[] => {
   const results: RouteProfileDataset[] = response.map((row) => {
     return {
       time: row.time,
-      elevations: row.elevations,
+      elevations: row.elevations.map((el) => parseInt(el)),
       data: row.data.map((seg) => {
         return {
           position: seg.position,
@@ -47,7 +47,7 @@ const transformTimeBands = (response: any[]): RouteProfileDataset[] => {
               if (elevation[0] === 'width' || elevation[0] === 'height') {
                 return;
               }
-              return { elevation: row.elevations[0], value: elevation[1][0], time: row.time[elevation[0]] };
+              return { elevation: parseInt(row.elevations[0]), value: elevation[1][0], time: row.time[elevation[0]] };
             })
             .filter((n) => n),
         };

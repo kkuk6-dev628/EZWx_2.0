@@ -8,6 +8,7 @@ import {
   getSegmentsCount,
   getTimeGradientStops,
   getValueFromDataset,
+  getValueFromDatasetByElevation,
   interpolateRoute,
   totalNumberOfElevations,
 } from './RouteProfileDataLoader';
@@ -111,7 +112,7 @@ const IcingChart = (props) => {
       segments.forEach((segment, index) => {
         const row = [];
         elevations.forEach((elevation) => {
-          const { value: temperature } = getValueFromDataset(
+          const { value: temperature } = getValueFromDatasetByElevation(
             queryTemperatureDataResult.data,
             new Date(segment.arriveTime),
             elevation,
@@ -274,8 +275,8 @@ const IcingChart = (props) => {
             if (routeProfileApiState.icingLayers.includes('Prob')) {
               const probItem = icingProbLegend.reduce((prev, curr) => {
                 const prevDiff = prev.value - prob;
-                const currDiff = prev.value - prob;
-                if (currDiff > 0 && currDiff < prevDiff) {
+                const currDiff = curr.value - prob;
+                if (currDiff > 0 && (prevDiff < 0 || currDiff < prevDiff)) {
                   return curr;
                 }
                 return prev;
@@ -285,8 +286,8 @@ const IcingChart = (props) => {
             } else if (routeProfileApiState.icingLayers.includes('SLD')) {
               const sldItem = icingSldLegend.reduce((prev, curr) => {
                 const prevDiff = prev.value - sld;
-                const currDiff = prev.value - sld;
-                if (currDiff > 0 && currDiff < prevDiff) {
+                const currDiff = curr.value - sld;
+                if (currDiff > 0 && (prevDiff < 0 || currDiff < prevDiff)) {
                   return curr;
                 }
                 return prev;
@@ -339,12 +340,17 @@ const IcingChart = (props) => {
       {icingSeries && (
         <VerticalRectSeries
           colorType="literal"
-          stroke="#AAAAAA"
+          stroke="#333335"
           data={icingSeries}
           style={{ strokeWidth: 0.1 }}
           // onValueMouseOut={() => setIcingHint(null)}
-          onValueMouseOver={(value) => setIcingHint(value)}
-          onValueClick={(value) => setIcingHint(value)}
+          onValueMouseOver={(value) =>
+            setIcingHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })
+          }
+          onValueClick={(value) => {
+            console.log(value);
+            setIcingHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 });
+          }}
         ></VerticalRectSeries>
       )}
 

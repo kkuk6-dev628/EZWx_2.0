@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { LineSeries, CustomSVGSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
-import { cacheKeys, getRouteLength, getSegmentsCount, getValueFromDataset } from './RouteProfileDataLoader';
+import { cacheKeys, getRouteLength, getSegmentsCount, getValueFromDatasetByElevation } from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';
 import {
   useGetRouteProfileStateQuery,
@@ -90,7 +90,7 @@ const WindChart = () => {
           return;
         }
         for (const el of elevations) {
-          const { value: windSpeed, time: windspeedTime } = getValueFromDataset(
+          const { value: windSpeed, time: windspeedTime } = getValueFromDatasetByElevation(
             dataset,
             new Date(segment.arriveTime),
             el,
@@ -99,13 +99,13 @@ const WindChart = () => {
           if (!windspeedTime) {
             continue;
           }
-          const { value: windDir } = getValueFromDataset(
+          const { value: windDir } = getValueFromDatasetByElevation(
             queryGfsWindDirectionDataResult.data,
             new Date(segment.arriveTime),
             el,
             index,
           );
-          const { value: temperature } = getValueFromDataset(
+          const { value: temperature } = getValueFromDatasetByElevation(
             queryTemperatureDataResult.data,
             new Date(segment.arriveTime),
             el,
@@ -231,7 +231,7 @@ const WindChart = () => {
       segments.forEach((segment, index) => {
         const row = [];
         elevations.forEach((elevation) => {
-          const { value: temperature } = getValueFromDataset(
+          const { value: temperature } = getValueFromDatasetByElevation(
             queryTemperatureDataResult.data,
             new Date(segment.arriveTime),
             elevation,
