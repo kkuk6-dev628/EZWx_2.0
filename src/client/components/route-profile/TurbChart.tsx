@@ -4,6 +4,7 @@ import { VerticalRectSeries, LineSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
   cacheKeys,
+  getMaxForecastTime,
   getRouteLength,
   getSegmentsCount,
   getTimeGradientStops,
@@ -36,15 +37,6 @@ export const colorsByEdr = {
   na: '#333',
 };
 
-function getMaxForecastTime(): Date {
-  const now = new Date();
-  now.setHours(now.getHours() + 18);
-  now.setMinutes(0);
-  now.setSeconds(0);
-  now.setMilliseconds(0);
-  return now;
-}
-
 const TurbChart = (props) => {
   const activeRoute = useSelector(selectActiveRoute);
   const userSettings = useSelector(selectSettings);
@@ -65,9 +57,10 @@ const TurbChart = (props) => {
       const routeLength = getRouteLength(activeRoute, true);
       const segmentCount = getSegmentsCount(activeRoute);
       const segmentLength = routeLength / segmentCount;
+      const maxForecastTime = getMaxForecastTime(queryCaturbDataResult.data);
       const turbData = [];
       let existTurbulence = false;
-      if (observationTime > getMaxForecastTime().getTime()) {
+      if (observationTime > maxForecastTime.getTime()) {
         setNoForecast(true);
         setNoDepicted(false);
         setTurbSeries([]);
@@ -84,7 +77,7 @@ const TurbChart = (props) => {
           let color = colorsByEdr.none;
           let category = 'None';
           let opacity = 0.5;
-          if (segment.arriveTime > getMaxForecastTime().getTime()) {
+          if (segment.arriveTime > maxForecastTime.getTime()) {
             category = 'N/A';
             color = colorsByEdr.na;
             edr = null;

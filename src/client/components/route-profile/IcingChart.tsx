@@ -4,6 +4,8 @@ import { VerticalRectSeries, LineSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
   cacheKeys,
+  getMaxForecastElevation,
+  getMaxForecastTime,
   getRouteLength,
   getSegmentsCount,
   getTimeGradientStops,
@@ -43,7 +45,7 @@ const icingProbLegend = [
   { value: 10, color: '#FFFFFF00', label: '10' },
   { value: 20, color: '#9AFFCD', label: '20' },
   { value: 30, color: '#9AFF66', label: '30' },
-  { value: 40, color: 'CDFF66', label: '40' },
+  { value: 40, color: '#CDFF66', label: '40' },
   { value: 50, color: '#FFFF00', label: '50' },
   { value: 60, color: '#FFCD00', label: '60' },
   { value: 70, color: '#FF9A00', label: '70' },
@@ -93,6 +95,7 @@ const IcingChart = (props) => {
   const [icingHint, setIcingHint] = useState(null);
 
   const segments = useSelector(selectRouteSegments);
+
   function buildTemperatureContourSeries() {
     if (queryTemperatureDataResult.isSuccess && segments.length > 0) {
       const segmentCount = getSegmentsCount(activeRoute);
@@ -199,15 +202,6 @@ const IcingChart = (props) => {
     routeProfileApiState.maxAltitude,
   ]);
 
-  function getMaxForecastTime(): Date {
-    const now = new Date();
-    now.setHours(now.getHours() + 18);
-    now.setMinutes(0);
-    now.setSeconds(0);
-    now.setMilliseconds(0);
-    return now;
-  }
-
   function buildIcingSeries() {
     if (queryIcingProbDataResult.isSuccess && queryIcingSevDataResult.isSuccess && queryIcingSldDataResult.isSuccess) {
       const routeLength = getRouteLength(activeRoute, true);
@@ -215,7 +209,9 @@ const IcingChart = (props) => {
       const segmentLength = routeLength / segmentCount;
       const icingData = [];
       const existIcing = false;
-      if (observationTime > getMaxForecastTime().getTime()) {
+      const maxForecastTime = getMaxForecastTime(queryIcingProbDataResult.data);
+      const maxForecastElevation = getMaxForecastElevation(queryIcingProbDataResult.data);
+      if (observationTime > maxForecastTime.getTime()) {
         setNoForecast(true);
         setNoDepicted(false);
         setIcingSeries(null);
@@ -223,15 +219,17 @@ const IcingChart = (props) => {
       }
       setNoForecast(false);
       segments.forEach((segment, index) => {
-        const maxElevation =
-          routeProfileApiState.maxAltitude === 500 ? 45000 : routeProfileApiState.maxAltitude === 300 ? 27000 : 18000;
+        const maxElevation = Math.min(
+          routeProfileApiState.maxAltitude === 500 ? 45000 : routeProfileApiState.maxAltitude === 300 ? 27000 : 18000,
+          maxForecastElevation,
+        );
         for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
           let time;
           let color = colorsByEdr.none;
           let opacity = 1;
           const severity = 'None';
           let hint;
-          if (segment.arriveTime > getMaxForecastTime().getTime()) {
+          if (segment.arriveTime > maxForecastTime.getTime()) {
             color = '#333';
             hint = {
               time: segment.arriveTime,
@@ -268,7 +266,6 @@ const IcingChart = (props) => {
               }
             }
             if (!sevData) {
-              console.log('Sev data invalid', sev);
               sevData = icingSevLegend[0];
             }
 
@@ -302,7 +299,7 @@ const IcingChart = (props) => {
             hint = {
               time: provTime ? provTime : segment.arriveTime,
               altitude: elevation,
-              prob: prob + ' %',
+              prob: prob !== null ? prob + ' %' : 'None',
               sev: sevData.label,
               sld: sld ? sld + ' %' : 'None',
             };
@@ -343,14 +340,11 @@ const IcingChart = (props) => {
           stroke="#333335"
           data={icingSeries}
           style={{ strokeWidth: 0.1 }}
-          // onValueMouseOut={() => setIcingHint(null)}
+          onValueMouseOut={() => setIcingHint(null)}
           onValueMouseOver={(value) =>
             setIcingHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })
           }
-          onValueClick={(value) => {
-            console.log(value);
-            setIcingHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 });
-          }}
+          onValueClick={(value) => setIcingHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })}
         ></VerticalRectSeries>
       )}
 
@@ -369,12 +363,43 @@ const IcingChart = (props) => {
             color={color}
             curve={'curveBasisOpen'}
             strokeWidth={strokeWidth}
+            style={{ pointerEvents: 'none' }}
           />
         );
       })}
       {contourLabelData.length > 0 ? (
         <LabelSeries animation allowOffsetToBeReversed data={contourLabelData}></LabelSeries>
       ) : null}
+      {noDepicted && (
+        <LabelSeries
+          style={{ fontSize: 22, fontWeight: 900, strokeWidth: 1, fill: 'red', stroke: 'white' }}
+          data={[
+            {
+              x: getRouteLength(activeRoute, !userSettings.default_distance_unit) / 2,
+              y: routeProfileApiState.maxAltitude * 100 - 10000,
+              label: 'No icing forecast depicted for this departure time',
+              style: {
+                textAnchor: 'middle',
+              },
+            },
+          ]}
+        ></LabelSeries>
+      )}
+      {noForecast && (
+        <LabelSeries
+          style={{ fontSize: 22, fontWeight: 900, strokeWidth: 1, fill: 'red', stroke: 'white' }}
+          data={[
+            {
+              x: getRouteLength(activeRoute, !userSettings.default_distance_unit) / 2,
+              y: routeProfileApiState.maxAltitude * 100 - 10000,
+              label: 'No icing forecast available for this departure time',
+              style: {
+                textAnchor: 'middle',
+              },
+            },
+          ]}
+        ></LabelSeries>
+      )}
       {icingHint ? (
         <Hint value={icingHint} className="icing-tooltip">
           <span>

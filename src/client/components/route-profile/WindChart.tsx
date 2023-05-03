@@ -54,9 +54,6 @@ const WindChart = () => {
     refetchOnMountOrArgChange: true,
   });
   const segments = useSelector(selectRouteSegments);
-  const [routeLength, setRouteLength] = useState(0);
-  const [startMargin, setStartMargin] = useState(0);
-  const [endMargin, setEndMargin] = useState(0);
 
   const [windSpeedSeries, setWindSpeedSeries] = useState([]);
   const [windHintValue, setWindHintValue] = useState(null);
@@ -75,12 +72,7 @@ const WindChart = () => {
   });
 
   function buildWindSeries() {
-    if (
-      queryGfsWindSpeedDataResult.isSuccess &&
-      queryGfsWindDirectionDataResult.isSuccess &&
-      queryTemperatureDataResult.isSuccess &&
-      segments.length > 0
-    ) {
+    if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess && segments.length > 0) {
       const windSpeedData = [];
       const dataset = queryGfsWindSpeedDataResult.data;
       segments.forEach((segment, index) => {
@@ -122,9 +114,6 @@ const WindChart = () => {
               backgroundColor = 'red';
             }
           }
-          const gfsTemp = userSettings.default_temperature_unit ? celsiusToFahrenheit(temperature, 1) : temperature;
-          const stdTemp = getStandardTemp(el, userSettings.default_temperature_unit);
-          const departure = round(gfsTemp - stdTemp, 1);
           const windText =
             routeProfileApiState.windLayer === 'Windspeed' ? Math.round(windSpeed) : Math.abs(Math.round(headwind));
           const ry = 10;
@@ -139,7 +128,6 @@ const WindChart = () => {
               windDir: Math.round(windDir),
               course: Math.round(segment.course),
               temp: temperature,
-              departureTemp: departure,
             },
             customComponent: (_row, _positionInPixels) => {
               return (
@@ -219,6 +207,11 @@ const WindChart = () => {
 
   function buildTemperatureContourSeries() {
     if (queryTemperatureDataResult.isSuccess && segments.length > 0) {
+      const segmentCount = getSegmentsCount(activeRoute);
+      const routeLength = getRouteLength(activeRoute, true);
+      const startMargin = segmentCount ? routeLength / segmentCount / 2 : 0;
+      const endMargin = segmentCount ? routeLength / segmentCount / 2 : 0;
+
       const matrixData: number[][] = [];
       const xs = [-startMargin, ...segments.map((segment) => segment.accDistance), routeLength + endMargin];
       const elevations = Array.from({ length: 50 }, (_value, index) => index * 1000);
@@ -312,19 +305,6 @@ const WindChart = () => {
     routeProfileApiState.maxAltitude,
   ]);
 
-  useEffect(() => {
-    if (activeRoute) {
-      // userSettings.default_distance_unit == true then km, or nm
-      const count = getSegmentsCount(activeRoute);
-      const length = getRouteLength(activeRoute, true);
-      setRouteLength(length);
-      const start = count ? length / count / 2 : 0;
-      const end = count ? length / count / 2 : 0;
-      setStartMargin(start);
-      setEndMargin(end);
-    }
-  }, [activeRoute]);
-
   return (
     <RouteProfileChart showDayNightBackground={true}>
       {temperatureContures.map((contourLine, index) => {
@@ -352,7 +332,14 @@ const WindChart = () => {
         <CustomSVGSeries
           customComponent="square"
           data={windSpeedSeries}
-          onValueMouseOver={(value) => setWindHintValue(value)}
+          onValueMouseOver={(value) => {
+            const gfsTemp = userSettings.default_temperature_unit
+              ? celsiusToFahrenheit(value.tooltip.temp, 1)
+              : value.tooltip.temp;
+            const stdTemp = getStandardTemp(value.y, userSettings.default_temperature_unit);
+            value.tooltip.departureTemp = round(gfsTemp - stdTemp, 1);
+            setWindHintValue(value);
+          }}
           onValueMouseOut={() => setWindHintValue(null)}
         ></CustomSVGSeries>
       ) : null}

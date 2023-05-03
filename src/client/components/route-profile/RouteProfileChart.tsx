@@ -240,22 +240,23 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           }}
           onValueMouseOut={() => setTimeHint(null)}
           data={Array.from({ length: segmentsCount + 1 }, (_value, index) => {
-            return {
-              x: Math.round((index * routeLength) / segmentsCount),
-              y: 0,
-              yOffset: 36,
-              segment: segments[index],
-              label: userSettings.default_time_display_unit
-                ? segments[index].departureTime.time
-                : simpleTimeOnlyFormat(new Date(segments[index].arriveTime), false),
-              style: {
-                fill: 'white',
-                dominantBaseline: 'text-after-edge',
-                textAnchor: 'start',
-                fontSize: 11,
-                fontWeight: 600,
-              },
-            };
+            if (segments[index])
+              return {
+                x: Math.round((index * routeLength) / segmentsCount),
+                y: 0,
+                yOffset: 36,
+                segment: segments[index],
+                label: userSettings.default_time_display_unit
+                  ? segments[index].departureTime.time
+                  : simpleTimeOnlyFormat(new Date(segments[index].arriveTime), false),
+                style: {
+                  fill: 'white',
+                  dominantBaseline: 'text-after-edge',
+                  textAnchor: 'start',
+                  fontSize: 11,
+                  fontWeight: 600,
+                },
+              };
           })}
         />
       ) : null}
