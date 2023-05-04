@@ -80,6 +80,10 @@ export const routeProfileApi = createApi({
       query: (data) => ({ url: '', method: 'Post', body: data }),
       invalidatesTags: ['RouteProfileState'],
     }),
+    queryAirportProperties: builder.mutation({
+      query: (data) => ({ url: 'data/airport-props', method: 'Post', body: data }),
+      transformResponse: transformElevationBands,
+    }),
     queryCaturbData: builder.mutation({
       query: (data) => ({ url: 'data/cat', method: 'Post', body: data }),
       transformResponse: transformElevationBands,

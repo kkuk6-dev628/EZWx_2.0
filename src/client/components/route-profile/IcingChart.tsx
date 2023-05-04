@@ -6,6 +6,7 @@ import {
   cacheKeys,
   getMaxForecastElevation,
   getMaxForecastTime,
+  getMinMaxValueByElevation,
   getRouteLength,
   getSegmentsCount,
   getTimeGradientStops,
@@ -35,10 +36,10 @@ const temperatureContourColors = {
 
 const icingSevLegend = [
   { value: 0, color: '#F6F6F6', label: 'None' },
-  { value: 1, color: '#CEFFFC', label: 'Trace' },
-  { value: 2, color: '#99CEFF', label: 'Light' },
-  { value: 3, color: '#6C9CF2', label: 'Moderate' },
-  { value: 4, color: '#3031FF', label: 'Heavy' },
+  { value: 4, color: '#CEFFFC', label: 'Trace' },
+  { value: 1, color: '#99CEFF', label: 'Light' },
+  { value: 2, color: '#6C9CF2', label: 'Moderate' },
+  { value: 5, color: '#3031FF', label: 'Heavy' },
 ];
 
 const icingProbLegend = [
@@ -106,10 +107,14 @@ const IcingChart = (props) => {
       const matrixData: number[][] = [];
       const xs = [-startMargin, ...segments.map((segment) => segment.accDistance), routeLength + endMargin];
       const elevations = Array.from({ length: 50 }, (_value, index) => index * 1000);
-      // const zs = [-40, -30, -20, -10, 0, 10, 20, 30, 40];
-      const min = routeProfileApiState.maxAltitude === 500 ? -85 : routeProfileApiState.maxAltitude === 300 ? -50 : -25;
+      let { min: min, max: max } = getMinMaxValueByElevation(
+        queryTemperatureDataResult.data,
+        routeProfileApiState.maxAltitude * 100,
+      );
+      min = Math.round(min);
+      max = Math.round(max);
       const step = routeProfileApiState.maxAltitude === 500 ? 5 : routeProfileApiState.maxAltitude === 300 ? 2 : 1;
-      const count = (20 - min) / step + 1;
+      const count = (max - min) / step + 1;
 
       const zs = Array.from({ length: count }, (x, i) => i * step + min);
       segments.forEach((segment, index) => {
@@ -239,24 +244,28 @@ const IcingChart = (props) => {
               sld: 'None',
             };
           } else {
-            const { value: prob, time: provTime } = getValueFromDataset(
+            let { value: prob, time: provTime } = getValueFromDataset(
               queryIcingProbDataResult.data,
               new Date(segment.arriveTime),
               elevation,
               index,
             );
-            const { value: sld, time: sldTime } = getValueFromDataset(
+            prob = Math.round(prob);
+            provTime = provTime ?? new Date(segment.arriveTime);
+            let { value: sld } = getValueFromDataset(
               queryIcingSldDataResult.data,
               new Date(segment.arriveTime),
               elevation,
               index,
             );
-            const { value: sev, time: sevTime } = getValueFromDataset(
+            sld = Math.round(sld);
+            let { value: sev } = getValueFromDataset(
               queryIcingSevDataResult.data,
               new Date(segment.arriveTime),
               elevation,
               index,
             );
+            sev = Math.round(sev);
 
             let sevData;
             for (const sevItem of icingSevLegend) {
@@ -297,7 +306,7 @@ const IcingChart = (props) => {
             }
 
             hint = {
-              time: provTime ? provTime : segment.arriveTime,
+              time: provTime,
               altitude: elevation,
               prob: prob !== null ? prob + ' %' : 'None',
               sev: sevData.label,

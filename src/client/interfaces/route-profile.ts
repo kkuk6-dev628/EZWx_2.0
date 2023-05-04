@@ -1,3 +1,5 @@
+import { RoutePoint } from './route';
+
 export type RouteProfileChartType = 'Wind' | 'Clouds' | 'Icing' | 'Turb';
 
 export type RouteProfileWindDataType = 'Windspeed' | 'Head/tailwind';
@@ -66,4 +68,6 @@ export interface RouteSegment {
     minute: number;
   };
   course: number;
+  airport?: RoutePoint;
+  isRoutePoint: boolean;
 }

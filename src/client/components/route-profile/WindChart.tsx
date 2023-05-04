@@ -2,7 +2,13 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { LineSeries, CustomSVGSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
-import { cacheKeys, getRouteLength, getSegmentsCount, getValueFromDatasetByElevation } from './RouteProfileDataLoader';
+import {
+  cacheKeys,
+  getMinMaxValueByElevation,
+  getRouteLength,
+  getSegmentsCount,
+  getValueFromDatasetByElevation,
+} from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';
 import {
   useGetRouteProfileStateQuery,
@@ -215,10 +221,14 @@ const WindChart = () => {
       const matrixData: number[][] = [];
       const xs = [-startMargin, ...segments.map((segment) => segment.accDistance), routeLength + endMargin];
       const elevations = Array.from({ length: 50 }, (_value, index) => index * 1000);
-      // const zs = [-40, -30, -20, -10, 0, 10, 20, 30, 40];
-      const min = routeProfileApiState.maxAltitude === 500 ? -85 : routeProfileApiState.maxAltitude === 300 ? -50 : -25;
+      let { min: min, max: max } = getMinMaxValueByElevation(
+        queryTemperatureDataResult.data,
+        routeProfileApiState.maxAltitude * 100,
+      );
+      min = Math.round(min);
+      max = Math.round(max);
       const step = routeProfileApiState.maxAltitude === 500 ? 5 : routeProfileApiState.maxAltitude === 300 ? 2 : 1;
-      const count = (20 - min) / step + 1;
+      const count = (max - min) / step + 1;
 
       const zs = Array.from({ length: count }, (x, i) => i * step + min);
       segments.forEach((segment, index) => {

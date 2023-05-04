@@ -41,6 +41,7 @@ import { selectLayerControlState, setLayerControlState } from '../../../../store
 import { useDispatch } from 'react-redux';
 import { selectAuth } from '../../../../store/auth/authSlice';
 import { useGetUserSettingsQuery } from '../../../../store/user/userSettingsApi';
+import { useGetAirportQuery } from '../../../../store/route/airportApi';
 
 interface IProps {
   children?: ReactElement[];
@@ -77,6 +78,8 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
       refetch();
     };
   }
+
+  const { isSuccess: isLoadedAirports, data: airportsTable } = useGetAirportQuery('');
 
   const map = useMap();
 
@@ -220,9 +223,9 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                 const stationId = prompt('Input Station ID');
                 const markers = new FeatureGroup();
                 //@ts-ignore
-                meteoLayers.metar.eachLayer((layer) => {
-                  if (layer.feature.properties.faaid == stationId) {
-                    const coords = layer.feature.geometry.coordinates;
+                airportsTable.map((airport) => {
+                  if (airport.key == stationId) {
+                    const coords = airport.position.coordinates;
                     const marker = new CircleMarker([coords[1], coords[0]]);
                     markers.addLayer(marker);
                   }

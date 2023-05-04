@@ -18,6 +18,7 @@ import {
   getSegmentsCount,
   getTimeGradientStops,
   interpolateRoute,
+  interpolateRouteWithStation,
   totalNumberOfElevations,
 } from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';
@@ -27,6 +28,7 @@ import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import { convertTimeFormat, meterToFeet, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
 import { nauticalMilesToKilometers } from '../../fly-js/src/helpers/converters/DistanceConverter';
 import * as flyjs from '../../fly-js/fly';
+import { useGetAirportQuery } from '../../store/route/airportApi';
 
 export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
   if (viewWidth < 900) {
@@ -58,6 +60,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   const [endMargin, setEndMargin] = useState(0);
   const [viewW, setViewW] = useState<number>(window.innerWidth);
   const [viewH, setViewH] = useState<number>(window.innerHeight);
+  const [airportLabelSeries, setAirportLabelSeries] = useState(null);
 
   const [elevationHint, setElevationHint] = useState(null);
   const [showElevationHint, setShowElevationHint] = useState(false);
@@ -74,6 +77,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       }));
       const stops = getTimeGradientStops(times);
       setGradientStops(stops);
+      buildAirportLabelSeries();
     }
   }, [segments]);
 
@@ -88,6 +92,29 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     setViewW(window.innerWidth);
     setViewH(window.innerHeight);
   };
+
+  function buildAirportLabelSeries() {
+    if (segments.length > 0) {
+      const labelStyle = {
+        fill: 'green',
+        dominantBaseline: 'text-after-edge',
+        textAnchor: 'start',
+        fontSize: 13,
+        fontWeight: 600,
+      };
+      const airportLabels = segments.map((seg) => {
+        return {
+          x: seg.accDistance,
+          y: 0,
+          yOffset: seg.isRoutePoint ? 24 : 36,
+          label: seg.airport ? seg.airport.key : null,
+          style: labelStyle,
+        };
+      });
+      console.log('airport labels', airportLabels);
+      setAirportLabelSeries(airportLabels);
+    }
+  }
 
   useEffect(() => {
     if (activeRoute) {
@@ -128,7 +155,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       width={calcChartWidth(viewW, viewH)}
       yDomain={[0, routeProfileApiState.maxAltitude * 100]}
       xDomain={[-startMargin, routeLength + endMargin]}
-      margin={{ right: 40 }}
+      margin={{ right: 40, bottom: 80 }}
     >
       {props.showDayNightBackground && (
         <GradientDefs>
@@ -195,7 +222,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
               userSettings.default_distance_unit ? flyjs.nauticalMilesTo('Kilometers', distInMile, 0) : distInMile,
             );
             return (
-              <tspan className="chart-label">
+              <tspan dy="3.6em" className="chart-label">
                 <tspan className="chart-label-dist">{dist}</tspan>
               </tspan>
             );
@@ -205,7 +232,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         style={{
           line: { stroke: '#ADDDE100' },
           ticks: { stroke: '#ADDDE100' },
-          text: { stroke: 'none', fill: 'white', fontWeight: 600 },
+          text: { stroke: 'none', fill: 'white', fontWeight: 600, marginTop: 36 },
         }}
       />
       <YAxis
@@ -244,7 +271,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
               return {
                 x: Math.round((index * routeLength) / segmentsCount),
                 y: 0,
-                yOffset: 36,
+                yOffset: 72,
                 segment: segments[index],
                 label: userSettings.default_time_display_unit
                   ? segments[index].departureTime.time
@@ -260,6 +287,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           })}
         />
       ) : null}
+      {airportLabelSeries && <LabelSeries data={airportLabelSeries} />}
       {props.children}
       {activeRoute ? (
         <LineSeries
