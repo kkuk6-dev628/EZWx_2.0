@@ -42,14 +42,20 @@ const transformTimeBands = (response: any[]): RouteProfileDataset[] => {
       data: row.data.map((seg) => {
         return {
           position: seg.position,
-          data: Object.entries(seg.data)
-            .map((elevation) => {
-              if (elevation[0] === 'width' || elevation[0] === 'height') {
-                return;
-              }
-              return { elevation: parseInt(row.elevations[0]), value: elevation[1][0], time: row.time[elevation[0]] };
-            })
-            .filter((n) => n),
+          data: seg.data
+            ? Object.entries(seg.data)
+                .map((elevation) => {
+                  if (elevation[0] === 'width' || elevation[0] === 'height') {
+                    return;
+                  }
+                  return {
+                    elevation: parseInt(row.elevations[0]),
+                    value: elevation[1][0],
+                    time: row.time[elevation[0]],
+                  };
+                })
+                .filter((n) => n)
+            : null,
         };
       }),
     };
@@ -82,7 +88,7 @@ export const routeProfileApi = createApi({
     }),
     queryAirportProperties: builder.mutation({
       query: (data) => ({ url: 'data/airport-props', method: 'Post', body: data }),
-      transformResponse: transformElevationBands,
+      // transformResponse: transformElevationBands,
     }),
     queryCaturbData: builder.mutation({
       query: (data) => ({ url: 'data/cat', method: 'Post', body: data }),
@@ -120,6 +126,58 @@ export const routeProfileApi = createApi({
       query: (data) => ({ url: 'data/icing-sld', method: 'Post', body: data }),
       transformResponse: transformElevationBands,
     }),
+    queryNbmCloudbase: builder.mutation({
+      query: (data) => ({ url: 'data/nbm-cloudbase', method: 'Post', body: data }),
+      transformResponse: transformTimeBands,
+    }),
+    queryNbmCloudCeiling: builder.mutation({
+      query: (data) => ({ url: 'data/nbm-cloudceiling', method: 'Post', body: data }),
+      transformResponse: transformTimeBands,
+    }),
+    queryNbmDewpoint: builder.mutation({
+      query: (data) => ({ url: 'data/nbm-dewpoint', method: 'Post', body: data }),
+      transformResponse: transformTimeBands,
+    }),
+    queryNbmGust: builder.mutation({
+      query: (data) => ({ url: 'data/nbm-gust', method: 'Post', body: data }),
+      transformResponse: transformTimeBands,
+    }),
+    queryNbmSkycover: builder.mutation({
+      query: (data) => ({ url: 'data/nbm-skycover', method: 'Post', body: data }),
+      transformResponse: transformTimeBands,
+    }),
+    queryNbmTemp: builder.mutation({
+      query: (data) => ({ url: 'data/nbm-t2m', method: 'Post', body: data }),
+      transformResponse: transformTimeBands,
+    }),
+    queryNbmVis: builder.mutation({
+      query: (data) => ({ url: 'data/nbm-vis', method: 'Post', body: data }),
+      transformResponse: transformTimeBands,
+    }),
+    queryNbmWindDir: builder.mutation({
+      query: (data) => ({ url: 'data/nbm-winddirection', method: 'Post', body: data }),
+      transformResponse: transformTimeBands,
+    }),
+    queryNbmWindSpeed: builder.mutation({
+      query: (data) => ({ url: 'data/nbm-windspeed', method: 'Post', body: data }),
+      transformResponse: transformTimeBands,
+    }),
+    queryNbmAll: builder.mutation({
+      query: (data) => ({ url: 'data/nbm-all', method: 'Post', body: data }),
+      transformResponse: (response: any) => {
+        return {
+          cloudbase: transformTimeBands(response.cloudbase),
+          cloudceiling: transformTimeBands(response.cloudceiling),
+          dewpoint: transformTimeBands(response.dewpoint),
+          gust: transformTimeBands(response.gust),
+          skycover: transformTimeBands(response.skycover),
+          temperature: transformTimeBands(response.temperature),
+          visibility: transformTimeBands(response.visibility),
+          winddir: transformTimeBands(response.winddir),
+          windspeed: transformTimeBands(response.windspeed),
+        };
+      },
+    }),
   }),
 });
 
@@ -127,6 +185,7 @@ export const {
   useGetRouteProfileStateQuery,
   useLazyGetRouteProfileStateQuery,
   useUpdateRouteProfileStateMutation,
+  useQueryAirportPropertiesMutation,
   useQueryCaturbDataMutation,
   useQueryMwturbDataMutation,
   useQueryHumidityDataMutation,
@@ -136,4 +195,14 @@ export const {
   useQueryIcingProbDataMutation,
   useQueryIcingSevDataMutation,
   useQueryIcingSldDataMutation,
+  useQueryNbmCloudbaseMutation,
+  useQueryNbmCloudCeilingMutation,
+  useQueryNbmDewpointMutation,
+  useQueryNbmGustMutation,
+  useQueryNbmSkycoverMutation,
+  useQueryNbmTempMutation,
+  useQueryNbmVisMutation,
+  useQueryNbmWindDirMutation,
+  useQueryNbmWindSpeedMutation,
+  useQueryNbmAllMutation,
 } = routeProfileApi;

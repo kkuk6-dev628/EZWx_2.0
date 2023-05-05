@@ -25,7 +25,7 @@ import { selectSettings } from '../../store/user/UserSettings';
 import { useGetRouteProfileStateQuery } from '../../store/route-profile/routeProfileApi';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
-import { convertTimeFormat, meterToFeet, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
+import { convertTimeFormat, meterToFeet, round, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
 import { nauticalMilesToKilometers } from '../../fly-js/src/helpers/converters/DistanceConverter';
 import * as flyjs from '../../fly-js/fly';
 import { useGetAirportQuery } from '../../store/route/airportApi';
@@ -107,7 +107,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           x: seg.accDistance,
           y: 0,
           yOffset: seg.isRoutePoint ? 24 : 36,
-          label: seg.airport ? seg.airport.key : null,
+          label: seg.airport ? seg.airport.key : round(seg.position.lat, 2) + '/' + round(seg.position.lng, 2),
           style: labelStyle,
         };
       });

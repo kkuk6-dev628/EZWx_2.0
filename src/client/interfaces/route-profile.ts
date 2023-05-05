@@ -56,6 +56,18 @@ export interface RouteProfileDataset {
   }[];
 }
 
+export interface NbmProperties {
+  cloudbase: number;
+  cloudceiling: number;
+  dewpoint: number;
+  gust: number;
+  skycover: number;
+  temperature: number;
+  visibility: number;
+  winddir: number;
+  windspeed: number;
+}
+
 export interface RouteSegment {
   position: { lat: number; lng: number };
   accDistance: number;
@@ -69,5 +81,7 @@ export interface RouteSegment {
   };
   course: number;
   airport?: RoutePoint;
+  segmentNbmProps: NbmProperties;
+  airportNbmProps?: NbmProperties;
   isRoutePoint: boolean;
 }

@@ -7,8 +7,7 @@ export interface AggregatedMapping {
   elevations: number[];
 }
 
-@Entity('cat_mapping')
-export class ClearAirTurb {
+export abstract class RasterMapping {
   @PrimaryColumn()
   id: number;
 
@@ -24,308 +23,55 @@ export class ClearAirTurb {
   @Column()
   elevation: number;
 }
+
+@Entity('cat_mapping')
+export class ClearAirTurb extends RasterMapping {}
 
 @Entity('mwturb_mapping')
-export class Mwturb {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
+export class Mwturb extends RasterMapping {}
 
 @Entity('gfs_humidity_mapping')
-export class GfsHumidity {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
+export class GfsHumidity extends RasterMapping {}
 
 @Entity('gfs_temperature_mapping')
-export class GfsTemperature {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
+export class GfsTemperature extends RasterMapping {}
 @Entity('gfs_windspeed_mapping')
-export class GfsWindSpeed {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
+export class GfsWindSpeed extends RasterMapping {}
 
 @Entity('gfs_winddirection_mapping')
-export class GfsWindDirection {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
-
+export class GfsWindDirection extends RasterMapping {}
 @Entity('icingprob_mapping')
-export class IcingProb {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
+export class IcingProb extends RasterMapping {}
 
 @Entity('icingsev_mapping')
-export class IcingSev {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
+export class IcingSev extends RasterMapping {}
 
 @Entity('icingsld_mapping')
-export class IcingSld {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
+export class IcingSld extends RasterMapping {}
 
 @Entity('nbm_cloudbase')
-export class NbmCloudbase {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
+export class NbmCloudbase extends RasterMapping {}
 
 @Entity('nbm_cloudceiling')
-export class NbmCloudceiling {
-  @PrimaryColumn()
-  id: number;
+export class NbmCloudceiling extends RasterMapping {}
 
-  @Column()
-  filename: string;
+@Entity('nbm_dewp')
+export class NbmDewpoint extends RasterMapping {}
 
-  @Column()
-  time: string;
+@Entity('nbm_gust')
+export class NbmGust extends RasterMapping {}
 
-  @Column()
-  band: string;
+@Entity('nbm_skycov')
+export class NbmSkycover extends RasterMapping {}
 
-  @Column()
-  elevation: number;
-}
+@Entity('nbm_temp')
+export class NbmT2m extends RasterMapping {}
 
-@Entity('nbm_dewpoint2m_mapping')
-export class NbmDewpoint {
-  @PrimaryColumn()
-  id: number;
+@Entity('nbm_vis')
+export class NbmVis extends RasterMapping {}
 
-  @Column()
-  filename: string;
+@Entity('nbm_wspeed')
+export class NbmWindDirection extends RasterMapping {}
 
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
-
-@Entity('nbm_gust10m_mapping')
-export class NbmGust {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
-
-@Entity('nbm_skycover_mapping')
-export class NbmSkycover {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
-
-@Entity('nbm_tem2m_mapping')
-export class NbmT2m {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
-
-@Entity('nbm_vis_mapping')
-export class NbmVis {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
-
-@Entity('nbm_wd10_mapping')
-export class NbmWindDirection {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
-
-@Entity('nbm_ws10_mapping')
-export class NbmWindSpeed {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  filename: string;
-
-  @Column()
-  time: string;
-
-  @Column()
-  band: string;
-
-  @Column()
-  elevation: number;
-}
+@Entity('nbm_wdir')
+export class NbmWindSpeed extends RasterMapping {}

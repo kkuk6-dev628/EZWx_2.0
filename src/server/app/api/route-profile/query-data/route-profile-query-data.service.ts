@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { FindManyOptions, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource, FindManyOptions, Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import {
   AggregatedMapping,
   ClearAirTurb,
@@ -22,8 +22,9 @@ import {
   NbmWindDirection,
   NbmWindSpeed,
 } from './route-profile.gisdb-entity';
-import { RouteProfileQueryDto } from './route-profile-query.dto';
+import { RouteProfileQueryDto, RouteSegmentsDto } from './route-profile-query.dto';
 import { dynamicImport } from 'tsimportlib';
+import { StationTime } from '../../station-time/station-time.gisdb-entity';
 
 const rasterDataDir = '/data/ingest';
 let geotiff;
@@ -69,6 +70,8 @@ export class RouteProfileQueryDataService {
     private nbmWindDirectionRepository: Repository<NbmWindDirection>,
     @InjectRepository(NbmWindSpeed, 'gisDB')
     private nbmWindSpeedRepository: Repository<NbmWindSpeed>,
+    @InjectDataSource('gisDB')
+    private dataSource: DataSource,
   ) {}
 
   async queryRaster(positions: GeoJSON.Position[], rasterFileName: string, pool) {
@@ -81,6 +84,10 @@ export class RouteProfileQueryDataService {
     const bboxHeight = bbox[3] - bbox[1];
     const results = [];
     for (const position of positions) {
+      if (position === null) {
+        results.push({ position, data: null });
+        continue;
+      }
       const widthPct = (position[0] - bbox[0]) / bboxWidth;
       const heightPct = (position[1] - bbox[1]) / bboxHeight;
       const xPx = Math.floor(pixelWidth * widthPct);
@@ -228,5 +235,18 @@ export class RouteProfileQueryDataService {
 
   async queryNbmWindSpeed(query: RouteProfileQueryDto) {
     return await this.queryRasterDataset(query.queryPoints, this.nbmWindSpeedRepository);
+  }
+
+  async queryAllNbmValues(query: RouteProfileQueryDto) {
+    const cloudbase = await this.queryRasterDataset(query.queryPoints, this.nbmCloudBaseRepository);
+    const cloudceiling = await this.queryRasterDataset(query.queryPoints, this.nbmCloudCeilingRepository);
+    const dewpoint = await this.queryRasterDataset(query.queryPoints, this.nbmDewpointRepository);
+    const gust = await this.queryRasterDataset(query.queryPoints, this.nbmGustRepository);
+    const skycover = await this.queryRasterDataset(query.queryPoints, this.nbmSkycoverRepository);
+    const temperature = await this.queryRasterDataset(query.queryPoints, this.nbmT2mRepository);
+    const visibility = await this.queryRasterDataset(query.queryPoints, this.nbmVisRepository);
+    const winddir = await this.queryRasterDataset(query.queryPoints, this.nbmWindDirectionRepository);
+    const windspeed = await this.queryRasterDataset(query.queryPoints, this.nbmWindSpeedRepository);
+    return { cloudbase, cloudceiling, dewpoint, gust, skycover, temperature, visibility, winddir, windspeed };
   }
 }

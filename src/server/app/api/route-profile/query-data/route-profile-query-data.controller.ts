@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { RouteProfileQueryDataService } from './route-profile-query-data.service';
-import { RouteProfileQueryDto } from './route-profile-query.dto';
+import { RouteProfileQueryDto, RouteSegmentsDto } from './route-profile-query.dto';
 
 @Controller('api/route-profile/data')
 export class RouteProfileQueryDataController {
@@ -10,7 +10,6 @@ export class RouteProfileQueryDataController {
   cat(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryCat(query);
   }
-
   @Post('mwturb')
   mwturb(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryMwturb(query);
@@ -78,5 +77,9 @@ export class RouteProfileQueryDataController {
   @Post('nbm-windspeed')
   nbmWindSpeed(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryNbmWindSpeed(query);
+  }
+  @Post('nbm-all')
+  nbmAll(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryAllNbmValues(query);
   }
 }
