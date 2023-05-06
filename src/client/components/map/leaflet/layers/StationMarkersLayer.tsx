@@ -8,7 +8,12 @@ import { useSelector } from 'react-redux';
 import Image from 'next/image';
 import SunCalc from 'suncalc';
 
-import { PersonalMinimums, selectPersonalMinimums, selectSettings } from '../../../../store/user/UserSettings';
+import {
+  PersonalMinimums,
+  initialUserSettingsState,
+  selectPersonalMinimums,
+  selectSettings,
+} from '../../../../store/user/UserSettings';
 import {
   StationMarkersLayerItems,
   paneOrders,
@@ -136,7 +141,13 @@ export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): string => {
   return iconUrl;
 };
 
-const getNbmFlightCategory = (feature: GeoJSON.Feature, personalMinimums: PersonalMinimums): string => {
+export const flightCategoryToColor = (flightCategory: string): string => {
+  return initialUserSettingsState.personalMinimumsState[flightCategory]
+    ? initialUserSettingsState.personalMinimumsState[flightCategory].color
+    : 'black';
+};
+
+export const getNbmFlightCategory = (feature: GeoJSON.Feature, personalMinimums: PersonalMinimums): string => {
   const visibility = feature.properties.vis;
   const [catVis] = getMetarVisibilityCategory(visibility, personalMinimums);
   const ceiling = feature.properties.ceil;

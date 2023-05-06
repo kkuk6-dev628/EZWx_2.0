@@ -47,6 +47,10 @@ import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 
 export const totalNumberOfElevations = 512;
 
+export const contourMin = -100;
+
+export const contourMax = 60;
+
 export const SUNSET_SUNRISE = {
   night: {
     start: 20,
@@ -1027,7 +1031,7 @@ const RouteProfileDataLoader = () => {
                 new Date(seg.arriveTime),
                 null,
                 index,
-              ),
+              ).value,
               gust: getValueFromDatasetByElevation(
                 queryNbmAllAirportResult.data.gust,
                 new Date(seg.arriveTime),

@@ -21,14 +21,22 @@ import {
   interpolateRouteWithStation,
   totalNumberOfElevations,
 } from './RouteProfileDataLoader';
-import { selectSettings } from '../../store/user/UserSettings';
+import { initialUserSettingsState, selectSettings } from '../../store/user/UserSettings';
 import { useGetRouteProfileStateQuery } from '../../store/route-profile/routeProfileApi';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
-import { convertTimeFormat, meterToFeet, round, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
+import {
+  convertTimeFormat,
+  getMetarCeilingCategory,
+  getMetarVisibilityCategory,
+  meterToFeet,
+  round,
+  simpleTimeOnlyFormat,
+} from '../map/common/AreoFunctions';
 import { nauticalMilesToKilometers } from '../../fly-js/src/helpers/converters/DistanceConverter';
 import * as flyjs from '../../fly-js/fly';
 import { useGetAirportQuery } from '../../store/route/airportApi';
+import { flightCategoryToColor, getNbmFlightCategory } from '../map/leaflet/layers/StationMarkersLayer';
 
 export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
   if (viewWidth < 900) {
@@ -44,6 +52,26 @@ export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
     return viewHeight - 240;
   }
 };
+
+function getFlightCategoryColor(visibility, ceiling): string {
+  const [catVis] = getMetarVisibilityCategory(visibility, initialUserSettingsState.personalMinimumsState);
+  const [catCeiling] = getMetarCeilingCategory(ceiling, initialUserSettingsState.personalMinimumsState);
+  const categories = Object.keys(initialUserSettingsState.personalMinimumsState);
+  const indexVis = categories.indexOf(catVis);
+  const indexCeiling = categories.indexOf(catCeiling);
+  let indexFinalCat: number;
+  if (indexCeiling > -1 && indexVis > -1) {
+    indexFinalCat = Math.min(indexCeiling, indexVis);
+  } else if (indexCeiling > -1) {
+    indexFinalCat = -1;
+  } else if (indexVis > -1) {
+    indexFinalCat = indexVis;
+  } else {
+    indexFinalCat = -1;
+  }
+  const finalCat = indexFinalCat > -1 ? categories[indexFinalCat] : 'Black';
+  return flightCategoryToColor(finalCat);
+}
 
 const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground: boolean }) => {
   const activeRoute = useSelector(selectActiveRoute);
@@ -65,6 +93,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   const [elevationHint, setElevationHint] = useState(null);
   const [showElevationHint, setShowElevationHint] = useState(false);
   const [timeHint, setTimeHint] = useState(null);
+  const [airportHint, setAirportHint] = useState(null);
 
   const [gradientStops, setGradientStops] = useState([]);
 
@@ -95,20 +124,34 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
 
   function buildAirportLabelSeries() {
     if (segments.length > 0) {
-      const labelStyle = {
-        fill: 'green',
-        dominantBaseline: 'text-after-edge',
-        textAnchor: 'start',
-        fontSize: 13,
-        fontWeight: 600,
-      };
+      let tooltip = null;
       const airportLabels = segments.map((seg) => {
+        const labelStyle = {
+          fill: 'green',
+          dominantBaseline: 'text-after-edge',
+          textAnchor: 'start',
+          fontSize: 13,
+          fontWeight: 600,
+        };
+        if (seg.airportNbmProps) {
+          labelStyle.fill = getFlightCategoryColor(seg.airportNbmProps.visibility, seg.airportNbmProps.cloudceiling);
+          tooltip = {
+            time: seg.arriveTime,
+            clouds: seg.airportNbmProps.cloudbase,
+            visibility: seg.airportNbmProps.visibility,
+            windspeed: seg.airportNbmProps.windspeed,
+            winddir: seg.airportNbmProps.winddir,
+            temperature: seg.airportNbmProps.temperature,
+            dewpoint: seg.airportNbmProps.dewpoint,
+          };
+        }
         return {
           x: seg.accDistance,
           y: 0,
           yOffset: seg.isRoutePoint ? 24 : 36,
           label: seg.airport ? seg.airport.key : round(seg.position.lat, 2) + '/' + round(seg.position.lng, 2),
           style: labelStyle,
+          tooltip: tooltip,
         };
       });
       console.log('airport labels', airportLabels);
@@ -265,6 +308,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           onValueMouseOver={(value) => {
             setTimeHint(value);
           }}
+          onValueClick={(value) => setTimeHint(value)}
           onValueMouseOut={() => setTimeHint(null)}
           data={Array.from({ length: segmentsCount + 1 }, (_value, index) => {
             if (segments[index])
@@ -287,7 +331,14 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           })}
         />
       ) : null}
-      {airportLabelSeries && <LabelSeries data={airportLabelSeries} />}
+      {airportLabelSeries && (
+        <LabelSeries
+          data={airportLabelSeries}
+          onValueMouseOver={(value) => setAirportHint(value)}
+          onValueClick={(value) => setAirportHint(value)}
+          onValueMouseOut={() => setAirportHint(null)}
+        />
+      )}
       {props.children}
       {activeRoute ? (
         <LineSeries
@@ -319,6 +370,31 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           <span>{timeHint.segment.departureTime.full}</span>
           <span>{convertTimeFormat(timeHint.segment.arriveTime, true)}</span>
           <span>{convertTimeFormat(timeHint.segment.arriveTime, false)}</span>
+        </Hint>
+      ) : null}
+      {airportHint && airportHint.tooltip ? (
+        <Hint value={airportHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
+          <span>
+            <b>Time:</b>&nbsp;{convertTimeFormat(airportHint.tooltip.time, false)}
+          </span>
+          <span>
+            <b>Clouds:</b>&nbsp;{airportHint.tooltip.clouds}
+          </span>
+          <span>
+            <b>Visibility:</b>&nbsp;{airportHint.tooltip.visibility}
+          </span>
+          <span>
+            <b>Wind speed:</b>&nbsp;{airportHint.tooltip.windspeed}
+          </span>
+          <span>
+            <b>Wind direction:</b>&nbsp;{airportHint.tooltip.winddir}
+          </span>
+          <span>
+            <b>temperature:</b>&nbsp;{airportHint.tooltip.temperature}
+          </span>
+          <span>
+            <b>Dewpoint:</b>&nbsp;{airportHint.tooltip.dewpoint}
+          </span>
         </Hint>
       ) : null}
     </XYPlot>

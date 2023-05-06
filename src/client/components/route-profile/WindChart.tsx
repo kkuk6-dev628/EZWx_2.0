@@ -4,6 +4,8 @@ import { LineSeries, CustomSVGSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
   cacheKeys,
+  contourMax,
+  contourMin,
   getMinMaxValueByElevation,
   getRouteLength,
   getSegmentsCount,
@@ -225,8 +227,8 @@ const WindChart = () => {
         queryTemperatureDataResult.data,
         routeProfileApiState.maxAltitude * 100,
       );
-      min = Math.round(min);
-      max = Math.round(max);
+      min = Math.round(Math.max(min, contourMin));
+      max = Math.round(Math.min(max, contourMax));
       const step = routeProfileApiState.maxAltitude === 500 ? 5 : routeProfileApiState.maxAltitude === 300 ? 2 : 1;
       const count = (max - min) / step + 1;
 

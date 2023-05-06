@@ -70,8 +70,8 @@ export class NbmT2m extends RasterMapping {}
 @Entity('nbm_vis')
 export class NbmVis extends RasterMapping {}
 
-@Entity('nbm_wspeed')
+@Entity('nbm_wdir')
 export class NbmWindDirection extends RasterMapping {}
 
-@Entity('nbm_wdir')
+@Entity('nbm_wspeed')
 export class NbmWindSpeed extends RasterMapping {}
