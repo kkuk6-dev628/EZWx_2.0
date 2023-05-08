@@ -988,7 +988,8 @@ const RouteProfileDataLoader = () => {
     }, initialSegment);
 
     const airportPoints = segments.map((seg) => (seg.airport ? seg.airport.position.coordinates : null));
-    if (!queryNbmAllAirportResult.isSuccess) queryNbmAllAirports({ queryPoints: airportPoints });
+    if (!queryNbmAllAirportResult.isSuccess && !queryNbmAllAirportResult.isLoading)
+      queryNbmAllAirports({ queryPoints: airportPoints });
     dispatch(setRouteSegments(segments));
   }
   useEffect(() => {
