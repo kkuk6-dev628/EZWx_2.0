@@ -222,10 +222,22 @@ const RouteProfileContainer = () => {
                 <div className="select-data-type">
                   <ToggleButtonGroup
                     value={routeProfileState.icingLayers}
-                    onChange={(_, value) => {
-                      handleUpdateState({ ...routeProfileState, icingLayers: value });
-                    }}
                     aria-label="Icing Data Layers"
+                    onChange={(_, values: RouteProfileIcingDataType[]) => {
+                      const newValues = values.filter((item) => !routeProfileState.icingLayers.includes(item));
+                      if (newValues.length > 0) {
+                        if (newValues.includes(routeProfileIcingDataTypes.prob)) {
+                          handleUpdateState({ ...routeProfileState, icingLayers: [routeProfileIcingDataTypes.prob] });
+                        } else {
+                          handleUpdateState({
+                            ...routeProfileState,
+                            icingLayers: values.filter((item) => item !== routeProfileIcingDataTypes.prob),
+                          });
+                        }
+                      } else {
+                        handleUpdateState({ ...routeProfileState, icingLayers: values });
+                      }
+                    }}
                   >
                     {Object.entries(routeProfileIcingDataTypes).map(([key, value]) => {
                       return (

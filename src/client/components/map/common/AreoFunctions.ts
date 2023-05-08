@@ -8,6 +8,14 @@ import { db } from '../../caching/dexieDb';
 import { Route, RoutePoint } from '../../../interfaces/route';
 import { route as routeErrorMessages } from '../../lang/messages';
 
+export function degree2radian(degree) {
+  return (degree * Math.PI) / 180;
+}
+
+export function radian2degree(radian) {
+  return (radian * 180) / Math.PI;
+}
+
 export const getAltitudeString = (value: string, isHundred = true, fzlbase?: string, fzltop?: string): string => {
   if (value === 'SFC' || value == '0') {
     return 'Surface';

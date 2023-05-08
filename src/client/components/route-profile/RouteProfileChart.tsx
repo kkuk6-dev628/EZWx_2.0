@@ -27,6 +27,7 @@ import { useQueryElevationApiMutation } from '../../store/route-profile/elevatio
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import {
   convertTimeFormat,
+  degree2radian,
   getMetarCeilingCategory,
   getMetarVisibilityCategory,
   meterToFeet,
@@ -37,6 +38,7 @@ import { nauticalMilesToKilometers } from '../../fly-js/src/helpers/converters/D
 import * as flyjs from '../../fly-js/fly';
 import { useGetAirportQuery } from '../../store/route/airportApi';
 import { flightCategoryToColor, getNbmFlightCategory } from '../map/leaflet/layers/StationMarkersLayer';
+import { MetarSkyValuesToString } from '../map/common/AreoConstants';
 
 export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
   if (viewWidth < 900) {
@@ -125,19 +127,66 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   function buildAirportLabelSeries() {
     if (segments.length > 0) {
       let tooltip = null;
-      const airportLabels = segments.map((seg) => {
+      const airportLabels = segments.map((seg, segmentIndex) => {
         const labelStyle = {
           fill: 'green',
           dominantBaseline: 'text-after-edge',
-          textAnchor: 'start',
-          fontSize: 13,
+          textAnchor: 'middle',
+          fontSize: seg.isRoutePoint ? 14 : 11,
           fontWeight: 600,
         };
         if (seg.airportNbmProps) {
           labelStyle.fill = getFlightCategoryColor(seg.airportNbmProps.visibility, seg.airportNbmProps.cloudceiling);
+          const lowestCloud = seg.airportNbmProps.cloudbase;
+          const ceiling = seg.airportNbmProps.cloudceiling;
+          const skyCover = seg.airportNbmProps.skycover;
+          const skyConditions = [];
+          if (ceiling) {
+            skyConditions.push({
+              skyCover: skyCover >= 88 ? 'OVC' : 'BKN',
+              cloudBase: ceiling,
+            });
+            if (lowestCloud) {
+              skyConditions.push({
+                skyCover: 'SCT',
+                cloudBase: lowestCloud,
+              });
+            }
+          } else if (lowestCloud) {
+            let skyCondition: string;
+            if (skyCover < 6) {
+              skyCondition = 'SKC';
+            } else if (skyCover < 31) {
+              skyCondition = 'FEW';
+            } else {
+              skyCondition = 'SCT';
+            }
+            skyConditions.push({
+              skyCover: skyCondition,
+              cloudBase: lowestCloud,
+            });
+          } else {
+            skyConditions.push({
+              skyCover: 'SKC',
+              cloudBase: 0,
+            });
+          }
+
+          const skyConditionsAsc = skyConditions.sort((a, b) => {
+            return a.cloudBase > b.cloudBase ? 1 : -1;
+          });
+
+          const clouds = skyConditionsAsc.map((skyCondition) => {
+            return MetarSkyValuesToString[skyCondition.skyCover] +
+              ' ' +
+              (['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false)
+              ? skyCondition.cloudBase + ' feet'
+              : null;
+          });
+
           tooltip = {
             time: seg.arriveTime,
-            clouds: seg.airportNbmProps.cloudbase,
+            clouds: clouds.join('\n'),
             visibility: seg.airportNbmProps.visibility,
             windspeed: seg.airportNbmProps.windspeed,
             winddir: seg.airportNbmProps.winddir,
@@ -145,8 +194,26 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             dewpoint: seg.airportNbmProps.dewpoint,
           };
         }
+        let airportDist = 0;
+        if (segmentIndex > 0) {
+          const airportDelta = flyjs.distanceTo(
+            seg.position.lat,
+            seg.position.lng,
+            seg.airport.position.coordinates[1],
+            seg.airport.position.coordinates[0],
+            2,
+          );
+          const airportCourse = flyjs.trueCourse(
+            seg.position.lat,
+            seg.position.lng,
+            seg.airport.position.coordinates[1],
+            seg.airport.position.coordinates[0],
+            2,
+          );
+          airportDist = Math.cos(degree2radian(airportCourse - seg.course)) * airportDelta;
+        }
         return {
-          x: seg.accDistance,
+          x: seg.accDistance + airportDist,
           y: 0,
           yOffset: seg.isRoutePoint ? 24 : 36,
           label: seg.airport ? seg.airport.key : round(seg.position.lat, 2) + '/' + round(seg.position.lng, 2),
@@ -154,7 +221,6 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           tooltip: tooltip,
         };
       });
-      console.log('airport labels', airportLabels);
       setAirportLabelSeries(airportLabels);
     }
   }
@@ -339,8 +405,37 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           onValueMouseOut={() => setAirportHint(null)}
         />
       )}
+      {routeProfileApiState.chartType === 'Wind' && activeRoute ? (
+        <LineSeries
+          data={[
+            { x: 0, y: activeRoute.altitude },
+            { x: routeLength, y: activeRoute.altitude },
+          ]}
+          color="white"
+          strokeWidth={4}
+        />
+      ) : null}
+      {routeProfileApiState.chartType === 'Wind' && activeRoute ? (
+        <LineSeries
+          data={[
+            { x: 0, y: activeRoute.altitude },
+            { x: routeLength, y: activeRoute.altitude },
+          ]}
+          color="magenta"
+        />
+      ) : null}
       {props.children}
-      {activeRoute ? (
+      {routeProfileApiState.chartType !== 'Wind' && activeRoute ? (
+        <LineSeries
+          data={[
+            { x: 0, y: activeRoute.altitude },
+            { x: routeLength, y: activeRoute.altitude },
+          ]}
+          color="white"
+          strokeWidth={4}
+        />
+      ) : null}
+      {routeProfileApiState.chartType !== 'Wind' && activeRoute ? (
         <LineSeries
           data={[
             { x: 0, y: activeRoute.altitude },

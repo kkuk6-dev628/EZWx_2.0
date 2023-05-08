@@ -105,15 +105,16 @@ const IcingChart = (props) => {
       const endMargin = segmentCount ? routeLength / segmentCount / 2 : 0;
 
       const matrixData: number[][] = [];
-      const xs = [-startMargin, ...segments.map((segment) => segment.accDistance), routeLength + endMargin];
+      // const xs = [-startMargin, ...segments.map((segment) => segment.accDistance), routeLength + endMargin];
+      const xs = segments.map((segment) => segment.accDistance);
       const elevations = Array.from({ length: 50 }, (_value, index) => index * 1000);
       let { min: min, max: max } = getMinMaxValueByElevation(
         queryTemperatureDataResult.data,
         routeProfileApiState.maxAltitude * 100,
       );
-      min = Math.round(min);
-      max = Math.round(max);
       const step = routeProfileApiState.maxAltitude === 500 ? 5 : routeProfileApiState.maxAltitude === 300 ? 2 : 1;
+      min = Math.round(min / step) * step;
+      max = Math.round(max / step) * step;
       const count = (max - min) / step + 1;
 
       const zs = Array.from({ length: count }, (x, i) => i * step + min);
@@ -130,11 +131,11 @@ const IcingChart = (props) => {
           row.push(temperature);
         });
         matrixData.push(row);
-        if (index === 0) {
-          matrixData.push(row);
-        } else if (index === segments.length - 1) {
-          matrixData.push(row);
-        }
+        // if (index === 0) {
+        //   matrixData.push(row);
+        // } else if (index === segments.length - 1) {
+        //   matrixData.push(row);
+        // }
       });
       const conrec = new Conrec(null);
       try {
@@ -177,7 +178,8 @@ const IcingChart = (props) => {
               : temperatureContourColors.negative,
           stroke: 'white',
           strokeWidth: 0.1,
-          dominantBaseline: 'text-after-edge',
+          dominantBaseline: 'middle',
+          textAnchor: 'end',
           fontWeight: 900,
         };
         contourLabels.push({
@@ -190,7 +192,7 @@ const IcingChart = (props) => {
           x: maxPos.x,
           y: maxPos.y,
           label,
-          style,
+          style: { ...style, textAnchor: 'start' },
         });
       });
       setContourLabelData(contourLabels);
@@ -236,6 +238,7 @@ const IcingChart = (props) => {
           let hint;
           if (segment.arriveTime > maxForecastTime.getTime()) {
             color = '#333';
+            opacity = 0.5;
             hint = {
               time: segment.arriveTime,
               altitude: elevation,
@@ -288,20 +291,24 @@ const IcingChart = (props) => {
                 return prev;
               });
               color = probItem.color;
-              opacity = prob < 10 ? 0 : 1;
+              opacity = prob < 10 ? 0 : 0.5;
             } else if (routeProfileApiState.icingLayers.includes('SLD')) {
               const sldItem = icingSldLegend.reduce((prev, curr) => {
                 const prevDiff = prev.value - sld;
                 const currDiff = curr.value - sld;
-                if (currDiff > 0 && (prevDiff < 0 || currDiff < prevDiff)) {
+                if (currDiff >= 0 && (prevDiff < 0 || currDiff < prevDiff)) {
                   return curr;
                 }
                 return prev;
               });
               color = sldItem.color;
-              opacity = sld < 10 ? 0 : 1;
+              opacity = sld < 10 ? 0 : 0.5;
+              if (sld < 10 && routeProfileApiState.icingLayers.includes('Sev')) {
+                opacity = sev === 0 ? 0 : 0.5;
+                color = sevData.color;
+              }
             } else if (routeProfileApiState.icingLayers.includes('Sev')) {
-              opacity = sev === 0 ? 0 : 1;
+              opacity = sev === 0 ? 0 : 0.5;
               color = sevData.color;
             }
 
@@ -315,9 +322,9 @@ const IcingChart = (props) => {
           }
           icingData.push({
             x0: Math.round(index * segmentLength - segmentLength / 2),
-            y0: elevation,
+            y0: elevation - 500,
             x: Math.round(index * segmentLength + segmentLength / 2),
-            y: elevation + 1000,
+            y: elevation + 500,
             color: color,
             opacity: opacity,
             hint,
@@ -346,9 +353,9 @@ const IcingChart = (props) => {
       {icingSeries && (
         <VerticalRectSeries
           colorType="literal"
-          stroke="#333335"
+          stroke="#33333500"
           data={icingSeries}
-          style={{ strokeWidth: 0.1 }}
+          style={{ strokeWidth: 0 }}
           onValueMouseOut={() => setIcingHint(null)}
           onValueMouseOver={(value) =>
             setIcingHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })
@@ -356,6 +363,34 @@ const IcingChart = (props) => {
           onValueClick={(value) => setIcingHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })}
         ></VerticalRectSeries>
       )}
+      {noForecast || noDepicted
+        ? [1].map((_) => {
+            const routeLength = getRouteLength(activeRoute, true);
+            const segmentCount = getSegmentsCount(activeRoute);
+            const segmentLength = routeLength / segmentCount;
+
+            return (
+              <VerticalRectSeries
+                colorType="literal"
+                data={[
+                  {
+                    x0: -segmentLength / 2,
+                    x: routeLength + segmentLength / 2,
+                    y0: 1000,
+                    y:
+                      routeProfileApiState.maxAltitude === 500
+                        ? 45000
+                        : routeProfileApiState.maxAltitude === 300
+                        ? 27000
+                        : 18000,
+                    color: '#333',
+                    opacity: 0.5,
+                  },
+                ]}
+              />
+            );
+          })
+        : null}
 
       {temperatureContures.map((contourLine, index) => {
         const color =
@@ -385,7 +420,7 @@ const IcingChart = (props) => {
           data={[
             {
               x: getRouteLength(activeRoute, !userSettings.default_distance_unit) / 2,
-              y: routeProfileApiState.maxAltitude * 100 - 10000,
+              y: (routeProfileApiState.maxAltitude * 100) / 2,
               label: 'No icing forecast depicted for this departure time',
               style: {
                 textAnchor: 'middle',
@@ -400,7 +435,7 @@ const IcingChart = (props) => {
           data={[
             {
               x: getRouteLength(activeRoute, !userSettings.default_distance_unit) / 2,
-              y: routeProfileApiState.maxAltitude * 100 - 10000,
+              y: (routeProfileApiState.maxAltitude * 100) / 2,
               label: 'No icing forecast available for this departure time',
               style: {
                 textAnchor: 'middle',

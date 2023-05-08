@@ -154,9 +154,9 @@ const TurbChart = (props) => {
           }
           turbData.push({
             x0: Math.round(index * segmentLength - segmentLength / 2),
-            y0: elevation,
+            y0: elevation - 500,
             x: Math.round(index * segmentLength + segmentLength / 2),
-            y: elevation + 1000,
+            y: elevation + 500,
             color: color,
             opacity: opacity,
             hint: {
@@ -198,6 +198,34 @@ const TurbChart = (props) => {
         }
         onValueClick={(value) => setTurbHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })}
       ></VerticalRectSeries>
+      {noForecast || noDepicted
+        ? [1].map((_) => {
+            const routeLength = getRouteLength(activeRoute, true);
+            const segmentCount = getSegmentsCount(activeRoute);
+            const segmentLength = routeLength / segmentCount;
+
+            return (
+              <VerticalRectSeries
+                colorType="literal"
+                data={[
+                  {
+                    x0: -segmentLength / 2,
+                    x: routeLength + segmentLength / 2,
+                    y0: 1000,
+                    y:
+                      routeProfileApiState.maxAltitude === 500
+                        ? 45000
+                        : routeProfileApiState.maxAltitude === 300
+                        ? 27000
+                        : 18000,
+                    color: '#333',
+                    opacity: 0.5,
+                  },
+                ]}
+              />
+            );
+          })
+        : null}
       {turbHint ? (
         <Hint value={turbHint} className="turbulence-tooltip">
           <span>
@@ -221,8 +249,8 @@ const TurbChart = (props) => {
           data={[
             {
               x: getRouteLength(activeRoute, !userSettings.default_distance_unit) / 2,
-              y: routeProfileApiState.maxAltitude * 100 - 10000,
-              label: 'No turbulence forecast depicted for this departure time',
+              y: (routeProfileApiState.maxAltitude * 100) / 2,
+              label: 'No turbulence forecast depicted \nfor this departure time',
               style: {
                 textAnchor: 'middle',
               },
@@ -236,8 +264,8 @@ const TurbChart = (props) => {
           data={[
             {
               x: getRouteLength(activeRoute, !userSettings.default_distance_unit) / 2,
-              y: routeProfileApiState.maxAltitude * 100 - 10000,
-              label: 'No turbulence forecast available for this departure time',
+              y: (routeProfileApiState.maxAltitude * 100) / 2,
+              label: 'No turbulence forecast available \nfor this departure time',
               style: {
                 textAnchor: 'middle',
               },
