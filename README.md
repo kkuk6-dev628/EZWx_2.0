@@ -44,3 +44,8 @@ docker-compose exec web yarn typeorm -- --help
 ## Resources
 
 - https://github.com/jmcdo29/testing-nestjs
+
+## Package versions
+
+- Nodejs v16.20.0 is required for Geotiff.js
+  When v20.0.0 is used, it shows error.
