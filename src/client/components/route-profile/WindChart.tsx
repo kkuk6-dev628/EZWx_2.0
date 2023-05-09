@@ -23,6 +23,7 @@ import { celsiusToFahrenheit, convertTimeFormat, getStandardTemp, round } from '
 import flyjs from '../../fly-js/fly';
 import { Conrec } from '../../conrec-js/conrec';
 import RouteProfileChart from './RouteProfileChart';
+import { addLeadingZeroes } from '../map/common/AreoFunctions';
 
 export const windDataElevations = {
   500: [5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000],
@@ -221,7 +222,7 @@ const WindChart = () => {
       const endMargin = segmentCount ? routeLength / segmentCount / 2 : 0;
 
       const matrixData: number[][] = [];
-      const xs = [-startMargin, ...segments.map((segment) => segment.accDistance), routeLength + endMargin];
+      const xs = [-startMargin / 2, ...segments.map((segment) => segment.accDistance), routeLength + endMargin / 2];
       const elevations = Array.from({ length: 50 }, (_value, index) => index * 1000);
       let { min: min, max: max } = getMinMaxValueByElevation(
         queryTemperatureDataResult.data,
@@ -288,7 +289,8 @@ const WindChart = () => {
           fill: contour.temperature > 0 ? temperatureContourColors.positive : temperatureContourColors.negative,
           stroke: 'white',
           strokeWidth: 0.1,
-          dominantBaseline: 'text-after-edge',
+          dominantBaseline: 'middle',
+          textAnchor: 'end',
         };
         contourLabels.push({
           x: minPos.x,
@@ -300,7 +302,7 @@ const WindChart = () => {
           x: maxPos.x,
           y: maxPos.y,
           label,
-          style,
+          style: { ...style, textAnchor: 'start' },
         });
       });
       setContourLabelData(contourLabels);
@@ -372,13 +374,13 @@ const WindChart = () => {
               <b>Wind speed:</b>&nbsp;{windHintValue.tooltip.windSpeed}&nbsp;knots
             </span>
             <span>
-              <b>Wind direction:</b>&nbsp;{windHintValue.tooltip.windDir}&deg;
+              <b>Wind direction:</b>&nbsp;{addLeadingZeroes(windHintValue.tooltip.windDir, 3)}&deg;
             </span>
             <span>
-              <b>Course:</b>&nbsp;{windHintValue.tooltip.course}&deg;
+              <b>Course:</b>&nbsp;{addLeadingZeroes(windHintValue.tooltip.course, 3)}&deg;
             </span>
             <span>
-              <b>Altitude:</b>&nbsp;{windHintValue.y} feet
+              <b>Altitude:</b>&nbsp;{windHintValue.y} feet MSL
             </span>
             <span>
               <b>Temperature:</b>&nbsp;

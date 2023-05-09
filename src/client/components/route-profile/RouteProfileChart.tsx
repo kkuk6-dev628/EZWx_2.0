@@ -26,6 +26,7 @@ import { useGetRouteProfileStateQuery } from '../../store/route-profile/routePro
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import {
+  celsiusToFahrenheit,
   convertTimeFormat,
   degree2radian,
   getMetarCeilingCategory,
@@ -186,7 +187,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
 
           tooltip = {
             time: seg.arriveTime,
-            clouds: clouds.join('\n'),
+            clouds: skyConditionsAsc,
             visibility: seg.airportNbmProps.visibility,
             windspeed: seg.airportNbmProps.windspeed,
             winddir: seg.airportNbmProps.winddir,
@@ -195,7 +196,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           };
         }
         let airportDist = 0;
-        if (segmentIndex > 0) {
+        if (segmentIndex > 0 && seg.airport) {
           const airportDelta = flyjs.distanceTo(
             seg.position.lat,
             seg.position.lng,
@@ -472,23 +473,48 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           <span>
             <b>Time:</b>&nbsp;{convertTimeFormat(airportHint.tooltip.time, false)}
           </span>
+          <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
+            <div>
+              <p style={{ marginTop: 3 }}>
+                <b>Clouds: </b>
+              </p>
+            </div>
+            <div style={{ margin: 3, marginTop: -3 }}>
+              {airportHint.tooltip.clouds.map((skyCondition) => {
+                return (
+                  <div
+                    key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`}
+                    style={{ marginTop: 6, marginBottom: 2 }}
+                  >
+                    {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
+                    {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false &&
+                      Math.round(skyCondition.cloudBase) + ' feet'}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           <span>
-            <b>Clouds:</b>&nbsp;{airportHint.tooltip.clouds}
+            <b>Visibility:</b>&nbsp;{Math.round(airportHint.tooltip.visibility)} statute miles
           </span>
           <span>
-            <b>Visibility:</b>&nbsp;{airportHint.tooltip.visibility}
+            <b>Wind speed:</b>&nbsp;{Math.round(airportHint.tooltip.windspeed)} knots
           </span>
           <span>
-            <b>Wind speed:</b>&nbsp;{airportHint.tooltip.windspeed}
+            <b>Wind direction:</b>&nbsp;{Math.round(airportHint.tooltip.winddir) + ' \u00B0'}
           </span>
           <span>
-            <b>Wind direction:</b>&nbsp;{airportHint.tooltip.winddir}
+            <b>temperature:</b>&nbsp;
+            {!userSettings.default_temperature_unit
+              ? Math.round(airportHint.tooltip.temperature) + ' \u00B0C'
+              : celsiusToFahrenheit(airportHint.tooltip.temperature, 0) + ' \u00B0F'}
           </span>
           <span>
-            <b>temperature:</b>&nbsp;{airportHint.tooltip.temperature}
-          </span>
-          <span>
-            <b>Dewpoint:</b>&nbsp;{airportHint.tooltip.dewpoint}
+            <b>Dewpoint:</b>&nbsp;{' '}
+            {!userSettings.default_temperature_unit
+              ? Math.round(airportHint.tooltip.dewpoint) + ' \u00B0C'
+              : celsiusToFahrenheit(airportHint.tooltip.dewpoint, 0) + ' \u00B0F'}
           </span>
         </Hint>
       ) : null}

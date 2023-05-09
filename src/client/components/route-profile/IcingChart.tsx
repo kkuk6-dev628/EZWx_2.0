@@ -105,8 +105,8 @@ const IcingChart = (props) => {
       const endMargin = segmentCount ? routeLength / segmentCount / 2 : 0;
 
       const matrixData: number[][] = [];
-      // const xs = [-startMargin, ...segments.map((segment) => segment.accDistance), routeLength + endMargin];
-      const xs = segments.map((segment) => segment.accDistance);
+      const xs = [-startMargin / 2, ...segments.map((segment) => segment.accDistance), routeLength + endMargin / 2];
+      // const xs = segments.map((segment) => segment.accDistance);
       const elevations = Array.from({ length: 50 }, (_value, index) => index * 1000);
       let { min: min, max: max } = getMinMaxValueByElevation(
         queryTemperatureDataResult.data,
@@ -131,11 +131,11 @@ const IcingChart = (props) => {
           row.push(temperature);
         });
         matrixData.push(row);
-        // if (index === 0) {
-        //   matrixData.push(row);
-        // } else if (index === segments.length - 1) {
-        //   matrixData.push(row);
-        // }
+        if (index === 0) {
+          matrixData.push(row);
+        } else if (index === segments.length - 1) {
+          matrixData.push(row);
+        }
       });
       const conrec = new Conrec(null);
       try {
