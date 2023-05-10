@@ -28,11 +28,8 @@ import RouteProfileChart from './RouteProfileChart';
 import { Conrec } from '../../conrec-js/conrec';
 import { celsiusToFahrenheit, convertTimeFormat, round } from '../map/common/AreoFunctions';
 import { colorsByEdr, takeoffEdrTable } from './TurbChart';
-
-const temperatureContourColors = {
-  positive: '#bd8545',
-  negative: '#0b7e0c',
-};
+import { Route } from '../../interfaces/route';
+import { RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
 
 const icingSevLegend = [
   { value: 0, color: '#F6F6F6', label: 'None' },
@@ -74,14 +71,9 @@ const IcingChart = (props) => {
   const { data: routeProfileApiState } = useGetRouteProfileStateQuery(null, {
     refetchOnMountOrArgChange: true,
   });
-  const [contourLabelData, setContourLabelData] = useState([]);
-  const [temperatureContures, setTemperatureContours] = useState([]);
   const [noForecast, setNoForecast] = useState(false);
   const [noDepicted, setNoDepicted] = useState(false);
 
-  const [, queryTemperatureDataResult] = useQueryTemperatureDataMutation({
-    fixedCacheKey: cacheKeys.gfsTemperature,
-  });
   const [queryIcingProbData, queryIcingProbDataResult] = useQueryIcingProbDataMutation({
     fixedCacheKey: cacheKeys.icingProb,
   });
@@ -97,120 +89,14 @@ const IcingChart = (props) => {
 
   const segments = useSelector(selectRouteSegments);
 
-  function buildTemperatureContourSeries() {
-    if (queryTemperatureDataResult.isSuccess && segments.length > 0) {
-      const segmentCount = getSegmentsCount(activeRoute);
-      const routeLength = getRouteLength(activeRoute, true);
-      const startMargin = segmentCount ? routeLength / segmentCount / 2 : 0;
-      const endMargin = segmentCount ? routeLength / segmentCount / 2 : 0;
-
-      const matrixData: number[][] = [];
-      const xs = [-startMargin / 2, ...segments.map((segment) => segment.accDistance), routeLength + endMargin / 2];
-      // const xs = segments.map((segment) => segment.accDistance);
-      const elevations = Array.from({ length: 50 }, (_value, index) => index * 1000);
-      let { min: min, max: max } = getMinMaxValueByElevation(
-        queryTemperatureDataResult.data,
-        routeProfileApiState.maxAltitude * 100,
-      );
-      const step = routeProfileApiState.maxAltitude === 500 ? 5 : routeProfileApiState.maxAltitude === 300 ? 2 : 1;
-      min = Math.round(min / step) * step;
-      max = Math.round(max / step) * step;
-      const count = (max - min) / step + 1;
-
-      const zs = Array.from({ length: count }, (x, i) => i * step + min);
-      segments.forEach((segment, index) => {
-        const row = [];
-        elevations.forEach((elevation) => {
-          const { value: temperature } = getValueFromDatasetByElevation(
-            queryTemperatureDataResult.data,
-            new Date(segment.arriveTime),
-            elevation,
-            index,
-          );
-          if (!temperature) return;
-          row.push(temperature);
-        });
-        matrixData.push(row);
-        if (index === 0) {
-          matrixData.push(row);
-        } else if (index === segments.length - 1) {
-          matrixData.push(row);
-        }
-      });
-      const conrec = new Conrec(null);
-      try {
-        conrec.contour(matrixData, 0, xs.length - 1, 0, elevations.length - 1, xs, elevations, zs.length, zs);
-      } catch (e) {
-        console.error(e);
-        console.debug(matrixData, xs, elevations, zs);
-      }
-
-      const contours = conrec.contourList();
-      const newContours = contours.map((contour) => ({
-        temperature: contour['level'],
-        contour: [...contour],
-      }));
-      const contourLabels = [];
-      newContours.forEach((contour) => {
-        switch (routeProfileApiState.maxAltitude) {
-          case 200:
-            if (contour.temperature % 2 !== 0) {
-              return;
-            }
-            break;
-          case 300:
-            if (contour.temperature % 4 !== 0) {
-              return;
-            }
-            break;
-        }
-        const minPos = contour.contour.reduce((prev, curr) => (prev.x < curr.x ? prev : curr));
-        const maxPos = contour.contour.reduce((prev, curr) => (prev.x > curr.x ? prev : curr));
-        const label = userSettings.default_temperature_unit
-          ? celsiusToFahrenheit(contour.temperature) + ' \u00B0F'
-          : round(contour.temperature, 1) + ' \u00B0C';
-        const style = {
-          fill:
-            contour.temperature > 0
-              ? temperatureContourColors.positive
-              : contour.temperature === 0
-              ? 'red'
-              : temperatureContourColors.negative,
-          stroke: 'white',
-          strokeWidth: 0.1,
-          dominantBaseline: 'middle',
-          textAnchor: 'end',
-          fontWeight: 900,
-        };
-        contourLabels.push({
-          x: minPos.x,
-          y: minPos.y,
-          label,
-          style,
-        });
-        contourLabels.push({
-          x: maxPos.x,
-          y: maxPos.y,
-          label,
-          style: { ...style, textAnchor: 'start' },
-        });
-      });
-      setContourLabelData(contourLabels);
-      setTemperatureContours(newContours);
-    }
-  }
-
-  useEffect(() => {
-    buildTemperatureContourSeries();
-  }, [
-    queryTemperatureDataResult.isSuccess,
-    segments,
-    userSettings.default_temperature_unit,
-    routeProfileApiState.maxAltitude,
-  ]);
-
   function buildIcingSeries() {
-    if (queryIcingProbDataResult.isSuccess && queryIcingSevDataResult.isSuccess && queryIcingSldDataResult.isSuccess) {
+    if (
+      segments &&
+      segments.length > 0 &&
+      queryIcingProbDataResult.isSuccess &&
+      queryIcingSevDataResult.isSuccess &&
+      queryIcingSldDataResult.isSuccess
+    ) {
       const routeLength = getRouteLength(activeRoute, true);
       const segmentCount = getSegmentsCount(activeRoute);
       const segmentLength = routeLength / segmentCount;
@@ -350,7 +236,7 @@ const IcingChart = (props) => {
 
   return (
     <RouteProfileChart showDayNightBackground={false}>
-      {icingSeries && (
+      {icingSeries ? (
         <VerticalRectSeries
           colorType="literal"
           stroke="#33333500"
@@ -362,7 +248,7 @@ const IcingChart = (props) => {
           }
           onValueClick={(value) => setIcingHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })}
         ></VerticalRectSeries>
-      )}
+      ) : null}
       {noForecast || noDepicted
         ? [1].map((_) => {
             const routeLength = getRouteLength(activeRoute, true);
@@ -392,28 +278,6 @@ const IcingChart = (props) => {
           })
         : null}
 
-      {temperatureContures.map((contourLine, index) => {
-        const color =
-          contourLine.temperature > 0
-            ? temperatureContourColors.positive
-            : contourLine.temperature === 0
-            ? 'red'
-            : temperatureContourColors.negative;
-        const strokeWidth = contourLine.temperature === 0 ? 2 : 1;
-        return (
-          <LineSeries
-            key={'temp-' + contourLine.temperature + '-' + index}
-            data={contourLine.contour}
-            color={color}
-            curve={'curveBasisOpen'}
-            strokeWidth={strokeWidth}
-            style={{ pointerEvents: 'none' }}
-          />
-        );
-      })}
-      {contourLabelData.length > 0 ? (
-        <LabelSeries animation allowOffsetToBeReversed data={contourLabelData}></LabelSeries>
-      ) : null}
       {noDepicted && (
         <LabelSeries
           style={{ fontSize: 22, fontWeight: 900, strokeWidth: 1, fill: 'red', stroke: 'white' }}

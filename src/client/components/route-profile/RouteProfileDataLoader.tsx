@@ -192,7 +192,6 @@ export function getMinMaxValueByElevation(
       }
     }
   }
-  console.log('max value: ', minValue, maxValue, elevation);
   return { max: maxValue, min: minValue };
 }
 
@@ -231,7 +230,55 @@ export function getValueFromDataset(
     return { value: null, time: null };
   }
 }
+export function getValuesFromDatasetAllElevationByTime(
+  datasetAll: RouteProfileDataset[],
+  time: Date,
+  segmentIndex,
+): { elevation: number; value: number }[] {
+  try {
+    if (!datasetAll) {
+      return [];
+    }
+    const result = [];
+    const filteredByTime = datasetAll.filter((dataset) => {
+      if (dataset.time && dataset.time.length === 1) {
+        const diff = time.getTime() - new Date(dataset.time[0]).getTime();
+        return diff >= 0 && diff < 3600 * 1000;
+      }
+      return false;
+    });
 
+    if (filteredByTime.length > 0) {
+      return filteredByTime[0].data[segmentIndex].data;
+    }
+    return result;
+  } catch (e) {
+    return [];
+  }
+}
+
+export function getValuesFromDatasetAllElevationByElevation(
+  datasetAll: RouteProfileDataset[],
+  time: Date,
+  segmentIndex,
+): { elevation: number; value: number }[] {
+  try {
+    if (!datasetAll) {
+      return [];
+    }
+    const result = [];
+    datasetAll.forEach((dataset) => {
+      const filteredByTimes = dataset.data[segmentIndex].data.filter((dataset) => {
+        const diff = time.getTime() - new Date(dataset.time).getTime();
+        return diff >= 0 && diff < 3600 * 1000;
+      });
+      result.push({ elevation: dataset.elevations[0], value: filteredByTimes[0].value });
+    });
+    return result;
+  } catch (e) {
+    return [];
+  }
+}
 export function getValueFromDatasetByElevation(
   datasetAll: RouteProfileDataset[],
   time: Date,

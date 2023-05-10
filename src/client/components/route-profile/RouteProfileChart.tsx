@@ -14,15 +14,21 @@ import {
 } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
+  cacheKeys,
+  getMinMaxValueByElevation,
   getRouteLength,
   getSegmentsCount,
   getTimeGradientStops,
+  getValueFromDatasetByElevation,
   interpolateRoute,
   interpolateRouteWithStation,
   totalNumberOfElevations,
 } from './RouteProfileDataLoader';
 import { initialUserSettingsState, selectSettings } from '../../store/user/UserSettings';
-import { useGetRouteProfileStateQuery } from '../../store/route-profile/routeProfileApi';
+import {
+  useGetRouteProfileStateQuery,
+  useQueryTemperatureDataMutation,
+} from '../../store/route-profile/routeProfileApi';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import {
@@ -40,6 +46,9 @@ import * as flyjs from '../../fly-js/fly';
 import { useGetAirportQuery } from '../../store/route/airportApi';
 import { flightCategoryToColor, getNbmFlightCategory } from '../map/leaflet/layers/StationMarkersLayer';
 import { MetarSkyValuesToString } from '../map/common/AreoConstants';
+import { Conrec } from '../../conrec-js/conrec';
+import { RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
+import Route from '../shared/Route';
 
 export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
   if (viewWidth < 900) {
@@ -55,6 +64,114 @@ export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
     return viewHeight - 240;
   }
 };
+
+export const temperatureContourColors = {
+  positive: '#bd8545',
+  negative: '#0b7e0c',
+};
+
+export function buildContour(
+  activeRoute: Route,
+  routeProfileDataset: RouteProfileDataset[],
+  segments: RouteSegment[],
+  maxAltitude: number,
+  showInCelsius: boolean,
+) {
+  const segmentCount = getSegmentsCount(activeRoute);
+  const routeLength = getRouteLength(activeRoute, true);
+  const startMargin = segmentCount ? routeLength / segmentCount / 2 : 0;
+  const endMargin = segmentCount ? routeLength / segmentCount / 2 : 0;
+
+  const matrixData: number[][] = [];
+  const xs = [-startMargin / 2, ...segments.map((segment) => segment.accDistance), routeLength + endMargin / 2];
+  // const xs = segments.map((segment) => segment.accDistance);
+  const elevations = Array.from({ length: 50 }, (_value, index) => index * 1000);
+  let { min: min, max: max } = getMinMaxValueByElevation(routeProfileDataset, maxAltitude * 100);
+  const step = maxAltitude === 500 ? 5 : maxAltitude === 300 ? 2 : 1;
+  min = Math.round(min / step) * step;
+  max = Math.round(max / step) * step;
+  const count = (max - min) / step + 1;
+
+  const zs = Array.from({ length: count }, (x, i) => i * step + min);
+  segments.forEach((segment, index) => {
+    const row = [];
+    elevations.forEach((elevation) => {
+      const { value: temperature } = getValueFromDatasetByElevation(
+        routeProfileDataset,
+        new Date(segment.arriveTime),
+        elevation,
+        index,
+      );
+      if (!temperature) return;
+      row.push(temperature);
+    });
+    matrixData.push(row);
+    if (index === 0) {
+      matrixData.push(row);
+    } else if (index === segments.length - 1) {
+      matrixData.push(row);
+    }
+  });
+  const conrec = new Conrec(null);
+  try {
+    conrec.contour(matrixData, 0, xs.length - 1, 0, elevations.length - 1, xs, elevations, zs.length, zs);
+  } catch (e) {
+    console.error(e);
+    console.debug(matrixData, xs, elevations, zs);
+  }
+
+  const contours = conrec.contourList();
+  const newContours = contours.map((contour) => ({
+    temperature: contour['level'],
+    contour: [...contour],
+  }));
+  const contourLabels = [];
+  newContours.forEach((contour) => {
+    switch (maxAltitude) {
+      case 200:
+        if (contour.temperature % 2 !== 0) {
+          return;
+        }
+        break;
+      case 300:
+        if (contour.temperature % 4 !== 0) {
+          return;
+        }
+        break;
+    }
+    const minPos = contour.contour.reduce((prev, curr) => (prev.x < curr.x ? prev : curr));
+    const maxPos = contour.contour.reduce((prev, curr) => (prev.x > curr.x ? prev : curr));
+    const label = !showInCelsius
+      ? celsiusToFahrenheit(contour.temperature) + ' \u00B0F'
+      : round(contour.temperature, 1) + ' \u00B0C';
+    const style = {
+      fill:
+        contour.temperature > 0
+          ? temperatureContourColors.positive
+          : contour.temperature === 0
+          ? 'red'
+          : temperatureContourColors.negative,
+      stroke: 'white',
+      strokeWidth: 0.1,
+      dominantBaseline: 'middle',
+      textAnchor: 'end',
+      fontWeight: 900,
+    };
+    contourLabels.push({
+      x: minPos.x,
+      y: minPos.y,
+      label,
+      style,
+    });
+    contourLabels.push({
+      x: maxPos.x,
+      y: maxPos.y,
+      label,
+      style: { ...style, textAnchor: 'start' },
+    });
+  });
+  return { contours: newContours, contourLabels };
+}
 
 function getFlightCategoryColor(visibility, ceiling): string {
   const [catVis] = getMetarVisibilityCategory(visibility, initialUserSettingsState.personalMinimumsState);
@@ -99,6 +216,34 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   const [airportHint, setAirportHint] = useState(null);
 
   const [gradientStops, setGradientStops] = useState([]);
+  const [, queryTemperatureDataResult] = useQueryTemperatureDataMutation({
+    fixedCacheKey: cacheKeys.gfsTemperature,
+  });
+  const [contourLabelData, setContourLabelData] = useState([]);
+  const [temperatureContures, setTemperatureContours] = useState([]);
+
+  function buildTemperatureContourSeries() {
+    if (queryTemperatureDataResult.isSuccess && segments.length > 0) {
+      const { contours, contourLabels } = buildContour(
+        activeRoute,
+        queryTemperatureDataResult.data,
+        segments,
+        routeProfileApiState.maxAltitude,
+        !userSettings.default_temperature_unit,
+      );
+      setContourLabelData(contourLabels);
+      setTemperatureContours(contours);
+    }
+  }
+
+  useEffect(() => {
+    buildTemperatureContourSeries();
+  }, [
+    queryTemperatureDataResult.isSuccess,
+    segments,
+    userSettings.default_temperature_unit,
+    routeProfileApiState.maxAltitude,
+  ]);
 
   useEffect(() => {
     if (segments.length > 0) {
@@ -107,6 +252,14 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         hour: segment.departureTime.hour,
         minute: segment.departureTime.minute,
       }));
+      const length = getRouteLength(activeRoute, true);
+      setRouteLength(length);
+      const count = segments.length;
+      setSegmentsCount(count);
+      const start = count ? length / (count - 1) / 2 : 0;
+      const end = count ? length / (count - 1) / 2 : 0;
+      setStartMargin(start);
+      setEndMargin(end);
       const stops = getTimeGradientStops(times);
       setGradientStops(stops);
       buildAirportLabelSeries();
@@ -231,14 +384,6 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       // userSettings.default_distance_unit == true then km, or nm
       const elevationPoints = interpolateRoute(activeRoute, totalNumberOfElevations);
       if (!queryElevationsResult.isSuccess) queryElevations({ queryPoints: elevationPoints });
-      const count = getSegmentsCount(activeRoute);
-      const length = getRouteLength(activeRoute, true);
-      setRouteLength(length);
-      setSegmentsCount(count);
-      const start = count ? length / count / 2 : 0;
-      const end = count ? length / count / 2 : 0;
-      setStartMargin(start);
-      setEndMargin(end);
     }
   }, [activeRoute]);
 
@@ -295,8 +440,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         />
       )}
       <VerticalGridLines
-        tickValues={Array.from({ length: segmentsCount * 2 + 1 }, (_value, index) =>
-          Math.round((index * routeLength) / (segmentsCount * 2)),
+        tickValues={Array.from({ length: segmentsCount * 2 - 1 }, (_value, index) =>
+          Math.round((index * routeLength) / ((segmentsCount - 1) * 2)),
         )}
         style={{
           stroke: 'grey',
@@ -322,11 +467,11 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         }}
       />
       <XAxis
-        tickValues={Array.from({ length: segmentsCount + 1 }, (_value, index) =>
-          Math.round((index * routeLength) / segmentsCount),
+        tickValues={Array.from({ length: segmentsCount }, (_value, index) =>
+          Math.round((index * routeLength) / (segmentsCount - 1)),
         )}
         tickFormat={(v, index) => {
-          if (segments.length > 0 && segments[index]) {
+          if (segmentsCount > 0 && segments[index]) {
             const distInMile = segments[index].accDistance;
             const dist = Math.round(
               userSettings.default_distance_unit ? flyjs.nauticalMilesTo('Kilometers', distInMile, 0) : distInMile,
@@ -377,24 +522,23 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           }}
           onValueClick={(value) => setTimeHint(value)}
           onValueMouseOut={() => setTimeHint(null)}
-          data={Array.from({ length: segmentsCount + 1 }, (_value, index) => {
-            if (segments[index])
-              return {
-                x: Math.round((index * routeLength) / segmentsCount),
-                y: 0,
-                yOffset: 72,
-                segment: segments[index],
-                label: userSettings.default_time_display_unit
-                  ? segments[index].departureTime.time
-                  : simpleTimeOnlyFormat(new Date(segments[index].arriveTime), false),
-                style: {
-                  fill: 'white',
-                  dominantBaseline: 'text-after-edge',
-                  textAnchor: 'start',
-                  fontSize: 11,
-                  fontWeight: 600,
-                },
-              };
+          data={Array.from({ length: segmentsCount }, (_value, index) => {
+            return {
+              x: Math.round((index * routeLength) / (segmentsCount - 1)),
+              y: 0,
+              yOffset: 72,
+              segment: segments[index],
+              label: userSettings.default_time_display_unit
+                ? segments[index].departureTime.time
+                : simpleTimeOnlyFormat(new Date(segments[index].arriveTime), false),
+              style: {
+                fill: 'white',
+                dominantBaseline: 'text-after-edge',
+                textAnchor: 'start',
+                fontSize: 11,
+                fontWeight: 600,
+              },
+            };
           })}
         />
       ) : null}
@@ -426,6 +570,30 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         />
       ) : null}
       {props.children}
+      {routeProfileApiState.chartType === 'Turb' &&
+        temperatureContures.map((contourLine, index) => {
+          const color =
+            contourLine.temperature > 0
+              ? temperatureContourColors.positive
+              : contourLine.temperature === 0
+              ? 'red'
+              : temperatureContourColors.negative;
+          const strokeWidth = contourLine.temperature === 0 ? 2 : 1;
+          return (
+            <LineSeries
+              key={'temp-' + contourLine.temperature + '-' + index}
+              data={contourLine.contour}
+              color={color}
+              curve={'curveBasisOpen'}
+              strokeWidth={strokeWidth}
+              style={{ pointerEvents: 'none' }}
+            />
+          );
+        })}
+      {routeProfileApiState.chartType === 'Turb' && contourLabelData.length > 0 ? (
+        <LabelSeries animation allowOffsetToBeReversed data={contourLabelData}></LabelSeries>
+      ) : null}
+
       {routeProfileApiState.chartType !== 'Wind' && activeRoute ? (
         <LineSeries
           data={[
