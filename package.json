@@ -34,7 +34,7 @@
     "@mapbox/timespace": "^2.0.4",
     "@material-ui/core": "latest",
     "@material-ui/icons": "latest",
-    "@mui/material": "^5.11.10",
+    "@mui/material": "^5.13.0",
     "@nestjs/axios": "^2.0.0",
     "@nestjs/common": "^9.3.3",
     "@nestjs/config": "^2.3.1",
