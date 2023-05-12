@@ -108,6 +108,76 @@ const nbmStationProperties = [
 
 const personalMinsColors = ['red', 'yellow', 'green'];
 
+export function getNbmWeatherMarkerIcon(
+  wx_1: number,
+  w_speed: number,
+  w_gust: number,
+  skycov: number,
+  latlng: { lat: number; lng: number },
+  time: number,
+): string {
+  let isDayTime = true;
+  const sunsetSunriseTime = SunCalc.getTimes(new Date(time), latlng.lat, latlng.lng);
+  if (Date.parse(sunsetSunriseTime.sunrise) && Date.parse(sunsetSunriseTime.sunset)) {
+    isDayTime = time >= sunsetSunriseTime.sunrise.getTime() && time <= sunsetSunriseTime.sunset.getTime();
+  }
+  let iconType = 'fas fa-question-square';
+  if (!wx_1) {
+    if (w_speed > 20 && w_gust > 25) {
+      iconType = 'fa-solid fa-wind';
+    } else {
+      if (skycov < 6) {
+        iconType = isDayTime ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      } else if (skycov < 31) {
+        iconType = isDayTime ? 'fas fa-sun-cloud' : 'fas fa-moon-cloud';
+      } else if (skycov < 58) {
+        iconType = isDayTime ? 'fa-solid fa-cloud-sun' : 'fa-solid fa-cloud-moon';
+      } else if (skycov < 88) {
+        iconType = isDayTime ? 'fas fa-clouds-sun' : 'fas fa-clouds-moon';
+      } else {
+        iconType = 'fa-solid fa-cloud';
+      }
+    }
+  } else {
+    // console.log(feature.properties.icaoid, feature.properties.faaid, wx_1);
+    switch (wx_1) {
+      case 1:
+        iconType = 'fa-solid fa-cloud-rain';
+        break;
+      case 2:
+        iconType = 'fa-solid fa-icicles';
+        break;
+      case 3:
+        iconType = 'fas fa-cloud-snow';
+        break;
+      case 4:
+        if (skycov < 88) {
+          iconType = isDayTime ? 'fa-cloud-bolt-sun' : 'fa-cloud-bolt-moon';
+        } else {
+          iconType = 'fa-solid fa-cloud-bolt';
+        }
+        break;
+      case 5:
+        if (skycov < 88) {
+          iconType = isDayTime ? 'fa-solid fa-cloud-sun-rain' : 'fas fa-cloud-moon-rain';
+        } else {
+          iconType = 'fa-solid fa-cloud-showers-heavy';
+        }
+        break;
+      case 6:
+        iconType = 'fas fa-cloud-sleet';
+        break;
+      case 7:
+        iconType = 'fas fa-cloud-snow';
+        break;
+      case 8:
+        iconType = 'fas fa-fog';
+        break;
+    }
+  }
+  return iconType;
+}
+
 export const getCeilingFromMetars = (feature: GeoJSON.Feature) => {
   if (feature.properties.vert_vis_ft) {
     return feature.properties.vert_vis_ft;
@@ -1484,70 +1554,14 @@ export const StationMarkersLayer = () => {
     if (flightCategory in personalMinimums) {
       iconColor = personalMinimums[flightCategory].color;
     }
-    let isDayTime = true;
-    const sunsetSunriseTime = SunCalc.getTimes(new Date(observationTime), latlng.lat, latlng.lng);
-    if (Date.parse(sunsetSunriseTime.sunrise) && Date.parse(sunsetSunriseTime.sunset)) {
-      isDayTime =
-        observationTime >= sunsetSunriseTime.sunrise.getTime() && observationTime <= sunsetSunriseTime.sunset.getTime();
-    }
-    let iconType = 'fa-solid fa-square-question';
-    const wx_1 = feature.properties.wx_1;
-    const w_speed = feature.properties.w_speed;
-    const w_gust = feature.properties.w_gust;
-    const skycov = feature.properties.skycov;
-    if (!wx_1) {
-      if (w_speed > 20 && w_gust > 25) {
-        iconType = 'fa-solid fa-wind';
-      } else {
-        if (skycov < 6) {
-          iconType = isDayTime ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        } else if (skycov < 31) {
-          iconType = isDayTime ? 'fas fa-sun-cloud' : 'fas fa-moon-cloud';
-        } else if (skycov < 58) {
-          iconType = isDayTime ? 'fa-solid fa-cloud-sun' : 'fa-solid fa-cloud-moon';
-        } else if (skycov < 88) {
-          iconType = isDayTime ? 'fas fa-clouds-sun' : 'fas fa-clouds-moon';
-        } else {
-          iconType = 'fa-solid fa-cloud';
-        }
-      }
-    } else {
-      // console.log(feature.properties.icaoid, feature.properties.faaid, wx_1);
-      switch (wx_1) {
-        case 1:
-          iconType = 'fa-solid fa-cloud-rain';
-          break;
-        case 2:
-          iconType = 'fa-solid fa-icicles';
-          break;
-        case 3:
-          iconType = 'fas fa-cloud-snow';
-          break;
-        case 4:
-          if (skycov < 88) {
-            iconType = isDayTime ? 'fa-cloud-bolt-sun' : 'fa-cloud-bolt-moon';
-          } else {
-            iconType = 'fa-solid fa-cloud-bolt';
-          }
-          break;
-        case 5:
-          if (skycov < 88) {
-            iconType = isDayTime ? 'fa-solid fa-cloud-sun-rain' : 'fas fa-cloud-moon-rain';
-          } else {
-            iconType = 'fa-solid fa-cloud-showers-heavy';
-          }
-          break;
-        case 6:
-          iconType = 'fas fa-cloud-sleet';
-          break;
-        case 7:
-          iconType = 'fas fa-cloud-snow';
-          break;
-        case 8:
-          iconType = 'fas fa-fog';
-          break;
-      }
-    }
+    const iconType = getNbmWeatherMarkerIcon(
+      feature.properties.wx_1,
+      feature.properties.w_speed,
+      feature.properties.w_gust,
+      feature.properties.skycov,
+      latlng,
+      observationTime,
+    );
     const metarMarker = L.marker(latlng, {
       icon: new L.DivIcon({
         className: 'metar-weather-icon',

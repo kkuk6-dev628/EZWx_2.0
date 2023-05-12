@@ -21,15 +21,13 @@ import {
   NbmVis,
   NbmWindDirection,
   NbmWindSpeed,
+  NbmWx1,
 } from './route-profile.gisdb-entity';
-import { RouteProfileQueryDto, RouteSegmentsDto } from './route-profile-query.dto';
+import { RouteProfileQueryDto } from './route-profile-query.dto';
 import { dynamicImport } from 'tsimportlib';
-import { StationTime } from '../../station-time/station-time.gisdb-entity';
 
-const rasterDataDir = '/data/ingest';
 let geotiff;
 let pool;
-const regex = /\_([\d]+T[\d]+)./gm;
 
 @Injectable()
 export class RouteProfileQueryDataService {
@@ -70,6 +68,8 @@ export class RouteProfileQueryDataService {
     private nbmWindDirectionRepository: Repository<NbmWindDirection>,
     @InjectRepository(NbmWindSpeed, 'gisDB')
     private nbmWindSpeedRepository: Repository<NbmWindSpeed>,
+    @InjectRepository(NbmWx1, 'gisDB')
+    private nbmWx1Repository: Repository<NbmWx1>,
     @InjectDataSource('gisDB')
     private dataSource: DataSource,
   ) {}
@@ -235,6 +235,10 @@ export class RouteProfileQueryDataService {
 
   async queryNbmWindSpeed(query: RouteProfileQueryDto) {
     return await this.queryRasterDataset(query.queryPoints, this.nbmWindSpeedRepository);
+  }
+
+  async queryNbmWx1(query: RouteProfileQueryDto) {
+    return await this.queryRasterDataset(query.queryPoints, this.nbmWx1Repository);
   }
 
   async queryAllNbmValues(query: RouteProfileQueryDto) {

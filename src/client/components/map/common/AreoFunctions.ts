@@ -16,6 +16,16 @@ export function radian2degree(radian) {
   return (radian * 180) / Math.PI;
 }
 
+export function roundCloudHeight(heightInFeet) {
+  if (heightInFeet <= 5000) {
+    return Math.round(heightInFeet / 100) * 100;
+  }
+  if (heightInFeet <= 10000) {
+    return Math.round(heightInFeet / 500) * 500;
+  }
+  return Math.round(heightInFeet / 1000) * 1000;
+}
+
 export const getAltitudeString = (value: string, isHundred = true, fzlbase?: string, fzltop?: string): string => {
   if (value === 'SFC' || value == '0') {
     return 'Surface';
@@ -382,124 +392,64 @@ export const loadFeaturesFromWeb = (
     });
 };
 
-export const visibilityMileToMeter = (mile: number): number => {
-  if (mile >= 7) return 9999; // yes that is 9999
-  else if (mile >= 6 && mile < 7) return 9000;
-  else if (mile >= 5 && mile < 6) return 8000;
-  else if (mile >= 4.5 && mile < 5) return 7000;
-  else if (mile >= 4 && mile < 4.5) return 6000;
-  else if (mile >= 3.5 && mile < 4) return 5000;
-  else if (mile >= 3 && mile < 3.5) return 4800;
-  else if (mile == 2.75) return 4400;
-  else if (mile == 2.5) return 4000;
-  else if (mile == 2.25) return 3600;
-  else if (mile == 2.0) return 3200;
-  else if (mile == 1.88) return 3000;
-  else if (mile == 1.75) return 2800;
-  else if (mile == 1.63) return 2600;
-  else if (mile == 1.5) return 2400;
-  else if (mile == 1.38) return 2200;
-  else if (mile == 1.25) return 2000;
-  else if (mile == 1.13) return 1800;
-  else if (mile == 1) return 1600;
-  else if (mile == 0.88) return 1400;
-  else if (mile == 0.75) return 1200;
-  else if (mile == 0.63) return 1000;
-  else if (mile == 0.5) return 800;
-  else if (mile == 0.38) return 600;
-  else if (mile == 0.31) return 500;
-  else if (mile == 0.25) return 400;
-  else if (mile == 0.13) return 200;
-  else if (mile == 0.06) return 100;
-  else if (mile == 0) return 0;
-  return 0.0;
+export const visibilityMileToMeter = (mile: number): string => {
+  if (mile < 0.6) return '0 meters';
+  else if (mile < 0.13) return '100 meters';
+  else if (mile < 0.25) return '200 meters';
+  else if (mile < 0.38) return '400 meters';
+  else if (mile < 0.5) return '600 meters';
+  else if (mile < 0.63) return '800 meters';
+  else if (mile < 0.75) return '1000 meters';
+  else if (mile < 0.88) return '1200 meters';
+  else if (mile < 1) return '1400 meters';
+  else if (mile < 1.13) return '1600 meters';
+  else if (mile < 1.25) return '1800 meters';
+  else if (mile < 1.38) return '2000 meters';
+  else if (mile < 1.5) return '2200 meters';
+  else if (mile < 1.63) return '2400 meters';
+  else if (mile < 1.75) return '2600 meters';
+  else if (mile < 1.88) return '2800 meters';
+  else if (mile < 2) return '3000 meters';
+  else if (mile < 2.25) return '3200 meters';
+  else if (mile < 2.5) return '3600 meters';
+  else if (mile < 2.75) return '4000 meters';
+  else if (mile < 3) return '4400 meters';
+  else if (mile < 3.5) return '4800 meters';
+  else if (mile < 4) return '5000 meters';
+  else if (mile < 5) return '7000 meters';
+  else if (mile < 6) return '8000 meters';
+  else if (mile < 7) return '9000 meters';
+  else return '9999 meters';
 };
 
 export const visibilityMileToFraction = (mile: number): string => {
   if (mile === undefined || mile === null) {
     return null;
   }
-  let fraction = mile.toString();
-  switch (mile) {
-    case 0:
-      fraction = '0';
-      break;
-    case 0.06:
-      fraction = '1/16';
-      break;
-    case 0.13:
-      fraction = '1/8';
-      break;
-    case 0.25:
-      fraction = '1/4';
-      break;
-    case 0.38:
-      fraction = '3/8';
-      break;
-    case 0.5:
-      fraction = '1/2';
-      break;
-    case 0.62:
-    case 0.63:
-      fraction = '5/8';
-      break;
-    case 0.75:
-      fraction = '3/4';
-      break;
-    case 0.88:
-      fraction = '7/8';
-      break;
-    case 1:
-      fraction = '1';
-      break;
-    case 1.13:
-      fraction = '1 1/8';
-      break;
-    case 1.24:
-    case 1.25:
-      fraction = '1 1/4';
-      break;
-    case 1.38:
-      fraction = '1 3/8';
-      break;
-    case 1.5:
-      fraction = '1 1/2';
-      break;
-    case 1.63:
-      fraction = '1 5/8';
-      break;
-    case 1.75:
-    case 1.86:
-      fraction = '1 3/4';
-      break;
-    case 1.88:
-      fraction = '1 7/8';
-      break;
-    case 2:
-      fraction = '2';
-      break;
-    case 2.25:
-      fraction = '2 1/4';
-      break;
-    case 2.49:
-    case 2.5:
-      fraction = '2 1/2';
-      break;
-    case 2.75:
-      fraction = '2 3/4';
-      break;
-    case 3:
-    case 3.11:
-      fraction = '3';
-      break;
-    case 3.5:
-      fraction = '3 1/2';
-      break;
-    case 3.73:
-      fraction = '4';
-      break;
-  }
-  return fraction;
+  if (mile < 0.6) return '0 statute miles';
+  else if (mile < 0.13) return '1/16 statute mile';
+  else if (mile < 0.25) return '1/8 statute mile';
+  else if (mile < 0.38) return '1/4 statute mile';
+  else if (mile < 0.5) return '3/8 statute mile';
+  else if (mile < 0.63) return '1/2 statute mile';
+  else if (mile < 0.75) return '5/8 statute mile';
+  else if (mile < 0.88) return '3/4 statute mile';
+  else if (mile < 1) return '7/8 statute mile';
+  else if (mile < 1.13) return '1 statute mile';
+  else if (mile < 1.25) return '1 1/8 statute miles';
+  else if (mile < 1.38) return '1 1/4 statute miles';
+  else if (mile < 1.5) return '1 3/8 statute miles';
+  else if (mile < 1.63) return '1 1/2 statute miles';
+  else if (mile < 1.75) return '1 5/8 statute miles';
+  else if (mile < 1.88) return '1 3/4 statute miles';
+  else if (mile < 2) return '1 7/8 statute miles';
+  else if (mile < 2.25) return '2 statute miles';
+  else if (mile < 2.5) return '2 1/4 statute miles';
+  else if (mile < 2.75) return '2 1/2 statute miles';
+  else if (mile < 3) return '2 3/4 statute miles';
+  else if (mile < 3.5) return '3 statute miles';
+  else if (mile < 4) return '3 1/2 statute miles';
+  else return Math.round(mile) + ' statute miles';
 };
 
 export const getMetarCeilingCategory = (ceiling: number, personalMinimums: PersonalMinimums): any[] => {

@@ -75,3 +75,6 @@ export class NbmWindDirection extends RasterMapping {}
 
 @Entity('nbm_wspeed')
 export class NbmWindSpeed extends RasterMapping {}
+
+@Entity('nbm_wx_1')
+export class NbmWx1 extends RasterMapping {}

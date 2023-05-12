@@ -44,9 +44,7 @@ const MetarsPopup = ({
   if (vimi >= 4) {
     vimi = Math.ceil(vimi);
   }
-  let visibility = !userSettings.default_visibility_unit
-    ? `${visibilityMileToFraction(vimi)} statute ${vimi <= 1 ? 'mile' : 'miles'}`
-    : `${visibilityMileToMeter(vimi)} meters`;
+  let visibility = !userSettings.default_visibility_unit ? visibilityMileToFraction(vimi) : visibilityMileToMeter(vimi);
   if (vimi === 0.25 && feature.properties.raw_text.indexOf('M1/4SM') > -1) {
     visibility = 'Less than ' + visibility;
   }

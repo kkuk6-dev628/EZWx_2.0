@@ -162,6 +162,10 @@ export const routeProfileApi = createApi({
       query: (data) => ({ url: 'data/nbm-windspeed', method: 'Post', body: data }),
       transformResponse: transformTimeBands,
     }),
+    queryNbmWx1: builder.mutation({
+      query: (data) => ({ url: 'data/nbm-wx-1', method: 'Post', body: data }),
+      transformResponse: transformTimeBands,
+    }),
     queryNbmAll: builder.mutation({
       query: (data) => ({ url: 'data/nbm-all', method: 'Post', body: data }),
       transformResponse: (response: any) => {
@@ -204,5 +208,6 @@ export const {
   useQueryNbmVisMutation,
   useQueryNbmWindDirMutation,
   useQueryNbmWindSpeedMutation,
+  useQueryNbmWx1Mutation,
   useQueryNbmAllMutation,
 } = routeProfileApi;

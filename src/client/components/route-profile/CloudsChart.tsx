@@ -30,6 +30,7 @@ import RouteProfileChart from './RouteProfileChart';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import flyjs from '../../fly-js/fly';
 import { colorsByEdr } from './TurbChart';
+import { meterToFeet } from '../map/common/AreoFunctions';
 
 const humidityThresholds = {
   1000: 98,
@@ -79,6 +80,9 @@ const humidityThresholds = {
   45000: 98,
 };
 
+const cloudColor1 = '#FFFFFF';
+const cloudColor2 = '#CCCCCC';
+
 const CloudsChart = (props) => {
   const activeRoute = useSelector(selectActiveRoute);
   const userSettings = useSelector(selectSettings);
@@ -105,7 +109,7 @@ const CloudsChart = (props) => {
     fixedCacheKey: cacheKeys.gfsHumidity,
   });
 
-  function getElevationByPosition(position: { lat: number; lng: number }): number {
+  function getElevationByPosition(position: { lat: number; lng: number }, inFeet = true): number {
     if (!queryElevationsResult.data || !queryElevationsResult.data.results) {
       return 0;
     }
@@ -117,7 +121,7 @@ const CloudsChart = (props) => {
       }
       return curr;
     });
-    return closestPosition.elevation;
+    return inFeet ? meterToFeet(closestPosition.elevation) : closestPosition.elevation;
   }
 
   function buildCloudSeries() {
@@ -134,12 +138,12 @@ const CloudsChart = (props) => {
       const maxForecastTime = getMaxForecastTime(queryIcingSevDataResult.data);
       segments.forEach((segment, index) => {
         const elevation = getElevationByPosition(segment.position);
-        let colorFirst = 'white';
-        let colorSecond = 'white';
+        let colorFirst = cloudColor1;
+        let colorSecond = cloudColor1;
         let opacity = 1;
         const severity = 'None';
         if (segment.arriveTime > maxForecastTime.getTime()) {
-          colorFirst = '#333';
+          colorFirst = cloudColor1;
           opacity = 0.5;
         } else {
           const { value: skycover } = getValueFromDatasetByElevation(
@@ -165,11 +169,11 @@ const CloudsChart = (props) => {
             index,
           );
           if (skycover <= 56) {
-            colorFirst = colorSecond = 'grey';
+            colorFirst = colorSecond = cloudColor2;
           } else {
             if (cloudbase && cloudceiling) {
-              colorFirst = 'grey';
-              colorSecond = 'white';
+              colorFirst = cloudColor2;
+              colorSecond = cloudColor1;
             }
           }
           if (cloudbase) {

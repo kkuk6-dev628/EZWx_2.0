@@ -66,6 +66,8 @@ export interface NbmProperties {
   visibility: number;
   winddir: number;
   windspeed: number;
+  wx_1: number;
+  time: number;
 }
 
 export interface RouteSegment {

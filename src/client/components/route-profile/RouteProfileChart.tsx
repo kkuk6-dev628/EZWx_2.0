@@ -11,6 +11,8 @@ import {
   Hint,
   LabelSeries,
   GradientDefs,
+  VerticalRectSeries,
+  CustomSVGSeries,
 } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
@@ -39,12 +41,13 @@ import {
   getMetarVisibilityCategory,
   meterToFeet,
   round,
+  roundCloudHeight,
   simpleTimeOnlyFormat,
+  visibilityMileToFraction,
+  visibilityMileToMeter,
 } from '../map/common/AreoFunctions';
-import { nauticalMilesToKilometers } from '../../fly-js/src/helpers/converters/DistanceConverter';
 import * as flyjs from '../../fly-js/fly';
-import { useGetAirportQuery } from '../../store/route/airportApi';
-import { flightCategoryToColor, getNbmFlightCategory } from '../map/leaflet/layers/StationMarkersLayer';
+import { flightCategoryToColor, getNbmWeatherMarkerIcon } from '../map/leaflet/layers/StationMarkersLayer';
 import { MetarSkyValuesToString } from '../map/common/AreoConstants';
 import { Conrec } from '../../conrec-js/conrec';
 import { RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
@@ -173,6 +176,31 @@ export function buildContour(
   return { contours: newContours, contourLabels };
 }
 
+const weatherFontContents = {
+  'fas fa-question-square': '\uf2fd',
+  'fa-solid fa-wind': '\uf72e',
+  'fa-solid fa-sun': '\uf185',
+  'fa-solid fa-moon': '\uf186',
+  'fas fa-sun-cloud': '\uf763',
+  'fas fa-moon-cloud': '\uf754',
+  'fa-solid fa-cloud-sun': '\uf6c4',
+  'fa-solid fa-cloud-moon': '\uf6c3',
+  'fas fa-clouds-sun': '\uf746',
+  'fas fa-clouds-moon': '\uf745',
+  'fa-solid fa-cloud': '\uf0c2',
+  'fa-solid fa-cloud-rain': '\uf73d',
+  'fa-solid fa-icicles': '\uf7ad',
+  'fas fa-cloud-snow': '\uf742',
+  'fa-cloud-bolt-sun': '\uf76e',
+  'fa-cloud-bolt-moon': '\uf76d',
+  'fa-solid fa-cloud-bolt': '\uf76c',
+  'fa-solid fa-cloud-sun-rain': '\uf743',
+  'fas fa-cloud-moon-rain': '\uf73c',
+  'fa-solid fa-cloud-showers-heavy': '\uf740',
+  'fas fa-cloud-sleet': '\uf741',
+  'fas fa-fog': '\uf74e',
+};
+
 function getFlightCategoryColor(visibility, ceiling): string {
   const [catVis] = getMetarVisibilityCategory(visibility, initialUserSettingsState.personalMinimumsState);
   const [catCeiling] = getMetarCeilingCategory(ceiling, initialUserSettingsState.personalMinimumsState);
@@ -221,6 +249,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   });
   const [contourLabelData, setContourLabelData] = useState([]);
   const [temperatureContures, setTemperatureContours] = useState([]);
+  const [weatherIconData, setWeatherIconData] = useState(null);
 
   function buildTemperatureContourSeries() {
     if (queryTemperatureDataResult.isSuccess && segments.length > 0) {
@@ -256,8 +285,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       setRouteLength(length);
       const count = segments.length;
       setSegmentsCount(count);
-      const start = count ? length / (count - 1) / 2 : 0;
-      const end = count ? length / (count - 1) / 2 : 0;
+      const start = count ? (0.7 * length) / (count - 1) : 0;
+      const end = count ? (0.7 * length) / (count - 1) : 0;
       setStartMargin(start);
       setEndMargin(end);
       const stops = getTimeGradientStops(times);
@@ -278,17 +307,53 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     setViewH(window.innerHeight);
   };
 
+  function buildWeatherSeries(segment: RouteSegment, segmentIndex: number) {
+    if (segment) {
+      const color = getFlightCategoryColor(segment.segmentNbmProps.visibility, segment.segmentNbmProps.cloudceiling);
+      const icon = getNbmWeatherMarkerIcon(
+        segment.segmentNbmProps.wx_1,
+        segment.segmentNbmProps.windspeed,
+        segment.segmentNbmProps.gust,
+        segment.segmentNbmProps.skycover,
+        segment.position,
+        segment.arriveTime,
+      );
+      return {
+        x: segment.accDistance,
+        y: routeProfileApiState.maxAltitude * 100 * 1.08,
+        customComponent: () => {
+          return (
+            <text x={0} y={0}>
+              <tspan
+                x="0"
+                y="24"
+                fill={color}
+                dominantBaseline="middle"
+                textAnchor="middle"
+                className={icon + ' fa-2x'}
+              >
+                {weatherFontContents[icon]}
+              </tspan>
+            </text>
+          );
+        },
+      };
+    }
+  }
+
   function buildAirportLabelSeries() {
     if (segments.length > 0) {
       let tooltip = null;
+      const weatherSeries = [];
       const airportLabels = segments.map((seg, segmentIndex) => {
         const labelStyle = {
           fill: 'green',
           dominantBaseline: 'text-after-edge',
           textAnchor: 'middle',
-          fontSize: seg.isRoutePoint ? 14 : 11,
+          fontSize: segmentIndex === 0 || segmentIndex === segmentsCount - 1 ? 14 : 11,
           fontWeight: 600,
         };
+        weatherSeries.push(buildWeatherSeries(seg, segmentIndex));
         if (seg.airportNbmProps) {
           labelStyle.fill = getFlightCategoryColor(seg.airportNbmProps.visibility, seg.airportNbmProps.cloudceiling);
           const lowestCloud = seg.airportNbmProps.cloudbase;
@@ -339,8 +404,10 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           });
 
           tooltip = {
-            time: seg.arriveTime,
+            time: seg.airportNbmProps.time,
             clouds: skyConditionsAsc,
+            ceiling: ceiling,
+            lowestCloud,
             visibility: seg.airportNbmProps.visibility,
             windspeed: seg.airportNbmProps.windspeed,
             winddir: seg.airportNbmProps.winddir,
@@ -376,6 +443,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         };
       });
       setAirportLabelSeries(airportLabels);
+      setWeatherIconData(weatherSeries);
     }
   }
 
@@ -408,7 +476,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     <XYPlot
       height={calcChartHeight(viewW, viewH)}
       width={calcChartWidth(viewW, viewH)}
-      yDomain={[0, routeProfileApiState.maxAltitude * 100]}
+      color="white"
+      yDomain={[0, routeProfileApiState.maxAltitude * 100 * 1.08]}
       xDomain={[-startMargin, routeLength + endMargin]}
       margin={{ right: 40, bottom: 80 }}
     >
@@ -424,8 +493,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       {props.showDayNightBackground && (
         <AreaSeries
           data={[
-            { x: -startMargin, y: 50000 },
-            { x: routeLength + endMargin, y: 50000 },
+            { x: -startMargin, y: routeProfileApiState.maxAltitude * 100 },
+            { x: routeLength + endMargin, y: routeProfileApiState.maxAltitude * 100 },
           ]}
           color={'url(#linear-gradient)'}
         />
@@ -433,8 +502,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       {!props.showDayNightBackground && (
         <AreaSeries
           data={[
-            { x: -startMargin, y: 50000 },
-            { x: routeLength + endMargin, y: 50000 },
+            { x: -startMargin, y: routeProfileApiState.maxAltitude * 100 },
+            { x: routeLength + endMargin, y: routeProfileApiState.maxAltitude * 100 },
           ]}
           color="#DDD"
         />
@@ -523,22 +592,23 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           onValueClick={(value) => setTimeHint(value)}
           onValueMouseOut={() => setTimeHint(null)}
           data={Array.from({ length: segmentsCount }, (_value, index) => {
-            return {
-              x: Math.round((index * routeLength) / (segmentsCount - 1)),
-              y: 0,
-              yOffset: 72,
-              segment: segments[index],
-              label: userSettings.default_time_display_unit
-                ? segments[index].departureTime.time
-                : simpleTimeOnlyFormat(new Date(segments[index].arriveTime), false),
-              style: {
-                fill: 'white',
-                dominantBaseline: 'text-after-edge',
-                textAnchor: 'start',
-                fontSize: 11,
-                fontWeight: 600,
-              },
-            };
+            if (segments[index].arriveTime)
+              return {
+                x: Math.round((index * routeLength) / (segmentsCount - 1)),
+                y: 0,
+                yOffset: 72,
+                segment: segments[index],
+                label: userSettings.default_time_display_unit
+                  ? segments[index].departureTime.time
+                  : simpleTimeOnlyFormat(new Date(segments[index].arriveTime), false),
+                style: {
+                  fill: 'white',
+                  dominantBaseline: 'text-after-edge',
+                  textAnchor: 'start',
+                  fontSize: 11,
+                  fontWeight: 600,
+                },
+              };
           })}
         />
       ) : null}
@@ -570,7 +640,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         />
       ) : null}
       {props.children}
-      {routeProfileApiState.chartType === 'Turb' &&
+      {routeProfileApiState.chartType !== 'Turb' &&
         temperatureContures.map((contourLine, index) => {
           const color =
             contourLine.temperature > 0
@@ -590,7 +660,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             />
           );
         })}
-      {routeProfileApiState.chartType === 'Turb' && contourLabelData.length > 0 ? (
+      {routeProfileApiState.chartType !== 'Turb' && contourLabelData.length > 0 ? (
         <LabelSeries animation allowOffsetToBeReversed data={contourLabelData}></LabelSeries>
       ) : null}
 
@@ -624,6 +694,20 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           onSeriesMouseOver={() => setShowElevationHint(true)}
         />
       ) : null}
+      <VerticalRectSeries
+        colorType="literal"
+        data={[
+          {
+            x0: -startMargin,
+            x: routeLength + endMargin,
+            y0: routeProfileApiState.maxAltitude * 100,
+            y: routeProfileApiState.maxAltitude * 100 * 1.08,
+          },
+        ]}
+        style={{ strokeWidth: 0 }}
+      ></VerticalRectSeries>
+      <CustomSVGSeries customComponent="square" data={weatherIconData}></CustomSVGSeries>
+
       {showElevationHint ? (
         <Hint value={elevationHint}>
           <div style={{ background: 'white', color: 'black', padding: 4, borderRadius: 4 }}>{elevationHint.y}</div>
@@ -656,7 +740,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                   >
                     {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
                     {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false &&
-                      Math.round(skyCondition.cloudBase) + ' feet'}
+                      roundCloudHeight(skyCondition.cloudBase) + ' feet'}
                   </div>
                 );
               })}
@@ -664,7 +748,17 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           </div>
 
           <span>
-            <b>Visibility:</b>&nbsp;{Math.round(airportHint.tooltip.visibility)} statute miles
+            <b>Lowest Cloud:</b>&nbsp;{Math.round(airportHint.tooltip.lowestCloud)}
+          </span>
+          <span>
+            <b>Ceiling:</b>&nbsp;{Math.round(airportHint.tooltip.ceiling)}
+          </span>
+
+          <span>
+            <b>Visibility:</b>&nbsp;
+            {!userSettings.default_visibility_unit
+              ? visibilityMileToFraction(airportHint.tooltip.visibility)
+              : visibilityMileToMeter(airportHint.tooltip.visibility)}
           </span>
           <span>
             <b>Wind speed:</b>&nbsp;{Math.round(airportHint.tooltip.windspeed)} knots

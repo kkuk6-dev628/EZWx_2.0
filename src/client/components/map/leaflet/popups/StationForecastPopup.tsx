@@ -184,8 +184,8 @@ const StationForecastPopup = ({
     vimi = Math.ceil(vimi);
   }
   const visibility = !userSettings.default_visibility_unit
-    ? `${visibilityMileToFraction(vimi)} statute ${vimi <= 1 ? 'mile' : 'miles'}`
-    : `${visibilityMileToMeter(vimi)} meters`;
+    ? visibilityMileToFraction(vimi)
+    : visibilityMileToMeter(vimi);
   const windSpeed =
     properties.w_speed === 0
       ? 'Calm'

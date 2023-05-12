@@ -111,6 +111,8 @@ const IcingChart = (props) => {
         return;
       }
       setNoForecast(false);
+      setNoDepicted(true);
+
       segments.forEach((segment, index) => {
         const maxElevation = Math.min(
           routeProfileApiState.maxAltitude === 500 ? 45000 : routeProfileApiState.maxAltitude === 300 ? 27000 : 18000,
@@ -178,6 +180,9 @@ const IcingChart = (props) => {
               });
               color = probItem.color;
               opacity = prob < 10 ? 0 : 0.5;
+              if (prob >= 10) {
+                setNoDepicted(false);
+              }
             } else if (routeProfileApiState.icingLayers.includes('SLD')) {
               const sldItem = icingSldLegend.reduce((prev, curr) => {
                 const prevDiff = prev.value - sld;
@@ -189,13 +194,22 @@ const IcingChart = (props) => {
               });
               color = sldItem.color;
               opacity = sld < 10 ? 0 : 0.5;
+              if (sld >= 10) {
+                setNoDepicted(false);
+              }
               if (sld < 10 && routeProfileApiState.icingLayers.includes('Sev')) {
                 opacity = sev === 0 ? 0 : 0.5;
                 color = sevData.color;
+                if (sev > 0) {
+                  setNoDepicted(false);
+                }
               }
             } else if (routeProfileApiState.icingLayers.includes('Sev')) {
               opacity = sev === 0 ? 0 : 0.5;
               color = sevData.color;
+              if (sev > 0) {
+                setNoDepicted(false);
+              }
             }
 
             hint = {
@@ -235,7 +249,7 @@ const IcingChart = (props) => {
   ]);
 
   return (
-    <RouteProfileChart showDayNightBackground={false}>
+    <RouteProfileChart showDayNightBackground={true}>
       {icingSeries ? (
         <VerticalRectSeries
           colorType="literal"
@@ -249,7 +263,7 @@ const IcingChart = (props) => {
           onValueClick={(value) => setIcingHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })}
         ></VerticalRectSeries>
       ) : null}
-      {noForecast || noDepicted
+      {noForecast
         ? [1].map((_) => {
             const routeLength = getRouteLength(activeRoute, true);
             const segmentCount = getSegmentsCount(activeRoute);

@@ -32,6 +32,7 @@ import {
   useQueryNbmVisMutation,
   useQueryNbmWindDirMutation,
   useQueryNbmWindSpeedMutation,
+  useQueryNbmWx1Mutation,
   useQueryTemperatureDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { CircularProgress } from '@mui/material';
@@ -85,6 +86,7 @@ export const cacheKeys = {
   nbmVis: 'nbm-vis',
   nbmWindDir: 'nbm-winddir',
   nbmWindSpeed: 'nbm-windspeed',
+  nbmWx1: 'nbm-wx1',
   nbmAllAirport: 'nbm-all-airport',
 };
 
@@ -641,6 +643,9 @@ const RouteProfileDataLoader = () => {
   const [queryNbmWindSpeed, queryNbmWindSpeedResult] = useQueryNbmWindSpeedMutation({
     fixedCacheKey: cacheKeys.nbmWindSpeed,
   });
+  const [queryNbmWx1, queryNbmWx1Result] = useQueryNbmWx1Mutation({
+    fixedCacheKey: cacheKeys.nbmWx1,
+  });
   const [queryNbmAllAirports, queryNbmAllAirportResult] = useQueryNbmAllMutation({
     fixedCacheKey: cacheKeys.nbmAllAirport,
   });
@@ -675,6 +680,7 @@ const RouteProfileDataLoader = () => {
     queryNbmVisResult.reset();
     queryNbmWindDirResult.reset();
     queryNbmWindSpeedResult.reset();
+    queryNbmWx1Result.reset();
     queryNbmAllAirportResult.reset();
   }
 
@@ -754,6 +760,7 @@ const RouteProfileDataLoader = () => {
         queryNbmWindDir({ queryPoints: positions });
       if (!queryNbmWindSpeedResult.isLoading && !queryNbmWindSpeedResult.isSuccess)
         queryNbmWindSpeed({ queryPoints: positions });
+      if (!queryNbmWx1Result.isLoading && !queryNbmWx1Result.isSuccess) queryNbmWx1({ queryPoints: positions });
     }
   }
 
@@ -919,7 +926,12 @@ const RouteProfileDataLoader = () => {
   }
 
   function readNbmProperties(time: Date, segmentIndex): NbmProperties {
-    const { value: cloudbase } = getValueFromDatasetByElevation(queryNbmCloudbaseResult.data, time, null, segmentIndex);
+    const { value: cloudbase, time: forecastTime } = getValueFromDatasetByElevation(
+      queryNbmCloudbaseResult.data,
+      time,
+      null,
+      segmentIndex,
+    );
     const { value: cloudceiling } = getValueFromDatasetByElevation(
       queryNbmCloudCeilingResult.data,
       time,
@@ -933,6 +945,7 @@ const RouteProfileDataLoader = () => {
     const { value: visibility } = getValueFromDatasetByElevation(queryNbmVisResult.data, time, null, segmentIndex);
     const { value: winddir } = getValueFromDatasetByElevation(queryNbmWindDirResult.data, time, null, segmentIndex);
     const { value: windspeed } = getValueFromDatasetByElevation(queryNbmWindSpeedResult.data, time, null, segmentIndex);
+    const { value: wx_1 } = getValueFromDatasetByElevation(queryNbmWx1Result.data, time, null, segmentIndex);
     return {
       cloudbase,
       cloudceiling,
@@ -943,6 +956,8 @@ const RouteProfileDataLoader = () => {
       visibility,
       winddir,
       windspeed,
+      wx_1,
+      time: forecastTime?.getTime(),
     };
   }
 
@@ -1059,15 +1074,17 @@ const RouteProfileDataLoader = () => {
       }
       const newSegments = routeSegments.map((seg, index) => {
         if (seg.airport) {
+          const { value: cloudbase, time: forecastTime } = getValueFromDatasetByElevation(
+            queryNbmAllAirportResult.data.cloudbase,
+            new Date(seg.arriveTime),
+            null,
+            index,
+          );
           return {
             ...seg,
             airportNbmProps: {
-              cloudbase: getValueFromDatasetByElevation(
-                queryNbmAllAirportResult.data.cloudbase,
-                new Date(seg.arriveTime),
-                null,
-                index,
-              ).value,
+              time: forecastTime?.getTime(),
+              cloudbase: cloudbase,
               cloudceiling: getValueFromDatasetByElevation(
                 queryNbmAllAirportResult.data.cloudceiling,
                 new Date(seg.arriveTime),

@@ -78,6 +78,10 @@ export class RouteProfileQueryDataController {
   nbmWindSpeed(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryNbmWindSpeed(query);
   }
+  @Post('nbm-wx-1')
+  nbmWx1(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryNbmWindSpeed(query);
+  }
   @Post('nbm-all')
   nbmAll(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryAllNbmValues(query);
