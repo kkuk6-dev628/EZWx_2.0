@@ -1062,6 +1062,7 @@ const RouteProfileDataLoader = () => {
     queryGfsWindSpeedDataResult.isSuccess,
     queryGfsWindDirectionDataResult.isSuccess,
     queryNbmWindSpeedResult.isSuccess,
+    queryNbmWx1Result.isSuccess,
     observationTime,
     userSettings.true_airspeed,
     activeRoute,
