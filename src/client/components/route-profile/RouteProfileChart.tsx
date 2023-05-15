@@ -29,6 +29,9 @@ import {
 import { initialUserSettingsState, selectSettings } from '../../store/user/UserSettings';
 import {
   useGetRouteProfileStateQuery,
+  useQueryCeilingVisibilityMutation,
+  useQueryGfsWindDirectionDataMutation,
+  useQueryGfsWindSpeedDataMutation,
   useQueryTemperatureDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
@@ -46,12 +49,13 @@ import {
   visibilityMileToFraction,
   visibilityMileToMeter,
 } from '../map/common/AreoFunctions';
-import * as flyjs from '../../fly-js/fly';
+import fly, * as flyjs from '../../fly-js/fly';
 import { flightCategoryToColor, getNbmWeatherMarkerIcon } from '../map/leaflet/layers/StationMarkersLayer';
 import { MetarSkyValuesToString } from '../map/common/AreoConstants';
 import { Conrec } from '../../conrec-js/conrec';
 import { RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
 import Route from '../shared/Route';
+import { LatLng } from 'leaflet';
 
 export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
   if (viewWidth < 900) {
@@ -229,6 +233,7 @@ function getFlightCategoryColor(visibility, ceiling): string {
 const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground: boolean }) => {
   const activeRoute = useSelector(selectActiveRoute);
   const userSettings = useSelector(selectSettings);
+  const observationTime = userSettings.observation_time;
   const { data: routeProfileApiState } = useGetRouteProfileStateQuery(null, {
     refetchOnMountOrArgChange: true,
   });
@@ -255,6 +260,16 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   const [contourLabelData, setContourLabelData] = useState([]);
   const [temperatureContures, setTemperatureContours] = useState([]);
   const [weatherIconData, setWeatherIconData] = useState(null);
+  const [flightCategorySeries, setFlightCategorySeries] = useState(null);
+  const [, queryGfsWindDirectionDataResult] = useQueryGfsWindDirectionDataMutation({
+    fixedCacheKey: cacheKeys.gfsWinddirection,
+  });
+  const [, queryGfsWindSpeedDataResult] = useQueryGfsWindSpeedDataMutation({
+    fixedCacheKey: cacheKeys.gfsWindspeed,
+  });
+  const [, queryNbmCeilingVisResult] = useQueryCeilingVisibilityMutation({
+    fixedCacheKey: cacheKeys.nbmCloudCeiling,
+  });
 
   function buildTemperatureContourSeries() {
     if (queryTemperatureDataResult.isSuccess && segments.length > 0) {
@@ -434,7 +449,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         return {
           x: seg.accDistance + airportDist,
           y: 0,
-          yOffset: seg.isRoutePoint ? 24 : 36,
+          yOffset: seg.isRoutePoint ? 28 : 40,
           label: seg.airport?.key || seg.position.lat.toFixed(2) + '/' + seg.position.lng.toFixed(2),
           style: labelStyle,
           tooltip: tooltip,
@@ -469,6 +484,95 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       setElevationSeries(elevations);
     }
   }, [queryElevationsResult.isSuccess, routeLength]);
+
+  function buildFlightCategorySeries() {
+    if (activeRoute && queryNbmCeilingVisResult.isSuccess) {
+      const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * 10, true);
+      const flightCategoryData = [];
+      const initial = {
+        position: { lat: positions[0].lat, lng: positions[0].lng },
+        accDistance: 0,
+        arriveTime: new Date(observationTime).getTime(),
+      };
+      positions.reduce(
+        (
+          acc: { position: { lat: number; lng: number }; accDistance: number; arriveTime: Date },
+          curr: LatLng,
+          index,
+        ) => {
+          try {
+            const dist = fly.distanceTo(acc.position.lat, acc.position.lng, curr.lat, curr.lng, 2);
+            const course = fly.trueCourse(acc.position.lat, acc.position.lng, curr.lat, curr.lng, 2);
+            if (!dist) return acc;
+            let speed: number;
+            if (activeRoute.useForecastWinds) {
+              if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess) {
+                const { value: speedValue } = getValueFromDatasetByElevation(
+                  queryGfsWindSpeedDataResult.data,
+                  new Date(acc.arriveTime),
+                  activeRoute.altitude,
+                  index,
+                );
+                const { value: dirValue } = getValueFromDatasetByElevation(
+                  queryGfsWindDirectionDataResult.data,
+                  new Date(acc.arriveTime),
+                  activeRoute.altitude,
+                  index,
+                );
+                const { groundSpeed } = fly.calculateHeadingAndGroundSpeed(
+                  userSettings.true_airspeed,
+                  course,
+                  speedValue,
+                  dirValue,
+                  2,
+                );
+                speed = groundSpeed;
+              } else {
+                speed = userSettings.true_airspeed;
+              }
+            } else {
+              speed = userSettings.true_airspeed;
+            }
+            const newTime = new Date(acc.arriveTime).getTime() + (3600 * 1000 * dist) / speed;
+            const { value: cloudceiling } = getValueFromDatasetByElevation(
+              queryNbmCeilingVisResult.data?.cloudceiling,
+              new Date(acc.arriveTime),
+              null,
+              index,
+            );
+            const { value: visibility } = getValueFromDatasetByElevation(
+              queryNbmCeilingVisResult.data?.visibility,
+              new Date(acc.arriveTime),
+              null,
+              index,
+            );
+            const flightCategoryColor = getFlightCategoryColor(visibility, cloudceiling);
+            flightCategoryData.push({
+              x0: acc.accDistance,
+              x: acc.accDistance + dist,
+              y0: (-routeProfileApiState.maxAltitude * 100) / 100,
+              y: 0,
+              color: flightCategoryColor,
+            });
+            return {
+              position: { lat: curr.lat, lng: curr.lng },
+              accDistance: acc.accDistance + dist,
+              arriveTime: newTime,
+            };
+          } catch (err) {
+            console.warn(err);
+            return acc;
+          }
+        },
+        initial,
+      );
+      setFlightCategorySeries(flightCategoryData);
+    }
+  }
+
+  useEffect(() => {
+    buildFlightCategorySeries();
+  }, [segments, queryNbmCeilingVisResult.isSuccess]);
 
   return (
     <XYPlot
@@ -590,7 +694,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           onValueClick={(value) => setTimeHint(value)}
           onValueMouseOut={() => setTimeHint(null)}
           data={Array.from({ length: segmentsCount }, (_value, index) => {
-            if (segments[index].arriveTime)
+            if (segments[index] && segments[index].arriveTime)
               return {
                 x: Math.round((index * routeLength) / (segmentsCount - 1)),
                 y: 0,
@@ -689,6 +793,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         strokeWidth={48}
       ></LineSeries>
       <CustomSVGSeries customComponent="square" data={weatherIconData}></CustomSVGSeries>
+      <VerticalRectSeries colorType="literal" data={flightCategorySeries}></VerticalRectSeries>
 
       {showElevationHint ? (
         <Hint value={elevationHint}>
@@ -766,3 +871,6 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   );
 };
 export default RouteProfileChart;
+function getFuzzyLocalTimeFromPoint(newTime: number, arg1: any[]) {
+  throw new Error('Function not implemented.');
+}
