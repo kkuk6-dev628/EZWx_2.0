@@ -253,4 +253,10 @@ export class RouteProfileQueryDataService {
     const windspeed = await this.queryRasterDataset(query.queryPoints, this.nbmWindSpeedRepository);
     return { cloudbase, cloudceiling, dewpoint, gust, skycover, temperature, visibility, winddir, windspeed };
   }
+
+  async queryCeilingVisibility(query: RouteProfileQueryDto) {
+    const cloudceiling = await this.queryRasterDataset(query.queryPoints, this.nbmCloudCeilingRepository);
+    const visibility = await this.queryRasterDataset(query.queryPoints, this.nbmVisRepository);
+    return { cloudceiling, visibility };
+  }
 }

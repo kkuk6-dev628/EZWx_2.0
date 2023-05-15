@@ -15,6 +15,7 @@ import {
   useGetRouteProfileStateQuery,
   useQueryAirportPropertiesMutation,
   useQueryCaturbDataMutation,
+  useQueryCeilingVisibilityMutation,
   useQueryGfsWindDirectionDataMutation,
   useQueryGfsWindSpeedDataMutation,
   useQueryHumidityDataMutation,
@@ -619,7 +620,7 @@ const RouteProfileDataLoader = () => {
   const [queryNbmCloudbase, queryNbmCloudbaseResult] = useQueryNbmCloudbaseMutation({
     fixedCacheKey: cacheKeys.nbmCloudbase,
   });
-  const [queryNbmCloudCeiling, queryNbmCloudCeilingResult] = useQueryNbmCloudCeilingMutation({
+  const [queryNbmCeilingVis, queryNbmCeilingVisResult] = useQueryCeilingVisibilityMutation({
     fixedCacheKey: cacheKeys.nbmCloudCeiling,
   });
   const [queryNbmDewpoint, queryNbmDewpointResult] = useQueryNbmDewpointMutation({
@@ -672,7 +673,7 @@ const RouteProfileDataLoader = () => {
     queryMwturbDataResult.reset();
     queryElevationsResult.reset();
     queryNbmCloudbaseResult.reset();
-    queryNbmCloudCeilingResult.reset();
+    queryNbmCeilingVisResult.reset();
     queryNbmDewpointResult.reset();
     queryNbmGustResult.reset();
     queryNbmSkycoverResult.reset();
@@ -745,17 +746,17 @@ const RouteProfileDataLoader = () => {
   function queryNbm() {
     if (activeRoute) {
       const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
+      const positions_2 = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * 10);
       if (!queryNbmCloudbaseResult.isLoading && !queryNbmCloudbaseResult.isSuccess)
         queryNbmCloudbase({ queryPoints: positions });
-      if (!queryNbmCloudCeilingResult.isLoading && !queryNbmCloudCeilingResult.isSuccess)
-        queryNbmCloudCeiling({ queryPoints: positions });
+      if (!queryNbmCeilingVisResult.isLoading && !queryNbmCeilingVisResult.isSuccess)
+        queryNbmCeilingVis({ queryPoints: positions_2 });
       if (!queryNbmDewpointResult.isLoading && !queryNbmDewpointResult.isSuccess)
         queryNbmDewpoint({ queryPoints: positions });
       if (!queryNbmGustResult.isLoading && !queryNbmGustResult.isSuccess) queryNbmGust({ queryPoints: positions });
       if (!queryNbmSkycoverResult.isLoading && !queryNbmSkycoverResult.isSuccess)
         queryNbmSkycover({ queryPoints: positions });
       if (!queryNbmTempResult.isLoading && !queryNbmTempResult.isSuccess) queryNbmTemp({ queryPoints: positions });
-      if (!queryNbmVisResult.isLoading && !queryNbmVisResult.isSuccess) queryNbmVis({ queryPoints: positions });
       if (!queryNbmWindDirResult.isLoading && !queryNbmWindDirResult.isSuccess)
         queryNbmWindDir({ queryPoints: positions });
       if (!queryNbmWindSpeedResult.isLoading && !queryNbmWindSpeedResult.isSuccess)
@@ -933,16 +934,21 @@ const RouteProfileDataLoader = () => {
       segmentIndex,
     );
     const { value: cloudceiling } = getValueFromDatasetByElevation(
-      queryNbmCloudCeilingResult.data,
+      queryNbmCeilingVisResult.data?.cloudceiling,
       time,
       null,
-      segmentIndex,
+      segmentIndex * 10,
     );
     const { value: dewpoint } = getValueFromDatasetByElevation(queryNbmDewpointResult.data, time, null, segmentIndex);
     const { value: gust } = getValueFromDatasetByElevation(queryNbmGustResult.data, time, null, segmentIndex);
     const { value: skycover } = getValueFromDatasetByElevation(queryNbmSkycoverResult.data, time, null, segmentIndex);
     const { value: temperature } = getValueFromDatasetByElevation(queryNbmTempResult.data, time, null, segmentIndex);
-    const { value: visibility } = getValueFromDatasetByElevation(queryNbmVisResult.data, time, null, segmentIndex);
+    const { value: visibility } = getValueFromDatasetByElevation(
+      queryNbmCeilingVisResult.data?.visibility,
+      time,
+      null,
+      segmentIndex * 10,
+    );
     const { value: winddir } = getValueFromDatasetByElevation(queryNbmWindDirResult.data, time, null, segmentIndex);
     const { value: windspeed } = getValueFromDatasetByElevation(queryNbmWindSpeedResult.data, time, null, segmentIndex);
     const { value: wx_1 } = getValueFromDatasetByElevation(queryNbmWx1Result.data, time, null, segmentIndex);

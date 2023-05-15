@@ -249,7 +249,7 @@ const IcingChart = (props) => {
   ]);
 
   return (
-    <RouteProfileChart showDayNightBackground={true}>
+    <RouteProfileChart showDayNightBackground={false}>
       {icingSeries ? (
         <VerticalRectSeries
           colorType="literal"

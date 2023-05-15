@@ -107,11 +107,11 @@ export const routeProfileApi = createApi({
       transformResponse: transformTimeBands,
     }),
     queryGfsWindDirectionData: builder.mutation({
-      query: (data) => ({ url: 'data/gfs-winddirection', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/g-winddirection', method: 'Post', body: data }),
       transformResponse: transformTimeBands,
     }),
     queryGfsWindSpeedData: builder.mutation({
-      query: (data) => ({ url: 'data/gfs-windspeed', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/g-windspeed', method: 'Post', body: data }),
       transformResponse: transformTimeBands,
     }),
     queryIcingProbData: builder.mutation({
@@ -127,47 +127,56 @@ export const routeProfileApi = createApi({
       transformResponse: transformElevationBands,
     }),
     queryNbmCloudbase: builder.mutation({
-      query: (data) => ({ url: 'data/nbm-cloudbase', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/n-cloudbase', method: 'Post', body: data }),
       transformResponse: transformTimeBands,
     }),
     queryNbmCloudCeiling: builder.mutation({
-      query: (data) => ({ url: 'data/nbm-cloudceiling', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/n-cloudceiling', method: 'Post', body: data }),
       transformResponse: transformTimeBands,
     }),
     queryNbmDewpoint: builder.mutation({
-      query: (data) => ({ url: 'data/nbm-dewpoint', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/n-dewpoint', method: 'Post', body: data }),
       transformResponse: transformTimeBands,
     }),
     queryNbmGust: builder.mutation({
-      query: (data) => ({ url: 'data/nbm-gust', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/n-gust', method: 'Post', body: data }),
       transformResponse: transformTimeBands,
     }),
     queryNbmSkycover: builder.mutation({
-      query: (data) => ({ url: 'data/nbm-skycover', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/n-skycover', method: 'Post', body: data }),
       transformResponse: transformTimeBands,
     }),
     queryNbmTemp: builder.mutation({
-      query: (data) => ({ url: 'data/nbm-t2m', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/n-t2m', method: 'Post', body: data }),
       transformResponse: transformTimeBands,
     }),
     queryNbmVis: builder.mutation({
-      query: (data) => ({ url: 'data/nbm-vis', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/n-vis', method: 'Post', body: data }),
       transformResponse: transformTimeBands,
     }),
     queryNbmWindDir: builder.mutation({
-      query: (data) => ({ url: 'data/nbm-winddirection', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/n-winddirection', method: 'Post', body: data }),
       transformResponse: transformTimeBands,
     }),
     queryNbmWindSpeed: builder.mutation({
-      query: (data) => ({ url: 'data/nbm-windspeed', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/n-windspeed', method: 'Post', body: data }),
       transformResponse: transformTimeBands,
     }),
     queryNbmWx1: builder.mutation({
-      query: (data) => ({ url: 'data/nbm-wx-1', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/n-wx-1', method: 'Post', body: data }),
       transformResponse: transformTimeBands,
     }),
+    queryCeilingVisibility: builder.mutation({
+      query: (data) => ({ url: 'data/n-ceiling-vis', method: 'Post', body: data }),
+      transformResponse: (response: any) => {
+        return {
+          cloudceiling: transformTimeBands(response.cloudceiling),
+          visibility: transformTimeBands(response.visibility),
+        };
+      },
+    }),
     queryNbmAll: builder.mutation({
-      query: (data) => ({ url: 'data/nbm-all', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/n-all', method: 'Post', body: data }),
       transformResponse: (response: any) => {
         return {
           cloudbase: transformTimeBands(response.cloudbase),
@@ -209,5 +218,6 @@ export const {
   useQueryNbmWindDirMutation,
   useQueryNbmWindSpeedMutation,
   useQueryNbmWx1Mutation,
+  useQueryCeilingVisibilityMutation,
   useQueryNbmAllMutation,
 } = routeProfileApi;

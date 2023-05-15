@@ -453,7 +453,7 @@ export const visibilityMileToFraction = (mile: number): string => {
 };
 
 export const getMetarCeilingCategory = (ceiling: number, personalMinimums: PersonalMinimums): any[] => {
-  if (ceiling === null || ceiling === 0 || !isFinite(ceiling)) {
+  if (ceiling === null || ceiling === 0 || ceiling === -9999 || !isFinite(ceiling)) {
     return [undefined, '#000', Infinity];
   }
   let ceilingMinimum = personalMinimums.VFR;

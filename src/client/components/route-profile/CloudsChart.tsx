@@ -176,7 +176,7 @@ const CloudsChart = (props) => {
               colorSecond = cloudColor1;
             }
           }
-          if (cloudbase) {
+          if (cloudbase && cloudbase > 0 && elevation + cloudbase + 2000 <= routeProfileApiState.maxAltitude * 100) {
             cloudbase = Math.round(cloudbase);
             cloudData.push({
               x0: Math.round(index * segmentLength - segmentLength / 2),
@@ -191,7 +191,11 @@ const CloudsChart = (props) => {
               },
             });
           }
-          if (cloudceiling) {
+          if (
+            cloudceiling &&
+            cloudceiling > 0 &&
+            elevation + cloudceiling + 2000 <= routeProfileApiState.maxAltitude * 100
+          ) {
             cloudceiling = Math.round(cloudceiling);
             cloudData.push({
               x0: Math.round(index * segmentLength - segmentLength / 2),
@@ -212,7 +216,10 @@ const CloudsChart = (props) => {
           const start = Math.max(elevation + cloudbase, elevation + cloudceiling) + 2000;
           humidityData.forEach((humidity) => {
             if (humidity.elevation > start) {
-              if (humidityThresholds[humidity.elevation] <= humidity.value) {
+              if (
+                humidityThresholds[humidity.elevation] <= humidity.value &&
+                humidity.elevation + 500 <= routeProfileApiState.maxAltitude * 100
+              ) {
                 cloudData.push({
                   x0: Math.round(index * segmentLength - segmentLength / 2),
                   y0: humidity.elevation - 500,
@@ -233,7 +240,7 @@ const CloudsChart = (props) => {
           );
           icingSevData.forEach((icingSev) => {
             if (icingSev.elevation > start) {
-              if (icingSev.value > 0) {
+              if (icingSev.value > 0 && icingSev.elevation + 500 < routeProfileApiState.maxAltitude) {
                 cloudData.push({
                   x0: Math.round(index * segmentLength - segmentLength / 2),
                   y0: icingSev.elevation - 500,

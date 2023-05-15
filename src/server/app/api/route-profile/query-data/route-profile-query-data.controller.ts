@@ -22,11 +22,11 @@ export class RouteProfileQueryDataController {
   temperature(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryTemperature(query);
   }
-  @Post('gfs-winddirection')
+  @Post('g-winddirection')
   gfsWindDirection(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryGfsWindDirection(query);
   }
-  @Post('gfs-windspeed')
+  @Post('g-windspeed')
   gfsWindSpeed(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryGfsWindSpeed(query);
   }
@@ -42,7 +42,7 @@ export class RouteProfileQueryDataController {
   icingSld(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryIcingSld(query);
   }
-  @Post('nbm-cloudbase')
+  @Post('n-cloudbase')
   nbmCloudbase(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryNbmCloudbase(query);
   }
@@ -50,40 +50,44 @@ export class RouteProfileQueryDataController {
   nbmCloudceiling(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryNbmCloudceiling(query);
   }
-  @Post('nbm-dewpoint')
+  @Post('n-dewpoint')
   nbmDewpoint(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryNbmDewpoint(query);
   }
-  @Post('nbm-gust')
+  @Post('n-gust')
   nbmGust(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryNbmGust(query);
   }
-  @Post('nbm-skycover')
+  @Post('n-skycover')
   nbmSkycover(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryNbmSkycover(query);
   }
-  @Post('nbm-t2m')
+  @Post('n-t2m')
   nbmT2m(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryNbmT2m(query);
   }
-  @Post('nbm-vis')
+  @Post('n-vis')
   nbmVis(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryNbmVis(query);
   }
-  @Post('nbm-winddirection')
+  @Post('n-winddirection')
   nbmWindDirection(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryNbmWindDirection(query);
   }
-  @Post('nbm-windspeed')
+  @Post('n-windspeed')
   nbmWindSpeed(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryNbmWindSpeed(query);
   }
-  @Post('nbm-wx-1')
+  @Post('n-wx-1')
   nbmWx1(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryNbmWx1(query);
   }
-  @Post('nbm-all')
+  @Post('n-all')
   nbmAll(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryAllNbmValues(query);
+  }
+  @Post('n-ceiling-vis')
+  nbmCeilingVisibility(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryCeilingVisibility(query);
   }
 }

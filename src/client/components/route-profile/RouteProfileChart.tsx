@@ -154,24 +154,29 @@ export function buildContour(
           : contour.temperature === 0
           ? 'red'
           : temperatureContourColors.negative,
-      stroke: 'white',
-      strokeWidth: 0.1,
+      // stroke: 'white',
+      // strokeWidth: 0.1,
+      filter: 'url(#solid)',
       dominantBaseline: 'middle',
       textAnchor: 'end',
       fontWeight: 900,
     };
-    contourLabels.push({
-      x: minPos.x,
-      y: minPos.y,
-      label,
-      style,
-    });
-    contourLabels.push({
-      x: maxPos.x,
-      y: maxPos.y,
-      label,
-      style: { ...style, textAnchor: 'start' },
-    });
+    if (minPos.y > 1000 && minPos.y < maxAltitude * 100 - 1000) {
+      contourLabels.push({
+        x: minPos.x,
+        y: minPos.y,
+        label,
+        style,
+      });
+    }
+    if (maxPos.y > 1000 && maxPos.y < maxAltitude * 100 - 1000) {
+      contourLabels.push({
+        x: maxPos.x,
+        y: maxPos.y,
+        label,
+        style: { ...style, textAnchor: 'start' },
+      });
+    }
   });
   return { contours: newContours, contourLabels };
 }
@@ -293,7 +298,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       setGradientStops(stops);
       buildAirportLabelSeries();
     }
-  }, [segments]);
+  }, [segments, routeProfileApiState.maxAltitude]);
 
   useEffect(() => {
     window.addEventListener('resize', handleWindowSizeChange);
@@ -320,18 +325,11 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       );
       return {
         x: segment.accDistance,
-        y: routeProfileApiState.maxAltitude * 100 * 1.08,
+        y: routeProfileApiState.maxAltitude * 100 * 1.04,
         customComponent: () => {
           return (
             <text x={0} y={0}>
-              <tspan
-                x="0"
-                y="24"
-                fill={color}
-                dominantBaseline="middle"
-                textAnchor="middle"
-                className={icon + ' fa-2x'}
-              >
+              <tspan x="0" y="0" fill={color} dominantBaseline="middle" textAnchor="middle" className={icon + ' fa-2x'}>
                 {weatherFontContents[icon]}
               </tspan>
             </text>
@@ -437,7 +435,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           x: seg.accDistance + airportDist,
           y: 0,
           yOffset: seg.isRoutePoint ? 24 : 36,
-          label: seg.airport ? seg.airport.key : round(seg.position.lat, 2) + '/' + round(seg.position.lng, 2),
+          label: seg.airport?.key || seg.position.lat.toFixed(2) + '/' + seg.position.lng.toFixed(2),
           style: labelStyle,
           tooltip: tooltip,
         };
@@ -479,17 +477,19 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       color="white"
       yDomain={[0, routeProfileApiState.maxAltitude * 100 * 1.08]}
       xDomain={[-startMargin, routeLength + endMargin]}
-      margin={{ right: 40, bottom: 80 }}
+      margin={{ right: 40, bottom: 80, top: 0 }}
     >
-      {props.showDayNightBackground && (
-        <GradientDefs>
-          <linearGradient id="linear-gradient">
-            {gradientStops.map(({ level, stopColor }, index) => (
-              <stop key={'gradient-' + index} offset={level} stopColor={stopColor} />
-            ))}
-          </linearGradient>
-        </GradientDefs>
-      )}
+      <GradientDefs>
+        <linearGradient id="linear-gradient">
+          {gradientStops.map(({ level, stopColor }, index) => (
+            <stop key={'gradient-' + index} offset={level} stopColor={stopColor} />
+          ))}
+        </linearGradient>
+        <filter x="0" y="0" width="1" height="1" id="solid">
+          <feFlood flood-color="#9BCAEF" />
+          <feComposite in="SourceGraphic" />
+        </filter>
+      </GradientDefs>
       {props.showDayNightBackground && (
         <AreaSeries
           data={[
@@ -505,7 +505,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             { x: -startMargin, y: routeProfileApiState.maxAltitude * 100 },
             { x: routeLength + endMargin, y: routeProfileApiState.maxAltitude * 100 },
           ]}
-          color="#DDD"
+          color="#F2F0F0"
         />
       )}
       <VerticalGridLines
@@ -584,8 +584,6 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       />
       {segments && segments.length > 4 ? (
         <LabelSeries
-          animation
-          allowOffsetToBeReversed
           onValueMouseOver={(value) => {
             setTimeHint(value);
           }}
@@ -620,7 +618,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           onValueMouseOut={() => setAirportHint(null)}
         />
       )}
-      {routeProfileApiState.chartType === 'Wind' && activeRoute ? (
+      {routeProfileApiState.chartType !== 'Wind' && activeRoute ? props.children : null}
+      {activeRoute ? (
         <LineSeries
           data={[
             { x: 0, y: activeRoute.altitude },
@@ -630,7 +629,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           strokeWidth={4}
         />
       ) : null}
-      {routeProfileApiState.chartType === 'Wind' && activeRoute ? (
+      {activeRoute ? (
         <LineSeries
           data={[
             { x: 0, y: activeRoute.altitude },
@@ -639,7 +638,6 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           color="magenta"
         />
       ) : null}
-      {props.children}
       {routeProfileApiState.chartType !== 'Turb' &&
         temperatureContures.map((contourLine, index) => {
           const color =
@@ -664,25 +662,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         <LabelSeries animation allowOffsetToBeReversed data={contourLabelData}></LabelSeries>
       ) : null}
 
-      {routeProfileApiState.chartType !== 'Wind' && activeRoute ? (
-        <LineSeries
-          data={[
-            { x: 0, y: activeRoute.altitude },
-            { x: routeLength, y: activeRoute.altitude },
-          ]}
-          color="white"
-          strokeWidth={4}
-        />
-      ) : null}
-      {routeProfileApiState.chartType !== 'Wind' && activeRoute ? (
-        <LineSeries
-          data={[
-            { x: 0, y: activeRoute.altitude },
-            { x: routeLength, y: activeRoute.altitude },
-          ]}
-          color="magenta"
-        />
-      ) : null}
+      {routeProfileApiState.chartType === 'Wind' && activeRoute ? props.children : null}
       {elevationSeries.length > 0 ? (
         <AreaSeries
           data={elevationSeries}
@@ -694,18 +674,20 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           onSeriesMouseOver={() => setShowElevationHint(true)}
         />
       ) : null}
-      <VerticalRectSeries
-        colorType="literal"
+      <LineSeries
+        color="white"
         data={[
           {
-            x0: -startMargin,
+            x: -startMargin,
+            y: routeProfileApiState.maxAltitude * 100 * 1.04,
+          },
+          {
             x: routeLength + endMargin,
-            y0: routeProfileApiState.maxAltitude * 100,
-            y: routeProfileApiState.maxAltitude * 100 * 1.08,
+            y: routeProfileApiState.maxAltitude * 100 * 1.04,
           },
         ]}
-        style={{ strokeWidth: 0 }}
-      ></VerticalRectSeries>
+        strokeWidth={48}
+      ></LineSeries>
       <CustomSVGSeries customComponent="square" data={weatherIconData}></CustomSVGSeries>
 
       {showElevationHint ? (
@@ -767,7 +749,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             <b>Wind direction:</b>&nbsp;{Math.round(airportHint.tooltip.winddir) + ' \u00B0'}
           </span>
           <span>
-            <b>temperature:</b>&nbsp;
+            <b>Temperature:</b>&nbsp;
             {!userSettings.default_temperature_unit
               ? Math.round(airportHint.tooltip.temperature) + ' \u00B0C'
               : celsiusToFahrenheit(airportHint.tooltip.temperature, 0) + ' \u00B0F'}
