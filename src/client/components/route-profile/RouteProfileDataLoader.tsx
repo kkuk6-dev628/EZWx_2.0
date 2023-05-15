@@ -205,15 +205,17 @@ export function getValueFromDataset(
   segmentIndex,
 ): { value: number; time: Date } {
   try {
-    const filteredByTime = datasetAll.filter((dataset) => {
-      if (dataset.time && dataset.time.length === 1) {
-        const diff = time.getTime() - new Date(dataset.time[0]).getTime();
-        return diff >= 0 && diff < 3600 * 1000;
+    const filteredByTime = datasetAll.reduce((prev, curr) => {
+      if (prev.time && prev.time.length === 1) {
+        const diff = time.getTime() - new Date(curr.time[0]).getTime();
+        const diffPrev = time.getTime() - new Date(prev.time[0]).getTime();
+        return diff >= 0 && diff < diffPrev ? curr : prev;
       }
-      return false;
+      return prev;
     });
 
-    if (filteredByTime.length > 0) {
+    const forecastTime = new Date(filteredByTime.time[0]);
+    if (time.getTime() - forecastTime.getTime() < 3600 * 3 * 1000) {
       const filteredByElevation = filteredByTime[0].data[segmentIndex].data.filter((dataset) => {
         return Math.abs(dataset.elevation - elevation) < 1000;
       });
@@ -242,19 +244,20 @@ export function getValuesFromDatasetAllElevationByTime(
     if (!datasetAll) {
       return [];
     }
-    const result = [];
-    const filteredByTime = datasetAll.filter((dataset) => {
-      if (dataset.time && dataset.time.length === 1) {
-        const diff = time.getTime() - new Date(dataset.time[0]).getTime();
-        return diff >= 0 && diff < 3600 * 1000;
+    const filteredByTime = datasetAll.reduce((prev, curr) => {
+      if (prev.time && prev.time.length === 1) {
+        const diff = time.getTime() - new Date(curr.time[0]).getTime();
+        const diffPrev = time.getTime() - new Date(prev.time[0]).getTime();
+        return diff >= 0 && diff < diffPrev ? curr : prev;
       }
-      return false;
+      return prev;
     });
 
-    if (filteredByTime.length > 0) {
+    const forecastTime = new Date(filteredByTime.time[0]);
+    if (time.getTime() - forecastTime.getTime() < 3600 * 3 * 1000) {
       return filteredByTime[0].data[segmentIndex].data;
     }
-    return result;
+    return [];
   } catch (e) {
     return [];
   }
@@ -271,11 +274,19 @@ export function getValuesFromDatasetAllElevationByElevation(
     }
     const result = [];
     datasetAll.forEach((dataset) => {
-      const filteredByTimes = dataset.data[segmentIndex].data.filter((dataset) => {
-        const diff = time.getTime() - new Date(dataset.time).getTime();
-        return diff >= 0 && diff < 3600 * 1000;
+      const filteredByTime = dataset.data[segmentIndex].data.reduce((prev, curr) => {
+        if (prev.time && prev.time.length === 1) {
+          const diff = time.getTime() - new Date(curr.time[0]).getTime();
+          const diffPrev = time.getTime() - new Date(prev.time[0]).getTime();
+          return diff >= 0 && diff < diffPrev ? curr : prev;
+        }
+        return prev;
       });
-      result.push({ elevation: dataset.elevations[0], value: filteredByTimes[0].value });
+
+      const forecastTime = new Date(filteredByTime.time[0]);
+      if (time.getTime() - forecastTime.getTime() < 3600 * 3 * 1000) {
+        result.push({ elevation: dataset.elevations[0], value: filteredByTime[0].value });
+      }
     });
     return result;
   } catch (e) {
@@ -304,26 +315,44 @@ export function getValueFromDatasetByElevation(
     }
 
     if (filteredByElevations.length === 1) {
-      const filteredByTimes = filteredByElevations[0].data[segmentIndex].data.filter((dataset) => {
-        const diff = time.getTime() - new Date(dataset.time).getTime();
-        return diff >= 0 && diff < 3600 * 1000;
+      const filteredByTime = filteredByElevations[0].data[segmentIndex].data.reduce((prev, curr) => {
+        if (prev.time) {
+          const diff = time.getTime() - new Date(curr.time).getTime();
+          const diffPrev = time.getTime() - new Date(prev.time).getTime();
+          return diff >= 0 && diff < diffPrev ? curr : prev;
+        }
+        return prev;
       });
-      if (filteredByTimes.length === 1) {
-        return { value: filteredByTimes[0].value, time: new Date(filteredByTimes[0].time) };
+      const forecastTime = new Date(filteredByTime.time);
+      if (time.getTime() - forecastTime.getTime() < 3600 * 3 * 1000) {
+        return { value: filteredByTime.value, time: new Date(filteredByTime.time) };
       }
     } else if (filteredByElevations.length === 2) {
-      const filteredByTimes_0 = filteredByElevations[0].data[segmentIndex].data.filter((dataset) => {
-        const diff = time.getTime() - new Date(dataset.time).getTime();
-        return diff >= 0 && diff < 3600 * 1000;
+      const filteredByTime_0 = filteredByElevations[0].data[segmentIndex].data.reduce((prev, curr) => {
+        if (prev.time) {
+          const diff = time.getTime() - new Date(curr.time).getTime();
+          const diffPrev = time.getTime() - new Date(prev.time).getTime();
+          return diff >= 0 && diff < diffPrev ? curr : prev;
+        }
+        return prev;
       });
-      const filteredByTimes_1 = filteredByElevations[1].data[segmentIndex].data.filter((dataset) => {
-        const diff = time.getTime() - new Date(dataset.time).getTime();
-        return diff >= 0 && diff < 3600 * 1000;
+      const forecastTime_0 = new Date(filteredByTime_0.time);
+      const filteredByTime_1 = filteredByElevations[1].data[segmentIndex].data.reduce((prev, curr) => {
+        if (prev.time && prev.time.length === 1) {
+          const diff = time.getTime() - new Date(curr.time).getTime();
+          const diffPrev = time.getTime() - new Date(prev.time).getTime();
+          return diff >= 0 && diff < diffPrev ? curr : prev;
+        }
+        return prev;
       });
-      if (filteredByTimes_0.length === 1 && filteredByTimes_1.length === 1) {
+      const forecastTime_1 = new Date(filteredByTime_1.time);
+      if (
+        time.getTime() - forecastTime_0.getTime() < 3600 * 3 * 1000 &&
+        time.getTime() - forecastTime_1.getTime() < 3600 * 3 * 1000
+      ) {
         return {
-          value: (filteredByTimes_0[0].value + filteredByTimes_1[0].value) / 2,
-          time: new Date(filteredByTimes_0[0].time),
+          value: (filteredByTime_0.value + filteredByTime_1.value) / 2,
+          time: new Date(filteredByTime_0.time),
         };
       }
     }
@@ -635,9 +664,6 @@ const RouteProfileDataLoader = () => {
   const [queryNbmTemp, queryNbmTempResult] = useQueryNbmTempMutation({
     fixedCacheKey: cacheKeys.nbmTemp,
   });
-  const [queryNbmVis, queryNbmVisResult] = useQueryNbmVisMutation({
-    fixedCacheKey: cacheKeys.nbmVis,
-  });
   const [queryNbmWindDir, queryNbmWindDirResult] = useQueryNbmWindDirMutation({
     fixedCacheKey: cacheKeys.nbmWindDir,
   });
@@ -678,7 +704,6 @@ const RouteProfileDataLoader = () => {
     queryNbmGustResult.reset();
     queryNbmSkycoverResult.reset();
     queryNbmTempResult.reset();
-    queryNbmVisResult.reset();
     queryNbmWindDirResult.reset();
     queryNbmWindSpeedResult.reset();
     queryNbmWx1Result.reset();
