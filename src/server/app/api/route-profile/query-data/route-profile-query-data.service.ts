@@ -255,8 +255,18 @@ export class RouteProfileQueryDataService {
   }
 
   async queryCeilingVisibility(query: RouteProfileQueryDto) {
+    // console.log('start', new Date().toLocaleTimeString());
+    // const [cloudceiling, visibility, skycover] = await Promise.all([
+    //   this.queryRasterDataset(query.queryPoints, this.nbmCloudCeilingRepository),
+    //   this.queryRasterDataset(query.queryPoints, this.nbmVisRepository),
+    //   this.queryRasterDataset(query.queryPoints, this.nbmSkycoverRepository),
+    // ]);
+    // console.log('end promise all', new Date().toLocaleTimeString());
+    const cloudbase = await this.queryRasterDataset(query.queryPoints, this.nbmCloudBaseRepository);
     const cloudceiling = await this.queryRasterDataset(query.queryPoints, this.nbmCloudCeilingRepository);
     const visibility = await this.queryRasterDataset(query.queryPoints, this.nbmVisRepository);
-    return { cloudceiling, visibility };
+    const skycover = await this.queryRasterDataset(query.queryPoints, this.nbmSkycoverRepository);
+    // console.log('end await all', new Date().toLocaleTimeString());
+    return { cloudbase, cloudceiling, visibility, skycover };
   }
 }

@@ -15,7 +15,7 @@ import {
   useGetRouteProfileStateQuery,
   useQueryAirportPropertiesMutation,
   useQueryCaturbDataMutation,
-  useQueryCeilingVisibilityMutation,
+  useQueryNbmFlightCategoryMutation,
   useQueryGfsWindDirectionDataMutation,
   useQueryGfsWindSpeedDataMutation,
   useQueryHumidityDataMutation,
@@ -37,7 +37,7 @@ import {
   useQueryTemperatureDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { CircularProgress } from '@mui/material';
-import { skipToken } from '@reduxjs/toolkit/query';
+import { QueryStatus, skipToken } from '@reduxjs/toolkit/query';
 import { useDispatch } from 'react-redux';
 import { NbmProperties, RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
 import { selectSettings } from '../../store/user/UserSettings';
@@ -52,6 +52,8 @@ export const totalNumberOfElevations = 512;
 export const contourMin = -100;
 
 export const contourMax = 60;
+
+export const flightCategoryDivide = 10;
 
 export const SUNSET_SUNRISE = {
   night: {
@@ -89,6 +91,7 @@ export const cacheKeys = {
   nbmWindSpeed: 'nbm-windspeed',
   nbmWx1: 'nbm-wx1',
   nbmAllAirport: 'nbm-all-airport',
+  elevation: 'elevation-api',
 };
 
 /**
@@ -216,15 +219,15 @@ export function getValueFromDataset(
 
     const forecastTime = new Date(filteredByTime.time[0]);
     if (time.getTime() - forecastTime.getTime() < 3600 * 3 * 1000) {
-      const filteredByElevation = filteredByTime[0].data[segmentIndex].data.filter((dataset) => {
+      const filteredByElevation = filteredByTime.data[segmentIndex].data.filter((dataset) => {
         return Math.abs(dataset.elevation - elevation) < 1000;
       });
       if (filteredByElevation.length === 1) {
-        return { value: filteredByElevation[0].value, time: new Date(filteredByTime[0].time[0]) };
+        return { value: filteredByElevation[0].value, time: new Date(filteredByTime.time[0]) };
       } else if (filteredByElevation.length === 2) {
         return {
           value: (filteredByElevation[0].value + filteredByElevation[0].value) / 2,
-          time: new Date(filteredByTime[0].time[0]),
+          time: new Date(filteredByTime.time[0]),
         };
       }
     }
@@ -255,7 +258,7 @@ export function getValuesFromDatasetAllElevationByTime(
 
     const forecastTime = new Date(filteredByTime.time[0]);
     if (time.getTime() - forecastTime.getTime() < 3600 * 3 * 1000) {
-      return filteredByTime[0].data[segmentIndex].data;
+      return filteredByTime.data[segmentIndex].data;
     }
     return [];
   } catch (e) {
@@ -275,17 +278,17 @@ export function getValuesFromDatasetAllElevationByElevation(
     const result = [];
     datasetAll.forEach((dataset) => {
       const filteredByTime = dataset.data[segmentIndex].data.reduce((prev, curr) => {
-        if (prev.time && prev.time.length === 1) {
-          const diff = time.getTime() - new Date(curr.time[0]).getTime();
-          const diffPrev = time.getTime() - new Date(prev.time[0]).getTime();
+        if (prev.time) {
+          const diff = time.getTime() - new Date(curr.time).getTime();
+          const diffPrev = time.getTime() - new Date(prev.time).getTime();
           return diff >= 0 && diff < diffPrev ? curr : prev;
         }
         return prev;
       });
 
-      const forecastTime = new Date(filteredByTime.time[0]);
+      const forecastTime = new Date(filteredByTime.time);
       if (time.getTime() - forecastTime.getTime() < 3600 * 3 * 1000) {
-        result.push({ elevation: dataset.elevations[0], value: filteredByTime[0].value });
+        result.push({ elevation: dataset.elevations[0], value: filteredByTime.value });
       }
     });
     return result;
@@ -649,7 +652,7 @@ const RouteProfileDataLoader = () => {
   const [queryNbmCloudbase, queryNbmCloudbaseResult] = useQueryNbmCloudbaseMutation({
     fixedCacheKey: cacheKeys.nbmCloudbase,
   });
-  const [queryNbmCeilingVis, queryNbmCeilingVisResult] = useQueryCeilingVisibilityMutation({
+  const [queryNbmFlightCategory, queryNbmFlightCatResult] = useQueryNbmFlightCategoryMutation({
     fixedCacheKey: cacheKeys.nbmCloudCeiling,
   });
   const [queryNbmDewpoint, queryNbmDewpointResult] = useQueryNbmDewpointMutation({
@@ -657,9 +660,6 @@ const RouteProfileDataLoader = () => {
   });
   const [queryNbmGust, queryNbmGustResult] = useQueryNbmGustMutation({
     fixedCacheKey: cacheKeys.nbmGust,
-  });
-  const [queryNbmSkycover, queryNbmSkycoverResult] = useQueryNbmSkycoverMutation({
-    fixedCacheKey: cacheKeys.nbmSkycover,
   });
   const [queryNbmTemp, queryNbmTempResult] = useQueryNbmTempMutation({
     fixedCacheKey: cacheKeys.nbmTemp,
@@ -676,7 +676,7 @@ const RouteProfileDataLoader = () => {
   const [queryNbmAllAirports, queryNbmAllAirportResult] = useQueryNbmAllMutation({
     fixedCacheKey: cacheKeys.nbmAllAirport,
   });
-  const [, queryElevationsResult] = useQueryElevationApiMutation({ fixedCacheKey: 'elevation-api' });
+  const [, queryElevationsResult] = useQueryElevationApiMutation({ fixedCacheKey: cacheKeys.elevation });
   const activeRoute = useSelector(selectActiveRoute);
   const dispatch = useDispatch();
   const [forceRefetch, setForceRefetch] = useState(Date.now());
@@ -699,10 +699,9 @@ const RouteProfileDataLoader = () => {
     queryMwturbDataResult.reset();
     queryElevationsResult.reset();
     queryNbmCloudbaseResult.reset();
-    queryNbmCeilingVisResult.reset();
+    queryNbmFlightCatResult.reset();
     queryNbmDewpointResult.reset();
     queryNbmGustResult.reset();
-    queryNbmSkycoverResult.reset();
     queryNbmTempResult.reset();
     queryNbmWindDirResult.reset();
     queryNbmWindSpeedResult.reset();
@@ -710,8 +709,14 @@ const RouteProfileDataLoader = () => {
     queryNbmAllAirportResult.reset();
   }
 
-  function queryGfsWindSpeed() {
-    if (activeRoute) {
+  function queryGfsWindSpeed(dependencyResult: {
+    status: QueryStatus;
+    isUninitialized: boolean;
+    isLoading: boolean;
+    isSuccess: boolean;
+    isError: boolean;
+  }) {
+    if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
       const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
       if (!queryGfsWindSpeedDataResult.isLoading && !queryGfsWindSpeedDataResult.isSuccess) {
         queryGfsWindSpeedData({ queryPoints: positions, elevations: windQueryElevations });
@@ -719,8 +724,14 @@ const RouteProfileDataLoader = () => {
     }
   }
 
-  function queryGfsWindDir() {
-    if (activeRoute) {
+  function queryGfsWindDir(dependencyResult: {
+    status: QueryStatus;
+    isUninitialized: boolean;
+    isLoading: boolean;
+    isSuccess: boolean;
+    isError: boolean;
+  }) {
+    if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
       if (!queryGfsWindDirectionDataResult.isLoading && !queryGfsWindDirectionDataResult.isSuccess) {
         const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
         queryGfsWindDirectionData({ queryPoints: positions, elevations: windQueryElevations });
@@ -728,8 +739,14 @@ const RouteProfileDataLoader = () => {
     }
   }
 
-  function queryGfsTemp() {
-    if (activeRoute) {
+  function queryGfsTemp(dependencyResult: {
+    status: QueryStatus;
+    isUninitialized: boolean;
+    isLoading: boolean;
+    isSuccess: boolean;
+    isError: boolean;
+  }) {
+    if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
       if (!queryTemperatureDataResult.isSuccess && !queryTemperatureDataResult.isLoading) {
         const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
         queryTemperatureData({ queryPoints: positions });
@@ -737,8 +754,14 @@ const RouteProfileDataLoader = () => {
     }
   }
 
-  function queryGfsHumi() {
-    if (activeRoute) {
+  function queryGfsHumi(dependencyResult: {
+    status: QueryStatus;
+    isUninitialized: boolean;
+    isLoading: boolean;
+    isSuccess: boolean;
+    isError: boolean;
+  }) {
+    if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
       if (!queryhumidityDataResult.isLoading && !queryhumidityDataResult.isSuccess) {
         const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
         queryHumidityData({ queryPoints: positions });
@@ -746,8 +769,14 @@ const RouteProfileDataLoader = () => {
     }
   }
 
-  function queryIcing() {
-    if (activeRoute) {
+  function queryIcing(dependencyResult: {
+    status: QueryStatus;
+    isUninitialized: boolean;
+    isLoading: boolean;
+    isSuccess: boolean;
+    isError: boolean;
+  }) {
+    if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
       const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
       if (!queryIcingProbDataResult.isLoading && !queryIcingProbDataResult.isSuccess)
         queryIcingProbData({ queryPoints: positions });
@@ -758,8 +787,14 @@ const RouteProfileDataLoader = () => {
     }
   }
 
-  function queryTurb() {
-    if (activeRoute) {
+  function queryTurb(dependencyResult: {
+    status: QueryStatus;
+    isUninitialized: boolean;
+    isLoading: boolean;
+    isSuccess: boolean;
+    isError: boolean;
+  }) {
+    if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
       const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
       if (!queryCaturbDataResult.isLoading && !queryCaturbDataResult.isSuccess)
         queryCaturbData({ queryPoints: positions });
@@ -768,25 +803,39 @@ const RouteProfileDataLoader = () => {
     }
   }
 
-  function queryNbm() {
-    if (activeRoute) {
+  function queryNbm(dependencyResult: {
+    status: QueryStatus;
+    isUninitialized: boolean;
+    isLoading: boolean;
+    isSuccess: boolean;
+    isError: boolean;
+  }) {
+    if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
       const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
-      const positions_2 = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * 10);
-      if (!queryNbmCloudbaseResult.isLoading && !queryNbmCloudbaseResult.isSuccess)
-        queryNbmCloudbase({ queryPoints: positions });
-      if (!queryNbmCeilingVisResult.isLoading && !queryNbmCeilingVisResult.isSuccess)
-        queryNbmCeilingVis({ queryPoints: positions_2 });
+      const positions_2 = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide);
       if (!queryNbmDewpointResult.isLoading && !queryNbmDewpointResult.isSuccess)
         queryNbmDewpoint({ queryPoints: positions });
       if (!queryNbmGustResult.isLoading && !queryNbmGustResult.isSuccess) queryNbmGust({ queryPoints: positions });
-      if (!queryNbmSkycoverResult.isLoading && !queryNbmSkycoverResult.isSuccess)
-        queryNbmSkycover({ queryPoints: positions });
       if (!queryNbmTempResult.isLoading && !queryNbmTempResult.isSuccess) queryNbmTemp({ queryPoints: positions });
       if (!queryNbmWindDirResult.isLoading && !queryNbmWindDirResult.isSuccess)
         queryNbmWindDir({ queryPoints: positions });
       if (!queryNbmWindSpeedResult.isLoading && !queryNbmWindSpeedResult.isSuccess)
         queryNbmWindSpeed({ queryPoints: positions });
       if (!queryNbmWx1Result.isLoading && !queryNbmWx1Result.isSuccess) queryNbmWx1({ queryPoints: positions });
+    }
+  }
+
+  function queryNbmFlightCat(dependencyResult: {
+    status: QueryStatus;
+    isUninitialized: boolean;
+    isLoading: boolean;
+    isSuccess: boolean;
+    isError: boolean;
+  }) {
+    if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
+      const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide);
+      if (!queryNbmFlightCatResult.isLoading && !queryNbmFlightCatResult.isSuccess)
+        queryNbmFlightCategory({ queryPoints: positions });
     }
   }
 
@@ -798,155 +847,119 @@ const RouteProfileDataLoader = () => {
   switch (routeProfileApiState.chartType) {
     case 'Wind':
       useEffect(() => {
-        queryGfsWindSpeed();
+        queryGfsWindSpeed(null);
       }, [forceRefetch]);
       useEffect(() => {
-        if (!queryGfsWindSpeedDataResult.isLoading) {
-          queryGfsWindDir();
-        }
+        queryGfsWindDir(queryGfsWindSpeedDataResult);
       }, [queryGfsWindSpeedDataResult.isLoading]);
       useEffect(() => {
-        if (!queryGfsWindDirectionDataResult.isLoading) {
-          queryGfsTemp();
-        }
+        queryGfsTemp(queryGfsWindDirectionDataResult);
       }, [queryGfsWindDirectionDataResult.isLoading]);
       useEffect(() => {
-        if (!queryTemperatureDataResult.isLoading) {
-          queryNbm();
-        }
+        queryNbm(queryTemperatureDataResult);
       }, [queryTemperatureDataResult.isLoading]);
       useEffect(() => {
-        if (!queryNbmWindSpeedResult.isLoading) {
-          queryIcing();
-        }
+        queryNbmFlightCat(queryNbmWindSpeedResult);
       }, [queryNbmWindSpeedResult.isLoading]);
+      useEffect(() => {
+        queryIcing(queryNbmFlightCatResult);
+      }, [queryNbmFlightCatResult.isLoading]);
 
       useEffect(() => {
-        if (!queryNbmWindSpeedResult.isLoading) {
-          queryTurb();
-        }
-      }, [queryNbmWindSpeedResult.isLoading]);
+        queryTurb(queryNbmFlightCatResult);
+      }, [queryNbmFlightCatResult.isLoading]);
 
       useEffect(() => {
-        if (!queryIcingProbDataResult.isLoading) {
-          queryGfsHumi();
-        }
+        queryGfsHumi(queryIcingProbDataResult);
       }, [queryIcingProbDataResult.isLoading]);
       isLoading = !queryGfsWindDirectionDataResult.isSuccess;
       break;
     case 'Turb':
       useEffect(() => {
-        queryTurb();
+        queryTurb(null);
       }, [forceRefetch]);
 
       useEffect(() => {
-        if (!queryCaturbDataResult.isLoading) {
-          queryGfsWindSpeed();
-        }
+        queryGfsWindSpeed(queryCaturbDataResult);
       }, [queryCaturbDataResult.isLoading]);
 
       useEffect(() => {
-        if (!queryGfsWindSpeedDataResult.isLoading) {
-          queryGfsWindDir();
-        }
+        queryGfsWindDir(queryGfsWindSpeedDataResult);
       }, [queryGfsWindSpeedDataResult.isLoading]);
       useEffect(() => {
-        if (!queryGfsWindDirectionDataResult.isLoading) {
-          queryNbm();
-        }
+        queryNbm(queryGfsWindDirectionDataResult);
       }, [queryGfsWindDirectionDataResult.isLoading]);
       useEffect(() => {
-        if (!queryNbmWindSpeedResult.isLoading) {
-          queryGfsTemp();
-        }
+        queryNbmFlightCat(queryNbmWindSpeedResult);
       }, [queryNbmWindSpeedResult.isLoading]);
       useEffect(() => {
-        if (!queryTemperatureDataResult.isLoading) {
-          queryIcing();
-        }
+        queryGfsTemp(queryNbmFlightCatResult);
+      }, [queryNbmFlightCatResult.isLoading]);
+      useEffect(() => {
+        queryIcing(queryTemperatureDataResult);
       }, [queryTemperatureDataResult.isLoading]);
 
       useEffect(() => {
-        if (!queryIcingProbDataResult.isLoading) {
-          queryGfsHumi();
-        }
+        queryGfsHumi(queryIcingProbDataResult);
       }, [queryIcingProbDataResult.isLoading]);
       isLoading = !queryCaturbDataResult.isSuccess;
       break;
     case 'Icing':
       useEffect(() => {
-        queryIcing();
+        queryIcing(null);
       }, [forceRefetch]);
       useEffect(() => {
-        if (!queryIcingProbDataResult.isLoading) {
-          queryGfsWindSpeed();
-        }
+        queryGfsWindSpeed(queryIcingProbDataResult);
       }, [queryIcingProbDataResult.isLoading]);
       useEffect(() => {
-        if (!queryGfsWindSpeedDataResult.isLoading) {
-          queryGfsWindDir();
-        }
+        queryGfsWindDir(queryGfsWindSpeedDataResult);
       }, [queryGfsWindSpeedDataResult.isLoading]);
       useEffect(() => {
-        if (!queryGfsWindDirectionDataResult.isLoading) {
-          queryGfsTemp();
-        }
+        queryGfsTemp(queryGfsWindDirectionDataResult);
       }, [queryGfsWindDirectionDataResult.isLoading]);
       useEffect(() => {
-        if (!queryTemperatureDataResult.isLoading) {
-          queryNbm();
-        }
+        queryNbm(queryTemperatureDataResult);
       }, [queryTemperatureDataResult.isLoading]);
-
       useEffect(() => {
-        if (!queryNbmWindSpeedResult.isLoading) {
-          queryTurb();
-        }
+        queryNbmFlightCat(queryNbmWindSpeedResult);
       }, [queryNbmWindSpeedResult.isLoading]);
 
       useEffect(() => {
-        if (!queryCaturbDataResult.isLoading) {
-          queryGfsHumi();
-        }
+        queryTurb(queryNbmFlightCatResult);
+      }, [queryNbmFlightCatResult.isLoading]);
+
+      useEffect(() => {
+        queryGfsHumi(queryCaturbDataResult);
       }, [queryCaturbDataResult.isLoading]);
       isLoading = !queryIcingProbDataResult.isSuccess;
       break;
     case 'Clouds':
       useEffect(() => {
-        queryGfsWindSpeed();
+        queryNbmFlightCat(null);
       }, [forceRefetch]);
       useEffect(() => {
-        if (!queryGfsWindSpeedDataResult.isLoading) {
-          queryGfsWindDir();
-        }
-      }, [queryGfsWindSpeedDataResult.isLoading]);
+        queryNbm(queryNbmFlightCatResult);
+      }, [queryNbmFlightCatResult.isLoading]);
       useEffect(() => {
-        if (!queryGfsWindDirectionDataResult.isLoading) {
-          queryGfsTemp();
-        }
-      }, [queryGfsWindDirectionDataResult.isLoading]);
+        queryIcing(queryNbmWindSpeedResult);
+      }, [queryNbmWindSpeedResult.isLoading]);
       useEffect(() => {
-        if (!queryTemperatureDataResult.isLoading) {
-          queryNbm();
-        }
+        queryGfsHumi(queryIcingSevDataResult);
+      }, [queryIcingSevDataResult.isLoading]);
+      useEffect(() => {
+        queryGfsTemp(queryhumidityDataResult);
+      }, [queryhumidityDataResult.isLoading]);
+      useEffect(() => {
+        queryGfsWindDir(queryTemperatureDataResult);
       }, [queryTemperatureDataResult.isLoading]);
       useEffect(() => {
-        if (!queryNbmWindSpeedResult.isLoading) {
-          queryIcing();
-        }
-      }, [queryNbmWindSpeedResult.isLoading]);
+        queryGfsWindSpeed(queryGfsWindDirectionDataResult);
+      }, [queryGfsWindDirectionDataResult.isLoading]);
 
       useEffect(() => {
-        if (!queryNbmWindSpeedResult.isLoading) {
-          queryTurb();
-        }
-      }, [queryNbmWindSpeedResult.isLoading]);
+        queryTurb(queryGfsWindSpeedDataResult);
+      }, [queryGfsWindSpeedDataResult.isLoading]);
 
-      useEffect(() => {
-        if (!queryIcingProbDataResult.isLoading) {
-          queryGfsHumi();
-        }
-      }, [queryIcingProbDataResult.isLoading]);
       isLoading = !queryIcingProbDataResult.isSuccess;
       break;
   }
@@ -959,20 +972,25 @@ const RouteProfileDataLoader = () => {
       segmentIndex,
     );
     const { value: cloudceiling } = getValueFromDatasetByElevation(
-      queryNbmCeilingVisResult.data?.cloudceiling,
+      queryNbmFlightCatResult.data?.cloudceiling,
       time,
       null,
-      segmentIndex * 10,
+      segmentIndex * flightCategoryDivide,
     );
     const { value: dewpoint } = getValueFromDatasetByElevation(queryNbmDewpointResult.data, time, null, segmentIndex);
     const { value: gust } = getValueFromDatasetByElevation(queryNbmGustResult.data, time, null, segmentIndex);
-    const { value: skycover } = getValueFromDatasetByElevation(queryNbmSkycoverResult.data, time, null, segmentIndex);
-    const { value: temperature } = getValueFromDatasetByElevation(queryNbmTempResult.data, time, null, segmentIndex);
-    const { value: visibility } = getValueFromDatasetByElevation(
-      queryNbmCeilingVisResult.data?.visibility,
+    const { value: skycover } = getValueFromDatasetByElevation(
+      queryNbmFlightCatResult.data?.skycover,
       time,
       null,
-      segmentIndex * 10,
+      segmentIndex * flightCategoryDivide,
+    );
+    const { value: temperature } = getValueFromDatasetByElevation(queryNbmTempResult.data, time, null, segmentIndex);
+    const { value: visibility } = getValueFromDatasetByElevation(
+      queryNbmFlightCatResult.data?.visibility,
+      time,
+      null,
+      segmentIndex * flightCategoryDivide,
     );
     const { value: winddir } = getValueFromDatasetByElevation(queryNbmWindDirResult.data, time, null, segmentIndex);
     const { value: windspeed } = getValueFromDatasetByElevation(queryNbmWindSpeedResult.data, time, null, segmentIndex);
@@ -1092,7 +1110,7 @@ const RouteProfileDataLoader = () => {
   }, [
     queryGfsWindSpeedDataResult.isSuccess,
     queryGfsWindDirectionDataResult.isSuccess,
-    queryNbmWindSpeedResult.isSuccess,
+    queryNbmFlightCatResult.isSuccess,
     queryNbmWx1Result.isSuccess,
     observationTime,
     userSettings.true_airspeed,

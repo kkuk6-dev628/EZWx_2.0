@@ -121,7 +121,8 @@ const IcingChart = (props) => {
         for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
           let time;
           let color = colorsByEdr.none;
-          let opacity = 1;
+          const visibleOpacity = 1;
+          let opacity = visibleOpacity;
           const severity = 'None';
           let hint;
           if (segment.arriveTime > maxForecastTime.getTime()) {
@@ -179,7 +180,7 @@ const IcingChart = (props) => {
                 return prev;
               });
               color = probItem.color;
-              opacity = prob < 10 ? 0 : 0.5;
+              opacity = prob < 10 ? 0 : visibleOpacity;
               if (prob >= 10) {
                 setNoDepicted(false);
               }
@@ -193,19 +194,19 @@ const IcingChart = (props) => {
                 return prev;
               });
               color = sldItem.color;
-              opacity = sld < 10 ? 0 : 0.5;
+              opacity = sld < 10 ? 0 : visibleOpacity;
               if (sld >= 10) {
                 setNoDepicted(false);
               }
               if (sld < 10 && routeProfileApiState.icingLayers.includes('Sev')) {
-                opacity = sev === 0 ? 0 : 0.5;
+                opacity = sev === 0 ? 0 : visibleOpacity;
                 color = sevData.color;
                 if (sev > 0) {
                   setNoDepicted(false);
                 }
               }
             } else if (routeProfileApiState.icingLayers.includes('Sev')) {
-              opacity = sev === 0 ? 0 : 0.5;
+              opacity = sev === 0 ? 0 : visibleOpacity;
               color = sevData.color;
               if (sev > 0) {
                 setNoDepicted(false);
@@ -249,8 +250,8 @@ const IcingChart = (props) => {
   ]);
 
   return (
-    <RouteProfileChart showDayNightBackground={false}>
-      {icingSeries ? (
+    <RouteProfileChart showDayNightBackground={true}>
+      {icingSeries && (
         <VerticalRectSeries
           colorType="literal"
           stroke="#33333500"
@@ -262,7 +263,7 @@ const IcingChart = (props) => {
           }
           onValueClick={(value) => setIcingHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })}
         ></VerticalRectSeries>
-      ) : null}
+      )}
       {noForecast
         ? [1].map((_) => {
             const routeLength = getRouteLength(activeRoute, true);

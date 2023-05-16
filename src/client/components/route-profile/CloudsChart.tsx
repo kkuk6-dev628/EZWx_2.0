@@ -15,10 +15,12 @@ import {
   getValuesFromDatasetAllElevationByTime,
   interpolateRoute,
   totalNumberOfElevations,
+  flightCategoryDivide,
 } from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';
 import {
   useGetRouteProfileStateQuery,
+  useQueryNbmFlightCategoryMutation,
   useQueryHumidityDataMutation,
   useQueryIcingSevDataMutation,
   useQueryNbmCloudCeilingMutation,
@@ -96,14 +98,11 @@ const CloudsChart = (props) => {
   const [, queryNbmCloudbaseResult] = useQueryNbmCloudbaseMutation({
     fixedCacheKey: cacheKeys.nbmCloudbase,
   });
-  const [, queryNbmCloudCeilingResult] = useQueryNbmCloudCeilingMutation({
+  const [, queryNbmFlightCatResult] = useQueryNbmFlightCategoryMutation({
     fixedCacheKey: cacheKeys.nbmCloudCeiling,
   });
   const [, queryIcingSevDataResult] = useQueryIcingSevDataMutation({
     fixedCacheKey: cacheKeys.icingSev,
-  });
-  const [, queryNbmSkycoverResult] = useQueryNbmSkycoverMutation({
-    fixedCacheKey: cacheKeys.nbmSkycover,
   });
   const [, queryhumidityDataResult] = useQueryHumidityDataMutation({
     fixedCacheKey: cacheKeys.gfsHumidity,
@@ -125,11 +124,7 @@ const CloudsChart = (props) => {
   }
 
   function buildCloudSeries() {
-    if (
-      queryNbmCloudbaseResult.isSuccess &&
-      queryIcingSevDataResult.isSuccess &&
-      queryNbmCloudCeilingResult.isSuccess
-    ) {
+    if (queryNbmCloudbaseResult.isSuccess && queryIcingSevDataResult.isSuccess && queryNbmFlightCatResult.isSuccess) {
       const routeLength = getRouteLength(activeRoute, true);
       const segmentCount = getSegmentsCount(activeRoute);
       const segmentLength = routeLength / segmentCount;
@@ -147,36 +142,36 @@ const CloudsChart = (props) => {
           opacity = 0.5;
         } else {
           const { value: skycover } = getValueFromDatasetByElevation(
-            queryNbmSkycoverResult.data,
+            queryNbmFlightCatResult.data?.skycover,
             new Date(segment.arriveTime),
             null,
-            index,
+            index * flightCategoryDivide,
           );
           if (skycover <= 6) {
             return;
           }
 
           let { value: cloudbase } = getValueFromDatasetByElevation(
-            queryNbmCloudbaseResult.data,
+            queryNbmFlightCatResult.data?.cloudbase,
             new Date(segment.arriveTime),
             null,
-            index,
+            index * flightCategoryDivide,
           );
           let { value: cloudceiling } = getValueFromDatasetByElevation(
-            queryNbmCloudCeilingResult.data,
+            queryNbmFlightCatResult.data?.cloudceiling,
             new Date(segment.arriveTime),
             null,
-            index,
+            index * flightCategoryDivide,
           );
           if (skycover <= 56) {
             colorFirst = colorSecond = cloudColor2;
           } else {
-            if (cloudbase && cloudceiling) {
+            if (cloudbase > 0 && cloudceiling > 0) {
               colorFirst = cloudColor2;
               colorSecond = cloudColor1;
             }
           }
-          if (cloudbase && cloudbase > 0 && elevation + cloudbase + 2000 <= routeProfileApiState.maxAltitude * 100) {
+          if (cloudbase > 0 && elevation + cloudbase + 2000 <= routeProfileApiState.maxAltitude * 100) {
             cloudbase = Math.round(cloudbase);
             cloudData.push({
               x0: Math.round(index * segmentLength - segmentLength / 2),
@@ -191,11 +186,7 @@ const CloudsChart = (props) => {
               },
             });
           }
-          if (
-            cloudceiling &&
-            cloudceiling > 0 &&
-            elevation + cloudceiling + 2000 <= routeProfileApiState.maxAltitude * 100
-          ) {
+          if (cloudceiling > 0 && elevation + cloudceiling + 2000 <= routeProfileApiState.maxAltitude * 100) {
             cloudceiling = Math.round(cloudceiling);
             cloudData.push({
               x0: Math.round(index * segmentLength - segmentLength / 2),
@@ -240,7 +231,7 @@ const CloudsChart = (props) => {
           );
           icingSevData.forEach((icingSev) => {
             if (icingSev.elevation > start) {
-              if (icingSev.value > 0 && icingSev.elevation + 500 < routeProfileApiState.maxAltitude) {
+              if (icingSev.value > 0 && icingSev.elevation + 500 <= routeProfileApiState.maxAltitude * 100) {
                 cloudData.push({
                   x0: Math.round(index * segmentLength - segmentLength / 2),
                   y0: icingSev.elevation - 500,
@@ -265,21 +256,23 @@ const CloudsChart = (props) => {
     segments,
     queryNbmCloudbaseResult.isSuccess,
     queryIcingSevDataResult.isSuccess,
-    queryNbmCloudCeilingResult.isSuccess,
+    queryNbmFlightCatResult.isSuccess,
   ]);
   return (
     <RouteProfileChart showDayNightBackground={true}>
-      <VerticalRectSeries
-        colorType="literal"
-        stroke="#AAAAAA"
-        data={cloudSeries}
-        style={{ strokeWidth: 0.1 }}
-        onValueMouseOut={() => setCloudHint(null)}
-        onValueMouseOver={(value) =>
-          setCloudHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })
-        }
-        onValueClick={(value) => setCloudHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })}
-      ></VerticalRectSeries>
+      {cloudSeries && (
+        <VerticalRectSeries
+          colorType="literal"
+          stroke="#AAAAAA"
+          data={cloudSeries}
+          style={{ strokeWidth: 0.1 }}
+          onValueMouseOut={() => setCloudHint(null)}
+          onValueMouseOver={(value) =>
+            setCloudHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })
+          }
+          onValueClick={(value) => setCloudHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })}
+        ></VerticalRectSeries>
+      )}
       {cloudHint ? (
         <Hint value={cloudHint} className="turbulence-tooltip">
           {cloudHint.hint.cloudbase && (

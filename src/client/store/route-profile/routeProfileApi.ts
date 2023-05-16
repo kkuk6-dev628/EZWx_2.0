@@ -166,12 +166,14 @@ export const routeProfileApi = createApi({
       query: (data) => ({ url: 'data/n-wx-1', method: 'Post', body: data }),
       transformResponse: transformTimeBands,
     }),
-    queryCeilingVisibility: builder.mutation({
+    queryNbmFlightCategory: builder.mutation({
       query: (data) => ({ url: 'data/n-ceiling-vis', method: 'Post', body: data }),
       transformResponse: (response: any) => {
         return {
           cloudceiling: transformTimeBands(response.cloudceiling),
           visibility: transformTimeBands(response.visibility),
+          skycover: transformTimeBands(response.skycover),
+          cloudbase: transformTimeBands(response.cloudbase),
         };
       },
     }),
@@ -218,6 +220,6 @@ export const {
   useQueryNbmWindDirMutation,
   useQueryNbmWindSpeedMutation,
   useQueryNbmWx1Mutation,
-  useQueryCeilingVisibilityMutation,
+  useQueryNbmFlightCategoryMutation,
   useQueryNbmAllMutation,
 } = routeProfileApi;

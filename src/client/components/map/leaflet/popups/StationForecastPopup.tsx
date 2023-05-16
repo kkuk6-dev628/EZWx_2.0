@@ -16,6 +16,7 @@ import {
   visibilityMileToMeter,
 } from '../../common/AreoFunctions';
 import { getNbmFlightCategoryIconUrl } from '../layers/StationMarkersLayer';
+import { makeSkyConditions } from '../../../route-profile/RouteProfileChart';
 
 const probStrings = {
   1: 'Slight chance',
@@ -137,43 +138,9 @@ const StationForecastPopup = ({
   const ceiling = properties.ceil;
   const [, ceilingColor] = getMetarCeilingCategory(ceiling, personalMinimums);
   const [, visibilityColor] = getMetarVisibilityCategory(properties.vis, personalMinimums);
-  const skyConditions = [];
   const skyCover = properties.skycov;
   const lowestCloud = properties.l_cloud;
-  if (ceiling) {
-    skyConditions.push({
-      skyCover: skyCover >= 88 ? 'OVC' : 'BKN',
-      cloudBase: ceiling,
-    });
-    if (lowestCloud) {
-      skyConditions.push({
-        skyCover: 'SCT',
-        cloudBase: lowestCloud,
-      });
-    }
-  } else if (lowestCloud) {
-    let skyCondition: string;
-    if (skyCover < 6) {
-      skyCondition = 'SKC';
-    } else if (skyCover < 31) {
-      skyCondition = 'FEW';
-    } else {
-      skyCondition = 'SCT';
-    }
-    skyConditions.push({
-      skyCover: skyCondition,
-      cloudBase: lowestCloud,
-    });
-  } else {
-    skyConditions.push({
-      skyCover: 'SKC',
-      cloudBase: 0,
-    });
-  }
-
-  const skyConditionsAsc = skyConditions.sort((a, b) => {
-    return a.cloudBase > b.cloudBase ? 1 : -1;
-  });
+  const skyConditionsAsc = makeSkyConditions(lowestCloud, ceiling, skyCover);
   const airportName = toTitleCase(
     properties.icaoid
       ? getAirportNameById(properties.icaoid, airportsData)

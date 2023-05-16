@@ -187,25 +187,29 @@ const TurbChart = (props) => {
 
   return (
     <RouteProfileChart showDayNightBackground={true}>
-      <VerticalRectSeries
-        colorType="literal"
-        stroke="#AAAAAA"
-        data={turbSeries}
-        style={{ strokeWidth: 0.1 }}
-        onValueMouseOut={() => setTurbHint(null)}
-        onValueMouseOver={(value) =>
-          setTurbHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })
-        }
-        onValueClick={(value) => setTurbHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })}
-      ></VerticalRectSeries>
-      {noForecast || noDepicted
-        ? [1].map((_) => {
+      {turbSeries && (
+        <VerticalRectSeries
+          colorType="literal"
+          stroke="#AAAAAA"
+          data={turbSeries}
+          style={{ strokeWidth: 0.1 }}
+          onValueMouseOut={() => setTurbHint(null)}
+          onValueMouseOver={(value) =>
+            setTurbHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })
+          }
+          onValueClick={(value) => setTurbHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })}
+        ></VerticalRectSeries>
+      )}
+      {noForecast ||
+        (noDepicted &&
+          [1].map((_) => {
             const routeLength = getRouteLength(activeRoute, true);
             const segmentCount = getSegmentsCount(activeRoute);
             const segmentLength = routeLength / segmentCount;
 
             return (
               <VerticalRectSeries
+                key="noDepictArea"
                 colorType="literal"
                 data={[
                   {
@@ -224,9 +228,8 @@ const TurbChart = (props) => {
                 ]}
               />
             );
-          })
-        : null}
-      {turbHint ? (
+          }))}
+      {turbHint && (
         <Hint value={turbHint} className="turbulence-tooltip">
           <span>
             <b>Time:</b> {convertTimeFormat(turbHint.hint.time, userSettings.default_time_display_unit)}
@@ -242,7 +245,7 @@ const TurbChart = (props) => {
             <b>Category:</b> {turbHint.hint.category}
           </span>
         </Hint>
-      ) : null}
+      )}
       {noDepicted && (
         <LabelSeries
           style={{ fontSize: 22, fontWeight: 900, strokeWidth: 1, fill: 'red', stroke: 'white' }}

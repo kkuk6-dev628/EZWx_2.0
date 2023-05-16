@@ -50,7 +50,7 @@ const WindChart = () => {
   });
   const segments = useSelector(selectRouteSegments);
 
-  const [windSpeedSeries, setWindSpeedSeries] = useState([]);
+  const [windSpeedSeries, setWindSpeedSeries] = useState(null);
   const [windHintValue, setWindHintValue] = useState(null);
 
   const [, queryTemperatureDataResult] = useQueryTemperatureDataMutation({
@@ -199,7 +199,7 @@ const WindChart = () => {
 
   return (
     <RouteProfileChart showDayNightBackground={true}>
-      {windSpeedSeries.length > 0 ? (
+      {windSpeedSeries && (
         <CustomSVGSeries
           customComponent="square"
           data={windSpeedSeries}
@@ -213,7 +213,7 @@ const WindChart = () => {
           }}
           onValueMouseOut={() => setWindHintValue(null)}
         ></CustomSVGSeries>
-      ) : null}
+      )}
       {windHintValue && (
         <Hint value={windHintValue}>
           <div className="chart-tooltip">

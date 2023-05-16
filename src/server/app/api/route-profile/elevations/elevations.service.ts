@@ -66,7 +66,7 @@ export class ElevationsService {
       this.httpService
         .post(elevationApiUrl, {
           points: { type: 1, coordinates: points },
-          dataSetName: 'SRTM_GL3',
+          dataSetName: 'NASADEM',
           reduceResolution: 20,
         })
         .pipe(

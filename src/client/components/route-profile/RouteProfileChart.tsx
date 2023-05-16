@@ -29,7 +29,7 @@ import {
 import { initialUserSettingsState, selectSettings } from '../../store/user/UserSettings';
 import {
   useGetRouteProfileStateQuery,
-  useQueryCeilingVisibilityMutation,
+  useQueryNbmFlightCategoryMutation,
   useQueryGfsWindDirectionDataMutation,
   useQueryGfsWindSpeedDataMutation,
   useQueryTemperatureDataMutation,
@@ -77,6 +77,48 @@ export const temperatureContourColors = {
   negative: '#0b7e0c',
 };
 
+export function makeSkyConditions(
+  lowestCloud: number,
+  ceiling: number,
+  skyCover: number,
+): { skyCover: string; cloudBase: number }[] {
+  const skyConditions = [];
+  if (ceiling > 0) {
+    skyConditions.push({
+      skyCover: skyCover >= 88 ? 'OVC' : 'BKN',
+      cloudBase: ceiling,
+    });
+    if (lowestCloud > 0) {
+      skyConditions.push({
+        skyCover: 'SCT',
+        cloudBase: lowestCloud,
+      });
+    }
+  } else if (lowestCloud > 0) {
+    let skyCondition: string;
+    if (skyCover < 6) {
+      skyCondition = 'SKC';
+    } else if (skyCover < 31) {
+      skyCondition = 'FEW';
+    } else {
+      skyCondition = 'SCT';
+    }
+    skyConditions.push({
+      skyCover: skyCondition,
+      cloudBase: lowestCloud,
+    });
+  } else {
+    skyConditions.push({
+      skyCover: 'SKC',
+      cloudBase: 0,
+    });
+  }
+
+  const skyConditionsAsc = skyConditions.sort((a, b) => {
+    return a.cloudBase > b.cloudBase ? 1 : -1;
+  });
+  return skyConditionsAsc;
+}
 export function buildContour(
   activeRoute: Route,
   routeProfileDataset: RouteProfileDataset[],
@@ -238,9 +280,9 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     refetchOnMountOrArgChange: true,
   });
   const segments = useSelector(selectRouteSegments);
-  const [queryElevations, queryElevationsResult] = useQueryElevationApiMutation({ fixedCacheKey: 'elevation-api' });
+  const [queryElevations, queryElevationsResult] = useQueryElevationApiMutation({ fixedCacheKey: cacheKeys.elevation });
   const [elevationSeries, setElevationSeries] = useState([]);
-  const [segmentsCount, setSegmentsCount] = useState(1);
+  const [segmentsCount, setSegmentsCount] = useState(0);
   const [routeLength, setRouteLength] = useState(0);
   const [startMargin, setStartMargin] = useState(0);
   const [endMargin, setEndMargin] = useState(0);
@@ -261,13 +303,14 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   const [temperatureContures, setTemperatureContours] = useState([]);
   const [weatherIconData, setWeatherIconData] = useState(null);
   const [flightCategorySeries, setFlightCategorySeries] = useState(null);
+  const [flightCatHint, setFlightCatHint] = useState(null);
   const [, queryGfsWindDirectionDataResult] = useQueryGfsWindDirectionDataMutation({
     fixedCacheKey: cacheKeys.gfsWinddirection,
   });
   const [, queryGfsWindSpeedDataResult] = useQueryGfsWindSpeedDataMutation({
     fixedCacheKey: cacheKeys.gfsWindspeed,
   });
-  const [, queryNbmCeilingVisResult] = useQueryCeilingVisibilityMutation({
+  const [, queryNbmFlightCatResult] = useQueryNbmFlightCategoryMutation({
     fixedCacheKey: cacheKeys.nbmCloudCeiling,
   });
 
@@ -372,50 +415,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           const lowestCloud = seg.airportNbmProps.cloudbase;
           const ceiling = seg.airportNbmProps.cloudceiling;
           const skyCover = seg.airportNbmProps.skycover;
-          const skyConditions = [];
-          if (ceiling) {
-            skyConditions.push({
-              skyCover: skyCover >= 88 ? 'OVC' : 'BKN',
-              cloudBase: ceiling,
-            });
-            if (lowestCloud) {
-              skyConditions.push({
-                skyCover: 'SCT',
-                cloudBase: lowestCloud,
-              });
-            }
-          } else if (lowestCloud) {
-            let skyCondition: string;
-            if (skyCover < 6) {
-              skyCondition = 'SKC';
-            } else if (skyCover < 31) {
-              skyCondition = 'FEW';
-            } else {
-              skyCondition = 'SCT';
-            }
-            skyConditions.push({
-              skyCover: skyCondition,
-              cloudBase: lowestCloud,
-            });
-          } else {
-            skyConditions.push({
-              skyCover: 'SKC',
-              cloudBase: 0,
-            });
-          }
-
-          const skyConditionsAsc = skyConditions.sort((a, b) => {
-            return a.cloudBase > b.cloudBase ? 1 : -1;
-          });
-
-          const clouds = skyConditionsAsc.map((skyCondition) => {
-            return MetarSkyValuesToString[skyCondition.skyCover] +
-              ' ' +
-              (['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false)
-              ? skyCondition.cloudBase + ' feet'
-              : null;
-          });
-
+          const skyConditionsAsc = makeSkyConditions(lowestCloud, ceiling, skyCover);
           tooltip = {
             time: seg.airportNbmProps.time,
             clouds: skyConditionsAsc,
@@ -449,7 +449,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         return {
           x: seg.accDistance + airportDist,
           y: 0,
-          yOffset: seg.isRoutePoint ? 28 : 40,
+          yOffset: seg.isRoutePoint ? 36 : 44,
           label: seg.airport?.key || seg.position.lat.toFixed(2) + '/' + seg.position.lng.toFixed(2),
           style: labelStyle,
           tooltip: tooltip,
@@ -486,7 +486,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   }, [queryElevationsResult.isSuccess, routeLength]);
 
   function buildFlightCategorySeries() {
-    if (activeRoute && queryNbmCeilingVisResult.isSuccess) {
+    if (activeRoute && queryNbmFlightCatResult.isSuccess) {
       const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * 10, true);
       const flightCategoryData = [];
       const initial = {
@@ -534,25 +534,43 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
               speed = userSettings.true_airspeed;
             }
             const newTime = new Date(acc.arriveTime).getTime() + (3600 * 1000 * dist) / speed;
-            const { value: cloudceiling } = getValueFromDatasetByElevation(
-              queryNbmCeilingVisResult.data?.cloudceiling,
+            const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(
+              queryNbmFlightCatResult.data?.cloudceiling,
               new Date(acc.arriveTime),
               null,
               index,
             );
             const { value: visibility } = getValueFromDatasetByElevation(
-              queryNbmCeilingVisResult.data?.visibility,
+              queryNbmFlightCatResult.data?.visibility,
               new Date(acc.arriveTime),
               null,
               index,
             );
+            const { value: skycover } = getValueFromDatasetByElevation(
+              queryNbmFlightCatResult.data?.skycover,
+              new Date(acc.arriveTime),
+              null,
+              index,
+            );
+            const { value: cloudbase } = getValueFromDatasetByElevation(
+              queryNbmFlightCatResult.data?.cloudbase,
+              new Date(acc.arriveTime),
+              null,
+              index,
+            );
+            const skyConditions = makeSkyConditions(cloudbase, cloudceiling, skycover);
             const flightCategoryColor = getFlightCategoryColor(visibility, cloudceiling);
             flightCategoryData.push({
               x0: acc.accDistance,
               x: acc.accDistance + dist,
-              y0: (-routeProfileApiState.maxAltitude * 100) / 100,
-              y: 0,
+              y0: (-routeProfileApiState.maxAltitude * 100) / 50,
+              y: -routeProfileApiState.maxAltitude / 5,
               color: flightCategoryColor,
+              tooltip: {
+                time: forecastTime,
+                clouds: skyConditions,
+                visibility: visibility,
+              },
             });
             return {
               position: { lat: curr.lat, lng: curr.lng },
@@ -572,302 +590,368 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
 
   useEffect(() => {
     buildFlightCategorySeries();
-  }, [segments, queryNbmCeilingVisResult.isSuccess]);
+  }, [segments, queryNbmFlightCatResult.isSuccess, routeProfileApiState.maxAltitude]);
 
   return (
-    <XYPlot
-      height={calcChartHeight(viewW, viewH)}
-      width={calcChartWidth(viewW, viewH)}
-      color="white"
-      yDomain={[0, routeProfileApiState.maxAltitude * 100 * 1.08]}
-      xDomain={[-startMargin, routeLength + endMargin]}
-      margin={{ right: 40, bottom: 80, top: 0 }}
-    >
-      <GradientDefs>
-        <linearGradient id="linear-gradient">
-          {gradientStops.map(({ level, stopColor }, index) => (
-            <stop key={'gradient-' + index} offset={level} stopColor={stopColor} />
-          ))}
-        </linearGradient>
-        <filter x="0" y="0" width="1" height="1" id="solid">
-          <feFlood flood-color="#9BCAEF" />
-          <feComposite in="SourceGraphic" />
-        </filter>
-      </GradientDefs>
-      {props.showDayNightBackground && (
-        <AreaSeries
-          data={[
-            { x: -startMargin, y: routeProfileApiState.maxAltitude * 100 },
-            { x: routeLength + endMargin, y: routeProfileApiState.maxAltitude * 100 },
-          ]}
-          color={'url(#linear-gradient)'}
-        />
-      )}
-      {!props.showDayNightBackground && (
-        <AreaSeries
-          data={[
-            { x: -startMargin, y: routeProfileApiState.maxAltitude * 100 },
-            { x: routeLength + endMargin, y: routeProfileApiState.maxAltitude * 100 },
-          ]}
-          color="#F2F0F0"
-        />
-      )}
-      <VerticalGridLines
-        tickValues={Array.from({ length: segmentsCount * 2 - 1 }, (_value, index) =>
-          Math.round((index * routeLength) / ((segmentsCount - 1) * 2)),
-        )}
-        style={{
-          stroke: 'grey',
-          strokeWidth: 0.2,
-        }}
-      />
-      <HorizontalGridLines
-        tickValues={Array.from({ length: 5 - 1 }, (_value, index) =>
-          Math.round(((index + 1) * routeProfileApiState.maxAltitude * 100) / 5),
-        )}
-        style={{
-          stroke: 'grey',
-          strokeWidth: 2,
-        }}
-      />
-      <HorizontalGridLines
-        tickValues={Array.from({ length: 5 }, (_value, index) =>
-          Math.round(((index + 0.5) * routeProfileApiState.maxAltitude * 100) / 5),
-        )}
-        style={{
-          stroke: 'grey',
-          strokeWidth: 0.2,
-        }}
-      />
-      <XAxis
-        tickValues={Array.from({ length: segmentsCount }, (_value, index) =>
-          Math.round((index * routeLength) / (segmentsCount - 1)),
-        )}
-        tickFormat={(v, index) => {
-          if (segmentsCount > 0 && segments[index]) {
-            const distInMile = segments[index].accDistance;
-            const dist = Math.round(
-              userSettings.default_distance_unit ? flyjs.nauticalMilesTo('Kilometers', distInMile, 0) : distInMile,
-            );
-            return (
-              <tspan dy="3.6em" className="chart-label">
-                <tspan className="chart-label-dist">{dist}</tspan>
-              </tspan>
-            );
-          }
-          return v;
-        }}
-        style={{
-          line: { stroke: '#ADDDE100' },
-          ticks: { stroke: '#ADDDE100' },
-          text: { stroke: 'none', fill: 'white', fontWeight: 600, marginTop: 36 },
-        }}
-      />
-      <YAxis
-        tickValues={Array.from({ length: 10 + 1 }, (_value, index) =>
-          Math.round((index * routeProfileApiState.maxAltitude * 100) / 5),
-        )}
-        tickFormat={(v) => v / 100}
-        style={{
-          line: { stroke: '#ADDDE100' },
-          ticks: { stroke: '#ADDDE100' },
-          text: { stroke: 'none', fill: 'white', fontWeight: 600 },
-        }}
-      />
-      <YAxis
-        tickValues={Array.from({ length: 10 + 1 }, (_value, index) =>
-          Math.round((index * routeProfileApiState.maxAltitude * 100) / 5),
-        )}
-        tickFormat={(v) => v / 100}
-        orientation="right"
-        style={{
-          line: { stroke: '#ADDDE100' },
-          ticks: { stroke: '#ADDDE100' },
-          text: { stroke: 'none', fill: 'white', fontWeight: 600 },
-        }}
-      />
-      {segments && segments.length > 4 ? (
-        <LabelSeries
-          onValueMouseOver={(value) => {
-            setTimeHint(value);
-          }}
-          onValueClick={(value) => setTimeHint(value)}
-          onValueMouseOut={() => setTimeHint(null)}
-          data={Array.from({ length: segmentsCount }, (_value, index) => {
-            if (segments[index] && segments[index].arriveTime)
-              return {
-                x: Math.round((index * routeLength) / (segmentsCount - 1)),
-                y: 0,
-                yOffset: 72,
-                segment: segments[index],
-                label: userSettings.default_time_display_unit
-                  ? segments[index].departureTime.time
-                  : simpleTimeOnlyFormat(new Date(segments[index].arriveTime), false),
-                style: {
-                  fill: 'white',
-                  dominantBaseline: 'text-after-edge',
-                  textAnchor: 'start',
-                  fontSize: 11,
-                  fontWeight: 600,
-                },
-              };
-          })}
-        />
-      ) : null}
-      {airportLabelSeries && (
-        <LabelSeries
-          data={airportLabelSeries}
-          onValueMouseOver={(value) => setAirportHint(value)}
-          onValueClick={(value) => setAirportHint(value)}
-          onValueMouseOut={() => setAirportHint(null)}
-        />
-      )}
-      {routeProfileApiState.chartType !== 'Wind' && activeRoute ? props.children : null}
-      {activeRoute ? (
-        <LineSeries
-          data={[
-            { x: 0, y: activeRoute.altitude },
-            { x: routeLength, y: activeRoute.altitude },
-          ]}
+    <>
+      {segmentsCount && (
+        <XYPlot
+          height={calcChartHeight(viewW, viewH)}
+          width={calcChartWidth(viewW, viewH)}
           color="white"
-          strokeWidth={4}
-        />
-      ) : null}
-      {activeRoute ? (
-        <LineSeries
-          data={[
-            { x: 0, y: activeRoute.altitude },
-            { x: routeLength, y: activeRoute.altitude },
-          ]}
-          color="magenta"
-        />
-      ) : null}
-      {routeProfileApiState.chartType !== 'Turb' &&
-        temperatureContures.map((contourLine, index) => {
-          const color =
-            contourLine.temperature > 0
-              ? temperatureContourColors.positive
-              : contourLine.temperature === 0
-              ? 'red'
-              : temperatureContourColors.negative;
-          const strokeWidth = contourLine.temperature === 0 ? 2 : 1;
-          return (
-            <LineSeries
-              key={'temp-' + contourLine.temperature + '-' + index}
-              data={contourLine.contour}
-              color={color}
-              curve={'curveBasisOpen'}
-              strokeWidth={strokeWidth}
-              style={{ pointerEvents: 'none' }}
+          yDomain={[0, routeProfileApiState.maxAltitude * 100 * 1.08]}
+          xDomain={[-startMargin, routeLength + endMargin]}
+          margin={{ right: 40, bottom: 80, top: 0 }}
+        >
+          <GradientDefs>
+            <linearGradient id="linear-gradient">
+              {gradientStops.map(({ level, stopColor }, index) => (
+                <stop key={'gradient-' + index} offset={level} stopColor={stopColor} />
+              ))}
+            </linearGradient>
+            <filter x="0" y="0" width="1" height="1" id="solid">
+              <feFlood floodColor="#9BCAEF" />
+              <feComposite in="SourceGraphic" />
+            </filter>
+          </GradientDefs>
+          {props.showDayNightBackground && (
+            <AreaSeries
+              data={[
+                { x: -startMargin, y: routeProfileApiState.maxAltitude * 100 },
+                { x: routeLength + endMargin, y: routeProfileApiState.maxAltitude * 100 },
+              ]}
+              color={'url(#linear-gradient)'}
             />
-          );
-        })}
-      {routeProfileApiState.chartType !== 'Turb' && contourLabelData.length > 0 ? (
-        <LabelSeries animation allowOffsetToBeReversed data={contourLabelData}></LabelSeries>
-      ) : null}
-
-      {routeProfileApiState.chartType === 'Wind' && activeRoute ? props.children : null}
-      {elevationSeries.length > 0 ? (
-        <AreaSeries
-          data={elevationSeries}
-          color="#9e8f85"
-          curve={'curveMonotoneX'}
-          stroke="#908177"
-          onNearestXY={(datapoint) => setElevationHint(datapoint)}
-          onSeriesMouseOut={() => setShowElevationHint(false)}
-          onSeriesMouseOver={() => setShowElevationHint(true)}
-        />
-      ) : null}
-      <LineSeries
-        color="white"
-        data={[
-          {
-            x: -startMargin,
-            y: routeProfileApiState.maxAltitude * 100 * 1.04,
-          },
-          {
-            x: routeLength + endMargin,
-            y: routeProfileApiState.maxAltitude * 100 * 1.04,
-          },
-        ]}
-        strokeWidth={48}
-      ></LineSeries>
-      <CustomSVGSeries customComponent="square" data={weatherIconData}></CustomSVGSeries>
-      <VerticalRectSeries colorType="literal" data={flightCategorySeries}></VerticalRectSeries>
-
-      {showElevationHint ? (
-        <Hint value={elevationHint}>
-          <div style={{ background: 'white', color: 'black', padding: 4, borderRadius: 4 }}>{elevationHint.y}</div>
-        </Hint>
-      ) : null}
-      {timeHint ? (
-        <Hint value={timeHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
-          <span>{timeHint.segment.departureTime.full}</span>
-          <span>{convertTimeFormat(timeHint.segment.arriveTime, true)}</span>
-          <span>{convertTimeFormat(timeHint.segment.arriveTime, false)}</span>
-        </Hint>
-      ) : null}
-      {airportHint && airportHint.tooltip ? (
-        <Hint value={airportHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
-          <span>
-            <b>Time:</b>&nbsp;{convertTimeFormat(airportHint.tooltip.time, false)}
-          </span>
-          <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
-            <div>
-              <p style={{ marginTop: 3 }}>
-                <b>Clouds: </b>
-              </p>
-            </div>
-            <div style={{ margin: 3, marginTop: -3 }}>
-              {airportHint.tooltip.clouds.map((skyCondition) => {
-                return (
-                  <div
-                    key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`}
-                    style={{ marginTop: 6, marginBottom: 2 }}
-                  >
-                    {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
-                    {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false &&
-                      roundCloudHeight(skyCondition.cloudBase) + ' feet'}
-                  </div>
+          )}
+          {!props.showDayNightBackground && (
+            <AreaSeries
+              data={[
+                { x: -startMargin, y: routeProfileApiState.maxAltitude * 100 },
+                { x: routeLength + endMargin, y: routeProfileApiState.maxAltitude * 100 },
+              ]}
+              color="#F2F0F0"
+            />
+          )}
+          <VerticalGridLines
+            tickValues={Array.from({ length: segmentsCount * 2 - 1 }, (_value, index) =>
+              Math.round((index * routeLength) / ((segmentsCount - 1) * 2)),
+            )}
+            style={{
+              stroke: 'grey',
+              strokeWidth: 0.2,
+            }}
+          />
+          <HorizontalGridLines
+            tickValues={Array.from({ length: 5 - 1 }, (_value, index) =>
+              Math.round(((index + 1) * routeProfileApiState.maxAltitude * 100) / 5),
+            )}
+            style={{
+              stroke: 'grey',
+              strokeWidth: 2,
+            }}
+          />
+          <HorizontalGridLines
+            tickValues={Array.from({ length: 5 }, (_value, index) =>
+              Math.round(((index + 0.5) * routeProfileApiState.maxAltitude * 100) / 5),
+            )}
+            style={{
+              stroke: 'grey',
+              strokeWidth: 0.2,
+            }}
+          />
+          <XAxis
+            tickValues={Array.from({ length: segmentsCount }, (_value, index) =>
+              Math.round((index * routeLength) / (segmentsCount - 1)),
+            )}
+            tickFormat={(v, index) => {
+              if (segmentsCount > 0 && segments[index]) {
+                const distInMile = segments[index].accDistance;
+                const dist = Math.round(
+                  userSettings.default_distance_unit ? flyjs.nauticalMilesTo('Kilometers', distInMile, 0) : distInMile,
                 );
+                return (
+                  <tspan dy="3.6em" className="chart-label">
+                    <tspan className="chart-label-dist">{dist}</tspan>
+                  </tspan>
+                );
+              }
+              return v;
+            }}
+            style={{
+              line: { stroke: '#ADDDE100' },
+              ticks: { stroke: '#ADDDE100' },
+              text: { stroke: 'none', fill: 'white', fontWeight: 600, marginTop: 36 },
+            }}
+          />
+          <YAxis
+            tickValues={Array.from({ length: 10 + 1 }, (_value, index) =>
+              Math.round((index * routeProfileApiState.maxAltitude * 100) / 5),
+            )}
+            tickFormat={(v) => v / 100}
+            style={{
+              line: { stroke: '#ADDDE100' },
+              ticks: { stroke: '#ADDDE100' },
+              text: { stroke: 'none', fill: 'white', fontWeight: 600 },
+            }}
+          />
+          <YAxis
+            tickValues={Array.from({ length: 10 + 1 }, (_value, index) =>
+              Math.round((index * routeProfileApiState.maxAltitude * 100) / 5),
+            )}
+            tickFormat={(v) => v / 100}
+            orientation="right"
+            style={{
+              line: { stroke: '#ADDDE100' },
+              ticks: { stroke: '#ADDDE100' },
+              text: { stroke: 'none', fill: 'white', fontWeight: 600 },
+            }}
+          />
+          {segments && segments.length > 4 ? (
+            <LabelSeries
+              onValueMouseOver={(value) => {
+                setTimeHint(value);
+              }}
+              onValueClick={(value) => setTimeHint(value)}
+              onValueMouseOut={() => setTimeHint(null)}
+              data={Array.from({ length: segmentsCount }, (_value, index) => {
+                if (segments[index] && segments[index].arriveTime)
+                  return {
+                    x: Math.round((index * routeLength) / (segmentsCount - 1)),
+                    y: 0,
+                    yOffset: 72,
+                    segment: segments[index],
+                    label: userSettings.default_time_display_unit
+                      ? segments[index].departureTime.time
+                      : simpleTimeOnlyFormat(new Date(segments[index].arriveTime), false),
+                    style: {
+                      fill: 'white',
+                      dominantBaseline: 'text-after-edge',
+                      textAnchor: 'start',
+                      fontSize: 11,
+                      fontWeight: 600,
+                    },
+                  };
+                else {
+                  return {
+                    x: Math.round((index * routeLength) / (segmentsCount - 1)),
+                    y: 0,
+                    yOffset: 72,
+                    segment: segments[index],
+                    label: '',
+                    style: {
+                      fill: 'white',
+                      dominantBaseline: 'text-after-edge',
+                      textAnchor: 'start',
+                      fontSize: 11,
+                      fontWeight: 600,
+                    },
+                  };
+                }
               })}
-            </div>
-          </div>
+            />
+          ) : null}
+          {airportLabelSeries && (
+            <LabelSeries
+              data={airportLabelSeries}
+              onValueMouseOver={(value) => setAirportHint(value)}
+              onValueClick={(value) => setAirportHint(value)}
+              onValueMouseOut={() => setAirportHint(null)}
+            />
+          )}
+          {routeProfileApiState.chartType !== 'Wind' && activeRoute ? props.children : null}
+          {activeRoute ? (
+            <LineSeries
+              data={[
+                { x: 0, y: activeRoute.altitude },
+                { x: routeLength, y: activeRoute.altitude },
+              ]}
+              color="white"
+              strokeWidth={4}
+            />
+          ) : null}
+          {activeRoute ? (
+            <LineSeries
+              data={[
+                { x: 0, y: activeRoute.altitude },
+                { x: routeLength, y: activeRoute.altitude },
+              ]}
+              color="magenta"
+            />
+          ) : null}
+          {routeProfileApiState.chartType !== 'Turb' &&
+            temperatureContures.map((contourLine, index) => {
+              const color =
+                contourLine.temperature > 0
+                  ? temperatureContourColors.positive
+                  : contourLine.temperature === 0
+                  ? 'red'
+                  : temperatureContourColors.negative;
+              const strokeWidth = contourLine.temperature === 0 ? 2 : 1;
+              return (
+                <LineSeries
+                  key={'temp-' + contourLine.temperature + '-' + index}
+                  data={contourLine.contour}
+                  color={color}
+                  curve={'curveBasisOpen'}
+                  strokeWidth={strokeWidth}
+                  style={{ pointerEvents: 'none' }}
+                />
+              );
+            })}
+          {routeProfileApiState.chartType !== 'Turb' && contourLabelData.length > 0 ? (
+            <LabelSeries animation allowOffsetToBeReversed data={contourLabelData}></LabelSeries>
+          ) : null}
 
-          <span>
-            <b>Lowest Cloud:</b>&nbsp;{Math.round(airportHint.tooltip.lowestCloud)}
-          </span>
-          <span>
-            <b>Ceiling:</b>&nbsp;{Math.round(airportHint.tooltip.ceiling)}
-          </span>
+          {routeProfileApiState.chartType === 'Wind' && activeRoute ? props.children : null}
+          {elevationSeries.length > 0 && (
+            <AreaSeries
+              data={elevationSeries}
+              color="#9e8f85"
+              curve={'curveMonotoneX'}
+              strokeWidth={0}
+              onNearestXY={(datapoint) => setElevationHint(datapoint)}
+              onSeriesMouseOut={() => setShowElevationHint(false)}
+              onSeriesMouseOver={() => setShowElevationHint(true)}
+            />
+          )}
+          {elevationSeries.length > 0 && (
+            <LineSeries color="#443322" data={elevationSeries} strokeWidth={1}></LineSeries>
+          )}
+          <LineSeries
+            color="white"
+            data={[
+              {
+                x: -startMargin,
+                y: routeProfileApiState.maxAltitude * 100 * 1.04,
+              },
+              {
+                x: routeLength + endMargin,
+                y: routeProfileApiState.maxAltitude * 100 * 1.04,
+              },
+            ]}
+            strokeWidth={48}
+          ></LineSeries>
+          {weatherIconData && <CustomSVGSeries customComponent="square" data={weatherIconData}></CustomSVGSeries>}
+          {flightCategorySeries && (
+            <VerticalRectSeries
+              colorType="literal"
+              data={flightCategorySeries}
+              onValueMouseOver={(value) => setFlightCatHint(value)}
+              onValueClick={(value) => setFlightCatHint(value)}
+              onValueMouseOut={() => setFlightCatHint(null)}
+            ></VerticalRectSeries>
+          )}
 
-          <span>
-            <b>Visibility:</b>&nbsp;
-            {!userSettings.default_visibility_unit
-              ? visibilityMileToFraction(airportHint.tooltip.visibility)
-              : visibilityMileToMeter(airportHint.tooltip.visibility)}
-          </span>
-          <span>
-            <b>Wind speed:</b>&nbsp;{Math.round(airportHint.tooltip.windspeed)} knots
-          </span>
-          <span>
-            <b>Wind direction:</b>&nbsp;{Math.round(airportHint.tooltip.winddir) + ' \u00B0'}
-          </span>
-          <span>
-            <b>Temperature:</b>&nbsp;
-            {!userSettings.default_temperature_unit
-              ? Math.round(airportHint.tooltip.temperature) + ' \u00B0C'
-              : celsiusToFahrenheit(airportHint.tooltip.temperature, 0) + ' \u00B0F'}
-          </span>
-          <span>
-            <b>Dewpoint:</b>&nbsp;{' '}
-            {!userSettings.default_temperature_unit
-              ? Math.round(airportHint.tooltip.dewpoint) + ' \u00B0C'
-              : celsiusToFahrenheit(airportHint.tooltip.dewpoint, 0) + ' \u00B0F'}
-          </span>
-        </Hint>
-      ) : null}
-    </XYPlot>
+          {showElevationHint ? (
+            <Hint value={elevationHint}>
+              <div style={{ background: 'white', color: 'black', padding: 4, borderRadius: 4 }}>{elevationHint.y}</div>
+            </Hint>
+          ) : null}
+          {timeHint ? (
+            <Hint value={timeHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
+              <span>{timeHint.segment.departureTime.full}</span>
+              <span>{convertTimeFormat(timeHint.segment.arriveTime, true)}</span>
+              <span>{convertTimeFormat(timeHint.segment.arriveTime, false)}</span>
+            </Hint>
+          ) : null}
+          {flightCatHint && (
+            <Hint value={flightCatHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
+              <span>
+                <b>Time:</b>&nbsp;{convertTimeFormat(flightCatHint.tooltip.time, false)}
+              </span>
+              <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
+                <div>
+                  <p style={{ marginTop: 3 }}>
+                    <b>Clouds: </b>
+                  </p>
+                </div>
+                <div style={{ margin: 3, marginTop: -3 }}>
+                  {flightCatHint.tooltip.clouds.map((skyCondition) => {
+                    return (
+                      <div
+                        key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`}
+                        style={{ marginTop: 6, marginBottom: 2 }}
+                      >
+                        {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
+                        {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false &&
+                          roundCloudHeight(skyCondition.cloudBase) + ' feet'}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <span>
+                <b>Visibility:</b>&nbsp;
+                {!userSettings.default_visibility_unit
+                  ? visibilityMileToFraction(flightCatHint.tooltip.visibility)
+                  : visibilityMileToMeter(flightCatHint.tooltip.visibility)}
+              </span>
+            </Hint>
+          )}
+          {airportHint && airportHint.tooltip ? (
+            <Hint value={airportHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
+              <span>
+                <b>Time:</b>&nbsp;{convertTimeFormat(airportHint.tooltip.time, false)}
+              </span>
+              <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
+                <div>
+                  <p style={{ marginTop: 3 }}>
+                    <b>Clouds: </b>
+                  </p>
+                </div>
+                <div style={{ margin: 3, marginTop: -3 }}>
+                  {airportHint.tooltip.clouds.map((skyCondition) => {
+                    return (
+                      <div
+                        key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`}
+                        style={{ marginTop: 6, marginBottom: 2 }}
+                      >
+                        {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
+                        {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false &&
+                          roundCloudHeight(skyCondition.cloudBase) + ' feet'}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <span>
+                <b>Lowest Cloud:</b>&nbsp;{Math.round(airportHint.tooltip.lowestCloud)}
+              </span>
+              <span>
+                <b>Ceiling:</b>&nbsp;{Math.round(airportHint.tooltip.ceiling)}
+              </span>
+
+              <span>
+                <b>Visibility:</b>&nbsp;
+                {!userSettings.default_visibility_unit
+                  ? visibilityMileToFraction(airportHint.tooltip.visibility)
+                  : visibilityMileToMeter(airportHint.tooltip.visibility)}
+              </span>
+              <span>
+                <b>Wind speed:</b>&nbsp;{Math.round(airportHint.tooltip.windspeed)} knots
+              </span>
+              <span>
+                <b>Wind direction:</b>&nbsp;{Math.round(airportHint.tooltip.winddir) + ' \u00B0'}
+              </span>
+              <span>
+                <b>Temperature:</b>&nbsp;
+                {!userSettings.default_temperature_unit
+                  ? Math.round(airportHint.tooltip.temperature) + ' \u00B0C'
+                  : celsiusToFahrenheit(airportHint.tooltip.temperature, 0) + ' \u00B0F'}
+              </span>
+              <span>
+                <b>Dewpoint:</b>&nbsp;{' '}
+                {!userSettings.default_temperature_unit
+                  ? Math.round(airportHint.tooltip.dewpoint) + ' \u00B0C'
+                  : celsiusToFahrenheit(airportHint.tooltip.dewpoint, 0) + ' \u00B0F'}
+              </span>
+            </Hint>
+          ) : null}
+        </XYPlot>
+      )}
+    </>
   );
 };
 export default RouteProfileChart;
