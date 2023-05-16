@@ -124,7 +124,7 @@ const CloudsChart = (props) => {
   }
 
   function buildCloudSeries() {
-    if (queryNbmCloudbaseResult.isSuccess && queryIcingSevDataResult.isSuccess && queryNbmFlightCatResult.isSuccess) {
+    if (queryNbmFlightCatResult.isSuccess && queryIcingSevDataResult.isSuccess) {
       const routeLength = getRouteLength(activeRoute, true);
       const segmentCount = getSegmentsCount(activeRoute);
       const segmentLength = routeLength / segmentCount;
@@ -254,9 +254,9 @@ const CloudsChart = (props) => {
     buildCloudSeries();
   }, [
     segments,
-    queryNbmCloudbaseResult.isSuccess,
     queryIcingSevDataResult.isSuccess,
     queryNbmFlightCatResult.isSuccess,
+    queryhumidityDataResult.isSuccess,
   ]);
   return (
     <RouteProfileChart showDayNightBackground={true}>
