@@ -109,10 +109,10 @@ const CloudsChart = (props) => {
   });
 
   function getElevationByPosition(position: { lat: number; lng: number }, inFeet = true): number {
-    if (!queryElevationsResult.data || !queryElevationsResult.data.results) {
+    if (!queryElevationsResult.data || !queryElevationsResult.data.geoPoints) {
       return 0;
     }
-    const closestPosition = queryElevationsResult.data.results.reduce((prev, curr) => {
+    const closestPosition = queryElevationsResult.data.geoPoints.reduce((prev, curr) => {
       const prevDist = flyjs.distanceTo(position.lat, position.lng, prev.latitude, prev.longitude, 4);
       const currDist = flyjs.distanceTo(position.lat, position.lng, curr.latitude, curr.longitude, 4);
       if (prevDist < currDist) {

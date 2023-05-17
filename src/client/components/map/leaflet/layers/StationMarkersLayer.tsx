@@ -152,7 +152,7 @@ export function getNbmWeatherMarkerIcon(
         break;
       case 4:
         if (skycov < 88) {
-          iconType = isDayTime ? 'fa-cloud-bolt-sun' : 'fa-cloud-bolt-moon';
+          iconType = isDayTime ? 'fas fa-cloud-bolt-sun' : 'fas fa-cloud-bolt-moon';
         } else {
           iconType = 'fa-solid fa-cloud-bolt';
         }
