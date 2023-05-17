@@ -45,7 +45,7 @@ function ProfileModal({ handleProfileModal, setIsUserLoginUser }: ProfileModalPr
       <div className="prom__header">
         <div className="prom__lft">
           <div className="prom__lft__img">
-            <Image height={50} width={50} src="/images/sunny.png" alt="profile" />
+            <Image height={50} width={50} src="/images/sunny.png" alt="profile" loading="eager" />
           </div>
         </div>
         <div className="prom__rgt">

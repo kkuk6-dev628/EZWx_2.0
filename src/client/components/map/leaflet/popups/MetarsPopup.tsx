@@ -65,7 +65,7 @@ const MetarsPopup = ({
   return (
     <>
       <div style={{ display: 'flex' }}>
-        <Image src={iconUrl} alt={''} width={16} height={16} />
+        <Image src={iconUrl} alt={''} width={16} height={16} loading="eager" />
         &nbsp;<b>{feature.properties.station_id}&nbsp;Surface observation</b>
       </div>
       <Divider></Divider>

@@ -209,7 +209,7 @@ const StationForecastPopup = ({
   return (
     <>
       <div style={{ display: 'flex' }}>
-        <Image src={iconUrl} alt={''} width={16} height={16} />
+        <Image src={iconUrl} alt={''} width={16} height={16} loading="eager" />
         &nbsp;
         <b>
           {properties.icaoid ? properties.icaoid : properties.faaid}

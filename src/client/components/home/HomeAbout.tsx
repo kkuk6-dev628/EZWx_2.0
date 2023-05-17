@@ -31,7 +31,7 @@ function HomeAbout() {
           <div className="about__cards">
             <div className="about__card">
               <div className="about__card_img__area">
-                <Image className="about__img" src="/images/slider3.jpeg" layout={'fill'} alt={''} />
+                <Image className="about__img" src="/images/slider3.jpeg" loading="eager" fill alt={''} />
               </div>
               <div className="about__card__content">
                 <div className="about__card__icon">
@@ -51,7 +51,7 @@ function HomeAbout() {
             </div>
             <div className="about__card">
               <div className="about__card_img__area">
-                <Image className="about__img" src="/images/slider3.jpeg" layout={'fill'} alt={''} />
+                <Image className="about__img" src="/images/slider3.jpeg" loading="eager" fill alt={''} />
               </div>
               <div className="about__card__content">
                 <div className="about__card__icon">
@@ -71,7 +71,7 @@ function HomeAbout() {
             </div>
             <div className="about__card">
               <div className="about__card_img__area">
-                <Image className="about__img" src="/images/slider3.jpeg" layout={'fill'} alt={''} />
+                <Image className="about__img" src="/images/slider3.jpeg" loading="eager" fill alt={''} />
               </div>
               <div className="about__card__content">
                 <div className="about__card__icon">

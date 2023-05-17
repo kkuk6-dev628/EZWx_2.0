@@ -21,7 +21,7 @@ function MapSearch() {
   return (
     <div className="search">
       <div className="search_logo">
-        <Image width={80} height={30} className="" src="/images/Logo.png" alt={'#logo'} />
+        <Image width={80} height={30} className="" src="/images/Logo.png" alt={'#logo'} loading="eager" />
       </div>
       <span className="search__btn">
         <FiNavigation />

@@ -175,7 +175,7 @@ function profile({ setIsShowModal }: Props) {
             <div className="profile__left__top profile__left__card">
               <div className="profile__lft__top__wrp">
                 <div className="profile__left__img">
-                  <Image height={50} width={50} src="/images/sunny.png" alt="profile" />
+                  <Image height={50} width={50} src="/images/sunny.png" alt="profile" loading="eager" />
                 </div>
                 <h3 className="profile__name">{userInfo.displayName}</h3>
               </div>

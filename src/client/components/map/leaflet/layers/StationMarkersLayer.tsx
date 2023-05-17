@@ -843,7 +843,7 @@ export const StationMarkersLayer = () => {
         className: 'metar-icon',
         html: ReactDOMServer.renderToString(
           <>
-            <Image src={iconUrl} alt={''} width={20} height={20} />
+            <Image src={iconUrl} alt={''} width={20} height={20} loading="eager" />
           </>,
         ),
         iconSize: [20, 20],
@@ -868,7 +868,7 @@ export const StationMarkersLayer = () => {
         html: ReactDOMServer.renderToString(
           <>
             <div style={{ display: 'inline', verticalAlign: -7, marginLeft: -4 }}>
-              <Image src={iconUrl} alt={''} width={20} height={20} />
+              <Image src={iconUrl} alt={''} width={20} height={20} loading="eager" />
             </div>
             <div
               style={{
@@ -908,7 +908,7 @@ export const StationMarkersLayer = () => {
         html: ReactDOMServer.renderToString(
           <>
             <div style={{ display: 'inline', verticalAlign: -7, marginLeft: -4 }}>
-              <Image src={iconUrl} alt={''} width={20} height={20} />
+              <Image src={iconUrl} alt={''} width={20} height={20} loading="eager" />
             </div>
             <div
               style={{
@@ -960,7 +960,7 @@ export const StationMarkersLayer = () => {
         html: ReactDOMServer.renderToString(
           <>
             <div style={{ display: 'inline', verticalAlign: -7, marginLeft: -4 }}>
-              <Image src={iconUrl} alt={''} width={20} height={20} />
+              <Image src={iconUrl} alt={''} width={20} height={20} loading="eager" />
             </div>
             <div
               style={{
@@ -1280,6 +1280,7 @@ export const StationMarkersLayer = () => {
               alt={''}
               width={30}
               height={30}
+              loading="eager"
             />
           </>,
         ),

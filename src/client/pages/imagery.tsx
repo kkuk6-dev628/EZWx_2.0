@@ -97,7 +97,7 @@ function Imagery() {
         </div>
         <div className="igry__mid">
           <div className="igry__img__area">
-            <Image className="igry__img" src="/images/map__img.png" layout={'fill'} alt={''} />
+            <Image className="igry__img" src="/images/map__img.png" layout={'fill'} alt={''} loading="eager" />
           </div>
         </div>
         <div className="igry__rgt igry__blu">

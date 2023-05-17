@@ -158,7 +158,7 @@ const PirepLayer = () => {
         className: 'pirep-icon',
         html: ReactDOMServer.renderToString(
           <>
-            <Image src={iconUrl} alt={''} width={16} height={16} />
+            <Image src={iconUrl} alt={''} width={16} height={16} loading="eager" />
             <span className={spanClass}>{flightLevel}</span>
           </>,
         ),
@@ -179,8 +179,8 @@ const PirepLayer = () => {
         className: 'pirep-icon',
         html: ReactDOMServer.renderToString(
           <>
-            <Image src={iconUrl1} className="pirep-left-icon" alt={''} width={16} height={16} />
-            <Image src={iconUrl2} className="pirep-right-icon" alt={''} width={16} height={16} />
+            <Image src={iconUrl1} className="pirep-left-icon" alt={''} width={16} height={16} loading="eager" />
+            <Image src={iconUrl2} className="pirep-right-icon" alt={''} width={16} height={16} loading="eager" />
             <span className={spanClass}>{flightLevel}</span>
           </>,
         ),

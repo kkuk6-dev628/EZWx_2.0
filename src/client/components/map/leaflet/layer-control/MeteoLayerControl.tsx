@@ -246,6 +246,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                 width={60}
                 height={60}
                 className="layer-control__header__img"
+                loading="eager"
               />
             </div>
             <div className="layer-control__rgt">
