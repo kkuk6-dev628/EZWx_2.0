@@ -36,11 +36,30 @@ export interface OpenMeteoApiResult {
 }
 
 export interface ElevationApiResult {
-  results: {
+  dataset: {
+    allowMissingDataGeneration: boolean;
+    attribution: any;
+    dataSource: any;
+    description: string;
+    extentInfo: string;
+    fileFormat: any;
+    isListed: boolean;
+    name: string;
+    noDataValue: number;
+    pointsPerDegree: number;
+    publicUrl: string;
+    resolutionArcSeconds: number;
+    resolutionMeters: number;
+    srid: number;
+  };
+  geoPoints: {
     elevation: number;
     latitude: number;
     longitude: number;
   }[];
+  message: string;
+  resultCount: number;
+  statusCode: number;
 }
 
 export interface RouteProfileDataset {

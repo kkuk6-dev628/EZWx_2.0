@@ -35,7 +35,7 @@ import {
   useQueryTemperatureDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
-import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
+import { selectFetchedDate, selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import {
   celsiusToFahrenheit,
   convertTimeFormat,
@@ -73,8 +73,8 @@ export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
 };
 
 export const temperatureContourColors = {
-  positive: '#bd8545',
-  negative: '#0b7e0c',
+  positive: '#FBF209',
+  negative: '#09FDC6',
 };
 
 export function makeSkyConditions(
@@ -279,6 +279,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   const { data: routeProfileApiState } = useGetRouteProfileStateQuery(null, {
     refetchOnMountOrArgChange: true,
   });
+  const fetchedDate = useSelector(selectFetchedDate);
   const segments = useSelector(selectRouteSegments);
   const [queryElevations, queryElevationsResult] = useQueryElevationApiMutation({ fixedCacheKey: cacheKeys.elevation });
   const [elevationSeries, setElevationSeries] = useState([]);
@@ -461,16 +462,17 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   }
 
   useEffect(() => {
-    if (activeRoute) {
+    if (activeRoute && !queryElevationsResult.isSuccess && !queryElevationsResult.isLoading) {
       // userSettings.default_distance_unit == true then km, or nm
+      console.log(queryElevationsResult, new Date().toLocaleTimeString());
       const elevationPoints = interpolateRoute(activeRoute, totalNumberOfElevations);
-      if (!queryElevationsResult.isSuccess) queryElevations({ queryPoints: elevationPoints });
+      queryElevations({ queryPoints: elevationPoints });
     }
-  }, [activeRoute]);
+  }, [fetchedDate]);
 
   useEffect(() => {
     if (queryElevationsResult.isSuccess && queryElevationsResult.data && routeLength) {
-      const elevationApiResults = queryElevationsResult.data.results;
+      const elevationApiResults = queryElevationsResult.data.geoPoints;
       const elevations = [{ x: -startMargin, y: meterToFeet(elevationApiResults[0].elevation) }];
       const elSegmentLength = routeLength / totalNumberOfElevations;
       for (let i = 1; i < elevationApiResults.length - 1; i++) {

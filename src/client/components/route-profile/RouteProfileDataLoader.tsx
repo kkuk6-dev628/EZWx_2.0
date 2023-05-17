@@ -41,7 +41,7 @@ import { QueryStatus, skipToken } from '@reduxjs/toolkit/query';
 import { useDispatch } from 'react-redux';
 import { NbmProperties, RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
 import { selectSettings } from '../../store/user/UserSettings';
-import { setRouteSegments } from '../../store/route-profile/RouteProfile';
+import { selectFetchedDate, setFetchedDate, setRouteSegments } from '../../store/route-profile/RouteProfile';
 import { windQueryElevations } from './WindChart';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { useGetAirportQuery } from '../../store/route/airportApi';
@@ -54,6 +54,8 @@ export const contourMin = -100;
 export const contourMax = 60;
 
 export const flightCategoryDivide = 10;
+
+export const NODATA = -9999;
 
 export const SUNSET_SUNRISE = {
   night: {
@@ -223,10 +225,16 @@ export function getValueFromDataset(
         return Math.abs(dataset.elevation - elevation) < 1000;
       });
       if (filteredByElevation.length === 1) {
-        return { value: filteredByElevation[0].value, time: new Date(filteredByTime.time[0]) };
+        return {
+          value: filteredByElevation[0].value === NODATA ? null : filteredByElevation[0].value,
+          time: new Date(filteredByTime.time[0]),
+        };
       } else if (filteredByElevation.length === 2) {
         return {
-          value: (filteredByElevation[0].value + filteredByElevation[0].value) / 2,
+          value:
+            filteredByElevation[0].value === NODATA
+              ? null
+              : (filteredByElevation[0].value + filteredByElevation[0].value) / 2,
           time: new Date(filteredByTime.time[0]),
         };
       }
@@ -288,7 +296,10 @@ export function getValuesFromDatasetAllElevationByElevation(
 
       const forecastTime = new Date(filteredByTime.time);
       if (time.getTime() - forecastTime.getTime() < 3600 * 3 * 1000) {
-        result.push({ elevation: dataset.elevations[0], value: filteredByTime.value });
+        result.push({
+          elevation: dataset.elevations[0],
+          value: filteredByTime.value === NODATA ? null : filteredByTime.value,
+        });
       }
     });
     return result;
@@ -328,7 +339,10 @@ export function getValueFromDatasetByElevation(
       });
       const forecastTime = new Date(filteredByTime.time);
       if (time.getTime() - forecastTime.getTime() < 3600 * 3 * 1000) {
-        return { value: filteredByTime.value, time: new Date(filteredByTime.time) };
+        return {
+          value: filteredByTime.value === NODATA ? null : filteredByTime.value,
+          time: new Date(filteredByTime.time),
+        };
       }
     } else if (filteredByElevations.length === 2) {
       const filteredByTime_0 = filteredByElevations[0].data[segmentIndex].data.reduce((prev, curr) => {
@@ -354,7 +368,7 @@ export function getValueFromDatasetByElevation(
         time.getTime() - forecastTime_1.getTime() < 3600 * 3 * 1000
       ) {
         return {
-          value: (filteredByTime_0.value + filteredByTime_1.value) / 2,
+          value: filteredByTime_0.value === NODATA ? null : (filteredByTime_0.value + filteredByTime_1.value) / 2,
           time: new Date(filteredByTime_0.time),
         };
       }
@@ -679,7 +693,7 @@ const RouteProfileDataLoader = () => {
   const [, queryElevationsResult] = useQueryElevationApiMutation({ fixedCacheKey: cacheKeys.elevation });
   const activeRoute = useSelector(selectActiveRoute);
   const dispatch = useDispatch();
-  const [forceRefetch, setForceRefetch] = useState(Date.now());
+  const fetchedDate = useSelector(selectFetchedDate);
   let isLoading = false;
   const { isSuccess: isLoadedAirports, data: airportsTable } = useGetAirportQuery('');
 
@@ -841,14 +855,14 @@ const RouteProfileDataLoader = () => {
 
   useEffect(() => {
     resetDataCaches();
-    setForceRefetch(Date.now());
+    dispatch(setFetchedDate(Date.now()));
   }, [activeRoute]);
 
   switch (routeProfileApiState.chartType) {
     case 'Wind':
       useEffect(() => {
         queryGfsWindSpeed(null);
-      }, [forceRefetch]);
+      }, [fetchedDate]);
       useEffect(() => {
         queryGfsWindDir(queryGfsWindSpeedDataResult);
       }, [queryGfsWindSpeedDataResult.isLoading]);
@@ -877,7 +891,7 @@ const RouteProfileDataLoader = () => {
     case 'Turb':
       useEffect(() => {
         queryTurb(null);
-      }, [forceRefetch]);
+      }, [fetchedDate]);
 
       useEffect(() => {
         queryGfsWindSpeed(queryCaturbDataResult);
@@ -907,7 +921,7 @@ const RouteProfileDataLoader = () => {
     case 'Icing':
       useEffect(() => {
         queryIcing(null);
-      }, [forceRefetch]);
+      }, [fetchedDate]);
       useEffect(() => {
         queryGfsWindSpeed(queryIcingProbDataResult);
       }, [queryIcingProbDataResult.isLoading]);
@@ -936,7 +950,7 @@ const RouteProfileDataLoader = () => {
     case 'Clouds':
       useEffect(() => {
         queryNbmFlightCat(null);
-      }, [forceRefetch]);
+      }, [fetchedDate]);
       useEffect(() => {
         queryNbm(queryNbmFlightCatResult);
       }, [queryNbmFlightCatResult.isLoading]);

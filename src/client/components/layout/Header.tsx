@@ -27,11 +27,6 @@ const links = [
         name: 'Imagery',
         link: '/imagery',
       },
-      {
-        id: 4,
-        name: 'Workshops',
-        link: '/samples/workshops',
-      },
     ],
   },
   {
@@ -81,11 +76,6 @@ const responsiveLink = [
     id: 4,
     name: 'Imagery',
     link: '/imagery',
-  },
-  {
-    id: 5,
-    name: 'Workshops',
-    link: '/workshops',
   },
   {
     id: 6,

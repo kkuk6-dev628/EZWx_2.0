@@ -16,7 +16,14 @@ async function bootstrap() {
       })
     : await NestFactory.create(ServerModule);
   app.use(cookieParser());
-  app.use(compression());
+  app.use(
+    compression({
+      filter: (args) => {
+        return true;
+      },
+      threshold: 0,
+    }),
+  );
 
   await app.listen(process.env.PORT || 3000);
 }
