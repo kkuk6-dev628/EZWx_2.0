@@ -854,6 +854,8 @@ const RouteProfileDataLoader = () => {
   }
 
   useEffect(() => {
+    // console.log(activeRoute);
+    // console.log(new Date(fetchedDate).toISOString(), new Date().toISOString());
     resetDataCaches();
     dispatch(setFetchedDate(Date.now()));
   }, [activeRoute]);

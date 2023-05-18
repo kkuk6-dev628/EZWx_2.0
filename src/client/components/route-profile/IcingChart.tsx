@@ -35,7 +35,7 @@ const icingSevLegend = [
   { value: 0, color: '#F6F6F6', label: 'None' },
   { value: 4, color: '#CEFFFC', label: 'Trace' },
   { value: 1, color: '#99CEFF', label: 'Light' },
-  { value: 2, color: '#6C9CF2', label: 'Moderate' },
+  { value: 2, color: '#0096FF', label: 'Moderate' },
   { value: 5, color: '#3031FF', label: 'Heavy' },
 ];
 
@@ -250,7 +250,16 @@ const IcingChart = (props) => {
   ]);
 
   return (
-    <RouteProfileChart showDayNightBackground={true}>
+    <RouteProfileChart
+      showDayNightBackground={true}
+      noDataMessage={
+        noDepicted
+          ? 'No icing forecast depicted for this departure time'
+          : noForecast
+          ? 'No icing forecast available for this departure time'
+          : null
+      }
+    >
       {icingSeries && (
         <VerticalRectSeries
           colorType="literal"
@@ -293,36 +302,6 @@ const IcingChart = (props) => {
           })
         : null}
 
-      {noDepicted && (
-        <LabelSeries
-          style={{ fontSize: 22, fontWeight: 900, strokeWidth: 1, fill: 'red', stroke: 'white' }}
-          data={[
-            {
-              x: getRouteLength(activeRoute, !userSettings.default_distance_unit) / 2,
-              y: (routeProfileApiState.maxAltitude * 100) / 2,
-              label: 'No icing forecast depicted for this departure time',
-              style: {
-                textAnchor: 'middle',
-              },
-            },
-          ]}
-        ></LabelSeries>
-      )}
-      {noForecast && (
-        <LabelSeries
-          style={{ fontSize: 22, fontWeight: 900, strokeWidth: 1, fill: 'red', stroke: 'white' }}
-          data={[
-            {
-              x: getRouteLength(activeRoute, !userSettings.default_distance_unit) / 2,
-              y: (routeProfileApiState.maxAltitude * 100) / 2,
-              label: 'No icing forecast available for this departure time',
-              style: {
-                textAnchor: 'middle',
-              },
-            },
-          ]}
-        ></LabelSeries>
-      )}
       {icingHint ? (
         <Hint value={icingHint} className="icing-tooltip">
           <span>

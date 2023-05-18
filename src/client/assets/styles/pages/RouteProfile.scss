@@ -138,6 +138,15 @@
         margin-left: 20px;
         line-height: 1.5;
       }
+      .nodata-msg {
+        font-size: 1.0rem;
+        width: 280px;
+        color: white;
+        padding: 10px 20px;
+        background: #3339;
+        border-radius: 6px;
+        text-align: center;
+      }
     }
   }
   .data-loading{

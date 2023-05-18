@@ -246,7 +246,7 @@ const StationForecastPopup = ({
                   <div key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`} style={{ marginTop: 8 }}>
                     {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
                     {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false &&
-                      skyCondition.cloudBase + ' feet'}
+                      ' at ' + skyCondition.cloudBase + ' feet'}
                   </div>
                 );
               })}

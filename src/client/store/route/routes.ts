@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Route } from '../../interfaces/route';
 import { AppState } from '../store';
+import { isSameRoutes } from '../../components/map/common/AreoFunctions';
 
 export interface RouteState {
   activeRoute: Route;
@@ -14,7 +15,9 @@ export const RoutesSlice = createSlice({
   initialState,
   reducers: {
     setActiveRoute: (state, action) => {
-      state.activeRoute = action.payload;
+      if (!isSameRoutes(state.activeRoute, action.payload)) {
+        state.activeRoute = action.payload;
+      }
     },
   },
 });

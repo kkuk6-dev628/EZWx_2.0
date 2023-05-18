@@ -67,6 +67,7 @@ export const convertTimeFormat = (time: string | number | Date, useLocalTime: bo
   const dateObj = new Date(time);
   if (useLocalTime) {
     return `${dateObj.toLocaleDateString('en-US', {
+      weekday: 'short',
       day: 'numeric',
       month: 'short',
       year: 'numeric',
@@ -78,6 +79,7 @@ export const convertTimeFormat = (time: string | number | Date, useLocalTime: bo
     })}`;
   } else {
     return `${dateObj.toLocaleDateString('en-US', {
+      weekday: 'short',
       day: 'numeric',
       month: 'short',
       year: 'numeric',

@@ -198,7 +198,7 @@ const WindChart = () => {
   ]);
 
   return (
-    <RouteProfileChart showDayNightBackground={true}>
+    <RouteProfileChart showDayNightBackground={true} noDataMessage={null}>
       {windSpeedSeries && (
         <CustomSVGSeries
           customComponent="square"

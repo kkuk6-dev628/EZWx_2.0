@@ -17,6 +17,7 @@ import {
 import { selectActiveRoute } from '../../store/route/routes';
 import {
   cacheKeys,
+  flightCategoryDivide,
   getMinMaxValueByElevation,
   getRouteLength,
   getSegmentsCount,
@@ -42,6 +43,7 @@ import {
   degree2radian,
   getMetarCeilingCategory,
   getMetarVisibilityCategory,
+  knotsToMph,
   meterToFeet,
   round,
   roundCloudHeight,
@@ -202,7 +204,7 @@ export function buildContour(
           : temperatureContourColors.negative,
       // stroke: 'white',
       // strokeWidth: 0.1,
-      filter: 'url(#solid)',
+      // filter: 'url(#solid)',
       dominantBaseline: 'middle',
       textAnchor: 'end',
       fontWeight: 900,
@@ -272,7 +274,7 @@ function getFlightCategoryColor(visibility, ceiling): string {
   return flightCategoryToColor(finalCat);
 }
 
-const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground: boolean }) => {
+const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground: boolean; noDataMessage: string }) => {
   const activeRoute = useSelector(selectActiveRoute);
   const userSettings = useSelector(selectSettings);
   const observationTime = userSettings.observation_time;
@@ -425,6 +427,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             visibility: seg.airportNbmProps.visibility,
             windspeed: seg.airportNbmProps.windspeed,
             winddir: seg.airportNbmProps.winddir,
+            windgust: seg.airportNbmProps.gust,
             temperature: seg.airportNbmProps.temperature,
             dewpoint: seg.airportNbmProps.dewpoint,
           };
@@ -491,101 +494,92 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     if (activeRoute && queryNbmFlightCatResult.isSuccess) {
       const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * 10, true);
       const flightCategoryData = [];
-      const initial = {
-        position: { lat: positions[0].lat, lng: positions[0].lng },
-        accDistance: 0,
-        arriveTime: new Date(observationTime).getTime(),
-      };
-      positions.reduce(
-        (
-          acc: { position: { lat: number; lng: number }; accDistance: number; arriveTime: Date },
-          curr: LatLng,
-          index,
-        ) => {
-          try {
-            const dist = fly.distanceTo(acc.position.lat, acc.position.lng, curr.lat, curr.lng, 2);
-            const course = fly.trueCourse(acc.position.lat, acc.position.lng, curr.lat, curr.lng, 2);
-            if (!dist) return acc;
-            let speed: number;
-            if (activeRoute.useForecastWinds) {
-              if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess) {
-                const { value: speedValue } = getValueFromDatasetByElevation(
-                  queryGfsWindSpeedDataResult.data,
-                  new Date(acc.arriveTime),
-                  activeRoute.altitude,
-                  index,
-                );
-                const { value: dirValue } = getValueFromDatasetByElevation(
-                  queryGfsWindDirectionDataResult.data,
-                  new Date(acc.arriveTime),
-                  activeRoute.altitude,
-                  index,
-                );
-                const { groundSpeed } = fly.calculateHeadingAndGroundSpeed(
-                  userSettings.true_airspeed,
-                  course,
-                  speedValue,
-                  dirValue,
-                  2,
-                );
-                speed = groundSpeed;
-              } else {
-                speed = userSettings.true_airspeed;
-              }
+      const prevPos: { lat: number; lng: number } = null;
+      let accDistance = 0;
+      let arriveTime = new Date(observationTime).getTime();
+      let dist = 0;
+      let course = 0;
+      positions.forEach((curr: LatLng, index) => {
+        try {
+          const nextPos = index < positions.length - 1 ? positions[index + 1] : null;
+          dist = index < positions.length - 1 ? fly.distanceTo(curr.lat, curr.lng, nextPos.lat, nextPos.lng, 2) : dist;
+          course =
+            index < positions.length - 1 ? fly.trueCourse(curr.lat, curr.lng, nextPos.lat, nextPos.lng, 2) : course;
+          if (index < positions.length - 1 && !dist) return;
+          let speed: number;
+          if (activeRoute.useForecastWinds) {
+            if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess) {
+              const { value: speedValue } = getValueFromDatasetByElevation(
+                queryGfsWindSpeedDataResult.data,
+                new Date(arriveTime),
+                activeRoute.altitude,
+                Math.round(index / flightCategoryDivide),
+              );
+              const { value: dirValue } = getValueFromDatasetByElevation(
+                queryGfsWindDirectionDataResult.data,
+                new Date(arriveTime),
+                activeRoute.altitude,
+                Math.round(index / flightCategoryDivide),
+              );
+              const { groundSpeed } = fly.calculateHeadingAndGroundSpeed(
+                userSettings.true_airspeed,
+                course,
+                speedValue,
+                dirValue,
+                2,
+              );
+              speed = groundSpeed;
             } else {
               speed = userSettings.true_airspeed;
             }
-            const newTime = new Date(acc.arriveTime).getTime() + (3600 * 1000 * dist) / speed;
-            const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(
-              queryNbmFlightCatResult.data?.cloudceiling,
-              new Date(acc.arriveTime),
-              null,
-              index,
-            );
-            const { value: visibility } = getValueFromDatasetByElevation(
-              queryNbmFlightCatResult.data?.visibility,
-              new Date(acc.arriveTime),
-              null,
-              index,
-            );
-            const { value: skycover } = getValueFromDatasetByElevation(
-              queryNbmFlightCatResult.data?.skycover,
-              new Date(acc.arriveTime),
-              null,
-              index,
-            );
-            const { value: cloudbase } = getValueFromDatasetByElevation(
-              queryNbmFlightCatResult.data?.cloudbase,
-              new Date(acc.arriveTime),
-              null,
-              index,
-            );
-            const skyConditions = makeSkyConditions(cloudbase, cloudceiling, skycover);
-            const flightCategoryColor = getFlightCategoryColor(visibility, cloudceiling);
-            flightCategoryData.push({
-              x0: acc.accDistance,
-              x: acc.accDistance + dist,
-              y0: (-routeProfileApiState.maxAltitude * 100) / 50,
-              y: -routeProfileApiState.maxAltitude / 5,
-              color: flightCategoryColor,
-              tooltip: {
-                time: forecastTime,
-                clouds: skyConditions,
-                visibility: visibility,
-              },
-            });
-            return {
-              position: { lat: curr.lat, lng: curr.lng },
-              accDistance: acc.accDistance + dist,
-              arriveTime: newTime,
-            };
-          } catch (err) {
-            console.warn(err);
-            return acc;
+          } else {
+            speed = userSettings.true_airspeed;
           }
-        },
-        initial,
-      );
+          const newTime = new Date(arriveTime).getTime() + (3600 * 1000 * dist) / speed;
+          const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(
+            queryNbmFlightCatResult.data?.cloudceiling,
+            new Date(arriveTime),
+            null,
+            index,
+          );
+          const { value: visibility } = getValueFromDatasetByElevation(
+            queryNbmFlightCatResult.data?.visibility,
+            new Date(arriveTime),
+            null,
+            index,
+          );
+          const { value: skycover } = getValueFromDatasetByElevation(
+            queryNbmFlightCatResult.data?.skycover,
+            new Date(arriveTime),
+            null,
+            index,
+          );
+          const { value: cloudbase } = getValueFromDatasetByElevation(
+            queryNbmFlightCatResult.data?.cloudbase,
+            new Date(arriveTime),
+            null,
+            index,
+          );
+          const skyConditions = makeSkyConditions(cloudbase, cloudceiling, skycover);
+          const flightCategoryColor = getFlightCategoryColor(visibility, cloudceiling);
+          flightCategoryData.push({
+            x0: accDistance - dist / 2,
+            x: accDistance + dist / 2,
+            y0: (-routeProfileApiState.maxAltitude * 100) / 50,
+            y: -routeProfileApiState.maxAltitude / 5,
+            color: flightCategoryColor,
+            tooltip: {
+              time: forecastTime,
+              clouds: skyConditions,
+              visibility: visibility,
+            },
+          });
+          accDistance += dist;
+          arriveTime = newTime;
+        } catch (err) {
+          console.warn(err);
+        }
+      });
       setFlightCategorySeries(flightCategoryData);
     }
   }
@@ -843,7 +837,32 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
               onValueMouseOut={() => setFlightCatHint(null)}
             ></VerticalRectSeries>
           )}
+          {props.noDataMessage && (
+            <CustomSVGSeries
+              data={[
+                {
+                  x: getRouteLength(activeRoute, !userSettings.default_distance_unit) / 2,
+                  y: (routeProfileApiState.maxAltitude * 100) / 2,
+                  customComponent: (_row, _positionInPixels) => {
+                    return (
+                      <switch>
+                        <foreignObject x="-150" y="-60" width="300" height="200">
+                          <p className="nodata-msg">{props.noDataMessage}</p>
+                        </foreignObject>
 
+                        <text x="20" y="20">
+                          {props.noDataMessage}
+                        </text>
+                      </switch>
+                    );
+                  },
+                  style: {
+                    textAnchor: 'middle',
+                  },
+                },
+              ]}
+            />
+          )}
           {showElevationHint ? (
             <Hint value={elevationHint}>
               <div style={{ background: 'white', color: 'black', padding: 4, borderRadius: 4 }}>{elevationHint.y}</div>
@@ -874,9 +893,9 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                         key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`}
                         style={{ marginTop: 6, marginBottom: 2 }}
                       >
-                        {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
+                        {MetarSkyValuesToString[skyCondition.skyCover]}
                         {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false &&
-                          roundCloudHeight(skyCondition.cloudBase) + ' feet'}
+                          ' at ' + roundCloudHeight(skyCondition.cloudBase) + ' feet'}
                       </div>
                     );
                   })}
@@ -911,7 +930,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                       >
                         {MetarSkyValuesToString[skyCondition.skyCover]}{' '}
                         {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false &&
-                          roundCloudHeight(skyCondition.cloudBase) + ' feet'}
+                          ' at ' + roundCloudHeight(skyCondition.cloudBase) + ' feet'}
                       </div>
                     );
                   })}
@@ -932,11 +951,24 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                   : visibilityMileToMeter(airportHint.tooltip.visibility)}
               </span>
               <span>
-                <b>Wind speed:</b>&nbsp;{Math.round(airportHint.tooltip.windspeed)} knots
+                <b>Wind speed:</b>&nbsp;
+                {!userSettings.default_wind_speed_unit
+                  ? Math.round(airportHint.tooltip.windspeed) +
+                    (Math.round(airportHint.tooltip.windspeed) <= 1 ? ' knot' : ' knots')
+                  : Math.round(knotsToMph(airportHint.tooltip.windspeed)) + ' mph'}
               </span>
               <span>
                 <b>Wind direction:</b>&nbsp;{Math.round(airportHint.tooltip.winddir) + ' \u00B0'}
               </span>
+              {airportHint.tooltip.windgust !== null && (
+                <span>
+                  <b>Wind Gust:</b>&nbsp;
+                  {!userSettings.default_wind_speed_unit
+                    ? Math.round(airportHint.tooltip.windgust) +
+                      (Math.round(airportHint.tooltip.windgust) <= 1 ? ' knot' : ' knots')
+                    : Math.round(knotsToMph(airportHint.tooltip.windgust)) + ' mph'}
+                </span>
+              )}
               <span>
                 <b>Temperature:</b>&nbsp;
                 {!userSettings.default_temperature_unit

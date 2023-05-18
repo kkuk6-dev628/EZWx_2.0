@@ -186,7 +186,16 @@ const TurbChart = (props) => {
   ]);
 
   return (
-    <RouteProfileChart showDayNightBackground={true}>
+    <RouteProfileChart
+      showDayNightBackground={true}
+      noDataMessage={
+        noDepicted
+          ? 'No turbulence forecast depicted for this departure time'
+          : noForecast
+          ? 'No turbulence forecast available for this departure time'
+          : null
+      }
+    >
       {turbSeries && (
         <VerticalRectSeries
           colorType="literal"
@@ -245,36 +254,6 @@ const TurbChart = (props) => {
             <b>Category:</b> {turbHint.hint.category}
           </span>
         </Hint>
-      )}
-      {noDepicted && (
-        <LabelSeries
-          style={{ fontSize: 22, fontWeight: 900, strokeWidth: 1, fill: 'red', stroke: 'white' }}
-          data={[
-            {
-              x: getRouteLength(activeRoute, !userSettings.default_distance_unit) / 2,
-              y: (routeProfileApiState.maxAltitude * 100) / 2,
-              label: 'No turbulence forecast depicted \nfor this departure time',
-              style: {
-                textAnchor: 'middle',
-              },
-            },
-          ]}
-        ></LabelSeries>
-      )}
-      {noForecast && (
-        <LabelSeries
-          style={{ fontSize: 22, fontWeight: 900, strokeWidth: 1, fill: 'red', stroke: 'white' }}
-          data={[
-            {
-              x: getRouteLength(activeRoute, !userSettings.default_distance_unit) / 2,
-              y: (routeProfileApiState.maxAltitude * 100) / 2,
-              label: 'No turbulence forecast available \nfor this departure time',
-              style: {
-                textAnchor: 'middle',
-              },
-            },
-          ]}
-        ></LabelSeries>
       )}
     </RouteProfileChart>
   );

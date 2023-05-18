@@ -130,7 +130,7 @@ const CloudsChart = (props) => {
       const segmentLength = routeLength / segmentCount;
       const cloudData = [];
       const existIcing = false;
-      const maxForecastTime = getMaxForecastTime(queryIcingSevDataResult.data);
+      const maxForecastTime = getMaxForecastTime(queryNbmFlightCatResult.data.skycover);
       segments.forEach((segment, index) => {
         const elevation = getElevationByPosition(segment.position);
         let colorFirst = cloudColor1;
@@ -259,7 +259,7 @@ const CloudsChart = (props) => {
     queryhumidityDataResult.isSuccess,
   ]);
   return (
-    <RouteProfileChart showDayNightBackground={true}>
+    <RouteProfileChart showDayNightBackground={true} noDataMessage={null}>
       {cloudSeries && (
         <VerticalRectSeries
           colorType="literal"
