@@ -36,7 +36,7 @@
     "@material-ui/icons": "latest",
     "@mui/material": "^5.13.1",
     "@nestjs/axios": "^2.0.0",
-    "@nestjs/common": "^9.3.3",
+    "@nestjs/common": "^9.4.1",
     "@nestjs/config": "^2.3.2",
     "@nestjs/core": "^9.3.9",
     "@nestjs/jwt": "^10.0.2",
