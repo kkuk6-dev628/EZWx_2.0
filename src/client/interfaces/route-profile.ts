@@ -18,6 +18,7 @@ export interface RouteProfileState {
   icingLayers: RouteProfileIcingDataType[];
   turbLayers: RouteProfileTurbDataType[];
   maxAltitude: RouteProfileMaxAltitudes;
+  showTemperature?: boolean;
 }
 
 export interface OpenTopoApiResult {

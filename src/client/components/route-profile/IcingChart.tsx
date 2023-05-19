@@ -126,8 +126,8 @@ const IcingChart = (props) => {
           const severity = 'None';
           let hint;
           if (segment.arriveTime > maxForecastTime.getTime()) {
-            color = '#333';
-            opacity = 0.5;
+            color = '#666';
+            opacity = 0.8;
             hint = {
               time: segment.arriveTime,
               altitude: elevation,

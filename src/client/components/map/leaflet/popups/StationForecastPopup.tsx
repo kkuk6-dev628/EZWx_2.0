@@ -45,7 +45,7 @@ const intenStrings = {
   3: 'heavy',
 };
 
-const makeWeatherString = (
+export const makeWeatherString = (
   wx: number,
   prob: number,
   inten: number,

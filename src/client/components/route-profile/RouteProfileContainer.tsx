@@ -192,6 +192,21 @@ const RouteProfileContainer = () => {
               })}
             </RadioGroup>
             <div className="header-right">
+              <div className="show-temperature">
+                <div className="MuiToggleButtonGroup-root">
+                  <ToggleButton
+                    value="showTemperature"
+                    aria-label="showTemperature"
+                    selected={routeProfileState.showTemperature}
+                    style={{ padding: 2 }}
+                    onChange={() => {
+                      handleUpdateState({ ...routeProfileState, showTemperature: !routeProfileState.showTemperature });
+                    }}
+                  >
+                    <i className="fas fa-thermometer-half fa-2x" aria-hidden="true"></i>
+                  </ToggleButton>
+                </div>
+              </div>
               {routeProfileState.chartType === routeProfileChartTypes.wind && (
                 <div className="select-data-type">
                   <InputFieldWrapper>
@@ -296,10 +311,10 @@ const RouteProfileContainer = () => {
           </div>
           <div className="route-profile-chart-container">
             <div className="scrollable-chart-content">
-              {routeProfileApiState.chartType === 'Wind' && <WindChart />}
-              {routeProfileApiState.chartType === 'Clouds' && <CloudsChart></CloudsChart>}
-              {routeProfileApiState.chartType === 'Icing' && <IcingChart></IcingChart>}
-              {routeProfileApiState.chartType === 'Turb' && <TurbChart></TurbChart>}
+              {routeProfileState.chartType === 'Wind' && <WindChart />}
+              {routeProfileState.chartType === 'Clouds' && <CloudsChart></CloudsChart>}
+              {routeProfileState.chartType === 'Icing' && <IcingChart></IcingChart>}
+              {routeProfileState.chartType === 'Turb' && <TurbChart></TurbChart>}
             </div>
           </div>
         </div>

@@ -58,6 +58,7 @@ import { Conrec } from '../../conrec-js/conrec';
 import { RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
 import Route from '../shared/Route';
 import { LatLng } from 'leaflet';
+import { makeWeatherString } from '../map/leaflet/popups/StationForecastPopup';
 
 export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
   if (viewWidth < 900) {
@@ -302,9 +303,10 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   const [, queryTemperatureDataResult] = useQueryTemperatureDataMutation({
     fixedCacheKey: cacheKeys.gfsTemperature,
   });
-  const [contourLabelData, setContourLabelData] = useState([]);
-  const [temperatureContures, setTemperatureContours] = useState([]);
+  const [contourLabelData, setContourLabelData] = useState(null);
+  const [temperatureContures, setTemperatureContours] = useState(null);
   const [weatherIconData, setWeatherIconData] = useState(null);
+  const [weatherHint, setWeatherHint] = useState(null);
   const [flightCategorySeries, setFlightCategorySeries] = useState(null);
   const [flightCatHint, setFlightCatHint] = useState(null);
   const [, queryGfsWindDirectionDataResult] = useQueryGfsWindDirectionDataMutation({
@@ -319,15 +321,20 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
 
   function buildTemperatureContourSeries() {
     if (queryTemperatureDataResult.isSuccess && segments.length > 0) {
-      const { contours, contourLabels } = buildContour(
-        activeRoute,
-        queryTemperatureDataResult.data,
-        segments,
-        routeProfileApiState.maxAltitude,
-        !userSettings.default_temperature_unit,
-      );
-      setContourLabelData(contourLabels);
-      setTemperatureContours(contours);
+      if (routeProfileApiState.showTemperature) {
+        const { contours, contourLabels } = buildContour(
+          activeRoute,
+          queryTemperatureDataResult.data,
+          segments,
+          routeProfileApiState.maxAltitude,
+          !userSettings.default_temperature_unit,
+        );
+        setContourLabelData(contourLabels);
+        setTemperatureContours(contours);
+      } else {
+        setContourLabelData(null);
+        setTemperatureContours(null);
+      }
     }
   }
 
@@ -338,6 +345,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     segments,
     userSettings.default_temperature_unit,
     routeProfileApiState.maxAltitude,
+    routeProfileApiState.showTemperature,
   ]);
 
   useEffect(() => {
@@ -375,18 +383,55 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
 
   function buildWeatherSeries(segment: RouteSegment, segmentIndex: number) {
     if (segment) {
-      const color = getFlightCategoryColor(segment.segmentNbmProps.visibility, segment.segmentNbmProps.cloudceiling);
+      const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(
+        queryNbmFlightCatResult.data?.cloudceiling,
+        new Date(segment.arriveTime),
+        null,
+        segmentIndex * flightCategoryDivide,
+      );
+      const { value: visibility } = getValueFromDatasetByElevation(
+        queryNbmFlightCatResult.data?.visibility,
+        new Date(segment.arriveTime),
+        null,
+        segmentIndex * flightCategoryDivide,
+      );
+      const { value: skycover } = getValueFromDatasetByElevation(
+        queryNbmFlightCatResult.data?.skycover,
+        new Date(segment.arriveTime),
+        null,
+        segmentIndex * flightCategoryDivide,
+      );
+      const { value: cloudbase } = getValueFromDatasetByElevation(
+        queryNbmFlightCatResult.data?.cloudbase,
+        new Date(segment.arriveTime),
+        null,
+        segmentIndex * flightCategoryDivide,
+      );
+      const color = getFlightCategoryColor(visibility, cloudceiling);
       const icon = getNbmWeatherMarkerIcon(
         segment.segmentNbmProps.wx_1,
         segment.segmentNbmProps.windspeed,
         segment.segmentNbmProps.gust,
-        segment.segmentNbmProps.skycover,
+        skycover,
         segment.position,
         segment.arriveTime,
       );
       return {
         x: segment.accDistance,
         y: routeProfileApiState.maxAltitude * 100 * 1.04,
+        tooltip: {
+          time: segment.segmentNbmProps.time,
+          clouds: makeSkyConditions(cloudbase, cloudceiling, skycover),
+          weather: makeWeatherString(
+            segment.segmentNbmProps.wx_1,
+            1,
+            2,
+            skycover,
+            segment.segmentNbmProps.windspeed,
+            segment.segmentNbmProps.gust,
+            false,
+          ),
+        },
         customComponent: () => {
           return (
             <text x={0} y={0}>
@@ -775,6 +820,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             />
           ) : null}
           {routeProfileApiState.chartType !== 'Turb' &&
+            routeProfileApiState.showTemperature &&
+            temperatureContures &&
             temperatureContures.map((contourLine, index) => {
               const color =
                 contourLine.temperature > 0
@@ -794,25 +841,25 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                 />
               );
             })}
-          {routeProfileApiState.chartType !== 'Turb' && contourLabelData.length > 0 ? (
+          {routeProfileApiState.chartType !== 'Turb' && routeProfileApiState.showTemperature && contourLabelData && (
             <LabelSeries animation allowOffsetToBeReversed data={contourLabelData}></LabelSeries>
-          ) : null}
-
+          )}
           {routeProfileApiState.chartType === 'Wind' && activeRoute ? props.children : null}
           {elevationSeries.length > 0 && (
             <AreaSeries
               data={elevationSeries}
               color="#9e8f85"
               curve={'curveMonotoneX'}
-              strokeWidth={0}
+              strokeWidth={1}
+              stroke="#443322"
               onNearestXY={(datapoint) => setElevationHint(datapoint)}
               onSeriesMouseOut={() => setShowElevationHint(false)}
               onSeriesMouseOver={() => setShowElevationHint(true)}
             />
           )}
-          {elevationSeries.length > 0 && (
-            <LineSeries color="#443322" data={elevationSeries} strokeWidth={1}></LineSeries>
-          )}
+          {/* {elevationSeries.length > 0 && (
+            <LineSeries color="#443322" curve={'curveMonotoneX'} data={elevationSeries} strokeWidth={1}></LineSeries>
+          )} */}
           <LineSeries
             color="white"
             data={[
@@ -827,7 +874,15 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             ]}
             strokeWidth={48}
           ></LineSeries>
-          {weatherIconData && <CustomSVGSeries customComponent="square" data={weatherIconData}></CustomSVGSeries>}
+          {weatherIconData && (
+            <CustomSVGSeries
+              customComponent="square"
+              data={weatherIconData}
+              onValueMouseOver={(value) => setWeatherHint(value)}
+              onValueClick={(value) => setWeatherHint(value)}
+              onValueMouseOut={() => setWeatherHint(null)}
+            />
+          )}
           {flightCategorySeries && (
             <VerticalRectSeries
               colorType="literal"
@@ -875,6 +930,39 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
               <span>{convertTimeFormat(timeHint.segment.arriveTime, false)}</span>
             </Hint>
           ) : null}
+          {weatherHint && (
+            <Hint value={weatherHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'bottom' }}>
+              <span>
+                <b>Time:</b>&nbsp;{convertTimeFormat(weatherHint.tooltip.time, false)}
+              </span>
+              <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
+                <div>
+                  <p style={{ marginTop: 3 }}>
+                    <b>Clouds: </b>
+                  </p>
+                </div>
+                <div style={{ margin: 3, marginTop: -3 }}>
+                  {weatherHint.tooltip.clouds.map((skyCondition) => {
+                    return (
+                      <div
+                        key={`${skyCondition.skyCover}-${skyCondition.cloudBase}`}
+                        style={{ marginTop: 6, marginBottom: 2 }}
+                      >
+                        {MetarSkyValuesToString[skyCondition.skyCover]}
+                        {['CLR', 'SKC', 'CAVOK'].includes(skyCondition.skyCover) === false &&
+                          ' at ' + roundCloudHeight(skyCondition.cloudBase) + ' feet'}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <span>
+                <b>Weather:</b>&nbsp;
+                {weatherHint.tooltip.weather}
+              </span>
+            </Hint>
+          )}
           {flightCatHint && (
             <Hint value={flightCatHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
               <span>

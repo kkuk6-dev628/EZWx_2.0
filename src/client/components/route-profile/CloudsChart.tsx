@@ -257,6 +257,7 @@ const CloudsChart = (props) => {
     queryIcingSevDataResult.isSuccess,
     queryNbmFlightCatResult.isSuccess,
     queryhumidityDataResult.isSuccess,
+    routeProfileApiState.maxAltitude,
   ]);
   return (
     <RouteProfileChart showDayNightBackground={true} noDataMessage={null}>

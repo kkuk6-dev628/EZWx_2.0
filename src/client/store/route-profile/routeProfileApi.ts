@@ -7,6 +7,7 @@ const initialRouteProfileState: RouteProfileState = {
   icingLayers: ['Prob'],
   turbLayers: ['CAT'],
   maxAltitude: 500,
+  showTemperature: true,
 };
 
 const baseUrl = '/api/route-profile';
@@ -70,13 +71,13 @@ export const routeProfileApi = createApi({
   endpoints: (builder) => ({
     getRouteProfileState: builder.query({
       query: () => ({ url: '', method: 'Get' }),
-      transformResponse: (response: RouteProfileState) => {
+      transformResponse: (response: RouteProfileState): RouteProfileState => {
         if (!response) {
           return initialRouteProfileState;
         }
         return response;
       },
-      transformErrorResponse: (response) => {
+      transformErrorResponse: (response): RouteProfileState => {
         console.error(response);
         return initialRouteProfileState;
       },

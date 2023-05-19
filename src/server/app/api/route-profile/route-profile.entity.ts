@@ -42,6 +42,9 @@ export class RouteProfile {
   @Column()
   maxAltitude: number;
 
+  @Column({ nullable: true })
+  showTemperature!: boolean;
+
   @Column()
   @CreateDateColumn()
   created_at: Date;

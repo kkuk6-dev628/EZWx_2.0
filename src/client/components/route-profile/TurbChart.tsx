@@ -34,7 +34,7 @@ export const colorsByEdr = {
   moderate: '#FF9900',
   severe: '#FF0000',
   extreme: '#660000',
-  na: '#333',
+  na: '#666',
 };
 
 const TurbChart = (props) => {
@@ -76,7 +76,7 @@ const TurbChart = (props) => {
           let edrType = 'Combined EDR';
           let color = colorsByEdr.none;
           let category = 'None';
-          let opacity = 0.5;
+          let opacity = 0.8;
           if (segment.arriveTime > maxForecastTime.getTime()) {
             category = 'N/A';
             color = colorsByEdr.na;
