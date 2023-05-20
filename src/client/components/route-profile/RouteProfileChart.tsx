@@ -29,6 +29,7 @@ import {
 } from './RouteProfileDataLoader';
 import { initialUserSettingsState, selectSettings } from '../../store/user/UserSettings';
 import {
+  useGetAirportNbmQuery,
   useGetRouteProfileStateQuery,
   useQueryNbmFlightCategoryMutation,
   useQueryGfsWindDirectionDataMutation,
@@ -55,7 +56,7 @@ import fly, * as flyjs from '../../fly-js/fly';
 import { flightCategoryToColor, getNbmWeatherMarkerIcon } from '../map/leaflet/layers/StationMarkersLayer';
 import { MetarSkyValuesToString } from '../map/common/AreoConstants';
 import { Conrec } from '../../conrec-js/conrec';
-import { RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
+import { AirportNbmData, RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
 import Route from '../shared/Route';
 import { LatLng } from 'leaflet';
 import { makeWeatherString } from '../map/leaflet/popups/StationForecastPopup';
@@ -79,6 +80,37 @@ export const temperatureContourColors = {
   positive: '#FBF209',
   negative: '#09FDC6',
 };
+
+export function getAirportNbmData(
+  data: { time: string; data: AirportNbmData[] }[],
+  time: number,
+  airportid: string,
+): { time: Date; data: AirportNbmData } {
+  const nullResult = { time: null, data: null };
+  const hours3 = 3 * 3600 * 1000;
+  if (!airportid) {
+    return nullResult;
+  }
+  const timeData = data.reduce((prev, curr) => {
+    const prevDiff = time - new Date(prev.time).getTime();
+    const currDiff = time - new Date(curr.time).getTime();
+    if (currDiff >= 0 && currDiff <= hours3 && currDiff < prevDiff) {
+      return curr;
+    }
+    return prev;
+  });
+  const resultDiff = time - new Date(timeData.time).getTime();
+  if (resultDiff < 0 || resultDiff > hours3) {
+    return nullResult;
+  }
+  const airportData = timeData.data.filter((timeD) => {
+    return timeD.icaoid === airportid || timeD.faaid === airportid;
+  });
+  if (airportData.length > 0) {
+    return { time: new Date(timeData.time), data: airportData[0] };
+  }
+  return nullResult;
+}
 
 export function makeSkyConditions(
   lowestCloud: number,
@@ -319,6 +351,13 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     fixedCacheKey: cacheKeys.nbmCloudCeiling,
   });
 
+  const { data: airportNbmData } = useGetAirportNbmQuery(
+    activeRoute ? [activeRoute.departure.key, activeRoute.destination.key] : [],
+    {
+      skip: activeRoute === null,
+    },
+  );
+
   function buildTemperatureContourSeries() {
     if (queryTemperatureDataResult.isSuccess && segments.length > 0) {
       if (routeProfileApiState.showTemperature) {
@@ -464,6 +503,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           const ceiling = seg.airportNbmProps.cloudceiling;
           const skyCover = seg.airportNbmProps.skycover;
           const skyConditionsAsc = makeSkyConditions(lowestCloud, ceiling, skyCover);
+          const { data: forCrosswind } = getAirportNbmData(airportNbmData, seg.arriveTime, seg.airport?.key);
           tooltip = {
             time: seg.airportNbmProps.time,
             clouds: skyConditionsAsc,
@@ -475,6 +515,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             windgust: seg.airportNbmProps.gust,
             temperature: seg.airportNbmProps.temperature,
             dewpoint: seg.airportNbmProps.dewpoint,
+            crosscom: forCrosswind?.cross_com,
+            crossRunwayId: forCrosswind?.cross_r_id,
           };
         }
         let airportDist = 0;
@@ -495,6 +537,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           );
           airportDist = Math.cos(degree2radian(airportCourse - seg.course)) * airportDelta;
         }
+
         return {
           x: seg.accDistance + airportDist,
           y: 0,
@@ -539,7 +582,6 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     if (activeRoute && queryNbmFlightCatResult.isSuccess) {
       const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * 10, true);
       const flightCategoryData = [];
-      const prevPos: { lat: number; lng: number } = null;
       let accDistance = 0;
       let arriveTime = new Date(observationTime).getTime();
       let dist = 0;
@@ -701,9 +743,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             }}
           />
           <XAxis
-            tickValues={Array.from({ length: segmentsCount }, (_value, index) =>
-              Math.round((index * routeLength) / (segmentsCount - 1)),
-            )}
+            tickValues={segments.map((segment) => segment.accDistance)}
             tickFormat={(v, index) => {
               if (segmentsCount > 0 && segments[index]) {
                 const distInMile = segments[index].accDistance;
@@ -754,40 +794,23 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
               }}
               onValueClick={(value) => setTimeHint(value)}
               onValueMouseOut={() => setTimeHint(null)}
-              data={Array.from({ length: segmentsCount }, (_value, index) => {
-                if (segments[index] && segments[index].arriveTime)
-                  return {
-                    x: Math.round((index * routeLength) / (segmentsCount - 1)),
-                    y: 0,
-                    yOffset: 72,
-                    segment: segments[index],
-                    label: userSettings.default_time_display_unit
-                      ? segments[index].departureTime.time
-                      : simpleTimeOnlyFormat(new Date(segments[index].arriveTime), false),
-                    style: {
-                      fill: 'white',
-                      dominantBaseline: 'text-after-edge',
-                      textAnchor: 'start',
-                      fontSize: 11,
-                      fontWeight: 600,
-                    },
-                  };
-                else {
-                  return {
-                    x: Math.round((index * routeLength) / (segmentsCount - 1)),
-                    y: 0,
-                    yOffset: 72,
-                    segment: segments[index],
-                    label: '',
-                    style: {
-                      fill: 'white',
-                      dominantBaseline: 'text-after-edge',
-                      textAnchor: 'start',
-                      fontSize: 11,
-                      fontWeight: 600,
-                    },
-                  };
-                }
+              data={segments.map((segment, index) => {
+                return {
+                  x: segment.accDistance,
+                  y: 0,
+                  yOffset: 72,
+                  segment: segment,
+                  label: userSettings.default_time_display_unit
+                    ? segment.departureTime.time
+                    : simpleTimeOnlyFormat(new Date(segment.arriveTime), false),
+                  style: {
+                    fill: 'white',
+                    dominantBaseline: 'text-after-edge',
+                    textAnchor: 'start',
+                    fontSize: 11,
+                    fontWeight: 600,
+                  },
+                };
               })}
             />
           ) : null}
@@ -1057,6 +1080,20 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                     : Math.round(knotsToMph(airportHint.tooltip.windgust)) + ' mph'}
                 </span>
               )}
+              {airportHint.tooltip.crosscom && (
+                <span>
+                  <b>Crosswind component:</b>&nbsp;
+                  {!userSettings.default_wind_speed_unit
+                    ? Math.round(airportHint.tooltip.crosscom) +
+                      (Math.round(airportHint.tooltip.crosscom) <= 1 ? ' knot' : ' knots')
+                    : Math.round(knotsToMph(airportHint.tooltip.crosscom)) + ' mph'}
+                </span>
+              )}
+              {airportHint.tooltip.crossRunwayId && (
+                <span>
+                  <b>Crosswind runway:</b>&nbsp;{airportHint.tooltip.crossRunwayId}
+                </span>
+              )}
               <span>
                 <b>Temperature:</b>&nbsp;
                 {!userSettings.default_temperature_unit
@@ -1077,6 +1114,3 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   );
 };
 export default RouteProfileChart;
-function getFuzzyLocalTimeFromPoint(newTime: number, arg1: any[]) {
-  throw new Error('Function not implemented.');
-}

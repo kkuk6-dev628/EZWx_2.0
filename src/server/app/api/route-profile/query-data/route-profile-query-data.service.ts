@@ -269,4 +269,47 @@ export class RouteProfileQueryDataService {
     // console.log('end await all', new Date().toLocaleTimeString());
     return { cloudbase, cloudceiling, visibility, skycover };
   }
+
+  async queryAirportNbm(query: { faaids: string }) {
+    const result = [];
+    const timeTables = await this.dataSource
+      .createQueryBuilder()
+      .select(['fcst_hr_stat_map.station_table_name AS table', 'fcst_hr_stat_map.valid_date AS time'])
+      .from('fcst_hr_stat_map', null)
+      .getRawMany();
+    for (const timeTable of timeTables) {
+      const rows = await this.dataSource
+        .createQueryBuilder()
+        .select([
+          'faaid',
+          'icaoid',
+          'temp_c',
+          'dewp_c',
+          'skycov',
+          'w_speed',
+          'w_dir',
+          'w_gust',
+          'vis',
+          'ceil',
+          'l_cloud',
+          'cross_r_id',
+          'cross_com',
+          'wx_1',
+          'wx_2',
+          'wx_3',
+          'wx_prob_cov_1',
+          'wx_prob_cov_2',
+          'wx_prob_cov_3',
+          'wx_inten_1',
+          'wx_inten_2',
+          'wx_inten_3',
+        ])
+        .from(`${timeTable.table}`, null)
+        .where(`${timeTable.table}.faaid IN (:...faaids)`, { faaids: query.faaids.split(',') })
+        .orWhere(`${timeTable.table}.icaoid IN (:...faaids)`, { faaids: query.faaids.split(',') })
+        .getRawMany();
+      result.push({ time: timeTable.time, data: rows });
+    }
+    return result;
+  }
 }

@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { RouteProfileDataset, RouteProfileState } from '../../interfaces/route-profile';
+import { AirportNbmData, RouteProfileDataset, RouteProfileState } from '../../interfaces/route-profile';
 
 const initialRouteProfileState: RouteProfileState = {
   chartType: 'Wind',
@@ -69,6 +69,12 @@ export const routeProfileApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl }),
   tagTypes: ['RouteProfileState'],
   endpoints: (builder) => ({
+    getAirportNbm: builder.query<{ time: string; data: AirportNbmData[] }[], string[]>({
+      query: (faaids: string[]) => ({
+        url: 'data/airport-nbm?faaids=' + faaids.join(','),
+        method: 'Get',
+      }),
+    }),
     getRouteProfileState: builder.query({
       query: () => ({ url: '', method: 'Get' }),
       transformResponse: (response: RouteProfileState): RouteProfileState => {
@@ -198,6 +204,7 @@ export const routeProfileApi = createApi({
 });
 
 export const {
+  useGetAirportNbmQuery,
   useGetRouteProfileStateQuery,
   useLazyGetRouteProfileStateQuery,
   useUpdateRouteProfileStateMutation,

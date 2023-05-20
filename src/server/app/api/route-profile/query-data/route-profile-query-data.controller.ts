@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { RouteProfileQueryDataService } from './route-profile-query-data.service';
 import { RouteProfileQueryDto, RouteSegmentsDto } from './route-profile-query.dto';
 
@@ -89,5 +89,9 @@ export class RouteProfileQueryDataController {
   @Post('n-ceiling-vis')
   nbmCeilingVisibility(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryCeilingVisibility(query);
+  }
+  @Get('airport-nbm')
+  airportNbm(@Query() query: { faaids: string }) {
+    return this.routeProfileQueryDataService.queryAirportNbm(query);
   }
 }

@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { ElevationApiResult, OpenMeteoApiResult, OpenTopoApiResult } from '../../interfaces/route-profile';
+import { ElevationApiResult } from '../../interfaces/route-profile';
 
 const baseUrl = 'https://api.elevationapi.com/api/Elevation/points';
 
