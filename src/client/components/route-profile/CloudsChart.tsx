@@ -171,7 +171,7 @@ const CloudsChart = (props) => {
               colorSecond = cloudColor1;
             }
           }
-          if (cloudbase > 0 && elevation + cloudbase + 2000 <= routeProfileApiState.maxAltitude * 100) {
+          if (cloudbase > 0 && elevation + cloudbase <= routeProfileApiState.maxAltitude * 100) {
             cloudbase = Math.round(cloudbase);
             cloudData.push({
               x0: Math.round(index * segmentLength - segmentLength / 2),
@@ -186,7 +186,7 @@ const CloudsChart = (props) => {
               },
             });
           }
-          if (cloudceiling > 0 && elevation + cloudceiling + 2000 <= routeProfileApiState.maxAltitude * 100) {
+          if (cloudceiling > 0 && elevation + cloudceiling <= routeProfileApiState.maxAltitude * 100) {
             cloudceiling = Math.round(cloudceiling);
             cloudData.push({
               x0: Math.round(index * segmentLength - segmentLength / 2),
@@ -209,7 +209,7 @@ const CloudsChart = (props) => {
             if (humidity.elevation > start) {
               if (
                 humidityThresholds[humidity.elevation] <= humidity.value &&
-                humidity.elevation + 500 <= routeProfileApiState.maxAltitude * 100
+                humidity.elevation <= routeProfileApiState.maxAltitude * 100
               ) {
                 cloudData.push({
                   x0: Math.round(index * segmentLength - segmentLength / 2),
@@ -231,7 +231,7 @@ const CloudsChart = (props) => {
           );
           icingSevData.forEach((icingSev) => {
             if (icingSev.elevation > start) {
-              if (icingSev.value > 0 && icingSev.elevation + 500 <= routeProfileApiState.maxAltitude * 100) {
+              if (icingSev.value > 0 && icingSev.elevation <= routeProfileApiState.maxAltitude * 100) {
                 cloudData.push({
                   x0: Math.round(index * segmentLength - segmentLength / 2),
                   y0: icingSev.elevation - 500,
@@ -266,7 +266,7 @@ const CloudsChart = (props) => {
           colorType="literal"
           stroke="#AAAAAA"
           data={cloudSeries}
-          style={{ strokeWidth: 0.1 }}
+          style={{ strokeWidth: 0 }}
           onValueMouseOut={() => setCloudHint(null)}
           onValueMouseOver={(value) =>
             setCloudHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })

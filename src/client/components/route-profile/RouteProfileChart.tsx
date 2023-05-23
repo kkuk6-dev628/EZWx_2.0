@@ -39,6 +39,7 @@ import {
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectFetchedDate, selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import {
+  addLeadingZeroes,
   celsiusToFahrenheit,
   convertTimeFormat,
   degree2radian,
@@ -457,9 +458,9 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       );
       return {
         x: segment.accDistance,
-        y: routeProfileApiState.maxAltitude * 100 * 1.04,
+        y: routeProfileApiState.maxAltitude * 100,
         tooltip: {
-          time: segment.segmentNbmProps.time,
+          time: forecastTime,
           clouds: makeSkyConditions(cloudbase, cloudceiling, skycover),
           weather: makeWeatherString(
             segment.segmentNbmProps.wx_1,
@@ -474,7 +475,14 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         customComponent: () => {
           return (
             <text x={0} y={0}>
-              <tspan x="0" y="0" fill={color} dominantBaseline="middle" textAnchor="middle" className={icon + ' fa-2x'}>
+              <tspan
+                x="0"
+                y="-24"
+                fill={color}
+                dominantBaseline="middle"
+                textAnchor="middle"
+                className={icon + ' fa-2x'}
+              >
                 {weatherFontContents[icon]}
               </tspan>
             </text>
@@ -564,15 +572,11 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   useEffect(() => {
     if (queryElevationsResult.isSuccess && queryElevationsResult.data && routeLength) {
       const elevationApiResults = queryElevationsResult.data.geoPoints;
-      const elevations = [{ x: -startMargin, y: meterToFeet(elevationApiResults[0].elevation) }];
-      const elSegmentLength = routeLength / totalNumberOfElevations;
-      for (let i = 1; i < elevationApiResults.length - 1; i++) {
-        elevations.push({ x: (i - 1) * elSegmentLength, y: meterToFeet(elevationApiResults[i].elevation) });
+      const elevations = [];
+      const elSegmentLength = (routeLength + startMargin + endMargin) / totalNumberOfElevations;
+      for (let i = 0; i < elevationApiResults.length; i++) {
+        elevations.push({ x: i * elSegmentLength - startMargin, y: meterToFeet(elevationApiResults[i].elevation) });
       }
-      elevations.push({
-        x: routeLength + endMargin,
-        y: meterToFeet(elevationApiResults[elevationApiResults.length - 1].elevation),
-      });
       if (elevations.length === 0) return;
       setElevationSeries(elevations);
     }
@@ -682,9 +686,9 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           height={calcChartHeight(viewW, viewH)}
           width={calcChartWidth(viewW, viewH)}
           color="white"
-          yDomain={[0, routeProfileApiState.maxAltitude * 100 * 1.08]}
+          yDomain={[0, routeProfileApiState.maxAltitude * 100]}
           xDomain={[-startMargin, routeLength + endMargin]}
-          margin={{ right: 40, bottom: 80, top: 0 }}
+          margin={{ right: 40, bottom: 80, top: 48 }}
         >
           <GradientDefs>
             <linearGradient id="linear-gradient">
@@ -883,20 +887,18 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           {/* {elevationSeries.length > 0 && (
             <LineSeries color="#443322" curve={'curveMonotoneX'} data={elevationSeries} strokeWidth={1}></LineSeries>
           )} */}
-          <LineSeries
+          <CustomSVGSeries
             color="white"
             data={[
               {
                 x: -startMargin,
-                y: routeProfileApiState.maxAltitude * 100 * 1.04,
-              },
-              {
-                x: routeLength + endMargin,
-                y: routeProfileApiState.maxAltitude * 100 * 1.04,
+                y: routeProfileApiState.maxAltitude * 100,
+                customComponent: () => {
+                  return <rect x="0" y="-48" width={calcChartWidth(viewW, viewH) - 80} height={48} fill="white" />;
+                },
               },
             ]}
-            strokeWidth={48}
-          ></LineSeries>
+          ></CustomSVGSeries>
           {weatherIconData && (
             <CustomSVGSeries
               customComponent="square"
@@ -1069,17 +1071,18 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                   : Math.round(knotsToMph(airportHint.tooltip.windspeed)) + ' mph'}
               </span>
               <span>
-                <b>Wind direction:</b>&nbsp;{Math.round(airportHint.tooltip.winddir) + ' \u00B0'}
+                <b>Wind direction:</b>&nbsp;{addLeadingZeroes(Math.round(airportHint.tooltip.winddir), 3) + ' \u00B0'}
               </span>
-              {airportHint.tooltip.windgust !== null && (
-                <span>
-                  <b>Wind Gust:</b>&nbsp;
-                  {!userSettings.default_wind_speed_unit
-                    ? Math.round(airportHint.tooltip.windgust) +
-                      (Math.round(airportHint.tooltip.windgust) <= 1 ? ' knot' : ' knots')
-                    : Math.round(knotsToMph(airportHint.tooltip.windgust)) + ' mph'}
-                </span>
-              )}
+              {airportHint.tooltip.windgust > 10 &&
+                Math.abs(airportHint.tooltip.windgust - airportHint.tooltip.windspeed) > 4 && (
+                  <span>
+                    <b>Wind Gust:</b>&nbsp;
+                    {!userSettings.default_wind_speed_unit
+                      ? Math.round(airportHint.tooltip.windgust) +
+                        (Math.round(airportHint.tooltip.windgust) <= 1 ? ' knot' : ' knots')
+                      : Math.round(knotsToMph(airportHint.tooltip.windgust)) + ' mph'}
+                  </span>
+                )}
               {airportHint.tooltip.crosscom && (
                 <span>
                   <b>Crosswind component:</b>&nbsp;

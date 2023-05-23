@@ -114,10 +114,7 @@ const IcingChart = (props) => {
       setNoDepicted(true);
 
       segments.forEach((segment, index) => {
-        const maxElevation = Math.min(
-          routeProfileApiState.maxAltitude === 500 ? 45000 : routeProfileApiState.maxAltitude === 300 ? 27000 : 18000,
-          maxForecastElevation,
-        );
+        const maxElevation = Math.min(routeProfileApiState.maxAltitude * 100, maxForecastElevation);
         for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
           let time;
           let color = colorsByEdr.none;

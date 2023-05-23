@@ -68,8 +68,7 @@ const TurbChart = (props) => {
       }
       setNoForecast(false);
       segments.forEach((segment, index) => {
-        const maxElevation =
-          routeProfileApiState.maxAltitude === 500 ? 45000 : routeProfileApiState.maxAltitude === 300 ? 27000 : 18000;
+        const maxElevation = routeProfileApiState.maxAltitude * 100;
         for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
           let edr = 0;
           let edrTime;

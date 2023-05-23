@@ -85,7 +85,7 @@ export const makeWeatherString = (
     }
     return addCloudCover
       ? `${skyString} with ${probStrings[prob].toLowerCase()} ${wxStrings[wx]}`
-      : `${probStrings[prob]} ${wxStrings[wx]}`;
+      : `${probStrings[prob]} of ${wxStrings[wx]}`;
   } else if (wx === 5) {
     let skyString = 'Cloudy';
     if (skyCov < 6) {
