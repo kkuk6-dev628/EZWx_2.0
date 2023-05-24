@@ -2,6 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { Route } from '../../interfaces/route';
 import { setActiveRoute } from './routes';
 import toast from 'react-hot-toast';
+import { userLoggedOut } from '../auth/authSlice';
 
 const baseUrl = '/api/route';
 
@@ -17,19 +18,26 @@ export const routeApi = createApi({
       // The `LIST` id is a "virtual id" we just made up to be able to invalidate this query specifically if a new `Posts` element was added.
       providesTags: (result) =>
         // is result available?
-        result
+        result && Array.isArray(result)
           ? // successful query
             [...result.map(({ id }) => ({ type: 'Route', id } as const)), { type: 'Route', id: 'LIST' }]
           : // an error occurred, but we still want to refetch this query when `{ type: 'Posts', id: 'LIST' }` is invalidated
             [{ type: 'Route', id: 'LIST' }],
-      transformResponse: (response: Route[]) =>
-        response.map((item) => {
+      transformResponse: (response: Route[], dispatch) => {
+        if (!Array.isArray(response)) {
+          return response;
+        }
+        return response.map((item) => {
           item.routeOfFlight = item.routeOfFlight.sort((a, b) => (a.order > b.order ? 1 : -1));
           return item;
-        }),
+        });
+      },
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
+          if (result.data.needSignin) {
+            dispatch(userLoggedOut());
+          }
           if (result.data.length > 0) {
             dispatch(setActiveRoute({ ...result.data[0] }));
           }

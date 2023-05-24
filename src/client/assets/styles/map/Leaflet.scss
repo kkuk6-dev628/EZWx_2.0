@@ -11,8 +11,7 @@
 }
 
 .leaflet-top{
-z-index: 400!important;
-
+  z-index: 400!important;
 }
 
 .leaflet-touch .leaflet-bar a{
@@ -33,9 +32,12 @@ z-index: 400!important;
 .map__container{
   height: 100%;
   width: 100%;
-  position: relative;
   overflow: hidden;
+  position: relative;
   // display: -webkit-inline-box;
+  .departure-advisor{
+    background-color: transparent;
+  }
 }
 
 @mixin stroke($color: #000, $size: 1px) {
@@ -66,7 +68,7 @@ z-index: 400!important;
 
 
 .Map_map__vPSDC{
-  height: calc(100vh - 120px)!important;
+  height: calc(100vh - 72px)!important;
   @media screen and (max-width: 1024px) {
     height: calc(100vh - 95px)!important;
     // top: 70px;

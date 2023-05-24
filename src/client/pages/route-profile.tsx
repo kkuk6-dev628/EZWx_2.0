@@ -9,13 +9,13 @@ import { SvgRefresh, SvgTabs, SvgZoom } from '../components/utils/SvgIcons';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import RouteProfileWrapper from '../components/route-profile/RouteProfileWrapper';
-import CollapsibleBar from '../components/shared/CollapsibleBar';
+import DepartureAdvisor from '../components/shared/DepartureAdvisor';
 
 function RouteProfile() {
   return (
     <>
       <RouteProfileWrapper />
-      <CollapsibleBar />
+      <DepartureAdvisor />
     </>
   );
 }

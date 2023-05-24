@@ -21,7 +21,7 @@ import Dialog from '@material-ui/core/Dialog';
 import Paper from '@material-ui/core/Paper';
 import Draggable from 'react-draggable';
 import Route from '../../shared/Route';
-import CollapsibleBar from '../../shared/CollapsibleBar';
+import DepartureAdvisor from '../../shared/DepartureAdvisor';
 import DateSliderModal from '../../shared/DateSliderModal';
 import MeteoLayers from './layers/MeteoLayers';
 // import './plugins/CacheTileLayer';
@@ -217,7 +217,7 @@ const LeafletMap = () => {
         </Dialog>
       </MapContainer>
       {isShowDateModal && <DateSliderModal setIsShowDateModal={setIsShowDateModal} />}
-      <CollapsibleBar />
+      <DepartureAdvisor />
     </div>
   );
 };

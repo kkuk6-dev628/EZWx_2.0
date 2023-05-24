@@ -1,5 +1,6 @@
 import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -9,13 +10,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   handleRequest<TUser = any>(err: any, user: any, info: any, context: ExecutionContext, status?: any): TUser {
-    const response = context.switchToHttp().getResponse();
+    const response = context.switchToHttp().getResponse<Response>();
     const request = context.switchToHttp().getRequest();
 
     if (err || !user) {
       // console.log('unauthorized...');
       // throw err || new UnauthorizedException();
-      response.redirect('/home');
+      response.write(JSON.stringify({ needSignin: true }));
+      response.end();
     }
     return user;
   }

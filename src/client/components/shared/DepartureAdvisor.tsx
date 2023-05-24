@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import Slider from '@mui/material/Slider';
 import React from 'react';
-import { diffMinutes, getTimeRangeStart, simpleTimeFormat } from '../map/common/AreoFunctions';
+import { diffMinutes, getTimeRangeStart, simpleTimeFormat, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
 import { useDispatch, useSelector } from 'react-redux';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { selectSettings, setUserSettings } from '../../store/user/UserSettings';
 import { useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
 import { selectAuth } from '../../store/auth/authSlice';
 
-function CollapsibleBar() {
+function DepartureAdvisor() {
   const dispatch = useDispatch();
   const settingsState = useSelector(selectSettings);
   const obsInterval = settingsState.observation_interval;
@@ -28,7 +28,55 @@ function CollapsibleBar() {
     return Math.floor(diff / 5);
   };
   function valuetext(value: number) {
-    return <div>{simpleTimeFormat(valueToTime(value), settingsState.default_time_display_unit)}</div>;
+    return (
+      <div className="slider-label-container">
+        <div className="bars-container">
+          <div className="bar">
+            <i className="dot circle"></i>
+            <i className="dot circle"></i>
+            <i className="dot circle"></i>
+            <i className="dot circle"></i>
+            <i className="dot rect"></i>
+            <i className="dot rect"></i>
+            <i className="dot rect"></i>
+            <i className="dot rect"></i>
+            <i className="dot triangle"></i>
+            <i className="dot triangle"></i>
+            <i className="dot triangle"></i>
+            <i className="dot triangle"></i>
+          </div>
+          <div className="bar">
+            <i className="dot circle"></i>
+            <i className="dot circle"></i>
+            <i className="dot circle"></i>
+            <i className="dot circle"></i>
+            <i className="dot rect"></i>
+            <i className="dot rect"></i>
+            <i className="dot rect"></i>
+            <i className="dot rect"></i>
+            <i className="dot triangle"></i>
+            <i className="dot triangle"></i>
+            <i className="dot triangle"></i>
+            <i className="dot triangle"></i>
+          </div>
+          <div className="bar">
+            <i className="dot circle"></i>
+            <i className="dot circle"></i>
+            <i className="dot circle"></i>
+            <i className="dot circle"></i>
+            <i className="dot rect"></i>
+            <i className="dot rect"></i>
+            <i className="dot rect"></i>
+            <i className="dot rect"></i>
+            <i className="dot triangle"></i>
+            <i className="dot triangle"></i>
+            <i className="dot triangle"></i>
+            <i className="dot triangle"></i>
+          </div>
+        </div>
+        <div className="label">{simpleTimeOnlyFormat(valueToTime(value), settingsState.default_time_display_unit)}</div>
+      </div>
+    );
   }
 
   const handleTimeChange = (time: Date, commit = true) => {
@@ -77,7 +125,7 @@ function CollapsibleBar() {
   ];
 
   return (
-    <div className="collps">
+    <div className="departure-advisor">
       <Slider
         className="time-slider"
         key={`time-range-slider`}
@@ -87,7 +135,6 @@ function CollapsibleBar() {
         max={84 * 12}
         valueLabelFormat={valuetext}
         step={1}
-        marks={marks}
         valueLabelDisplay="on"
         onChange={(_e, newValue: number) => {
           handleTimeChange(valueToTime(newValue), false);
@@ -96,25 +143,27 @@ function CollapsibleBar() {
           handleTimeChange(valueToTime(newValue));
         }}
       />
-      <FormControl sx={{ m: 1, minWidth: 120 }} size="small" className="interval-select" color="secondary">
-        <InputLabel id="Select Observation Interval">Interval</InputLabel>
-        <Select
-          labelId="select-observation-interval"
-          id="select-observation-interval"
-          value={obsInterval}
-          label="Select Observation Interval"
-          onChange={(e) => {
-            // @ts-ignore
-            handleIntervalChange(e.target.value);
-          }}
-        >
-          <MenuItem value={50}>50</MenuItem>
-          <MenuItem value={75}>75</MenuItem>
-          <MenuItem value={90}>90</MenuItem>
-        </Select>{' '}
-      </FormControl>
+      <div className="blocks-container">
+        <div className="move-left">-3h</div>
+        <div className="blocks-date">
+          <div className="horizental-blocks">
+            <div className="block">3z</div>
+            <div className="block">6z</div>
+            <div className="block">9z</div>
+            <div className="block">12z</div>
+            <div className="block">15z</div>
+            <div className="block">18z</div>
+            <div className="block">21z</div>
+            <div className="block">24z</div>
+          </div>
+          <div className="date">
+            {simpleTimeFormat(new Date(settingsState.observation_time), settingsState.default_time_display_unit)}
+          </div>
+        </div>
+        <div className="move-right">+3h</div>
+      </div>
     </div>
   );
 }
 
-export default CollapsibleBar;
+export default DepartureAdvisor;

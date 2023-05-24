@@ -1,6 +1,6 @@
-.collps{
+.departure-advisor{
   background-color: var(--color-primary);
-  position: relative;
+  position: absolute;
   width: 100%;
   // position: absolute;
   // width: 100%;
@@ -9,11 +9,23 @@
   z-index: 500;
   bottom: 0;
   display: flex;
+  flex-direction: column;
   color: whitesmoke;
 
+  .css-14pt78w-MuiSlider-rail{
+    opacity: 1;
+    border: 1px solid currentColor;
+  }
   .css-nnid7-MuiSlider-valueLabel {
     line-height: 1;
     padding: 0.2rem 0.4rem;
+    background-color: transparent;
+    top: 0;
+  }
+  .css-eg0mwd-MuiSlider-thumb{
+    width: 16px;
+    height: 16px;
+    color: var(--color-primary);
   }
   &__wrp{
     max-width: 1756px;
@@ -55,13 +67,13 @@
     
     P{
       font-weight: 400;
-font-size: 20px;
-line-height: 24px;
-color: var(--color-white);
-padding-left: 5px;
-@media (max-width: 550px){
-  font-size: 12px;
- }
+      font-size: 20px;
+      line-height: 24px;
+      color: var(--color-white);
+      padding-left: 5px;
+      @media (max-width: 550px){
+        font-size: 12px;
+      }
     }
   }
 
@@ -169,10 +181,84 @@ padding-left: 5px;
     // overflow-x: scroll;
   }
   .time-slider{
-    margin: 0 68px;
+    margin: 0 auto;
+    color: white;
+    width: calc(100% - 80px);
   }
   .interval-select{
     color:white;
+  }
+  .slider-label-container{
+    display: flex;
+    justify-content: center;
+    .bars-container{
+      display: flex;
+      width: 80px;
+      justify-content: space-around;
+      .bar{
+        display: flex;
+        flex-direction: column;
+        background-color: white;
+        border: var(--color-primary) solid 1px;
+        border-radius: 4px;
+        .dot{
+          width: 8px;
+          height: 8px;
+          border: #44442288 solid 1px;
+          margin: 1px 2px;
+        }
+        .circle{
+          border-radius: 4px;
+        }
+      }
+    }
+    .label{
+      bottom: -38px;
+      position: absolute;
+      align-self: center;
+      font-size: 11px;
+      border-radius: 5px;
+      background-color: white;
+      color: black;
+      padding: 1px 2px;
+    }
+  }
+  .blocks-container{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    color: black;
+    .blocks-date{
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: calc(100% - 80px);
+      .horizental-blocks{
+        display: flex;
+        justify-content: space-between;
+        .block{
+          width: 12%;
+          height: 20px;
+          background-color: aliceblue;
+          font-size: 14px;
+          border-radius: 4px;
+        }
+      }
+      .date{
+        margin-bottom: 6px;
+        background-color: aliceblue;
+        height: 20px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 4px;
+      }
+    }
+    .move-left, .move-right{
+      background-color: aliceblue;
+      width: 24px;
+      height: 36px;
+      margin: 8px;
+    }
   }
 }
 

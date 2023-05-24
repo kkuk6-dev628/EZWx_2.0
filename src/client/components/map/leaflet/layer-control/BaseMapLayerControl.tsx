@@ -3,7 +3,11 @@ import { createContext, ReactElement, useContext, useEffect, useRef, useState } 
 import { useMapEvent } from 'react-leaflet';
 import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
-import { selectBaseMapLayerControl, setBaseMapLayerControl } from '../../../../store/layers/BaseMapLayerControl';
+import {
+  initialBaseLayerControlState,
+  selectBaseMapLayerControl,
+  setBaseMapLayerControl,
+} from '../../../../store/layers/BaseMapLayerControl';
 import { POSITION_CLASSES } from '../../common/AreoConstants';
 import { FormControlLabel, Checkbox } from '@material-ui/core';
 import CircleCheckedFilled from '@material-ui/icons/CheckCircle';
@@ -38,10 +42,10 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
   const baseMapLayerStatus = useSelector(selectBaseMapLayerControl);
   const [updateBaseLayerControlState] = useUpdateBaseLayerControlStateMutation();
   const auth = useSelector(selectAuth);
-  const { data: serverData } = auth.id ? useGetBaseLayerControlStateQuery('') : { data: undefined };
+  const { data: serverData } = auth.id ? useGetBaseLayerControlStateQuery('') : { data: initialBaseLayerControlState };
 
   useEffect(() => {
-    if (serverData && serverData.bounds.length) map.fitBounds(serverData.bounds);
+    if (serverData?.bounds?.length) map.fitBounds(serverData.bounds);
   }, [serverData]);
 
   const map = useMapEvent('moveend', () => {
