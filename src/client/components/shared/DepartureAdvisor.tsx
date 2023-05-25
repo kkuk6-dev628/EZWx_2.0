@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import Slider from '@mui/material/Slider';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { diffMinutes, getTimeRangeStart, simpleTimeFormat, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
 import { useDispatch, useSelector } from 'react-redux';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
@@ -15,6 +15,17 @@ function DepartureAdvisor() {
   let defaultTime;
   const [updateUserSettingsAPI] = useUpdateUserSettingsMutation();
   const auth = useSelector(selectAuth);
+  const [hideDotsBars, setHideDotsBars] = useState(true);
+
+  useEffect(() => {
+    setHideDotsBars(false);
+  }, [settingsState.observation_time]);
+
+  useEffect(() => {
+    if (!hideDotsBars) {
+      setHideDotsBars(true);
+    }
+  }, [settingsState.observation_time, hideDotsBars]);
 
   const valueToTime = (value: number): Date => {
     const origin = getTimeRangeStart();
@@ -27,51 +38,52 @@ function DepartureAdvisor() {
     const diff = diffMinutes(time, origin);
     return Math.floor(diff / 5);
   };
+
   function valuetext(value: number) {
     return (
       <div className="slider-label-container">
-        <div className="bars-container">
+        <div className={'bars-container' + (hideDotsBars ? ' fade-out' : '')}>
           <div className="bar">
-            <i className="dot circle"></i>
-            <i className="dot circle"></i>
-            <i className="dot circle"></i>
-            <i className="dot circle"></i>
-            <i className="dot rect"></i>
-            <i className="dot rect"></i>
-            <i className="dot rect"></i>
-            <i className="dot rect"></i>
-            <i className="dot triangle"></i>
-            <i className="dot triangle"></i>
-            <i className="dot triangle"></i>
-            <i className="dot triangle"></i>
+            <i className="dot circle red"></i>
+            <i className="dot circle red"></i>
+            <i className="dot circle red"></i>
+            <i className="dot circle red"></i>
+            <i className="dot rect yellow"></i>
+            <i className="dot rect yellow"></i>
+            <i className="dot rect yellow"></i>
+            <i className="dot rect yellow"></i>
+            <i className="dot triangle green"></i>
+            <i className="dot triangle green"></i>
+            <i className="dot triangle green"></i>
+            <i className="dot triangle green"></i>
           </div>
           <div className="bar">
-            <i className="dot circle"></i>
-            <i className="dot circle"></i>
-            <i className="dot circle"></i>
-            <i className="dot circle"></i>
-            <i className="dot rect"></i>
-            <i className="dot rect"></i>
-            <i className="dot rect"></i>
-            <i className="dot rect"></i>
-            <i className="dot triangle"></i>
-            <i className="dot triangle"></i>
-            <i className="dot triangle"></i>
-            <i className="dot triangle"></i>
+            <i className="dot circle red"></i>
+            <i className="dot circle red"></i>
+            <i className="dot rect yellow"></i>
+            <i className="dot rect yellow"></i>
+            <i className="dot triangle green"></i>
+            <i className="dot triangle green"></i>
+            <i className="dot triangle green"></i>
+            <i className="dot triangle green"></i>
+            <i className="dot circle red"></i>
+            <i className="dot circle red"></i>
+            <i className="dot rect yellow"></i>
+            <i className="dot rect yellow"></i>
           </div>
           <div className="bar">
-            <i className="dot circle"></i>
-            <i className="dot circle"></i>
-            <i className="dot circle"></i>
-            <i className="dot circle"></i>
-            <i className="dot rect"></i>
-            <i className="dot rect"></i>
-            <i className="dot rect"></i>
-            <i className="dot rect"></i>
-            <i className="dot triangle"></i>
-            <i className="dot triangle"></i>
-            <i className="dot triangle"></i>
-            <i className="dot triangle"></i>
+            <i className="dot circle red"></i>
+            <i className="dot circle red"></i>
+            <i className="dot rect yellow"></i>
+            <i className="dot rect yellow"></i>
+            <i className="dot triangle green"></i>
+            <i className="dot circle red"></i>
+            <i className="dot circle red"></i>
+            <i className="dot rect yellow"></i>
+            <i className="dot rect yellow"></i>
+            <i className="dot triangle green"></i>
+            <i className="dot triangle green"></i>
+            <i className="dot triangle green"></i>
           </div>
         </div>
         <div className="label">{simpleTimeOnlyFormat(valueToTime(value), settingsState.default_time_display_unit)}</div>
