@@ -23,9 +23,9 @@
     top: 0;
   }
   .css-eg0mwd-MuiSlider-thumb{
-    width: 16px;
-    height: 16px;
-    color: var(--color-primary);
+    width: 14px;
+    height: 14px;
+    color: white;
   }
   &__wrp{
     max-width: 1756px;
@@ -184,13 +184,19 @@
     margin: 0 auto;
     color: white;
     width: calc(100% - 80px);
+    padding: 8px 0;
   }
   .interval-select{
     color:white;
   }
   .slider-label-container{
     display: flex;
+    flex-direction: column;
     justify-content: center;
+    position: absolute;
+    bottom: 52px;
+    left: -30px;
+    margin-top: 0;
     .bars-container{
       display: flex;
       width: 80px;
@@ -213,8 +219,7 @@
       }
     }
     .label{
-      bottom: -38px;
-      position: absolute;
+      margin-top: 2px;
       align-self: center;
       font-size: 11px;
       border-radius: 5px;
@@ -239,13 +244,11 @@
         .block{
           width: 12%;
           height: 20px;
-          background-color: aliceblue;
           font-size: 14px;
           border-radius: 4px;
         }
       }
       .date{
-        margin-bottom: 6px;
         background-color: aliceblue;
         height: 20px;
         font-size: 15px;
@@ -256,26 +259,30 @@
     .move-left, .move-right{
       background-color: aliceblue;
       width: 24px;
-      height: 36px;
-      margin: 8px;
+      height: 42px;
+      line-height: 42px;
+      margin: 1px 8px;
+    }
+    .move-left{
+      border-radius: 36px 0 0 36px;
+    }
+    .move-right{
+      border-radius: 0 36px 36px 0;
     }
   }
 }
 
 .red{
-  span{
-    background-color: #E83328;
-  }
+  background-color: #E83328;
 }
 
 .yellow{
-  span{
-    background-color: #FEFF05;
-  }
+  background-color: #FEFF05;
 }
 
 .green{
-  span{
-    background-color: #027200;
-  }
+  background-color: #027200;
+}
+.grey{
+  background-color: rgb(191, 218, 230);
 }

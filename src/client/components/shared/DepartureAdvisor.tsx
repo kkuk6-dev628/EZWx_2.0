@@ -126,6 +126,25 @@ function DepartureAdvisor() {
 
   return (
     <div className="departure-advisor">
+      <div className="blocks-container">
+        <div className="move-left">-3h</div>
+        <div className="blocks-date">
+          <div className="horizental-blocks">
+            <div className="block green">3z</div>
+            <div className="block red">6z</div>
+            <div className="block yellow">9z</div>
+            <div className="block grey">12z</div>
+            <div className="block grey">15z</div>
+            <div className="block grey">18z</div>
+            <div className="block grey">21z</div>
+            <div className="block grey">24z</div>
+          </div>
+          <div className="date">
+            {simpleTimeFormat(new Date(settingsState.observation_time), settingsState.default_time_display_unit)}
+          </div>
+        </div>
+        <div className="move-right">+3h</div>
+      </div>
       <Slider
         className="time-slider"
         key={`time-range-slider`}
@@ -143,25 +162,6 @@ function DepartureAdvisor() {
           handleTimeChange(valueToTime(newValue));
         }}
       />
-      <div className="blocks-container">
-        <div className="move-left">-3h</div>
-        <div className="blocks-date">
-          <div className="horizental-blocks">
-            <div className="block">3z</div>
-            <div className="block">6z</div>
-            <div className="block">9z</div>
-            <div className="block">12z</div>
-            <div className="block">15z</div>
-            <div className="block">18z</div>
-            <div className="block">21z</div>
-            <div className="block">24z</div>
-          </div>
-          <div className="date">
-            {simpleTimeFormat(new Date(settingsState.observation_time), settingsState.default_time_display_unit)}
-          </div>
-        </div>
-        <div className="move-right">+3h</div>
-      </div>
     </div>
   );
 }
