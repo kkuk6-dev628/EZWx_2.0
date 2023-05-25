@@ -573,7 +573,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     if (queryElevationsResult.isSuccess && queryElevationsResult.data && routeLength) {
       const elevationApiResults = queryElevationsResult.data.geoPoints;
       const elevations = [];
-      const elSegmentLength = (routeLength + startMargin + endMargin) / totalNumberOfElevations;
+      const elSegmentLength = (routeLength + startMargin + endMargin) / (elevationApiResults.length - 1);
       for (let i = 0; i < elevationApiResults.length; i++) {
         elevations.push({ x: i * elSegmentLength - startMargin, y: meterToFeet(elevationApiResults[i].elevation) });
       }

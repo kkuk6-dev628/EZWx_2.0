@@ -113,49 +113,58 @@ function DepartureAdvisor() {
     defaultTime = new Date();
     handleTimeChange(defaultTime, true);
   }
-  const marks = [
-    {
-      value: 0,
-      label: simpleTimeFormat(valueToTime(0), settingsState.default_time_display_unit),
-    },
-    {
-      value: 12 * 12,
-      label: simpleTimeFormat(valueToTime(12 * 12), settingsState.default_time_display_unit),
-    },
-    {
-      value: 36 * 12,
-      label: simpleTimeFormat(valueToTime(36 * 12), settingsState.default_time_display_unit),
-    },
-    {
-      value: 60 * 12,
-      label: simpleTimeFormat(valueToTime(60 * 12), settingsState.default_time_display_unit),
-    },
-    {
-      value: 84 * 12,
-      label: simpleTimeFormat(valueToTime(84 * 12), settingsState.default_time_display_unit),
-    },
-  ];
+
+  function handleClick3h(isForward) {
+    const newTime = settingsState.observation_time + (isForward ? 1 : -1) * 3 * 3600 * 1000;
+    handleTimeChange(new Date(newTime), true);
+  }
+
+  function handleClickHour(hour: number) {
+    const oldTime = new Date(settingsState.observation_time);
+    settingsState.default_time_display_unit ? oldTime.setHours(hour, 0, 0, 0) : oldTime.setUTCHours(hour, 0, 0, 0);
+    handleTimeChange(oldTime, true);
+  }
 
   return (
     <div className="departure-advisor">
       <div className="blocks-container">
-        <div className="move-left">-3h</div>
+        <div className="move-left" onClick={() => handleClick3h(false)}>
+          -3h
+        </div>
         <div className="blocks-date">
           <div className="horizental-blocks">
-            <div className="block green">3z</div>
-            <div className="block red">6z</div>
-            <div className="block yellow">9z</div>
-            <div className="block grey">12z</div>
-            <div className="block grey">15z</div>
-            <div className="block grey">18z</div>
-            <div className="block grey">21z</div>
-            <div className="block grey">24z</div>
+            <div className="block green" onClick={() => handleClickHour(3)}>
+              3z
+            </div>
+            <div className="block red" onClick={() => handleClickHour(6)}>
+              6z
+            </div>
+            <div className="block yellow" onClick={() => handleClickHour(9)}>
+              9z
+            </div>
+            <div className="block grey" onClick={() => handleClickHour(12)}>
+              12z
+            </div>
+            <div className="block grey" onClick={() => handleClickHour(15)}>
+              15z
+            </div>
+            <div className="block grey" onClick={() => handleClickHour(18)}>
+              18z
+            </div>
+            <div className="block grey" onClick={() => handleClickHour(21)}>
+              21z
+            </div>
+            <div className="block grey" onClick={() => handleClickHour(24)}>
+              24z
+            </div>
           </div>
           <div className="date">
             {simpleTimeFormat(new Date(settingsState.observation_time), settingsState.default_time_display_unit)}
           </div>
         </div>
-        <div className="move-right">+3h</div>
+        <div className="move-right" onClick={() => handleClick3h(true)}>
+          +3h
+        </div>
       </div>
       <Slider
         className="time-slider"
