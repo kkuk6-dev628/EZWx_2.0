@@ -133,7 +133,7 @@ const IcingChart = (props) => {
               sld: 'None',
             };
           } else {
-            let { value: prob, time: provTime } = getValueFromDataset(
+            let { value: prob, time: provTime } = getValueFromDatasetByElevation(
               queryIcingProbDataResult.data,
               new Date(segment.arriveTime),
               elevation,
@@ -141,14 +141,14 @@ const IcingChart = (props) => {
             );
             prob = Math.round(prob);
             provTime = provTime ?? new Date(segment.arriveTime);
-            let { value: sld } = getValueFromDataset(
+            let { value: sld } = getValueFromDatasetByElevation(
               queryIcingSldDataResult.data,
               new Date(segment.arriveTime),
               elevation,
               index,
             );
             sld = Math.round(sld);
-            let { value: sev } = getValueFromDataset(
+            let { value: sev } = getValueFromDatasetByElevation(
               queryIcingSevDataResult.data,
               new Date(segment.arriveTime),
               elevation,

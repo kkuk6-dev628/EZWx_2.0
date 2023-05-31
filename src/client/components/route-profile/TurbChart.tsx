@@ -9,6 +9,7 @@ import {
   getSegmentsCount,
   getTimeGradientStops,
   getValueFromDataset,
+  getValueFromDatasetByElevation,
   interpolateRoute,
   totalNumberOfElevations,
 } from './RouteProfileDataLoader';
@@ -90,13 +91,13 @@ const TurbChart = (props) => {
             }
           } else {
             if (routeProfileApiState.turbLayers.includes('CAT') && routeProfileApiState.turbLayers.includes('MWT')) {
-              const caturb = getValueFromDataset(
+              const caturb = getValueFromDatasetByElevation(
                 queryCaturbDataResult.data,
                 new Date(segment.arriveTime),
                 elevation,
                 index,
               );
-              const mwturb = getValueFromDataset(
+              const mwturb = getValueFromDatasetByElevation(
                 queryMwturbDataResult.data,
                 new Date(segment.arriveTime),
                 elevation,
@@ -106,7 +107,7 @@ const TurbChart = (props) => {
               edrTime = caturb.time;
               edrType = 'Combined EDR';
             } else if (routeProfileApiState.turbLayers.includes('CAT')) {
-              const data = getValueFromDataset(
+              const data = getValueFromDatasetByElevation(
                 queryCaturbDataResult.data,
                 new Date(segment.arriveTime),
                 elevation,
@@ -116,7 +117,7 @@ const TurbChart = (props) => {
               edrTime = data.time;
               edrType = 'Clear Air EDR';
             } else if (routeProfileApiState.turbLayers.includes('MWT')) {
-              ({ value: edr, time: edrTime } = getValueFromDataset(
+              ({ value: edr, time: edrTime } = getValueFromDatasetByElevation(
                 queryMwturbDataResult.data,
                 new Date(segment.arriveTime),
                 elevation,

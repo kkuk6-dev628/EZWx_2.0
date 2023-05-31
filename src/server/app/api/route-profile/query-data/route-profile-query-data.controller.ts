@@ -14,11 +14,11 @@ export class RouteProfileQueryDataController {
   mwturb(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryMwturb(query);
   }
-  @Post('humidity')
+  @Post('g-humidity')
   humidity(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryHumidity(query);
   }
-  @Post('temperature')
+  @Post('g-temperature')
   temperature(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryTemperature(query);
   }
@@ -88,8 +88,13 @@ export class RouteProfileQueryDataController {
   }
   @Post('n-ceiling-vis')
   nbmCeilingVisibility(@Body() query: RouteProfileQueryDto) {
-    return this.routeProfileQueryDataService.queryCeilingVisibility(query);
+    return this.routeProfileQueryDataService.queryFlightCategory(query);
   }
+  @Post('d-advisor')
+  query4DepartureAdvisor(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.query4DepartureAdvisor(query);
+  }
+
   @Get('airport-nbm')
   airportNbm(@Query() query: { faaids: string }) {
     return this.routeProfileQueryDataService.queryAirportNbm(query);

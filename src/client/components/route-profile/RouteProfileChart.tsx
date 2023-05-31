@@ -35,6 +35,7 @@ import {
   useQueryGfsWindDirectionDataMutation,
   useQueryGfsWindSpeedDataMutation,
   useQueryTemperatureDataMutation,
+  useGetDepartureAdvisorDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectFetchedDate, selectRouteSegments } from '../../store/route-profile/RouteProfile';
@@ -351,6 +352,9 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   const [, queryNbmFlightCatResult] = useQueryNbmFlightCategoryMutation({
     fixedCacheKey: cacheKeys.nbmCloudCeiling,
   });
+  const [getDepartureAdvisorData, getDepartureAdvisorDataResult] = useGetDepartureAdvisorDataMutation({
+    fixedCacheKey: cacheKeys.departureAdvisor,
+  });
 
   const { data: airportNbmData } = useGetAirportNbmQuery(
     activeRoute ? [activeRoute.departure.key, activeRoute.destination.key] : [],
@@ -424,13 +428,13 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   function buildWeatherSeries(segment: RouteSegment, segmentIndex: number) {
     if (segment) {
       const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(
-        queryNbmFlightCatResult.data?.cloudceiling,
+        getDepartureAdvisorDataResult.data?.cloudceiling,
         new Date(segment.arriveTime),
         null,
         segmentIndex * flightCategoryDivide,
       );
       const { value: visibility } = getValueFromDatasetByElevation(
-        queryNbmFlightCatResult.data?.visibility,
+        getDepartureAdvisorDataResult.data?.visibility,
         new Date(segment.arriveTime),
         null,
         segmentIndex * flightCategoryDivide,
@@ -529,20 +533,22 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         }
         let airportDist = 0;
         if (segmentIndex > 0 && seg.airport) {
-          const airportDelta = flyjs.distanceTo(
-            seg.position.lat,
-            seg.position.lng,
-            seg.airport.position.coordinates[1],
-            seg.airport.position.coordinates[0],
-            2,
-          );
-          const airportCourse = flyjs.trueCourse(
-            seg.position.lat,
-            seg.position.lng,
-            seg.airport.position.coordinates[1],
-            seg.airport.position.coordinates[0],
-            2,
-          );
+          const airportDelta =
+            flyjs.distanceTo(
+              seg.position.lat,
+              seg.position.lng,
+              seg.airport.position.coordinates[1],
+              seg.airport.position.coordinates[0],
+              2,
+            ) | 0;
+          const airportCourse =
+            flyjs.trueCourse(
+              seg.position.lat,
+              seg.position.lng,
+              seg.airport.position.coordinates[1],
+              seg.airport.position.coordinates[0],
+              2,
+            ) | 0;
           airportDist = Math.cos(degree2radian(airportCourse - seg.course)) * airportDelta;
         }
 
@@ -562,8 +568,6 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
 
   useEffect(() => {
     if (activeRoute && !queryElevationsResult.isSuccess && !queryElevationsResult.isLoading) {
-      // userSettings.default_distance_unit == true then km, or nm
-      console.log(queryElevationsResult, new Date().toLocaleTimeString());
       const elevationPoints = interpolateRoute(activeRoute, totalNumberOfElevations);
       queryElevations({ queryPoints: elevationPoints });
     }
@@ -628,13 +632,13 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           }
           const newTime = new Date(arriveTime).getTime() + (3600 * 1000 * dist) / speed;
           const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(
-            queryNbmFlightCatResult.data?.cloudceiling,
+            getDepartureAdvisorDataResult.data?.cloudceiling,
             new Date(arriveTime),
             null,
             index,
           );
           const { value: visibility } = getValueFromDatasetByElevation(
-            queryNbmFlightCatResult.data?.visibility,
+            getDepartureAdvisorDataResult.data?.visibility,
             new Date(arriveTime),
             null,
             index,

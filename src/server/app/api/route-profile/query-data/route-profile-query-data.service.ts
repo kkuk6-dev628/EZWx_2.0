@@ -254,20 +254,38 @@ export class RouteProfileQueryDataService {
     return { cloudbase, cloudceiling, dewpoint, gust, skycover, temperature, visibility, winddir, windspeed };
   }
 
-  async queryCeilingVisibility(query: RouteProfileQueryDto) {
-    // console.log('start', new Date().toLocaleTimeString());
-    // const [cloudceiling, visibility, skycover] = await Promise.all([
-    //   this.queryRasterDataset(query.queryPoints, this.nbmCloudCeilingRepository),
-    //   this.queryRasterDataset(query.queryPoints, this.nbmVisRepository),
-    //   this.queryRasterDataset(query.queryPoints, this.nbmSkycoverRepository),
-    // ]);
-    // console.log('end promise all', new Date().toLocaleTimeString());
+  async queryFlightCategory(query: RouteProfileQueryDto) {
     const cloudbase = await this.queryRasterDataset(query.queryPoints, this.nbmCloudBaseRepository);
+    const skycover = await this.queryRasterDataset(query.queryPoints, this.nbmSkycoverRepository);
+    return { cloudbase, skycover };
+  }
+
+  async queryIcingAll(query: RouteProfileQueryDto) {
+    const prob = await this.queryRasterDataset(query.queryPoints, this.icingProbRepository);
+    const severity = await this.queryRasterDataset(query.queryPoints, this.icingSevRepository);
+    return { prob, severity };
+  }
+
+  async query4DepartureAdvisor(query: RouteProfileQueryDto) {
+    const cat = await this.queryRasterDatasetByElevations(
+      query.queryPoints,
+      query.elevations,
+      this.clearAirTubRepository,
+    );
+    const mwt = await this.queryRasterDatasetByElevations(query.queryPoints, query.elevations, this.mwturbRepository);
+    const prob = await this.queryRasterDatasetByElevations(
+      query.queryPoints,
+      query.elevations,
+      this.icingProbRepository,
+    );
+    const severity = await this.queryRasterDatasetByElevations(
+      query.queryPoints,
+      query.elevations,
+      this.icingSevRepository,
+    );
     const cloudceiling = await this.queryRasterDataset(query.queryPoints, this.nbmCloudCeilingRepository);
     const visibility = await this.queryRasterDataset(query.queryPoints, this.nbmVisRepository);
-    const skycover = await this.queryRasterDataset(query.queryPoints, this.nbmSkycoverRepository);
-    // console.log('end await all', new Date().toLocaleTimeString());
-    return { cloudbase, cloudceiling, visibility, skycover };
+    return { cat, mwt, prob, severity, cloudceiling, visibility };
   }
 
   async queryAirportNbm(query: { faaids: string }) {

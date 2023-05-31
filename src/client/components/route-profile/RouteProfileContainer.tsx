@@ -32,6 +32,7 @@ import CloudsChart from './CloudsChart';
 import TurbChart from './TurbChart';
 import WindChart from './WindChart';
 import IcingChart from './IcingChart';
+import DepartureAdvisor from '../shared/DepartureAdvisor';
 
 const routeProfileChartTypes: {
   wind: RouteProfileChartType;
@@ -147,83 +148,162 @@ const RouteProfileContainer = () => {
 
   return (
     isRouteProfileStateLoaded && (
-      <div className="route-profile">
-        <FetchUserSettings />
-        <Dialog
-          PaperComponent={PaperComponent}
-          hideBackdrop
-          disableEnforceFocus
-          style={{ position: 'absolute' }}
-          open={showRouteEditor}
-          onClose={() => setShowRouteEditor(false)}
-          aria-labelledby="draggable-dialog-title"
-        >
-          <Route setIsShowModal={setShowRouteEditor} />
-        </Dialog>
-        <MapTabs tabMenus={tabMenus} />
-        <div className="route-profile-container">
-          <RouteProfileDataLoader key={dataLoadTime} />
-          <div className="route-profile-header">
-            <RadioGroup
-              className="select-chart-type"
-              value={routeProfileState.chartType ? routeProfileState.chartType : routeProfileChartTypes.wind}
-              onChange={(_e, value) => {
-                handleUpdateState({
-                  ...routeProfileState,
-                  chartType: value as unknown as RouteProfileChartType,
-                });
-              }}
-            >
-              {Object.entries(routeProfileChartTypes).map(([key, value]) => {
-                return (
-                  <FormControlLabel
-                    key={value}
-                    value={value}
-                    control={
-                      <Radio
-                        color="primary"
-                        icon={<CheckBoxOutlineBlankOutlined />}
-                        checkedIcon={<CheckBoxOutlinedIcon />}
-                      />
-                    }
-                    label={value}
-                  />
-                );
-              })}
-            </RadioGroup>
-            <div className="header-right">
-              <div className="show-temperature">
-                <div className="MuiToggleButtonGroup-root">
-                  <ToggleButton
-                    value="showTemperature"
-                    aria-label="showTemperature"
-                    selected={routeProfileState.showTemperature}
-                    style={{ padding: 2 }}
-                    onChange={() => {
-                      handleUpdateState({ ...routeProfileState, showTemperature: !routeProfileState.showTemperature });
-                    }}
-                  >
-                    <i className="fas fa-thermometer-half fa-2x" aria-hidden="true"></i>
-                  </ToggleButton>
+      <>
+        <div className="route-profile">
+          <FetchUserSettings />
+          <Dialog
+            PaperComponent={PaperComponent}
+            hideBackdrop
+            disableEnforceFocus
+            style={{ position: 'absolute' }}
+            open={showRouteEditor}
+            onClose={() => setShowRouteEditor(false)}
+            aria-labelledby="draggable-dialog-title"
+          >
+            <Route setIsShowModal={setShowRouteEditor} />
+          </Dialog>
+          <MapTabs tabMenus={tabMenus} />
+          <div className="route-profile-container">
+            <RouteProfileDataLoader key={dataLoadTime} />
+            <div className="route-profile-header">
+              <RadioGroup
+                className="select-chart-type"
+                value={routeProfileState.chartType ? routeProfileState.chartType : routeProfileChartTypes.wind}
+                onChange={(_e, value) => {
+                  handleUpdateState({
+                    ...routeProfileState,
+                    chartType: value as unknown as RouteProfileChartType,
+                  });
+                }}
+              >
+                {Object.entries(routeProfileChartTypes).map(([key, value]) => {
+                  return (
+                    <FormControlLabel
+                      key={value}
+                      value={value}
+                      control={
+                        <Radio
+                          color="primary"
+                          icon={<CheckBoxOutlineBlankOutlined />}
+                          checkedIcon={<CheckBoxOutlinedIcon />}
+                        />
+                      }
+                      label={value}
+                    />
+                  );
+                })}
+              </RadioGroup>
+              <div className="header-right">
+                <div className="show-temperature">
+                  <div className="MuiToggleButtonGroup-root">
+                    <ToggleButton
+                      value="showTemperature"
+                      aria-label="showTemperature"
+                      selected={routeProfileState.showTemperature}
+                      style={{ padding: 2 }}
+                      onChange={() => {
+                        handleUpdateState({
+                          ...routeProfileState,
+                          showTemperature: !routeProfileState.showTemperature,
+                        });
+                      }}
+                    >
+                      <i className="fas fa-thermometer-half fa-2x" aria-hidden="true"></i>
+                    </ToggleButton>
+                  </div>
                 </div>
-              </div>
-              {routeProfileState.chartType === routeProfileChartTypes.wind && (
-                <div className="select-data-type">
+                {routeProfileState.chartType === routeProfileChartTypes.wind && (
+                  <div className="select-data-type">
+                    <InputFieldWrapper>
+                      <div className="input_radio_container">
+                        {Object.entries(routeProfileWindDataTypes).map(([key, value]) => {
+                          return (
+                            <RadioButton
+                              id={key}
+                              key={value}
+                              value={value}
+                              title={value}
+                              selectedValue={routeProfileState.windLayer}
+                              description=""
+                              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                handleUpdateState({
+                                  ...routeProfileApiState,
+                                  windLayer: e.target.value as unknown as RouteProfileWindDataType,
+                                });
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    </InputFieldWrapper>
+                  </div>
+                )}
+                {routeProfileState.chartType === routeProfileChartTypes.icing && (
+                  <div className="select-data-type">
+                    <ToggleButtonGroup
+                      value={routeProfileState.icingLayers}
+                      aria-label="Icing Data Layers"
+                      onChange={(_, values: RouteProfileIcingDataType[]) => {
+                        const newValues = values.filter((item) => !routeProfileState.icingLayers.includes(item));
+                        if (newValues.length > 0) {
+                          if (newValues.includes(routeProfileIcingDataTypes.prob)) {
+                            handleUpdateState({ ...routeProfileState, icingLayers: [routeProfileIcingDataTypes.prob] });
+                          } else {
+                            handleUpdateState({
+                              ...routeProfileState,
+                              icingLayers: values.filter((item) => item !== routeProfileIcingDataTypes.prob),
+                            });
+                          }
+                        } else {
+                          handleUpdateState({ ...routeProfileState, icingLayers: values });
+                        }
+                      }}
+                    >
+                      {Object.entries(routeProfileIcingDataTypes).map(([key, value]) => {
+                        return (
+                          <ToggleButton key={value} value={value} aria-label={value}>
+                            {value}
+                          </ToggleButton>
+                        );
+                      })}
+                    </ToggleButtonGroup>
+                  </div>
+                )}
+                {routeProfileState.chartType === routeProfileChartTypes.turb && (
+                  <div className="select-data-type">
+                    <ToggleButtonGroup
+                      value={routeProfileState.turbLayers}
+                      onChange={(_, value) => {
+                        handleUpdateState({ ...routeProfileState, turbLayers: value });
+                      }}
+                      aria-label="Turbulence Data Layers"
+                    >
+                      {Object.entries(routeProfileTurbDataTypes).map(([key, value]) => {
+                        return (
+                          <ToggleButton key={value} value={value} aria-label={value}>
+                            {value}
+                          </ToggleButton>
+                        );
+                      })}
+                    </ToggleButtonGroup>
+                  </div>
+                )}
+                <div className="select-altitude">
                   <InputFieldWrapper>
                     <div className="input_radio_container">
-                      {Object.entries(routeProfileWindDataTypes).map(([key, value]) => {
+                      {routeProfileMaxAltitudes.map((value) => {
                         return (
                           <RadioButton
-                            id={key}
+                            id={value}
                             key={value}
                             value={value}
                             title={value}
-                            selectedValue={routeProfileState.windLayer}
+                            selectedValue={routeProfileState.maxAltitude}
                             description=""
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
                               handleUpdateState({
-                                ...routeProfileApiState,
-                                windLayer: e.target.value as unknown as RouteProfileWindDataType,
+                                ...routeProfileState,
+                                maxAltitude: parseInt(e.target.value) as RouteProfileMaxAltitudes,
                               });
                             }}
                           />
@@ -232,93 +312,20 @@ const RouteProfileContainer = () => {
                     </div>
                   </InputFieldWrapper>
                 </div>
-              )}
-              {routeProfileState.chartType === routeProfileChartTypes.icing && (
-                <div className="select-data-type">
-                  <ToggleButtonGroup
-                    value={routeProfileState.icingLayers}
-                    aria-label="Icing Data Layers"
-                    onChange={(_, values: RouteProfileIcingDataType[]) => {
-                      const newValues = values.filter((item) => !routeProfileState.icingLayers.includes(item));
-                      if (newValues.length > 0) {
-                        if (newValues.includes(routeProfileIcingDataTypes.prob)) {
-                          handleUpdateState({ ...routeProfileState, icingLayers: [routeProfileIcingDataTypes.prob] });
-                        } else {
-                          handleUpdateState({
-                            ...routeProfileState,
-                            icingLayers: values.filter((item) => item !== routeProfileIcingDataTypes.prob),
-                          });
-                        }
-                      } else {
-                        handleUpdateState({ ...routeProfileState, icingLayers: values });
-                      }
-                    }}
-                  >
-                    {Object.entries(routeProfileIcingDataTypes).map(([key, value]) => {
-                      return (
-                        <ToggleButton key={value} value={value} aria-label={value}>
-                          {value}
-                        </ToggleButton>
-                      );
-                    })}
-                  </ToggleButtonGroup>
-                </div>
-              )}
-              {routeProfileState.chartType === routeProfileChartTypes.turb && (
-                <div className="select-data-type">
-                  <ToggleButtonGroup
-                    value={routeProfileState.turbLayers}
-                    onChange={(_, value) => {
-                      handleUpdateState({ ...routeProfileState, turbLayers: value });
-                    }}
-                    aria-label="Turbulence Data Layers"
-                  >
-                    {Object.entries(routeProfileTurbDataTypes).map(([key, value]) => {
-                      return (
-                        <ToggleButton key={value} value={value} aria-label={value}>
-                          {value}
-                        </ToggleButton>
-                      );
-                    })}
-                  </ToggleButtonGroup>
-                </div>
-              )}
-              <div className="select-altitude">
-                <InputFieldWrapper>
-                  <div className="input_radio_container">
-                    {routeProfileMaxAltitudes.map((value) => {
-                      return (
-                        <RadioButton
-                          id={value}
-                          key={value}
-                          value={value}
-                          title={value}
-                          selectedValue={routeProfileState.maxAltitude}
-                          description=""
-                          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            handleUpdateState({
-                              ...routeProfileState,
-                              maxAltitude: parseInt(e.target.value) as RouteProfileMaxAltitudes,
-                            });
-                          }}
-                        />
-                      );
-                    })}
-                  </div>
-                </InputFieldWrapper>
+              </div>
+            </div>
+            <div className="route-profile-chart-container">
+              <div className="scrollable-chart-content">
+                {routeProfileState.chartType === 'Wind' && <WindChart />}
+                {routeProfileState.chartType === 'Clouds' && <CloudsChart></CloudsChart>}
+                {routeProfileState.chartType === 'Icing' && <IcingChart></IcingChart>}
+                {routeProfileState.chartType === 'Turb' && <TurbChart></TurbChart>}
               </div>
             </div>
           </div>
-          <div className="route-profile-chart-container">
-            <div className="scrollable-chart-content">
-              {routeProfileState.chartType === 'Wind' && <WindChart />}
-              {routeProfileState.chartType === 'Clouds' && <CloudsChart></CloudsChart>}
-              {routeProfileState.chartType === 'Icing' && <IcingChart></IcingChart>}
-              {routeProfileState.chartType === 'Turb' && <TurbChart></TurbChart>}
-            </div>
-          </div>
         </div>
-      </div>
+        <DepartureAdvisor />
+      </>
     )
   );
 };

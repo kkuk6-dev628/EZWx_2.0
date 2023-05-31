@@ -35,6 +35,7 @@ import {
   useQueryNbmWindSpeedMutation,
   useQueryNbmWx1Mutation,
   useQueryTemperatureDataMutation,
+  useGetDepartureAdvisorDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { CircularProgress } from '@mui/material';
 import { QueryStatus, skipToken } from '@reduxjs/toolkit/query';
@@ -94,6 +95,7 @@ export const cacheKeys = {
   nbmWx1: 'nbm-wx1',
   nbmAllAirport: 'nbm-all-airport',
   elevation: 'elevation-api',
+  departureAdvisor: 'departure-advisor',
 };
 
 /**
@@ -684,6 +686,9 @@ const RouteProfileDataLoader = () => {
   const [queryNbmAllAirports, queryNbmAllAirportResult] = useQueryNbmAllMutation({
     fixedCacheKey: cacheKeys.nbmAllAirport,
   });
+  const [getDepartureAdvisorData, getDepartureAdvisorDataResult] = useGetDepartureAdvisorDataMutation({
+    fixedCacheKey: cacheKeys.departureAdvisor,
+  });
   const [, queryElevationsResult] = useQueryElevationApiMutation({ fixedCacheKey: cacheKeys.elevation });
   const activeRoute = useSelector(selectActiveRoute);
   const dispatch = useDispatch();
@@ -715,6 +720,7 @@ const RouteProfileDataLoader = () => {
     queryNbmWindSpeedResult.reset();
     queryNbmWx1Result.reset();
     queryNbmAllAirportResult.reset();
+    getDepartureAdvisorDataResult.reset();
   }
 
   function queryGfsWindSpeed(dependencyResult: {
@@ -982,7 +988,7 @@ const RouteProfileDataLoader = () => {
       segmentIndex,
     );
     const { value: cloudceiling } = getValueFromDatasetByElevation(
-      queryNbmFlightCatResult.data?.cloudceiling,
+      getDepartureAdvisorDataResult.data?.cloudceiling,
       time,
       null,
       segmentIndex * flightCategoryDivide,
@@ -997,7 +1003,7 @@ const RouteProfileDataLoader = () => {
     );
     const { value: temperature } = getValueFromDatasetByElevation(queryNbmTempResult.data, time, null, segmentIndex);
     const { value: visibility } = getValueFromDatasetByElevation(
-      queryNbmFlightCatResult.data?.visibility,
+      getDepartureAdvisorDataResult.data?.visibility,
       time,
       null,
       segmentIndex * flightCategoryDivide,
