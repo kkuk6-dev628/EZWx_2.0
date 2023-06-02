@@ -8,6 +8,7 @@ import { PersonalMinimums, selectSettings, setUserSettings } from '../../store/u
 import { useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
 import { selectAuth } from '../../store/auth/authSlice';
 import {
+  useGetAirportNbmQuery,
   useGetDepartureAdvisorDataMutation,
   useQueryGfsWindDirectionDataMutation,
   useQueryGfsWindSpeedDataMutation,
@@ -22,12 +23,12 @@ import {
 import { selectActiveRoute } from '../../store/route/routes';
 import { LatLng } from 'leaflet';
 import fly from '../../fly-js/fly';
-import { makeSkyConditions } from '../route-profile/RouteProfileChart';
+import { getAirportNbmData } from '../route-profile/RouteProfileChart';
 import { UserSettings } from '../../interfaces/users';
 import { jsonClone } from '../utils/ObjectUtil';
 
-type personalMinValue = 0 | 1 | 2;
-type personalMinColor = 'red' | 'yellow' | 'green';
+type personalMinValue = 0 | 1 | 2 | 10;
+type personalMinColor = 'red' | 'yellow' | 'green' | 'grey';
 type personalMinShape = 'rect' | 'circle' | 'triangle';
 
 interface PersonalMinsEvaluation {
@@ -45,65 +46,69 @@ interface PersonalMinsEvaluation {
   destinationCrosswind: { value: personalMinValue; color: personalMinColor };
 }
 
-const personalMinValueToColor: { 0: personalMinColor; 1: personalMinColor; 2: personalMinColor } = {
-  0: 'red',
-  1: 'yellow',
-  2: 'green',
-};
-const personalMinValueToShape: { 0: personalMinShape; 1: personalMinShape; 2: personalMinShape } = {
-  0: 'rect',
-  1: 'circle',
-  2: 'triangle',
-};
+const personalMinValueToColor: { 0: personalMinColor; 1: personalMinColor; 2: personalMinColor; 10: personalMinColor } =
+  {
+    0: 'red',
+    1: 'yellow',
+    2: 'green',
+    10: 'grey',
+  };
+const personalMinValueToShape: { 0: personalMinShape; 1: personalMinShape; 2: personalMinShape; 10: personalMinShape } =
+  {
+    0: 'triangle',
+    1: 'rect',
+    2: 'circle',
+    10: 'rect',
+  };
 
 const initialEvaluation: PersonalMinsEvaluation = {
   departureCeiling: {
-    value: 0,
-    color: 'red',
+    value: 10,
+    color: 'grey',
   },
   departureVisibility: {
-    value: 0,
-    color: 'red',
+    value: 10,
+    color: 'grey',
   },
   departureCrosswind: {
-    value: 0,
-    color: 'red',
+    value: 10,
+    color: 'grey',
   },
   alongRouteCeiling: {
-    value: 0,
-    color: 'red',
+    value: 10,
+    color: 'grey',
   },
   alongRouteVisibility: {
-    value: 0,
-    color: 'red',
+    value: 10,
+    color: 'grey',
   },
   alongRouteProb: {
-    value: 0,
-    color: 'red',
+    value: 10,
+    color: 'grey',
   },
   destinationCeiling: {
-    value: 0,
-    color: 'red',
+    value: 10,
+    color: 'grey',
   },
   destinationVisibility: {
-    value: 0,
-    color: 'red',
+    value: 10,
+    color: 'grey',
   },
   destinationCrosswind: {
-    value: 0,
-    color: 'red',
+    value: 10,
+    color: 'grey',
   },
   alongRouteSeverity: {
-    value: 0,
-    color: 'red',
+    value: 10,
+    color: 'grey',
   },
   alongRouteTurbulence: {
-    value: 0,
-    color: 'red',
+    value: 10,
+    color: 'grey',
   },
   alongRouteConvection: {
-    value: 0,
-    color: 'red',
+    value: 10,
+    color: 'grey',
   },
 };
 
@@ -117,12 +122,15 @@ function getWheatherMinimumsAlongRoute(
   departureData,
   gfsWindspeed,
   gfsWinddirection,
+  departureAirportID: string,
+  destAirportID: string,
+  airportNbmData,
 ): PersonalMinsEvaluation {
   let accDistance = 0;
   let arriveTime = new Date(observationTime).getTime();
   let dist = 0;
   let course = 0;
-  const personalMinsEvaluation = jsonClone(initialEvaluation);
+  const personalMinsEvaluation: PersonalMinsEvaluation = jsonClone(initialEvaluation);
 
   const ceilings = [];
   const visibilities = [];
@@ -140,7 +148,7 @@ function getWheatherMinimumsAlongRoute(
       if (useForecastWinds) {
         if (gfsWindspeed.isSuccess && gfsWinddirection.isSuccess) {
           const { value: speedValue } = getValueFromDatasetByElevation(
-            gfsWinddirection.data,
+            gfsWindspeed.data,
             new Date(arriveTime),
             routeAltitude,
             Math.round(index / flightCategoryDivide),
@@ -173,7 +181,7 @@ function getWheatherMinimumsAlongRoute(
         index,
       );
       if (index === 0) {
-        if (personalMins.ceiling_at_departure[1] <= cloudceiling || cloudceiling === null) {
+        if (personalMins.ceiling_at_departure[1] <= cloudceiling || cloudceiling === null || cloudceiling === 0) {
           personalMinsEvaluation.departureCeiling.value = 2;
           personalMinsEvaluation.departureCeiling.color = personalMinValueToColor[2];
         } else if (personalMins.ceiling_at_departure[0] <= cloudceiling) {
@@ -193,8 +201,19 @@ function getWheatherMinimumsAlongRoute(
           personalMinsEvaluation.departureVisibility.value = 0;
           personalMinsEvaluation.departureVisibility.color = personalMinValueToColor[0];
         }
+        const { data: forCrosswind } = getAirportNbmData(airportNbmData, observationTime, departureAirportID);
+        if (!forCrosswind || personalMins.crosswinds_at_departure_airport[0] > forCrosswind.cross_com) {
+          personalMinsEvaluation.departureCrosswind.value = 2;
+          personalMinsEvaluation.departureCrosswind.color = personalMinValueToColor[2];
+        } else if (personalMins.crosswinds_at_departure_airport[1] > forCrosswind.cross_com) {
+          personalMinsEvaluation.departureCrosswind.value = 1;
+          personalMinsEvaluation.departureCrosswind.color = personalMinValueToColor[1];
+        } else {
+          personalMinsEvaluation.departureCrosswind.value = 0;
+          personalMinsEvaluation.departureCrosswind.color = personalMinValueToColor[0];
+        }
       } else if (index === positions.length - 1) {
-        if (personalMins.ceiling_at_destination[0] <= cloudceiling) {
+        if (personalMins.ceiling_at_destination[0] <= cloudceiling || cloudceiling === null || cloudceiling === 0) {
           personalMinsEvaluation.destinationCeiling.value = 2;
           personalMinsEvaluation.destinationCeiling.color = personalMinValueToColor[2];
         } else if (personalMins.ceiling_at_destination[1] <= cloudceiling) {
@@ -214,9 +233,20 @@ function getWheatherMinimumsAlongRoute(
           personalMinsEvaluation.destinationVisibility.value = 0;
           personalMinsEvaluation.destinationVisibility.color = personalMinValueToColor[0];
         }
+        const { data: forCrosswind } = getAirportNbmData(airportNbmData, arriveTime, destAirportID);
+        if (!forCrosswind || personalMins.crosswinds_at_destination_airport[0] > forCrosswind.cross_com) {
+          personalMinsEvaluation.destinationCrosswind.value = 2;
+          personalMinsEvaluation.destinationCrosswind.color = personalMinValueToColor[2];
+        } else if (personalMins.crosswinds_at_destination_airport[1] > forCrosswind.cross_com) {
+          personalMinsEvaluation.destinationCrosswind.value = 1;
+          personalMinsEvaluation.destinationCrosswind.color = personalMinValueToColor[1];
+        } else {
+          personalMinsEvaluation.destinationCrosswind.value = 0;
+          personalMinsEvaluation.destinationCrosswind.color = personalMinValueToColor[0];
+        }
       } else {
-        ceilings.push(cloudceiling);
-        visibilities.push(visibility);
+        cloudceiling && ceilings.push(cloudceiling);
+        visibility && visibilities.push(visibility);
         const { value: icingProb } = getValueFromDatasetByElevation(
           departureData.data?.prob,
           new Date(arriveTime),
@@ -241,8 +271,8 @@ function getWheatherMinimumsAlongRoute(
           null,
           index,
         );
-        icingProbs.push(icingProb);
-        icingSeverities.push(icingSeverity);
+        icingProb && icingProbs.push(icingProb);
+        icingSeverity && icingSeverities.push(icingSeverity);
         turbulences.push(Math.max(cat, mwt));
       }
       accDistance += dist;
@@ -315,7 +345,7 @@ function getWheatherMinimumsAlongRoute(
   return personalMinsEvaluation;
 }
 
-function DepartureAdvisor() {
+function DepartureAdvisor(props: { showPast: boolean }) {
   const dispatch = useDispatch();
   const settingsState = useSelector(selectSettings);
   const activeRoute = useSelector(selectActiveRoute);
@@ -332,18 +362,32 @@ function DepartureAdvisor() {
   const [queryGfsWindSpeedData, queryGfsWindSpeedDataResult] = useQueryGfsWindSpeedDataMutation({
     fixedCacheKey: cacheKeys.gfsWindspeed,
   });
+  const { data: airportNbmData, isSuccess: isAirportNbmLoaded } = useGetAirportNbmQuery(
+    activeRoute ? [activeRoute.departure.key, activeRoute.destination.key] : [],
+    {
+      skip: activeRoute === null,
+    },
+  );
 
   const [currEval, setCurrEval] = useState(initialEvaluation);
   const [beforeEval, setBeforeEval] = useState(initialEvaluation);
   const [afterEval, setAfterEval] = useState(initialEvaluation);
   const [colorByTimes, setColorByTimes] = useState(Array.from({ length: 8 }));
+  const [day, setDay] = useState(0);
+  const [hour, setHour] = useState(0);
 
   useEffect(() => {
+    const day = new Date(settingsState.observation_time).getUTCDay();
+    const hour = new Date(settingsState.observation_time);
+    hour.setMinutes(0, 0, 0);
+    setDay(day);
+    setHour(hour.getTime());
     setHideDotsBars(false);
   }, [settingsState.observation_time]);
 
   useEffect(() => {
-    if (activeRoute && !getDepartureAdvisorDataResult.isLoading && !getDepartureAdvisorDataResult.isSuccess) {
+    if (activeRoute) {
+      getDepartureAdvisorDataResult.reset();
       const queryPoints = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide);
       const elevations = [];
       if (activeRoute.altitude % 1000 === 0) {
@@ -369,7 +413,11 @@ function DepartureAdvisor() {
         getDepartureAdvisorDataResult,
         queryGfsWindSpeedDataResult,
         queryGfsWindDirectionDataResult,
+        activeRoute.departure.key,
+        activeRoute.destination.key,
+        airportNbmData,
       );
+
       setCurrEval(currEvaluation);
       const beforeEvaluation = getWheatherMinimumsAlongRoute(
         queryPoints,
@@ -381,6 +429,9 @@ function DepartureAdvisor() {
         getDepartureAdvisorDataResult,
         queryGfsWindSpeedDataResult,
         queryGfsWindDirectionDataResult,
+        activeRoute.departure.key,
+        activeRoute.destination.key,
+        airportNbmData,
       );
       setBeforeEval(beforeEvaluation);
       const afterEvaluation = getWheatherMinimumsAlongRoute(
@@ -393,28 +444,78 @@ function DepartureAdvisor() {
         getDepartureAdvisorDataResult,
         queryGfsWindSpeedDataResult,
         queryGfsWindDirectionDataResult,
+        activeRoute.departure.key,
+        activeRoute.destination.key,
+        airportNbmData,
       );
       setAfterEval(afterEvaluation);
+    }
+  }, [getDepartureAdvisorDataResult.isSuccess, hour]);
+
+  useEffect(() => {
+    if (activeRoute && getDepartureAdvisorDataResult.isSuccess) {
+      const queryPoints = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide, true);
+      const currentHour = new Date();
+      currentHour.setMinutes(0, 0, 0);
       const evalByTimes: string[] = Array.from({ length: 8 }, (_value, index) => {
         const time = new Date(settingsState.observation_time);
         time.setUTCHours((index + 1) * 3);
-        const evalByTime = getWheatherMinimumsAlongRoute(
-          queryPoints,
-          settingsState,
-          time.getTime(),
-          activeRoute.useForecastWinds,
-          activeRoute.altitude,
-          settingsState.true_airspeed,
-          getDepartureAdvisorDataResult,
-          queryGfsWindSpeedDataResult,
-          queryGfsWindDirectionDataResult,
-        );
-        const minValue = Math.min(...Object.values(evalByTime).map((item) => item.value));
-        return personalMinValueToColor[minValue];
+        if (currentHour > time) {
+          return personalMinValueToColor[10];
+        } else {
+          const evalByTime = getWheatherMinimumsAlongRoute(
+            queryPoints,
+            settingsState,
+            time.getTime(),
+            activeRoute.useForecastWinds,
+            activeRoute.altitude,
+            settingsState.true_airspeed,
+            getDepartureAdvisorDataResult,
+            queryGfsWindSpeedDataResult,
+            queryGfsWindDirectionDataResult,
+            activeRoute.departure.key,
+            activeRoute.destination.key,
+            airportNbmData,
+          );
+          const evalByTimeBefore = getWheatherMinimumsAlongRoute(
+            queryPoints,
+            settingsState,
+            time.getTime() - 3600 * 1000,
+            activeRoute.useForecastWinds,
+            activeRoute.altitude,
+            settingsState.true_airspeed,
+            getDepartureAdvisorDataResult,
+            queryGfsWindSpeedDataResult,
+            queryGfsWindDirectionDataResult,
+            activeRoute.departure.key,
+            activeRoute.destination.key,
+            airportNbmData,
+          );
+          const evalByTimeAfter = getWheatherMinimumsAlongRoute(
+            queryPoints,
+            settingsState,
+            time.getTime() + 3600 * 1000,
+            activeRoute.useForecastWinds,
+            activeRoute.altitude,
+            settingsState.true_airspeed,
+            getDepartureAdvisorDataResult,
+            queryGfsWindSpeedDataResult,
+            queryGfsWindDirectionDataResult,
+            activeRoute.departure.key,
+            activeRoute.destination.key,
+            airportNbmData,
+          );
+          const minValue = Math.min(
+            ...Object.values(evalByTime).map((item) => item.value),
+            ...Object.values(evalByTimeBefore).map((item) => item.value),
+            ...Object.values(evalByTimeAfter).map((item) => item.value),
+          );
+          return personalMinValueToColor[minValue];
+        }
       });
       setColorByTimes(evalByTimes);
     }
-  }, [getDepartureAdvisorDataResult.isSuccess, settingsState]);
+  }, [getDepartureAdvisorDataResult.isSuccess, day]);
 
   useEffect(() => {
     if (!hideDotsBars) {
@@ -423,13 +524,13 @@ function DepartureAdvisor() {
   }, [settingsState.observation_time, hideDotsBars]);
 
   const valueToTime = (value: number): Date => {
-    const origin = getTimeRangeStart();
+    const origin = getTimeRangeStart(props.showPast);
     origin.setMinutes(value * 5);
     return origin;
   };
 
   const timeToValue = (time: Date): number => {
-    const origin = getTimeRangeStart();
+    const origin = getTimeRangeStart(props.showPast);
     const diff = diffMinutes(time, origin);
     return Math.floor(diff / 5);
   };
@@ -638,7 +739,7 @@ function DepartureAdvisor() {
   };
 
   if (
-    settingsState.observation_time >= getTimeRangeStart().getTime() &&
+    settingsState.observation_time >= getTimeRangeStart(props.showPast).getTime() &&
     settingsState.observation_time <= valueToTime(84 * 12).getTime()
   ) {
     defaultTime = new Date(settingsState.observation_time);
@@ -705,7 +806,7 @@ function DepartureAdvisor() {
         aria-label="Time Slider"
         // defaultValue={timeToValue(defaultTime)}
         value={timeToValue(defaultTime)}
-        max={84 * 12}
+        max={props.showPast ? 84 * 12 : 72 * 12}
         valueLabelFormat={valuetext}
         step={1}
         valueLabelDisplay="on"

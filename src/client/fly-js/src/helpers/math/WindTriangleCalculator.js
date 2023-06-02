@@ -60,7 +60,7 @@ WindTriangleCalculator.prototype.calculateHeadingAndGroundSpeed = function (true
     var groundSpeed;
 
     if (Math.abs(SWC) > 1) {
-      throw new Error("Course cannot be flown - wind too strong");
+      throw new Error("Course cannot be flown - wind too strong " + windSpeed);
     } else {
 
         heading = courseInRadians + Math.asin(SWC);
@@ -74,7 +74,7 @@ WindTriangleCalculator.prototype.calculateHeadingAndGroundSpeed = function (true
         groundSpeed = trueAirSpeed * Math.sqrt(1 - Math.pow(SWC, 2)) - windSpeed * Math.cos(angleDifference);
 
         if (groundSpeed < 0) {
-            throw new Error("course cannot be flown - wind too strong");
+            throw new Error("course cannot be flown - wind too strong " + windSpeed);
         }
     }
 

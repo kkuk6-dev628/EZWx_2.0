@@ -169,9 +169,9 @@ export const getCacheVersion = (updateInterval: number): number => {
   return version;
 };
 
-export const getTimeRangeStart = () => {
+export const getTimeRangeStart = (showPast: boolean) => {
   const origin = new Date();
-  origin.setHours(origin.getHours() - 12, 0, 0);
+  showPast && origin.setHours(origin.getHours() - 12, 0, 0);
   origin.setMinutes(0);
   origin.setSeconds(0);
   origin.setMilliseconds(0);

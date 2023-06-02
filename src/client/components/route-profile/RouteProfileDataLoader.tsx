@@ -635,6 +635,7 @@ const RouteProfileDataLoader = () => {
   const userSettings = useSelector(selectSettings);
   const { data: routeProfileApiState } = useGetRouteProfileStateQuery(null);
   const observationTime = userSettings.observation_time;
+  const [hourState, setHourState] = useState(0);
   const routeSegments = useSelector(selectRouteSegments);
   const [queryCaturbData, queryCaturbDataResult] = useQueryCaturbDataMutation({ fixedCacheKey: cacheKeys.caturb });
   const [queryMwturbData, queryMwturbDataResult] = useQueryMwturbDataMutation({ fixedCacheKey: cacheKeys.mwturb });
@@ -720,7 +721,6 @@ const RouteProfileDataLoader = () => {
     queryNbmWindSpeedResult.reset();
     queryNbmWx1Result.reset();
     queryNbmAllAirportResult.reset();
-    getDepartureAdvisorDataResult.reset();
   }
 
   function queryGfsWindSpeed(dependencyResult: {
@@ -982,7 +982,7 @@ const RouteProfileDataLoader = () => {
 
   function readNbmProperties(time: Date, segmentIndex): NbmProperties {
     const { value: cloudbase, time: forecastTime } = getValueFromDatasetByElevation(
-      queryNbmCloudbaseResult.data,
+      queryNbmFlightCatResult.data?.cloudbase,
       time,
       null,
       segmentIndex,
@@ -1119,6 +1119,13 @@ const RouteProfileDataLoader = () => {
       queryNbmAllAirports({ queryPoints: airportPoints });
     dispatch(setRouteSegments(segments));
   }
+
+  useEffect(() => {
+    const hour = new Date(observationTime);
+    hour.setMinutes(0, 0, 0);
+    setHourState(hour.getTime());
+  }, [observationTime]);
+
   useEffect(() => {
     if (activeRoute && isLoadedAirports) {
       buildSegments();
@@ -1128,7 +1135,7 @@ const RouteProfileDataLoader = () => {
     queryGfsWindDirectionDataResult.isSuccess,
     queryNbmFlightCatResult.isSuccess,
     queryNbmWx1Result.isSuccess,
-    observationTime,
+    hourState,
     userSettings.true_airspeed,
     activeRoute,
   ]);

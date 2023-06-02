@@ -217,7 +217,7 @@ const LeafletMap = () => {
         </Dialog>
       </MapContainer>
       {isShowDateModal && <DateSliderModal setIsShowDateModal={setIsShowDateModal} />}
-      <DepartureAdvisor />
+      <DepartureAdvisor showPast={true} />
     </div>
   );
 };

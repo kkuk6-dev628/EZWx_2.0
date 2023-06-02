@@ -356,7 +356,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     fixedCacheKey: cacheKeys.departureAdvisor,
   });
 
-  const { data: airportNbmData } = useGetAirportNbmQuery(
+  const { data: airportNbmData, isSuccess: isAirportNbmLoaded } = useGetAirportNbmQuery(
     activeRoute ? [activeRoute.departure.key, activeRoute.destination.key] : [],
     {
       skip: activeRoute === null,
@@ -409,9 +409,14 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       setEndMargin(end);
       const stops = getTimeGradientStops(times);
       setGradientStops(stops);
-      buildAirportLabelSeries();
     }
   }, [segments, routeProfileApiState.maxAltitude]);
+
+  useEffect(() => {
+    if (segments.length > 0 && airportNbmData && isAirportNbmLoaded) {
+      buildAirportLabelSeries();
+    }
+  }, [isAirportNbmLoaded, segments]);
 
   useEffect(() => {
     window.addEventListener('resize', handleWindowSizeChange);
@@ -466,6 +471,9 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         tooltip: {
           time: forecastTime,
           clouds: makeSkyConditions(cloudbase, cloudceiling, skycover),
+          ceiling: cloudceiling,
+          lowestCloud: cloudbase,
+          skycover,
           weather: makeWeatherString(
             segment.segmentNbmProps.wx_1,
             1,
@@ -508,14 +516,14 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           fontSize: segmentIndex === 0 || segmentIndex === segmentsCount - 1 ? 14 : 11,
           fontWeight: 600,
         };
-        weatherSeries.push(buildWeatherSeries(seg, segmentIndex));
+        const weatherData = buildWeatherSeries(seg, segmentIndex);
+        weatherSeries.push(weatherData);
         if (seg.airportNbmProps) {
           labelStyle.fill = getFlightCategoryColor(seg.airportNbmProps.visibility, seg.airportNbmProps.cloudceiling);
           const lowestCloud = seg.airportNbmProps.cloudbase;
           const ceiling = seg.airportNbmProps.cloudceiling;
           const skyCover = seg.airportNbmProps.skycover;
           const skyConditionsAsc = makeSkyConditions(lowestCloud, ceiling, skyCover);
-          const { data: forCrosswind } = getAirportNbmData(airportNbmData, seg.arriveTime, seg.airport?.key);
           tooltip = {
             time: seg.airportNbmProps.time,
             clouds: skyConditionsAsc,
@@ -527,9 +535,31 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             windgust: seg.airportNbmProps.gust,
             temperature: seg.airportNbmProps.temperature,
             dewpoint: seg.airportNbmProps.dewpoint,
-            crosscom: forCrosswind?.cross_com,
-            crossRunwayId: forCrosswind?.cross_r_id,
           };
+          if (segmentIndex === 0 || segmentIndex === segments.length - 1) {
+            const { data: forCrosswind } = getAirportNbmData(airportNbmData, seg.arriveTime, seg.airport?.key);
+            tooltip.crosscom = forCrosswind?.cross_com;
+            tooltip.crossRunwayId = forCrosswind?.cross_r_id;
+          }
+        } else {
+          labelStyle.fill = getFlightCategoryColor(seg.segmentNbmProps.visibility, seg.segmentNbmProps.cloudceiling);
+          tooltip = {
+            time: seg.arriveTime,
+            clouds: weatherData.tooltip.clouds,
+            ceiling: weatherData.tooltip.ceiling,
+            lowestCloud: weatherData.tooltip.lowestCloud,
+            visibility: seg.segmentNbmProps.visibility,
+            windspeed: seg.segmentNbmProps.windspeed,
+            winddir: seg.segmentNbmProps.winddir,
+            windgust: seg.segmentNbmProps.gust,
+            temperature: seg.segmentNbmProps.temperature,
+            dewpoint: seg.segmentNbmProps.dewpoint,
+          };
+          if (segmentIndex === 0 || segmentIndex === segments.length - 1) {
+            const { data: forCrosswind } = getAirportNbmData(airportNbmData, seg.arriveTime, seg.airport?.key);
+            tooltip.crosscom = forCrosswind?.cross_com;
+            tooltip.crossRunwayId = forCrosswind?.cross_r_id;
+          }
         }
         let airportDist = 0;
         if (segmentIndex > 0 && seg.airport) {

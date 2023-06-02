@@ -26,6 +26,7 @@ import {
   useQueryNbmCloudCeilingMutation,
   useQueryNbmCloudbaseMutation,
   useQueryNbmSkycoverMutation,
+  useGetDepartureAdvisorDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import RouteProfileChart from './RouteProfileChart';
@@ -107,6 +108,9 @@ const CloudsChart = (props) => {
   const [, queryhumidityDataResult] = useQueryHumidityDataMutation({
     fixedCacheKey: cacheKeys.gfsHumidity,
   });
+  const [, getDepartureAdvisorDataResult] = useGetDepartureAdvisorDataMutation({
+    fixedCacheKey: cacheKeys.departureAdvisor,
+  });
 
   function getElevationByPosition(position: { lat: number; lng: number }, inFeet = true): number {
     if (!queryElevationsResult.data || !queryElevationsResult.data.geoPoints) {
@@ -158,7 +162,7 @@ const CloudsChart = (props) => {
             index * flightCategoryDivide,
           );
           let { value: cloudceiling } = getValueFromDatasetByElevation(
-            queryNbmFlightCatResult.data?.cloudceiling,
+            getDepartureAdvisorDataResult.data?.cloudceiling,
             new Date(segment.arriveTime),
             null,
             index * flightCategoryDivide,
@@ -224,7 +228,7 @@ const CloudsChart = (props) => {
             }
           });
 
-          const icingSevData = getValuesFromDatasetAllElevationByTime(
+          const icingSevData = getValuesFromDatasetAllElevationByElevation(
             queryIcingSevDataResult.data,
             new Date(segment.arriveTime),
             index,

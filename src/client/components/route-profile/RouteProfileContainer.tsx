@@ -324,7 +324,7 @@ const RouteProfileContainer = () => {
             </div>
           </div>
         </div>
-        <DepartureAdvisor />
+        <DepartureAdvisor showPast={false} />
       </>
     )
   );
