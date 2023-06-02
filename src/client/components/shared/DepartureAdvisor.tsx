@@ -369,12 +369,64 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     },
   );
 
+  const blockhours = 3;
+  const stepsPerHour = 12;
+  const timeRange = props.showPast ? 84 : 72;
   const [currEval, setCurrEval] = useState(initialEvaluation);
   const [beforeEval, setBeforeEval] = useState(initialEvaluation);
   const [afterEval, setAfterEval] = useState(initialEvaluation);
   const [colorByTimes, setColorByTimes] = useState(Array.from({ length: 8 }));
   const [day, setDay] = useState(0);
   const [hour, setHour] = useState(0);
+  const blockCount = timeRange / blockhours;
+
+  const maxRange = timeRange * stepsPerHour;
+  const blockInterval = blockhours * stepsPerHour;
+  const startTime = getTimeRangeStart(props.showPast);
+  startTime.setUTCHours(startTime.getUTCHours() + 1, 0, 0, 0);
+  const [blockTimes] = useState(
+    Array.from({ length: blockCount }, (_v, index) => {
+      const time = new Date(startTime);
+      time.setUTCHours(time.getUTCHours() + index * 3);
+      return time;
+    }),
+  );
+
+  const [blockDays] = useState(() => {
+    const startDate = startTime.getUTCDate();
+    const endTime = new Date(startTime);
+    endTime.setHours(startTime.getHours() + timeRange);
+    const endDate = endTime.getUTCDate();
+    return Array.from({ length: endDate - startDate + 1 }, (_, i) => {
+      const date = new Date(startTime);
+      date.setUTCDate(i + startDate);
+      let width = 24 / timeRange;
+      if (i === 0) {
+        width = (24 - startTime.getUTCHours()) / timeRange;
+      } else if (i === endDate - startDate) {
+        width = endTime.getUTCHours() / timeRange;
+      }
+      return {
+        date: date.toDateString(),
+        width: width * 100,
+      };
+    });
+  });
+
+  // useEffect(() => {
+  //   window.addEventListener('resize', handleWindowSizeChange);
+  //   return () => {
+  //     window.removeEventListener('resize', handleWindowSizeChange);
+  //   };
+  // }, []);
+
+  // const handleWindowSizeChange = () => {
+  //   if (window.innerWidth >= 1000) {
+  //     setBlockCount(28);
+  //   } else if (window.innerWidth > 720) {
+  //     setBlockCount(16);
+  //   }
+  // };
 
   useEffect(() => {
     const day = new Date(settingsState.observation_time).getUTCDay();
@@ -457,9 +509,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       const queryPoints = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide, true);
       const currentHour = new Date();
       currentHour.setMinutes(0, 0, 0);
-      const evalByTimes: string[] = Array.from({ length: 8 }, (_value, index) => {
-        const time = new Date(settingsState.observation_time);
-        time.setUTCHours((index + 1) * 3);
+      const evalByTimes: string[] = blockTimes.map((time, index) => {
         if (currentHour > time) {
           return personalMinValueToColor[10];
         } else {
@@ -515,7 +565,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       });
       setColorByTimes(evalByTimes);
     }
-  }, [getDepartureAdvisorDataResult.isSuccess, day]);
+  }, [getDepartureAdvisorDataResult.isSuccess, activeRoute]);
 
   useEffect(() => {
     if (!hideDotsBars) {
@@ -753,12 +803,6 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     handleTimeChange(new Date(newTime), true);
   }
 
-  function handleClickHour(hour: number) {
-    const oldTime = new Date(settingsState.observation_time);
-    settingsState.default_time_display_unit ? oldTime.setHours(hour, 0, 0, 0) : oldTime.setUTCHours(hour, 0, 0, 0);
-    handleTimeChange(oldTime, true);
-  }
-
   return (
     <div className="departure-advisor">
       <div className="blocks-container">
@@ -766,34 +810,21 @@ function DepartureAdvisor(props: { showPast: boolean }) {
           -3h
         </div>
         <div className="blocks-date">
-          <div className="horizental-blocks">
-            <div className={`block ${colorByTimes[0]}`} onClick={() => handleClickHour(3)}>
-              3z
+          <div className="blocks-contents">
+            <div className="horizental-blocks">
+              {blockTimes.map((time, index) => (
+                <div className={`block ${colorByTimes[index]}`} onClick={() => handleTimeChange(time)}>
+                  {time.getUTCHours()}z
+                </div>
+              ))}
             </div>
-            <div className={`block ${colorByTimes[1]}`} onClick={() => handleClickHour(6)}>
-              6z
+            <div className="date-container">
+              {blockDays.map((item, index) => (
+                <div className="date" style={{ width: item.width + '%' }}>
+                  {item.date}
+                </div>
+              ))}
             </div>
-            <div className={`block ${colorByTimes[2]}`} onClick={() => handleClickHour(9)}>
-              9z
-            </div>
-            <div className={`block ${colorByTimes[3]}`} onClick={() => handleClickHour(12)}>
-              12z
-            </div>
-            <div className={`block ${colorByTimes[4]}`} onClick={() => handleClickHour(15)}>
-              15z
-            </div>
-            <div className={`block ${colorByTimes[5]}`} onClick={() => handleClickHour(18)}>
-              18z
-            </div>
-            <div className={`block ${colorByTimes[6]}`} onClick={() => handleClickHour(21)}>
-              21z
-            </div>
-            <div className={`block ${colorByTimes[7]}`} onClick={() => handleClickHour(24)}>
-              24z
-            </div>
-          </div>
-          <div className="date">
-            {simpleTimeFormat(new Date(settingsState.observation_time), settingsState.default_time_display_unit)}
           </div>
         </div>
         <div className="move-right" onClick={() => handleClick3h(true)}>
@@ -806,7 +837,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         aria-label="Time Slider"
         // defaultValue={timeToValue(defaultTime)}
         value={timeToValue(defaultTime)}
-        max={props.showPast ? 84 * 12 : 72 * 12}
+        max={maxRange}
         valueLabelFormat={valuetext}
         step={1}
         valueLabelDisplay="on"

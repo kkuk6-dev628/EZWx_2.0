@@ -245,11 +245,13 @@
     width: 100%;
     justify-content: space-between;
     color: black;
-    .blocks-date{
+    .blocks-contents{
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      width: calc(100% - 80px);
+      width: calc(100vw - 80px);
+      min-width: 960px;
+      height: 100%;
       .horizental-blocks{
         display: flex;
         justify-content: space-between;
@@ -258,15 +260,20 @@
           height: 20px;
           font-size: 14px;
           border-radius: 4px;
+          margin: 1px;
           cursor: pointer;
         }
       }
-      .date{
-        background-color: aliceblue;
-        height: 20px;
-        font-size: 15px;
-        font-weight: 600;
-        border-radius: 4px;
+      .date-container{
+        display: flex;
+        .date{
+          background-color: aliceblue;
+          height: 20px;
+          font-size: 15px;
+          font-weight: 600;
+          border-radius: 4px;
+          margin: 0 1px;
+        }
       }
     }
     .move-left, .move-right{
