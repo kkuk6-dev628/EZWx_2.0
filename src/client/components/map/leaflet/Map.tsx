@@ -22,7 +22,7 @@ import Paper from '@material-ui/core/Paper';
 import Draggable from 'react-draggable';
 import Route from '../../shared/Route';
 import DepartureAdvisor from '../../shared/DepartureAdvisor';
-import DateSliderModal from '../../shared/DateSliderModal';
+import DepartureAdvisorPopup from '../../shared/DepartureAdvisorPopup';
 import MeteoLayers from './layers/MeteoLayers';
 // import './plugins/CacheTileLayer';
 import { useDispatch } from 'react-redux';
@@ -216,7 +216,7 @@ const LeafletMap = () => {
           <Route setIsShowModal={setIsShowModal} />
         </Dialog>
       </MapContainer>
-      {isShowDateModal && <DateSliderModal setIsShowDateModal={setIsShowDateModal} />}
+      {isShowDateModal && <DepartureAdvisorPopup setIsShowDateModal={setIsShowDateModal} />}
       <DepartureAdvisor showPast={true} />
     </div>
   );

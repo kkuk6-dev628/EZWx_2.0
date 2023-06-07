@@ -1,25 +1,50 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import DateSlider from './DateSlider';
 
 //i pass setIsShowModal and showModal as a prop to the modal component
 interface Props {
   setIsShowDateModal: (isShowModal: boolean) => void;
+  evaluationsByTime: any[];
+  observationTime: number;
 }
 
-function DateSliderModal({ setIsShowDateModal }: Props) {
+function DepartureAdvisorPopup({ setIsShowDateModal, evaluationsByTime, observationTime }: Props) {
+  const [currentTime, setCurrentTime] = useState(observationTime);
+  const [evaluation, setEvaluation] = useState();
+  useEffect(() => {
+    const evaluation = evaluationsByTime.reduce((prev, curr) => {
+      const diffPrev = currentTime - prev.time;
+      const diffCurr = currentTime - curr.time;
+      if (diffCurr > 0 && diffCurr < diffPrev) {
+        return curr;
+      }
+      return prev;
+    });
+    setEvaluation(evaluation.evaluation);
+  }, [currentTime]);
   return (
     <div className="dates">
       <div className="dates__wrp">
         <div className="dates__top">
-          <p className="dates__top__text text">Date slider</p>
+          <p className="dates__top__text text">Departure Advisor</p>
           <button onClick={() => setIsShowDateModal(false)} className="dates__top__close">
             <AiOutlineClose className="dates__icon" />
           </button>
         </div>
         <div className="dates__content">
           <div className="dates__date__area">
-            <DateSlider />
+            <div>
+              <b>Time:</b>
+            </div>
+            <p>
+              {new Date(currentTime).toLocaleDateString('en-US', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'numeric',
+                timeZone: 'UTC',
+              })}
+            </p>
           </div>
           <div className="dates__data__area">
             <div className="dates__circle dates__circle__red">&nbsp;</div>
@@ -71,4 +96,4 @@ function DateSliderModal({ setIsShowDateModal }: Props) {
   );
 }
 
-export default DateSliderModal;
+export default DepartureAdvisorPopup;

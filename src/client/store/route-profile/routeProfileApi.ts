@@ -208,6 +208,12 @@ export const routeProfileApi = createApi({
           severity: transformTimeBands(response.severity),
           cloudceiling: transformTimeBands(response.cloudceiling),
           visibility: transformTimeBands(response.visibility),
+          wx_1: transformTimeBands(response.wx_1),
+          wx_2: transformTimeBands(response.wx_2),
+          wxInten1: transformTimeBands(response.wxInten1),
+          wxInten2: transformTimeBands(response.wxInten2),
+          wxProbCov1: transformTimeBands(response.wxProbCov1),
+          wxProbCov2: transformTimeBands(response.wxProbCov2),
         };
       },
     }),

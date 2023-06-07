@@ -78,3 +78,18 @@ export class NbmWindSpeed extends RasterMapping {}
 
 @Entity('nbm_wx_1')
 export class NbmWx1 extends RasterMapping {}
+
+@Entity('nbm_wx_2')
+export class NbmWx2 extends RasterMapping {}
+
+@Entity('nbm_wx_inten_1')
+export class NbmWxInten1 extends RasterMapping {}
+
+@Entity('nbm_wx_inten_2')
+export class NbmWxInten2 extends RasterMapping {}
+
+@Entity('nbm_wx_prob_cov_1')
+export class NbmWxProbCov1 extends RasterMapping {}
+
+@Entity('nbm_wx_prob_cov_2')
+export class NbmWxProbCov2 extends RasterMapping {}

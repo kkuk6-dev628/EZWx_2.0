@@ -416,7 +416,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     if (segments.length > 0 && airportNbmData && isAirportNbmLoaded) {
       buildAirportLabelSeries();
     }
-  }, [isAirportNbmLoaded, segments]);
+  }, [isAirportNbmLoaded, segments, routeProfileApiState.maxAltitude]);
 
   useEffect(() => {
     window.addEventListener('resize', handleWindowSizeChange);
@@ -456,6 +456,64 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         null,
         segmentIndex * flightCategoryDivide,
       );
+      const { value: wx_1 } = getValueFromDatasetByElevation(
+        getDepartureAdvisorDataResult.data?.wx_1,
+        new Date(segment.arriveTime),
+        null,
+        segmentIndex * flightCategoryDivide,
+      );
+      const { value: wx_2 } = getValueFromDatasetByElevation(
+        getDepartureAdvisorDataResult.data?.wx_2,
+        new Date(segment.arriveTime),
+        null,
+        segmentIndex * flightCategoryDivide,
+      );
+      const { value: wxInten1 } = getValueFromDatasetByElevation(
+        getDepartureAdvisorDataResult.data?.wxInten1,
+        new Date(segment.arriveTime),
+        null,
+        segmentIndex * flightCategoryDivide,
+      );
+      const { value: wxInten2 } = getValueFromDatasetByElevation(
+        getDepartureAdvisorDataResult.data?.wxInten2,
+        new Date(segment.arriveTime),
+        null,
+        segmentIndex * flightCategoryDivide,
+      );
+      const { value: wxProbCov1 } = getValueFromDatasetByElevation(
+        getDepartureAdvisorDataResult.data?.wxProbCov1,
+        new Date(segment.arriveTime),
+        null,
+        segmentIndex * flightCategoryDivide,
+      );
+      const { value: wxProbCov2 } = getValueFromDatasetByElevation(
+        getDepartureAdvisorDataResult.data?.wxProbCov2,
+        new Date(segment.arriveTime),
+        null,
+        segmentIndex * flightCategoryDivide,
+      );
+      const weather1 = makeWeatherString(
+        wx_1,
+        wxProbCov1,
+        wxInten1,
+        skycover,
+        segment.segmentNbmProps.windspeed,
+        segment.segmentNbmProps.gust,
+        false,
+      );
+      const weathers = [weather1];
+      if (wx_2 && wx_2 !== -9999) {
+        const weather2 = makeWeatherString(
+          wx_2,
+          wxProbCov2,
+          wxInten2,
+          skycover,
+          segment.segmentNbmProps.windspeed,
+          segment.segmentNbmProps.gust,
+          false,
+        );
+        weathers.push(weather2);
+      }
       const color = getFlightCategoryColor(visibility, cloudceiling);
       const icon = getNbmWeatherMarkerIcon(
         segment.segmentNbmProps.wx_1,
@@ -474,15 +532,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           ceiling: cloudceiling,
           lowestCloud: cloudbase,
           skycover,
-          weather: makeWeatherString(
-            segment.segmentNbmProps.wx_1,
-            1,
-            2,
-            skycover,
-            segment.segmentNbmProps.windspeed,
-            segment.segmentNbmProps.gust,
-            false,
-          ),
+          weathers: weathers,
         },
         customComponent: () => {
           return (
@@ -1015,11 +1065,22 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                   })}
                 </div>
               </div>
-
-              <span>
-                <b>Weather:</b>&nbsp;
-                {weatherHint.tooltip.weather}
-              </span>
+              <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
+                <div>
+                  <p style={{ marginTop: 3 }}>
+                    <b>Weather: </b>
+                  </p>
+                </div>
+                <div style={{ margin: 3, marginTop: -3 }}>
+                  {weatherHint.tooltip.weathers.map((weather, index) => {
+                    return (
+                      <div key={`weather-${index}`} style={{ marginTop: 6, marginBottom: 2 }}>
+                        {weather}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </Hint>
           )}
           {flightCatHint && (

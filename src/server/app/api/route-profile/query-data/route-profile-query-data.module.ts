@@ -20,6 +20,11 @@ import {
   NbmWindDirection,
   NbmWindSpeed,
   NbmWx1,
+  NbmWx2,
+  NbmWxInten1,
+  NbmWxInten2,
+  NbmWxProbCov1,
+  NbmWxProbCov2,
 } from './route-profile.gisdb-entity';
 import { RouteProfileQueryDataController } from './route-profile-query-data.controller';
 import { RouteProfileQueryDataService } from './route-profile-query-data.service';
@@ -45,6 +50,11 @@ import { RouteProfileQueryDataService } from './route-profile-query-data.service
     TypeOrmModule.forFeature([NbmWindDirection], 'gisDB'),
     TypeOrmModule.forFeature([NbmWindSpeed], 'gisDB'),
     TypeOrmModule.forFeature([NbmWx1], 'gisDB'),
+    TypeOrmModule.forFeature([NbmWx2], 'gisDB'),
+    TypeOrmModule.forFeature([NbmWxInten1], 'gisDB'),
+    TypeOrmModule.forFeature([NbmWxInten2], 'gisDB'),
+    TypeOrmModule.forFeature([NbmWxProbCov1], 'gisDB'),
+    TypeOrmModule.forFeature([NbmWxProbCov2], 'gisDB'),
   ],
   controllers: [RouteProfileQueryDataController],
   providers: [RouteProfileQueryDataService],

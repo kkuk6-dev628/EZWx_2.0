@@ -22,6 +22,11 @@ import {
   NbmWindDirection,
   NbmWindSpeed,
   NbmWx1,
+  NbmWx2,
+  NbmWxInten1,
+  NbmWxInten2,
+  NbmWxProbCov1,
+  NbmWxProbCov2,
 } from './route-profile.gisdb-entity';
 import { RouteProfileQueryDto } from './route-profile-query.dto';
 import { dynamicImport } from 'tsimportlib';
@@ -70,6 +75,16 @@ export class RouteProfileQueryDataService {
     private nbmWindSpeedRepository: Repository<NbmWindSpeed>,
     @InjectRepository(NbmWx1, 'gisDB')
     private nbmWx1Repository: Repository<NbmWx1>,
+    @InjectRepository(NbmWx2, 'gisDB')
+    private nbmWx2Repository: Repository<NbmWx2>,
+    @InjectRepository(NbmWxInten1, 'gisDB')
+    private nbmWxInten1Repository: Repository<NbmWxInten1>,
+    @InjectRepository(NbmWxInten2, 'gisDB')
+    private nbmWxInten2Repository: Repository<NbmWxInten2>,
+    @InjectRepository(NbmWxProbCov1, 'gisDB')
+    private nbmWxProbCov1Repository: Repository<NbmWxProbCov1>,
+    @InjectRepository(NbmWxProbCov2, 'gisDB')
+    private nbmWxProbCov2Repository: Repository<NbmWxProbCov2>,
     @InjectDataSource('gisDB')
     private dataSource: DataSource,
   ) {}
@@ -285,7 +300,26 @@ export class RouteProfileQueryDataService {
     );
     const cloudceiling = await this.queryRasterDataset(query.queryPoints, this.nbmCloudCeilingRepository);
     const visibility = await this.queryRasterDataset(query.queryPoints, this.nbmVisRepository);
-    return { cat, mwt, prob, severity, cloudceiling, visibility };
+    const wx_1 = await this.queryRasterDataset(query.queryPoints, this.nbmWx1Repository);
+    const wx_2 = await this.queryRasterDataset(query.queryPoints, this.nbmWx2Repository);
+    const wxInten1 = await this.queryRasterDataset(query.queryPoints, this.nbmWxInten1Repository);
+    const wxInten2 = await this.queryRasterDataset(query.queryPoints, this.nbmWxInten2Repository);
+    const wxProbCov1 = await this.queryRasterDataset(query.queryPoints, this.nbmWxProbCov1Repository);
+    const wxProbCov2 = await this.queryRasterDataset(query.queryPoints, this.nbmWxProbCov2Repository);
+    return {
+      cat,
+      mwt,
+      prob,
+      severity,
+      cloudceiling,
+      visibility,
+      wx_1,
+      wx_2,
+      wxInten1,
+      wxInten2,
+      wxProbCov1,
+      wxProbCov2,
+    };
   }
 
   async queryAirportNbm(query: { faaids: string }) {

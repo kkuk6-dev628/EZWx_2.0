@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import Slider from '@mui/material/Slider';
 import React, { useEffect, useState } from 'react';
-import { diffMinutes, getTimeRangeStart, simpleTimeFormat, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
+import {
+  addLeadingZeroes,
+  diffMinutes,
+  getTimeRangeStart,
+  simpleTimeFormat,
+  simpleTimeOnlyFormat,
+} from '../map/common/AreoFunctions';
 import { useDispatch, useSelector } from 'react-redux';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { PersonalMinimums, selectSettings, setUserSettings } from '../../store/user/UserSettings';
@@ -26,6 +32,8 @@ import fly from '../../fly-js/fly';
 import { getAirportNbmData } from '../route-profile/RouteProfileChart';
 import { UserSettings } from '../../interfaces/users';
 import { jsonClone } from '../utils/ObjectUtil';
+import { DateObject } from 'react-multi-date-picker';
+import DepartureAdvisorPopup from './DepartureAdvisorPopup';
 
 type personalMinValue = 0 | 1 | 2 | 10;
 type personalMinColor = 'red' | 'yellow' | 'green' | 'grey';
@@ -60,6 +68,7 @@ const personalMinValueToShape: { 0: personalMinShape; 1: personalMinShape; 2: pe
     2: 'circle',
     10: 'rect',
   };
+const hourInMili = 3600 * 1000;
 
 const initialEvaluation: PersonalMinsEvaluation = {
   departureCeiling: {
@@ -112,6 +121,495 @@ const initialEvaluation: PersonalMinsEvaluation = {
   },
 };
 
+// return values 0: None, 1: Very Low, 2: Low, 3: Mod, 4: Hi, 5: Very Hi
+function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxProbCov1, wxProbCov2) {
+  if (wx_1 === 5 && wx_2 === 4) {
+    switch (wxProbCov1) {
+      case 1:
+        switch (wxProbCov2) {
+          case 5:
+            switch (wxInten1) {
+              case 1:
+                return 1;
+                break;
+              case 2:
+                return 2;
+                break;
+              case 3:
+                return 3;
+                break;
+            }
+            break;
+          case 6:
+            switch (wxInten1) {
+              case 1:
+                return 2;
+                break;
+              case 2:
+                return 3;
+                break;
+              case 3:
+                return 4;
+                break;
+            }
+            break;
+          case 7:
+            switch (wxInten1) {
+              case 1:
+                return 3;
+                break;
+              case 2:
+                return 4;
+                break;
+              case 3:
+                return 5;
+                break;
+            }
+            break;
+        }
+        break;
+      case 2:
+        switch (wxProbCov2) {
+          case 5:
+            switch (wxInten1) {
+              case 1:
+                return 2;
+                break;
+              case 2:
+                return 3;
+                break;
+              case 3:
+                return 4;
+                break;
+            }
+            break;
+          case 6:
+            switch (wxInten1) {
+              case 1:
+                return 3;
+                break;
+              case 2:
+                return 4;
+                break;
+              case 3:
+                return 5;
+                break;
+            }
+            break;
+          case 7:
+            switch (wxInten1) {
+              case 1:
+                return 3;
+                break;
+              case 2:
+                return 4;
+                break;
+              case 3:
+                return 5;
+                break;
+            }
+            break;
+        }
+        break;
+      case 3:
+        switch (wxProbCov2) {
+          case 5:
+            switch (wxInten1) {
+              case 1:
+                return 3;
+                break;
+              case 2:
+                return 4;
+                break;
+              case 3:
+                return 5;
+                break;
+            }
+            break;
+          case 6:
+            switch (wxInten1) {
+              case 1:
+                return 3;
+                break;
+              case 2:
+                return 4;
+                break;
+              case 3:
+                return 4;
+                break;
+            }
+            break;
+          case 7:
+            switch (wxInten1) {
+              case 1:
+                return 4;
+                break;
+              case 2:
+                return 5;
+                break;
+              case 3:
+                return 5;
+                break;
+            }
+            break;
+        }
+        break;
+      case 4:
+        switch (wxProbCov2) {
+          case 5:
+            switch (wxInten1) {
+              case 1:
+                return 3;
+                break;
+              case 2:
+                return 4;
+                break;
+              case 3:
+                return 4;
+                break;
+            }
+            break;
+          case 6:
+            switch (wxInten1) {
+              case 1:
+                return 3;
+                break;
+              case 2:
+                return 4;
+                break;
+              case 3:
+                return 5;
+                break;
+            }
+            break;
+          case 7:
+            switch (wxInten1) {
+              case 1:
+                return 4;
+                break;
+              case 2:
+                return 5;
+                break;
+              case 3:
+                return 5;
+                break;
+            }
+            break;
+        }
+        break;
+    }
+  } else if (wx_1 === 4 && wx_2 === 5) {
+    switch (wxProbCov2) {
+      case 1:
+        switch (wxProbCov1) {
+          case 5:
+            switch (wxInten1) {
+              case 1:
+                return 1;
+                break;
+              case 2:
+                return 2;
+                break;
+              case 3:
+                return 3;
+                break;
+            }
+            break;
+          case 6:
+            switch (wxInten1) {
+              case 1:
+                return 2;
+                break;
+              case 2:
+                return 3;
+                break;
+              case 3:
+                return 4;
+                break;
+            }
+            break;
+          case 7:
+            switch (wxInten1) {
+              case 1:
+                return 3;
+                break;
+              case 2:
+                return 4;
+                break;
+              case 3:
+                return 5;
+                break;
+            }
+            break;
+        }
+        break;
+      case 2:
+        switch (wxProbCov1) {
+          case 5:
+            switch (wxInten1) {
+              case 1:
+                return 2;
+                break;
+              case 2:
+                return 3;
+                break;
+              case 3:
+                return 4;
+                break;
+            }
+            break;
+          case 6:
+            switch (wxInten1) {
+              case 1:
+                return 3;
+                break;
+              case 2:
+                return 4;
+                break;
+              case 3:
+                return 5;
+                break;
+            }
+            break;
+          case 7:
+            switch (wxInten1) {
+              case 1:
+                return 3;
+                break;
+              case 2:
+                return 4;
+                break;
+              case 3:
+                return 5;
+                break;
+            }
+            break;
+        }
+        break;
+      case 3:
+        switch (wxProbCov1) {
+          case 5:
+            switch (wxInten1) {
+              case 1:
+                return 3;
+                break;
+              case 2:
+                return 4;
+                break;
+              case 3:
+                return 5;
+                break;
+            }
+            break;
+          case 6:
+            switch (wxInten1) {
+              case 1:
+                return 3;
+                break;
+              case 2:
+                return 4;
+                break;
+              case 3:
+                return 4;
+                break;
+            }
+            break;
+          case 7:
+            switch (wxInten1) {
+              case 1:
+                return 4;
+                break;
+              case 2:
+                return 5;
+                break;
+              case 3:
+                return 5;
+                break;
+            }
+            break;
+        }
+        break;
+      case 4:
+        switch (wxProbCov1) {
+          case 5:
+            switch (wxInten1) {
+              case 1:
+                return 3;
+                break;
+              case 2:
+                return 4;
+                break;
+              case 3:
+                return 4;
+                break;
+            }
+            break;
+          case 6:
+            switch (wxInten1) {
+              case 1:
+                return 3;
+                break;
+              case 2:
+                return 4;
+                break;
+              case 3:
+                return 5;
+                break;
+            }
+            break;
+          case 7:
+            switch (wxInten1) {
+              case 1:
+                return 4;
+                break;
+              case 2:
+                return 5;
+                break;
+              case 3:
+                return 5;
+                break;
+            }
+            break;
+        }
+        break;
+    }
+  } else if (wx_1 === 5 && wx_2 !== 4) {
+    switch (wxProbCov1) {
+      case 1:
+        switch (wxInten1) {
+          case 1:
+            return 1;
+            break;
+          case 2:
+            return 2;
+            break;
+          case 3:
+            return 3;
+            break;
+        }
+        break;
+      case 2:
+        switch (wxInten1) {
+          case 1:
+            return 2;
+            break;
+          case 2:
+            return 3;
+            break;
+          case 3:
+            return 4;
+            break;
+        }
+        break;
+      case 3:
+        switch (wxInten1) {
+          case 1:
+            return 3;
+            break;
+          case 2:
+            return 4;
+            break;
+          case 3:
+            return 5;
+            break;
+        }
+        break;
+      case 4:
+        switch (wxInten1) {
+          case 1:
+            return 4;
+            break;
+          case 2:
+            return 4;
+            break;
+          case 3:
+            return 5;
+            break;
+        }
+        break;
+    }
+  } else if (wx_2 === 5 && wx_1 !== 4) {
+    switch (wxProbCov2) {
+      case 1:
+        switch (wxInten2) {
+          case 1:
+            return 1;
+            break;
+          case 2:
+            return 2;
+            break;
+          case 3:
+            return 3;
+            break;
+        }
+        break;
+      case 2:
+        switch (wxInten2) {
+          case 1:
+            return 2;
+            break;
+          case 2:
+            return 3;
+            break;
+          case 3:
+            return 4;
+            break;
+        }
+        break;
+      case 3:
+        switch (wxInten2) {
+          case 1:
+            return 3;
+            break;
+          case 2:
+            return 4;
+            break;
+          case 3:
+            return 5;
+            break;
+        }
+        break;
+      case 4:
+        switch (wxInten2) {
+          case 1:
+            return 4;
+            break;
+          case 2:
+            return 4;
+            break;
+          case 3:
+            return 5;
+            break;
+        }
+        break;
+    }
+  } else if (wx_1 === 4 && wx_2 !== 5) {
+    switch (wxProbCov1) {
+      case 5:
+        return 2;
+        break;
+      case 6:
+        return 3;
+        break;
+      case 7:
+        return 4;
+        break;
+    }
+  } else if (wx_2 === 4 && wx_1 !== 5) {
+    switch (wxProbCov2) {
+      case 5:
+        return 2;
+        break;
+      case 6:
+        return 3;
+        break;
+      case 7:
+        return 4;
+        break;
+    }
+  }
+}
+
 function getWheatherMinimumsAlongRoute(
   positions: LatLng[],
   personalMins: UserSettings,
@@ -137,6 +635,7 @@ function getWheatherMinimumsAlongRoute(
   const icingProbs = [];
   const icingSeverities = [];
   const turbulences = [];
+  const convections = [];
 
   positions.forEach((curr: LatLng, index) => {
     try {
@@ -274,6 +773,44 @@ function getWheatherMinimumsAlongRoute(
         icingProb && icingProbs.push(icingProb);
         icingSeverity && icingSeverities.push(icingSeverity);
         turbulences.push(Math.max(cat, mwt));
+        const { value: wx_1 } = getValueFromDatasetByElevation(
+          departureData.data?.wx_1,
+          new Date(arriveTime),
+          null,
+          index,
+        );
+        const { value: wx_2 } = getValueFromDatasetByElevation(
+          departureData.data?.wx_2,
+          new Date(arriveTime),
+          null,
+          index,
+        );
+        const { value: wxInten1 } = getValueFromDatasetByElevation(
+          departureData.data?.wxInten1,
+          new Date(arriveTime),
+          null,
+          index,
+        );
+        const { value: wxInten2 } = getValueFromDatasetByElevation(
+          departureData.data?.wxInten2,
+          new Date(arriveTime),
+          null,
+          index,
+        );
+        const { value: wxProbCov1 } = getValueFromDatasetByElevation(
+          departureData.data?.wxProbCov1,
+          new Date(arriveTime),
+          null,
+          index,
+        );
+        const { value: wxProbCov2 } = getValueFromDatasetByElevation(
+          departureData.data?.wxProbCov2,
+          new Date(arriveTime),
+          null,
+          index,
+        );
+        const convection = evaluateConvection(wx_1, wx_2, wxInten1, wxInten2, wxProbCov1, wxProbCov2);
+        convection && convections.push(convection);
       }
       accDistance += dist;
       arriveTime = newTime;
@@ -286,6 +823,7 @@ function getWheatherMinimumsAlongRoute(
   const alongIcingProb = Math.max(...icingProbs);
   const alongIcingSeverity = Math.max(...icingSeverities);
   const alongTurbulence = Math.max(...turbulences);
+  const alongConvection = Math.max(...convections);
 
   if (personalMins.ceiling_along_route[0] <= alongCeiling) {
     personalMinsEvaluation.alongRouteCeiling.value = 2;
@@ -342,6 +880,17 @@ function getWheatherMinimumsAlongRoute(
     personalMinsEvaluation.alongRouteTurbulence.color = personalMinValueToColor[0];
   }
 
+  if (personalMins.en_route_convective_potential[0] > alongConvection) {
+    personalMinsEvaluation.alongRouteConvection.value = 2;
+    personalMinsEvaluation.alongRouteConvection.color = personalMinValueToColor[2];
+  } else if (personalMins.en_route_convective_potential[1] > alongConvection) {
+    personalMinsEvaluation.alongRouteConvection.value = 1;
+    personalMinsEvaluation.alongRouteConvection.color = personalMinValueToColor[1];
+  } else {
+    personalMinsEvaluation.alongRouteConvection.value = 0;
+    personalMinsEvaluation.alongRouteConvection.color = personalMinValueToColor[0];
+  }
+
   return personalMinsEvaluation;
 }
 
@@ -349,10 +898,11 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const dispatch = useDispatch();
   const settingsState = useSelector(selectSettings);
   const activeRoute = useSelector(selectActiveRoute);
-  let defaultTime;
+  let currentTime: Date;
   const [updateUserSettingsAPI] = useUpdateUserSettingsMutation();
   const auth = useSelector(selectAuth);
   const [hideDotsBars, setHideDotsBars] = useState(true);
+  const [clickedDotsBars, setClickedDotsBars] = useState(false);
   const [getDepartureAdvisorData, getDepartureAdvisorDataResult] = useGetDepartureAdvisorDataMutation({
     fixedCacheKey: cacheKeys.departureAdvisor,
   });
@@ -376,23 +926,28 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const [beforeEval, setBeforeEval] = useState(initialEvaluation);
   const [afterEval, setAfterEval] = useState(initialEvaluation);
   const [colorByTimes, setColorByTimes] = useState(Array.from({ length: 8 }));
-  const [day, setDay] = useState(0);
   const [hour, setHour] = useState(0);
   const blockCount = timeRange / blockhours;
+  const [currentHour, setCurrentHour] = useState(new Date().getUTCHours());
 
   const maxRange = timeRange * stepsPerHour;
   const blockInterval = blockhours * stepsPerHour;
   const startTime = getTimeRangeStart(props.showPast);
   startTime.setUTCHours(startTime.getUTCHours() + 1, 0, 0, 0);
-  const [blockTimes] = useState(
-    Array.from({ length: blockCount }, (_v, index) => {
+  const [blockTimes, setBlockTimes] = useState(calcBlockTimes());
+  const [blockDays, setBlockDays] = useState(calcBlockDays());
+  const [showPopup, setShowPopup] = useState(false);
+  const [evaluationsByTime, setEvaluationsByTime] = useState<any[]>();
+
+  function calcBlockTimes() {
+    return Array.from({ length: blockCount }, (_v, index) => {
       const time = new Date(startTime);
       time.setUTCHours(time.getUTCHours() + index * 3);
       return time;
-    }),
-  );
+    });
+  }
 
-  const [blockDays] = useState(() => {
+  function calcBlockDays() {
     const startDate = startTime.getUTCDate();
     const endTime = new Date(startTime);
     endTime.setHours(startTime.getHours() + timeRange);
@@ -407,12 +962,23 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         width = endTime.getUTCHours() / timeRange;
       }
       return {
-        date: date.toDateString(),
+        date: date,
         width: width * 100,
       };
     });
-  });
+  }
 
+  useEffect(() => {
+    const days = calcBlockDays();
+    setBlockDays(days);
+    const times = calcBlockTimes();
+    setBlockTimes(times);
+  }, [currentHour]);
+
+  useEffect(() => {
+    const interval = setInterval(() => setCurrentHour(new Date().getHours()), 1000);
+    return () => clearInterval(interval);
+  }, []);
   // useEffect(() => {
   //   window.addEventListener('resize', handleWindowSizeChange);
   //   return () => {
@@ -429,12 +995,11 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   // };
 
   useEffect(() => {
-    const day = new Date(settingsState.observation_time).getUTCDay();
     const hour = new Date(settingsState.observation_time);
     hour.setMinutes(0, 0, 0);
-    setDay(day);
     setHour(hour.getTime());
     setHideDotsBars(false);
+    setClickedDotsBars(false);
   }, [settingsState.observation_time]);
 
   useEffect(() => {
@@ -502,13 +1067,30 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       );
       setAfterEval(afterEvaluation);
     }
-  }, [getDepartureAdvisorDataResult.isSuccess, hour]);
+  }, [
+    getDepartureAdvisorDataResult.isSuccess,
+    hour,
+    activeRoute,
+    settingsState.ceiling_at_departure,
+    settingsState.ceiling_along_route,
+    settingsState.ceiling_at_destination,
+    settingsState.surface_visibility_along_route,
+    settingsState.surface_visibility_at_departure,
+    settingsState.surface_visibility_at_destination,
+    settingsState.crosswinds_at_departure_airport,
+    settingsState.crosswinds_at_destination_airport,
+    settingsState.en_route_icing_intensity,
+    settingsState.en_route_icing_probability,
+    settingsState.en_route_convective_potential,
+    settingsState.en_route_turbulence_intensity,
+  ]);
 
   useEffect(() => {
     if (activeRoute && getDepartureAdvisorDataResult.isSuccess) {
       const queryPoints = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide, true);
       const currentHour = new Date();
       currentHour.setMinutes(0, 0, 0);
+      const evaluationsByTime = [];
       const evalByTimes: string[] = blockTimes.map((time, index) => {
         if (currentHour > time) {
           return personalMinValueToColor[10];
@@ -527,10 +1109,11 @@ function DepartureAdvisor(props: { showPast: boolean }) {
             activeRoute.destination.key,
             airportNbmData,
           );
+          evaluationsByTime.push({ time: time.getTime(), evaluation: evalByTime });
           const evalByTimeBefore = getWheatherMinimumsAlongRoute(
             queryPoints,
             settingsState,
-            time.getTime() - 3600 * 1000,
+            time.getTime() - hourInMili,
             activeRoute.useForecastWinds,
             activeRoute.altitude,
             settingsState.true_airspeed,
@@ -541,10 +1124,11 @@ function DepartureAdvisor(props: { showPast: boolean }) {
             activeRoute.destination.key,
             airportNbmData,
           );
+          evaluationsByTime.push({ time: time.getTime() - hourInMili, evaluation: evalByTimeBefore });
           const evalByTimeAfter = getWheatherMinimumsAlongRoute(
             queryPoints,
             settingsState,
-            time.getTime() + 3600 * 1000,
+            time.getTime() + hourInMili,
             activeRoute.useForecastWinds,
             activeRoute.altitude,
             settingsState.true_airspeed,
@@ -555,6 +1139,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
             activeRoute.destination.key,
             airportNbmData,
           );
+          evaluationsByTime.push({ time: time.getTime() + hourInMili, evaluation: evalByTimeAfter });
           const minValue = Math.min(
             ...Object.values(evalByTime).map((item) => item.value),
             ...Object.values(evalByTimeBefore).map((item) => item.value),
@@ -564,11 +1149,28 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         }
       });
       setColorByTimes(evalByTimes);
+      setEvaluationsByTime(evaluationsByTime);
     }
-  }, [getDepartureAdvisorDataResult.isSuccess, activeRoute]);
+  }, [
+    getDepartureAdvisorDataResult.isSuccess,
+    activeRoute,
+    currentHour,
+    settingsState.ceiling_at_departure,
+    settingsState.ceiling_along_route,
+    settingsState.ceiling_at_destination,
+    settingsState.surface_visibility_along_route,
+    settingsState.surface_visibility_at_departure,
+    settingsState.surface_visibility_at_destination,
+    settingsState.crosswinds_at_departure_airport,
+    settingsState.crosswinds_at_destination_airport,
+    settingsState.en_route_icing_intensity,
+    settingsState.en_route_icing_probability,
+    settingsState.en_route_convective_potential,
+    settingsState.en_route_turbulence_intensity,
+  ]);
 
   useEffect(() => {
-    if (!hideDotsBars) {
+    if (!hideDotsBars && !clickedDotsBars) {
       setHideDotsBars(true);
     }
   }, [settingsState.observation_time, hideDotsBars]);
@@ -585,11 +1187,18 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     return Math.floor(diff / 5);
   };
 
+  function clickEvaluationBar(hour: number, e) {
+    e.stopPropagation();
+    setHideDotsBars(false);
+    setClickedDotsBars(true);
+    setShowPopup(true);
+  }
+
   function valuetext(value: number) {
     return (
       <div className="slider-label-container">
         <div className={'bars-container' + (hideDotsBars ? ' fade-out' : '')}>
-          <div className="bar">
+          <div className="bar" onClick={(e) => clickEvaluationBar(-1, e)}>
             <i
               className={`dot ${beforeEval.departureCeiling.color} ${
                 personalMinValueToShape[beforeEval.departureCeiling.value]
@@ -651,7 +1260,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
               }`}
             ></i>
           </div>
-          <div className="bar">
+          <div className="bar" onClick={(e) => clickEvaluationBar(0, e)}>
             <i
               className={`dot ${currEval.departureCeiling.color} ${
                 personalMinValueToShape[currEval.departureCeiling.value]
@@ -713,7 +1322,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
               }`}
             ></i>
           </div>
-          <div className="bar">
+          <div className="bar" onClick={(e) => clickEvaluationBar(1, e)}>
             <i
               className={`dot ${afterEval.departureCeiling.color} ${
                 personalMinValueToShape[afterEval.departureCeiling.value]
@@ -792,10 +1401,10 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     settingsState.observation_time >= getTimeRangeStart(props.showPast).getTime() &&
     settingsState.observation_time <= valueToTime(84 * 12).getTime()
   ) {
-    defaultTime = new Date(settingsState.observation_time);
+    currentTime = new Date(settingsState.observation_time);
   } else {
-    defaultTime = new Date();
-    handleTimeChange(defaultTime, true);
+    currentTime = new Date();
+    handleTimeChange(currentTime, true);
   }
 
   function handleClick3h(isForward) {
@@ -805,8 +1414,23 @@ function DepartureAdvisor(props: { showPast: boolean }) {
 
   return (
     <div className="departure-advisor">
+      {showPopup && (
+        <DepartureAdvisorPopup
+          setIsShowDateModal={setShowPopup}
+          evaluationsByTime={evaluationsByTime}
+          observationTime={settingsState.observation_time}
+        />
+      )}
       <div className="blocks-container">
-        <div className="move-left" onClick={() => handleClick3h(false)}>
+        <div
+          className={
+            'move-left' +
+            (currentTime.getTime() - blockhours * 3600 * 1000 < getTimeRangeStart(props.showPast).getTime()
+              ? ' disabled'
+              : '')
+          }
+          onClick={() => handleClick3h(false)}
+        >
           -3h
         </div>
         <div className="blocks-date">
@@ -814,20 +1438,33 @@ function DepartureAdvisor(props: { showPast: boolean }) {
             <div className="horizental-blocks">
               {blockTimes.map((time, index) => (
                 <div className={`block ${colorByTimes[index]}`} onClick={() => handleTimeChange(time)}>
-                  {time.getUTCHours()}z
+                  {addLeadingZeroes(time.getUTCHours(), 2)}z
                 </div>
               ))}
             </div>
             <div className="date-container">
               {blockDays.map((item, index) => (
                 <div className="date" style={{ width: item.width + '%' }}>
-                  {item.date}
+                  {item.width > 5
+                    ? item.date.toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        day: 'numeric',
+                        month: 'numeric',
+                        timeZone: 'UTC',
+                      })
+                    : ''}
                 </div>
               ))}
             </div>
           </div>
         </div>
-        <div className="move-right" onClick={() => handleClick3h(true)}>
+        <div
+          className={
+            'move-right' +
+            (currentTime.getTime() + blockhours * 3600 * 1000 > valueToTime(maxRange).getTime() ? ' disabled' : '')
+          }
+          onClick={() => handleClick3h(true)}
+        >
           +3h
         </div>
       </div>
@@ -836,7 +1473,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         key={`time-range-slider`}
         aria-label="Time Slider"
         // defaultValue={timeToValue(defaultTime)}
-        value={timeToValue(defaultTime)}
+        value={timeToValue(currentTime)}
         max={maxRange}
         valueLabelFormat={valuetext}
         step={1}
