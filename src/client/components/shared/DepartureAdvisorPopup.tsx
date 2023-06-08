@@ -1,7 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import DateSlider from './DateSlider';
+import { PersonalMinsEvaluation, hourInMili, personalMinValueToShape } from './DepartureAdvisor';
+import { simpleTimeFormat } from '../map/common/AreoFunctions';
+import { useSelector } from 'react-redux';
+import { selectSettings } from '../../store/user/UserSettings';
 
+export function getEvaluationByTime(
+  evaluationData: { time: number; evaluation: PersonalMinsEvaluation }[],
+  time: number,
+): PersonalMinsEvaluation {
+  const evaluation = evaluationData.reduce((prev, curr) => {
+    const diffPrev = time - prev.time;
+    const diffCurr = time - curr.time;
+    if (diffCurr > 0 && diffCurr < diffPrev) {
+      return curr;
+    }
+    return prev;
+  });
+  return evaluation.evaluation;
+}
 //i pass setIsShowModal and showModal as a prop to the modal component
 interface Props {
   setIsShowDateModal: (isShowModal: boolean) => void;
@@ -10,19 +28,19 @@ interface Props {
 }
 
 function DepartureAdvisorPopup({ setIsShowDateModal, evaluationsByTime, observationTime }: Props) {
+  const settingsState = useSelector(selectSettings);
   const [currentTime, setCurrentTime] = useState(observationTime);
-  const [evaluation, setEvaluation] = useState();
+  const [evaluation, setEvaluation] = useState<PersonalMinsEvaluation>(
+    getEvaluationByTime(evaluationsByTime, observationTime),
+  );
   useEffect(() => {
-    const evaluation = evaluationsByTime.reduce((prev, curr) => {
-      const diffPrev = currentTime - prev.time;
-      const diffCurr = currentTime - curr.time;
-      if (diffCurr > 0 && diffCurr < diffPrev) {
-        return curr;
-      }
-      return prev;
-    });
-    setEvaluation(evaluation.evaluation);
+    const evaluation = getEvaluationByTime(evaluationsByTime, currentTime);
+    setEvaluation(evaluation);
   }, [currentTime]);
+
+  function moveTime(isForward = true) {
+    setCurrentTime((prevState) => (isForward ? prevState + hourInMili : prevState - hourInMili));
+  }
   return (
     <div className="dates">
       <div className="dates__wrp">
@@ -32,63 +50,148 @@ function DepartureAdvisorPopup({ setIsShowDateModal, evaluationsByTime, observat
             <AiOutlineClose className="dates__icon" />
           </button>
         </div>
-        <div className="dates__content">
-          <div className="dates__date__area">
-            <div>
-              <b>Time:</b>
-            </div>
-            <p>
-              {new Date(currentTime).toLocaleDateString('en-US', {
-                weekday: 'short',
-                day: 'numeric',
-                month: 'numeric',
-                timeZone: 'UTC',
-              })}
+        <div className="evaluations-container">
+          <div className="evaluation-item">
+            <i
+              className={`twice dot ${evaluation.departureCeiling.color} ${
+                personalMinValueToShape[evaluation.departureCeiling.value]
+              }`}
+            />
+            <p className="evaluation-item-text text">
+              Departure ceiling height ({settingsState.ceiling_at_departure[0]}, {settingsState.ceiling_at_departure[1]}
+              )
             </p>
           </div>
-          <div className="dates__data__area">
-            <div className="dates__circle dates__circle__red">&nbsp;</div>
-            <p className="dates__text text">Departure ceiling height (2900, 4800)</p>
+          <div className="evaluation-item">
+            <i
+              className={`twice dot ${evaluation.departureVisibility.color} ${
+                personalMinValueToShape[evaluation.departureVisibility.value]
+              }`}
+            />
+            <p className="evaluation-item-text text">
+              Departure surface visibility ({settingsState.surface_visibility_at_departure[0]},{' '}
+              {settingsState.surface_visibility_at_departure[1]})
+            </p>
           </div>
-          <div className="dates__data__area">
-            <div className="dates__circle dates__circle__yello">&nbsp;</div>
-            <p className="dates__text text">Departure surface visibility (4.5, 11.5)</p>
+          <div className="evaluation-item">
+            <i
+              className={`twice dot ${evaluation.departureCrosswind.color} ${
+                personalMinValueToShape[evaluation.departureCrosswind.value]
+              }`}
+            />
+            <p className="evaluation-item-text text">
+              Departure crosswinds ({settingsState.crosswinds_at_departure_airport[0]},{' '}
+              {settingsState.crosswinds_at_departure_airport[1]})
+            </p>
           </div>
-          <div className="dates__data__area">
-            <div className="dates__circle dates__circle__grn">&nbsp;</div>
-            <p className="dates__text text">Departure crosswinds (9, 22)</p>
+          <div className="evaluation-item">
+            <i
+              className={`twice dot ${evaluation.alongRouteCeiling.color} ${
+                personalMinValueToShape[evaluation.alongRouteCeiling.value]
+              }`}
+            />
+            <p className="evaluation-item-text text">
+              En route ceiling height ({settingsState.ceiling_along_route[0]}, {settingsState.ceiling_along_route[1]})
+            </p>
           </div>
-          <div className="dates__data__area">
-            <div className="dates__circle dates__circle__red">&nbsp;</div>
-            <p className="dates__text text">En route ceiling height (2400, 4300)</p>
+          <div className="evaluation-item">
+            <i
+              className={`twice dot ${evaluation.alongRouteVisibility.color} ${
+                personalMinValueToShape[evaluation.alongRouteVisibility.value]
+              }`}
+            />
+            <p className="evaluation-item-text text">
+              En route surface visibility ({settingsState.surface_visibility_along_route[0]},{' '}
+              {settingsState.surface_visibility_along_route[1]})
+            </p>
           </div>
-          <div className="dates__data__area">
-            <div className="dates__circle dates__circle__yello">&nbsp;</div>
-            <p className="dates__text text">En route surface visibility (5.5, 12.5)</p>
+          <div className="evaluation-item">
+            <i
+              className={`twice dot ${evaluation.alongRouteProb.color} ${
+                personalMinValueToShape[evaluation.alongRouteProb.value]
+              }`}
+            />
+            <p className="evaluation-item-text text">
+              En route icing probability ({settingsState.en_route_icing_probability[0]},{' '}
+              {settingsState.en_route_icing_probability[1]})
+            </p>
           </div>
-          <div className="dates__data__area">
-            <div className="dates__circle dates__circle__grn">&nbsp;</div>
-            <p className="dates__text text">En route icing probability (18, 69)</p>
+          <div className="evaluation-item">
+            <i
+              className={`twice dot ${evaluation.alongRouteSeverity.color} ${
+                personalMinValueToShape[evaluation.alongRouteSeverity.value]
+              }`}
+            />
+            <p className="evaluation-item-text text">
+              En route icing intensity ({settingsState.en_route_icing_intensity[0]},{' '}
+              {settingsState.en_route_icing_intensity[1]})
+            </p>
           </div>
-          <div className="dates__data__area">
-            <div className="dates__circle dates__circle__yello">&nbsp;</div>
-            <p className="dates__text text">Departure surface visibility (4.5, 11.5)</p>
+          <div className="evaluation-item">
+            <i
+              className={`twice dot ${evaluation.alongRouteTurbulence.color} ${
+                personalMinValueToShape[evaluation.alongRouteTurbulence.value]
+              }`}
+            />
+            <p className="evaluation-item-text text">
+              En route turbulence intensity ({settingsState.en_route_turbulence_intensity[0]},{' '}
+              {settingsState.en_route_turbulence_intensity[1]})
+            </p>
           </div>
-          <div className="dates__data__area">
-            <div className="dates__circle dates__circle__grn">&nbsp;</div>
-            <p className="dates__text text">Departure crosswinds (9, 22)</p>
+          <div className="evaluation-item">
+            <i
+              className={`twice dot ${evaluation.alongRouteConvection.color} ${
+                personalMinValueToShape[evaluation.alongRouteConvection.value]
+              }`}
+            />
+            <p className="evaluation-item-text text">
+              En route convective potential ({settingsState.en_route_convective_potential[0]},{' '}
+              {settingsState.en_route_convective_potential[1]})
+            </p>
           </div>
-          <div className="dates__data__area">
-            <div className="dates__circle dates__circle__red">&nbsp;</div>
-            <p className="dates__text text">En route ceiling height (2400, 4300)</p>
+          <div className="evaluation-item">
+            <i
+              className={`twice dot ${evaluation.destinationCeiling.color} ${
+                personalMinValueToShape[evaluation.destinationCeiling.value]
+              }`}
+            />
+            <p className="evaluation-item-text text">
+              Destination ceiling height ({settingsState.ceiling_at_destination[0]},{' '}
+              {settingsState.ceiling_at_destination[1]})
+            </p>
           </div>
-          <div className="dates__data__area">
-            <div className="dates__circle dates__circle__yello">&nbsp;</div>
-            <p className="dates__text text">En route surface visibility (5.5, 12.5)</p>
+          <div className="evaluation-item">
+            <i
+              className={`twice dot ${evaluation.destinationVisibility.color} ${
+                personalMinValueToShape[evaluation.destinationVisibility.value]
+              }`}
+            />
+            <p className="evaluation-item-text text">
+              Destination surface visibility ({settingsState.surface_visibility_at_destination[0]},{' '}
+              {settingsState.surface_visibility_at_destination[1]})
+            </p>
           </div>
-          <div className="dates__data__area">
-            <div className="dates__circle dates__circle__grn">&nbsp;</div>
-            <p className="dates__text text">En route icing probability (18, 69)</p>
+          <div className="evaluation-item">
+            <i
+              className={`twice dot ${evaluation.destinationCrosswind.color} ${
+                personalMinValueToShape[evaluation.destinationCrosswind.value]
+              }`}
+            />
+            <p className="evaluation-item-text text">
+              Destination crosswinds ({settingsState.crosswinds_at_destination_airport[0]},{' '}
+              {settingsState.crosswinds_at_destination_airport[1]})
+            </p>
+          </div>
+        </div>
+        <div className="control-container">
+          <div className="time-control" onClick={() => moveTime(false)}>
+            <i className="fa-solid fa-backward-step fa-2xl"></i>
+          </div>
+          <div className="time text">
+            <p>{simpleTimeFormat(new Date(currentTime), settingsState.default_time_display_unit)}</p>
+          </div>
+          <div className="time-control" onClick={() => moveTime()}>
+            <i className="fa-solid fa-forward-step fa-2xl"></i>
           </div>
         </div>
       </div>

@@ -216,7 +216,6 @@ const LeafletMap = () => {
           <Route setIsShowModal={setIsShowModal} />
         </Dialog>
       </MapContainer>
-      {isShowDateModal && <DepartureAdvisorPopup setIsShowDateModal={setIsShowDateModal} />}
       <DepartureAdvisor showPast={true} />
     </div>
   );

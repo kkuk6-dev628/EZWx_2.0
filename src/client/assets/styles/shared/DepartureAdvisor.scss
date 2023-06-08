@@ -212,23 +212,6 @@
         background-color: white;
         border: var(--color-primary) solid 1px;
         border-radius: 4px;
-        .dot{
-          width: 6px;
-          height: 6px;
-          border: #44442288 solid 1px;
-          margin: 1px 2px;
-        }
-        .circle{
-          border-radius: 4px;
-        }
-        .triangle{
-          width: 0; 
-          height: 0; 
-          border-left: 4px solid transparent;
-          border-right: 4px solid transparent;          
-          border-bottom: 7px solid red;
-          background-color: transparent;
-        }
       }
     }
     .label{
@@ -300,6 +283,29 @@
     }
   }
 }
+.control-container{
+  display: flex;
+  color: var(--color-primary);
+  justify-content: space-evenly;
+  font-size: 1rem;
+  align-items: stretch;
+  margin: 10px;
+  .time-control{
+    cursor: pointer;
+  }
+}
+.evaluations-container{
+  margin: 14px;
+  .evaluation-item{
+    margin: 6px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    .evaluation-item-text{
+      margin-left: 20px;
+    }
+  }
+}
 
 .red{
   background-color: #E83328;
@@ -314,4 +320,25 @@
 }
 .grey{
   background-color: rgb(191, 218, 230);
+}
+.dot{
+  width: 6px;
+  height: 6px;
+  border: #44442288 solid 1px;
+  margin: 1px 2px;
+}
+.circle{
+  border-radius: 50%;
+}
+.triangle{
+  width: 0; 
+  height: 0; 
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;          
+  border-bottom: 7px solid red;
+  background-color: transparent;
+  border-top: none;
+}
+.twice{
+  transform: scale(2);
 }
