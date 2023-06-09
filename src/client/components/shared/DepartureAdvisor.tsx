@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import Slider from '@mui/material/Slider';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import {
   addLeadingZeroes,
   diffMinutes,
@@ -35,6 +35,7 @@ import { jsonClone } from '../utils/ObjectUtil';
 import { DateObject } from 'react-multi-date-picker';
 import DepartureAdvisorPopup, { getEvaluationByTime } from './DepartureAdvisorPopup';
 import { getMaxForecastTime } from '../route-profile/RouteProfileDataLoader';
+import { PaperComponent } from '../map/leaflet/Map';
 
 type personalMinValue = 0 | 1 | 2 | 10;
 type personalMinColor = 'red' | 'yellow' | 'green' | 'grey';
@@ -971,24 +972,45 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   }
 
   function calcBlockDays() {
-    const startDate = startTime.getUTCDate();
-    const endTime = new Date(startTime);
-    endTime.setHours(startTime.getHours() + timeRange);
-    const endDate = endTime.getUTCDate();
-    return Array.from({ length: endDate - startDate + 1 }, (_, i) => {
-      const date = new Date(startTime);
-      date.setUTCDate(i + startDate);
-      let width = 24 / timeRange;
-      if (i === 0) {
-        width = (24 - startTime.getUTCHours()) / timeRange;
-      } else if (i === endDate - startDate) {
-        width = endTime.getUTCHours() / timeRange;
-      }
-      return {
-        date: date,
-        width: width * 100,
-      };
-    });
+    if (settingsState.default_time_display_unit) {
+      const startDate = startTime.getDate();
+      const endTime = new Date(startTime);
+      endTime.setHours(startTime.getHours() + timeRange);
+      const endDate = endTime.getDate();
+      return Array.from({ length: endDate - startDate + 1 }, (_, i) => {
+        const date = new Date(startTime);
+        date.setDate(i + startDate);
+        let width = 24 / timeRange;
+        if (i === 0) {
+          width = (24 - startTime.getHours()) / timeRange;
+        } else if (i === endDate - startDate) {
+          width = endTime.getHours() / timeRange;
+        }
+        return {
+          date: date,
+          width: width * 100,
+        };
+      });
+    } else {
+      const startDate = startTime.getUTCDate();
+      const endTime = new Date(startTime);
+      endTime.setHours(startTime.getHours() + timeRange);
+      const endDate = endTime.getUTCDate();
+      return Array.from({ length: endDate - startDate + 1 }, (_, i) => {
+        const date = new Date(startTime);
+        date.setUTCDate(i + startDate);
+        let width = 24 / timeRange;
+        if (i === 0) {
+          width = (24 - startTime.getUTCHours()) / timeRange;
+        } else if (i === endDate - startDate) {
+          width = endTime.getUTCHours() / timeRange;
+        }
+        return {
+          date: date,
+          width: width * 100,
+        };
+      });
+    }
   }
 
   useEffect(() => {
@@ -996,7 +1018,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     setBlockDays(days);
     const times = calcBlockTimes();
     setBlockTimes(times);
-  }, [currentHour]);
+  }, [currentHour, settingsState.default_time_display_unit]);
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentHour(new Date().getHours()), 1000);
@@ -1148,7 +1170,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   }, [
     getDepartureAdvisorDataResult.isSuccess,
     activeRoute,
-    currentHour,
+    // currentHour,
     settingsState.ceiling_at_departure,
     settingsState.ceiling_along_route,
     settingsState.ceiling_at_destination,
@@ -1171,7 +1193,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
 
   useEffect(() => {
     if (dotElementRef.current) {
-      dotElementRef.current.addEventListener('click', clickEvaluationBar);
+      // dotElementRef.current.addEventListener('click', clickEvaluationBar);
     }
   }, [dotElementRef.current]);
 
@@ -1187,11 +1209,11 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     return Math.floor(diff / 5);
   };
 
-  function clickEvaluationBar(e) {
-    e.stopImmediatePropagation();
+  function clickEvaluationBar(e: SyntheticEvent) {
+    e.nativeEvent.stopPropagation();
     setHideDotsBars(false);
     setClickedDotsBars(true);
-    setShowPopup(true);
+    evaluationsByTime && setShowPopup(true);
   }
 
   function valuetext(value: number) {
@@ -1201,6 +1223,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
           ref={dotElementRef}
           className={'bars-container' + (hideDotsBars ? ' fade-out' : '')}
           onClick={clickEvaluationBar}
+          onMouseDown={(e) => e.stopPropagation()}
           onMouseOver={() => {
             setHideDotsBars(false);
             setClickedDotsBars(true);
@@ -1439,6 +1462,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   }
 
   const handleTimeChange = (time: Date, commit = true) => {
+    setHideDotsBars(false);
     const timespan = time.getTime();
     const newSettings = { ...settingsState, observation_time: timespan };
     if (commit && auth.id) updateUserSettingsAPI(newSettings);
@@ -1455,7 +1479,8 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     handleTimeChange(currentTime, true);
   }
 
-  function handleClick3h(isForward) {
+  function handleClick3h(e, isForward) {
+    e.currentTarget.disabled = true;
     const newTime = settingsState.observation_time + (isForward ? 1 : -1) * 3 * 3600 * 1000;
     handleTimeChange(new Date(newTime), true);
   }
@@ -1463,6 +1488,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   return (
     <div className="departure-advisor">
       <Dialog
+        PaperComponent={PaperComponent}
         hideBackdrop
         disableEnforceFocus
         style={{ position: 'absolute' }}
@@ -1484,7 +1510,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
               ? ' disabled'
               : '')
           }
-          onClick={() => handleClick3h(false)}
+          onClick={(e) => handleClick3h(e, false)}
         >
           -3h
         </div>
@@ -1492,20 +1518,26 @@ function DepartureAdvisor(props: { showPast: boolean }) {
           <div className="blocks-contents">
             <div className="horizental-blocks">
               {blockTimes.map((time, index) => (
-                <div className={`block ${colorByTimes[index]}`} onClick={() => handleTimeChange(time)}>
-                  {addLeadingZeroes(time.getUTCHours(), 2)}z
+                <div
+                  key={'time' + index}
+                  className={`block ${colorByTimes[index]}`}
+                  onClick={() => handleTimeChange(time)}
+                >
+                  {settingsState.default_time_display_unit
+                    ? addLeadingZeroes(time.getHours(), 2)
+                    : addLeadingZeroes(time.getUTCHours(), 2) + 'z'}
                 </div>
               ))}
             </div>
             <div className="date-container">
               {blockDays.map((item, index) => (
-                <div className="date" style={{ width: item.width + '%' }}>
+                <div key={'date' + index} className="date" style={{ width: item.width + '%' }}>
                   {item.width > 5
                     ? item.date.toLocaleDateString('en-US', {
                         weekday: 'short',
                         day: 'numeric',
                         month: 'numeric',
-                        timeZone: 'UTC',
+                        timeZone: settingsState.default_time_display_unit ? undefined : 'UTC',
                       })
                     : ''}
                 </div>
@@ -1516,9 +1548,9 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         <div
           className={
             'move-right' +
-            (currentTime.getTime() + blockhours * 3600 * 1000 > valueToTime(maxRange).getTime() ? ' disabled' : '')
+            (currentTime.getTime() + blockhours * hourInMili > valueToTime(maxRange).getTime() ? ' disabled' : '')
           }
-          onClick={() => handleClick3h(true)}
+          onClick={(e) => handleClick3h(e, true)}
         >
           +3h
         </div>

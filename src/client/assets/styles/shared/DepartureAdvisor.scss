@@ -283,29 +283,51 @@
     }
   }
 }
-.control-container{
-  display: flex;
-  color: var(--color-primary);
-  justify-content: space-evenly;
-  font-size: 1rem;
-  align-items: stretch;
-  margin: 10px;
-  .time-control{
+.departure-advisor-popup{
+
+  .control-container{
+    display: flex;
+    color: var(--color-primary);
+    justify-content: space-evenly;
+    font-size: 1rem;
+    align-items: stretch;
+    margin: 10px;
+    .time-control{
+      cursor: pointer;
+    }
+  }
+  .evaluations-container{
+    margin: 14px;
+    .evaluation-item{
+      margin: 6px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      .evaluation-item-text{
+        margin-left: 20px;
+      }
+    }
+  }
+  &-title{
+    background-color: var(--color-primary);
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 8px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    cursor: move;
+    .text{
+      color: white;
+    }
+  }  
+  &-close{
+    background: transparent;
+    border: none;
+    color: white;
     cursor: pointer;
   }
 }
-.evaluations-container{
-  margin: 14px;
-  .evaluation-item{
-    margin: 6px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    .evaluation-item-text{
-      margin-left: 20px;
-    }
-  }
-}
+
 
 .red{
   background-color: #E83328;

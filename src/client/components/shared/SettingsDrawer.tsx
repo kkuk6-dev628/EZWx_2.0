@@ -24,6 +24,10 @@ export const FetchUserSettings = () => {
   return <></>;
 };
 
+export const icingIntensity = ['None', 'Trc', 'Lgt', 'Mod', 'Hvy'];
+
+export const convectivePotential = ['None', 'Very Lo', 'Lo', 'Mod', 'Hi', 'Very Hi'];
+
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;
   isShowSettingsDrawer: boolean;
@@ -449,7 +453,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                           if (value < 0 || value > 4) {
                             return '';
                           }
-                          return ['None', 'Trc', 'Lgt', 'Mod', 'Hvy'][value];
+                          return icingIntensity[value];
                         },
                       },
                       density: 20,
@@ -509,7 +513,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                           if (value < 0 || value > 5) {
                             return '';
                           }
-                          return ['None', 'Very Lo', 'Lo', 'Mod', 'Hi', 'Very Hi'][value];
+                          return convectivePotential[value];
                         },
                       },
                       density: 20,
