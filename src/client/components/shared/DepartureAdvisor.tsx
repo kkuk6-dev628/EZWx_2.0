@@ -36,6 +36,7 @@ import { DateObject } from 'react-multi-date-picker';
 import DepartureAdvisorPopup, { getEvaluationByTime } from './DepartureAdvisorPopup';
 import { getMaxForecastTime } from '../route-profile/RouteProfileDataLoader';
 import { PaperComponent } from '../map/leaflet/Map';
+import DepartureAdvisorBarComponent from './DepartureAdvisorBarComponent';
 
 type personalMinValue = 0 | 1 | 2 | 10;
 type personalMinColor = 'red' | 'yellow' | 'green' | 'grey';
@@ -962,6 +963,8 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const [showPopup, setShowPopup] = useState(false);
   const [evaluationsByTime, setEvaluationsByTime] = useState<any[]>();
   const dotElementRef = useRef(null);
+  const [showBarComponent, setShowBarComponent] = useState(false);
+  const [barPos, setBarPos] = useState(0);
 
   function calcBlockTimes() {
     return Array.from({ length: blockCount }, (_v, index) => {
@@ -1516,12 +1519,27 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         </div>
         <div className="blocks-date">
           <div className="blocks-contents">
+            {showBarComponent && (
+              <DepartureAdvisorBarComponent
+                index={barPos}
+                evaluationsByTime={evaluationsByTime}
+                setShowPopup={setShowPopup}
+                isMap={blockTimes.length > 24}
+              />
+            )}
             <div className="horizental-blocks">
               {blockTimes.map((time, index) => (
                 <div
                   key={'time' + index}
                   className={`block ${colorByTimes[index]}`}
                   onClick={() => handleTimeChange(time)}
+                  onMouseOver={(e) => {
+                    setBarPos(index);
+                    setShowBarComponent(true);
+                  }}
+                  onMouseOut={(e) => {
+                    setShowBarComponent(false);
+                  }}
                 >
                   {settingsState.default_time_display_unit
                     ? addLeadingZeroes(time.getHours(), 2)
