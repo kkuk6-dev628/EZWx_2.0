@@ -36,7 +36,7 @@ import { DateObject } from 'react-multi-date-picker';
 import DepartureAdvisorPopup, { getEvaluationByTime } from './DepartureAdvisorPopup';
 import { getMaxForecastTime } from '../route-profile/RouteProfileDataLoader';
 import { PaperComponent } from '../map/leaflet/Map';
-import DepartureAdvisorBarComponent from './DepartureAdvisorBarComponent';
+import DepartureAdvisorTimeBlockComponent from './DepartureAdvisorTimeBlockComponent';
 
 type personalMinValue = 0 | 1 | 2 | 10;
 type personalMinColor = 'red' | 'yellow' | 'green' | 'grey';
@@ -947,9 +947,9 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const stepsPerHour = 12;
   const timeRange = props.showPast ? 84 : 72;
   const [currEval, setCurrEval] = useState(initialEvaluation);
-  const [beforeEval, setBeforeEval] = useState(initialEvaluation);
+  const [beforeEval, setBeforeEval] = useState(null);
   const [afterEval, setAfterEval] = useState(initialEvaluation);
-  const [colorByTimes, setColorByTimes] = useState(Array.from({ length: 8 }));
+  const [colorByTimes, setColorByTimes] = useState<string[]>(Array.from({ length: 8 }));
   const [hour, setHour] = useState(0);
   const blockCount = timeRange / blockhours;
   const [currentHour, setCurrentHour] = useState(new Date().getUTCHours());
@@ -1222,243 +1222,245 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   function valuetext(value: number) {
     return (
       <div className="slider-label-container">
-        <div
-          ref={dotElementRef}
-          className={'bars-container' + (hideDotsBars ? ' fade-out' : '')}
-          onClick={clickEvaluationBar}
-          onMouseDown={(e) => e.stopPropagation()}
-          onMouseOver={() => {
-            setHideDotsBars(false);
-            setClickedDotsBars(true);
-          }}
-          onMouseOut={() => {
-            setHideDotsBars(true);
-            setClickedDotsBars(false);
-          }}
-        >
-          <div className="bar">
-            <i
-              title="Departure ceiling height"
-              className={`dot ${beforeEval.departureCeiling.color} ${
-                personalMinValueToShape[beforeEval.departureCeiling.value]
-              }`}
-            ></i>
-            <i
-              title="Departure surface visibility"
-              className={`dot ${beforeEval.departureVisibility.color} ${
-                personalMinValueToShape[beforeEval.departureVisibility.value]
-              }`}
-            ></i>
-            <i
-              title="Departure crosswinds"
-              className={`dot ${beforeEval.departureCrosswind.color} ${
-                personalMinValueToShape[beforeEval.departureCrosswind.value]
-              }`}
-            ></i>
-            <i
-              title="En route ceiling height"
-              className={`dot ${beforeEval.alongRouteCeiling.color} ${
-                personalMinValueToShape[beforeEval.alongRouteCeiling.value]
-              }`}
-            ></i>
-            <i
-              title="En route surface visibility"
-              className={`dot ${beforeEval.alongRouteVisibility.color} ${
-                personalMinValueToShape[beforeEval.alongRouteVisibility.value]
-              }`}
-            ></i>
-            <i
-              title="En route icing probability"
-              className={`dot ${beforeEval.alongRouteProb.color} ${
-                personalMinValueToShape[beforeEval.alongRouteProb.value]
-              }`}
-            ></i>
-            <i
-              title="En route icing severity"
-              className={`dot ${beforeEval.alongRouteSeverity.color} ${
-                personalMinValueToShape[beforeEval.alongRouteSeverity.value]
-              }`}
-            ></i>
-            <i
-              title="En route turbulence intensity"
-              className={`dot ${beforeEval.alongRouteTurbulence.color} ${
-                personalMinValueToShape[beforeEval.alongRouteTurbulence.value]
-              }`}
-            ></i>
-            <i
-              title="En route convective potential"
-              className={`dot ${beforeEval.alongRouteConvection.color} ${
-                personalMinValueToShape[beforeEval.alongRouteConvection.value]
-              }`}
-            ></i>
-            <i
-              title="Destination ceiling height"
-              className={`dot ${beforeEval.destinationCeiling.color} ${
-                personalMinValueToShape[beforeEval.destinationCeiling.value]
-              }`}
-            ></i>
-            <i
-              title="Destination surface visibility"
-              className={`dot ${beforeEval.destinationVisibility.color} ${
-                personalMinValueToShape[beforeEval.destinationVisibility.value]
-              }`}
-            ></i>
-            <i
-              title="Destination crosswinds"
-              className={`dot ${beforeEval.destinationCrosswind.color} ${
-                personalMinValueToShape[beforeEval.destinationCrosswind.value]
-              }`}
-            ></i>
+        {beforeEval && (
+          <div
+            ref={dotElementRef}
+            className={'bars-container' + (hideDotsBars ? ' fade-out' : '')}
+            onClick={clickEvaluationBar}
+            onMouseDown={(e) => e.stopPropagation()}
+            onMouseOver={() => {
+              setHideDotsBars(false);
+              setClickedDotsBars(true);
+            }}
+            onMouseOut={() => {
+              setHideDotsBars(true);
+              setClickedDotsBars(false);
+            }}
+          >
+            <div className="bar">
+              <i
+                title="Departure ceiling height"
+                className={`dot ${beforeEval.departureCeiling.color} ${
+                  personalMinValueToShape[beforeEval.departureCeiling.value]
+                }`}
+              ></i>
+              <i
+                title="Departure surface visibility"
+                className={`dot ${beforeEval.departureVisibility.color} ${
+                  personalMinValueToShape[beforeEval.departureVisibility.value]
+                }`}
+              ></i>
+              <i
+                title="Departure crosswinds"
+                className={`dot ${beforeEval.departureCrosswind.color} ${
+                  personalMinValueToShape[beforeEval.departureCrosswind.value]
+                }`}
+              ></i>
+              <i
+                title="En route ceiling height"
+                className={`dot ${beforeEval.alongRouteCeiling.color} ${
+                  personalMinValueToShape[beforeEval.alongRouteCeiling.value]
+                }`}
+              ></i>
+              <i
+                title="En route surface visibility"
+                className={`dot ${beforeEval.alongRouteVisibility.color} ${
+                  personalMinValueToShape[beforeEval.alongRouteVisibility.value]
+                }`}
+              ></i>
+              <i
+                title="En route icing probability"
+                className={`dot ${beforeEval.alongRouteProb.color} ${
+                  personalMinValueToShape[beforeEval.alongRouteProb.value]
+                }`}
+              ></i>
+              <i
+                title="En route icing severity"
+                className={`dot ${beforeEval.alongRouteSeverity.color} ${
+                  personalMinValueToShape[beforeEval.alongRouteSeverity.value]
+                }`}
+              ></i>
+              <i
+                title="En route turbulence intensity"
+                className={`dot ${beforeEval.alongRouteTurbulence.color} ${
+                  personalMinValueToShape[beforeEval.alongRouteTurbulence.value]
+                }`}
+              ></i>
+              <i
+                title="En route convective potential"
+                className={`dot ${beforeEval.alongRouteConvection.color} ${
+                  personalMinValueToShape[beforeEval.alongRouteConvection.value]
+                }`}
+              ></i>
+              <i
+                title="Destination ceiling height"
+                className={`dot ${beforeEval.destinationCeiling.color} ${
+                  personalMinValueToShape[beforeEval.destinationCeiling.value]
+                }`}
+              ></i>
+              <i
+                title="Destination surface visibility"
+                className={`dot ${beforeEval.destinationVisibility.color} ${
+                  personalMinValueToShape[beforeEval.destinationVisibility.value]
+                }`}
+              ></i>
+              <i
+                title="Destination crosswinds"
+                className={`dot ${beforeEval.destinationCrosswind.color} ${
+                  personalMinValueToShape[beforeEval.destinationCrosswind.value]
+                }`}
+              ></i>
+            </div>
+            <div className="bar">
+              <i
+                title="Departure ceiling height"
+                className={`dot ${currEval.departureCeiling.color} ${
+                  personalMinValueToShape[currEval.departureCeiling.value]
+                }`}
+              ></i>
+              <i
+                title="Departure surface visibility"
+                className={`dot ${currEval.departureVisibility.color} ${
+                  personalMinValueToShape[currEval.departureVisibility.value]
+                }`}
+              ></i>
+              <i
+                title="Departure crosswinds"
+                className={`dot ${currEval.departureCrosswind.color} ${
+                  personalMinValueToShape[currEval.departureCrosswind.value]
+                }`}
+              ></i>
+              <i
+                title="En route ceiling height"
+                className={`dot ${currEval.alongRouteCeiling.color} ${
+                  personalMinValueToShape[currEval.alongRouteCeiling.value]
+                }`}
+              ></i>
+              <i
+                title="En route surface visibility"
+                className={`dot ${currEval.alongRouteVisibility.color} ${
+                  personalMinValueToShape[currEval.alongRouteVisibility.value]
+                }`}
+              ></i>
+              <i
+                title="En route icing probability"
+                className={`dot ${currEval.alongRouteProb.color} ${
+                  personalMinValueToShape[currEval.alongRouteProb.value]
+                }`}
+              ></i>
+              <i
+                title="En route icing severity"
+                className={`dot ${currEval.alongRouteSeverity.color} ${
+                  personalMinValueToShape[currEval.alongRouteSeverity.value]
+                }`}
+              ></i>
+              <i
+                title="En route turbulence intensity"
+                className={`dot ${currEval.alongRouteTurbulence.color} ${
+                  personalMinValueToShape[currEval.alongRouteTurbulence.value]
+                }`}
+              ></i>
+              <i
+                title="En route convective potential"
+                className={`dot ${currEval.alongRouteConvection.color} ${
+                  personalMinValueToShape[currEval.alongRouteConvection.value]
+                }`}
+              ></i>
+              <i
+                title="Destination ceiling height"
+                className={`dot ${currEval.destinationCeiling.color} ${
+                  personalMinValueToShape[currEval.destinationCeiling.value]
+                }`}
+              ></i>
+              <i
+                title="Destination surface visibility"
+                className={`dot ${currEval.destinationVisibility.color} ${
+                  personalMinValueToShape[currEval.destinationVisibility.value]
+                }`}
+              ></i>
+              <i
+                title="Destination crosswinds"
+                className={`dot ${currEval.destinationCrosswind.color} ${
+                  personalMinValueToShape[currEval.destinationCrosswind.value]
+                }`}
+              ></i>
+            </div>
+            <div className="bar">
+              <i
+                title="Departure ceiling height"
+                className={`dot ${afterEval.departureCeiling.color} ${
+                  personalMinValueToShape[afterEval.departureCeiling.value]
+                }`}
+              ></i>
+              <i
+                title="Departure surface visibility"
+                className={`dot ${afterEval.departureVisibility.color} ${
+                  personalMinValueToShape[afterEval.departureVisibility.value]
+                }`}
+              ></i>
+              <i
+                title="Departure crosswinds"
+                className={`dot ${afterEval.departureCrosswind.color} ${
+                  personalMinValueToShape[afterEval.departureCrosswind.value]
+                }`}
+              ></i>
+              <i
+                title="En route ceiling height"
+                className={`dot ${afterEval.alongRouteCeiling.color} ${
+                  personalMinValueToShape[afterEval.alongRouteCeiling.value]
+                }`}
+              ></i>
+              <i
+                title="En route surface visibility"
+                className={`dot ${afterEval.alongRouteVisibility.color} ${
+                  personalMinValueToShape[afterEval.alongRouteVisibility.value]
+                }`}
+              ></i>
+              <i
+                title="En route icing probability"
+                className={`dot ${afterEval.alongRouteProb.color} ${
+                  personalMinValueToShape[afterEval.alongRouteProb.value]
+                }`}
+              ></i>
+              <i
+                title="En route icing severity"
+                className={`dot ${afterEval.alongRouteSeverity.color} ${
+                  personalMinValueToShape[afterEval.alongRouteSeverity.value]
+                }`}
+              ></i>
+              <i
+                title="En route turbulence intensity"
+                className={`dot ${afterEval.alongRouteTurbulence.color} ${
+                  personalMinValueToShape[afterEval.alongRouteTurbulence.value]
+                }`}
+              ></i>
+              <i
+                title="En route convective potential"
+                className={`dot ${afterEval.alongRouteConvection.color} ${
+                  personalMinValueToShape[afterEval.alongRouteConvection.value]
+                }`}
+              ></i>
+              <i
+                title="Destination ceiling height"
+                className={`dot ${afterEval.destinationCeiling.color} ${
+                  personalMinValueToShape[afterEval.destinationCeiling.value]
+                }`}
+              ></i>
+              <i
+                title="Destination surface visibility"
+                className={`dot ${afterEval.destinationVisibility.color} ${
+                  personalMinValueToShape[afterEval.destinationVisibility.value]
+                }`}
+              ></i>
+              <i
+                title="Destination crosswinds"
+                className={`dot ${afterEval.destinationCrosswind.color} ${
+                  personalMinValueToShape[afterEval.destinationCrosswind.value]
+                }`}
+              ></i>
+            </div>
           </div>
-          <div className="bar">
-            <i
-              title="Departure ceiling height"
-              className={`dot ${currEval.departureCeiling.color} ${
-                personalMinValueToShape[currEval.departureCeiling.value]
-              }`}
-            ></i>
-            <i
-              title="Departure surface visibility"
-              className={`dot ${currEval.departureVisibility.color} ${
-                personalMinValueToShape[currEval.departureVisibility.value]
-              }`}
-            ></i>
-            <i
-              title="Departure crosswinds"
-              className={`dot ${currEval.departureCrosswind.color} ${
-                personalMinValueToShape[currEval.departureCrosswind.value]
-              }`}
-            ></i>
-            <i
-              title="En route ceiling height"
-              className={`dot ${currEval.alongRouteCeiling.color} ${
-                personalMinValueToShape[currEval.alongRouteCeiling.value]
-              }`}
-            ></i>
-            <i
-              title="En route surface visibility"
-              className={`dot ${currEval.alongRouteVisibility.color} ${
-                personalMinValueToShape[currEval.alongRouteVisibility.value]
-              }`}
-            ></i>
-            <i
-              title="En route icing probability"
-              className={`dot ${currEval.alongRouteProb.color} ${
-                personalMinValueToShape[currEval.alongRouteProb.value]
-              }`}
-            ></i>
-            <i
-              title="En route icing severity"
-              className={`dot ${currEval.alongRouteSeverity.color} ${
-                personalMinValueToShape[currEval.alongRouteSeverity.value]
-              }`}
-            ></i>
-            <i
-              title="En route turbulence intensity"
-              className={`dot ${currEval.alongRouteTurbulence.color} ${
-                personalMinValueToShape[currEval.alongRouteTurbulence.value]
-              }`}
-            ></i>
-            <i
-              title="En route convective potential"
-              className={`dot ${currEval.alongRouteConvection.color} ${
-                personalMinValueToShape[currEval.alongRouteConvection.value]
-              }`}
-            ></i>
-            <i
-              title="Destination ceiling height"
-              className={`dot ${currEval.destinationCeiling.color} ${
-                personalMinValueToShape[currEval.destinationCeiling.value]
-              }`}
-            ></i>
-            <i
-              title="Destination surface visibility"
-              className={`dot ${currEval.destinationVisibility.color} ${
-                personalMinValueToShape[currEval.destinationVisibility.value]
-              }`}
-            ></i>
-            <i
-              title="Destination crosswinds"
-              className={`dot ${currEval.destinationCrosswind.color} ${
-                personalMinValueToShape[currEval.destinationCrosswind.value]
-              }`}
-            ></i>
-          </div>
-          <div className="bar">
-            <i
-              title="Departure ceiling height"
-              className={`dot ${afterEval.departureCeiling.color} ${
-                personalMinValueToShape[afterEval.departureCeiling.value]
-              }`}
-            ></i>
-            <i
-              title="Departure surface visibility"
-              className={`dot ${afterEval.departureVisibility.color} ${
-                personalMinValueToShape[afterEval.departureVisibility.value]
-              }`}
-            ></i>
-            <i
-              title="Departure crosswinds"
-              className={`dot ${afterEval.departureCrosswind.color} ${
-                personalMinValueToShape[afterEval.departureCrosswind.value]
-              }`}
-            ></i>
-            <i
-              title="En route ceiling height"
-              className={`dot ${afterEval.alongRouteCeiling.color} ${
-                personalMinValueToShape[afterEval.alongRouteCeiling.value]
-              }`}
-            ></i>
-            <i
-              title="En route surface visibility"
-              className={`dot ${afterEval.alongRouteVisibility.color} ${
-                personalMinValueToShape[afterEval.alongRouteVisibility.value]
-              }`}
-            ></i>
-            <i
-              title="En route icing probability"
-              className={`dot ${afterEval.alongRouteProb.color} ${
-                personalMinValueToShape[afterEval.alongRouteProb.value]
-              }`}
-            ></i>
-            <i
-              title="En route icing severity"
-              className={`dot ${afterEval.alongRouteSeverity.color} ${
-                personalMinValueToShape[afterEval.alongRouteSeverity.value]
-              }`}
-            ></i>
-            <i
-              title="En route turbulence intensity"
-              className={`dot ${afterEval.alongRouteTurbulence.color} ${
-                personalMinValueToShape[afterEval.alongRouteTurbulence.value]
-              }`}
-            ></i>
-            <i
-              title="En route convective potential"
-              className={`dot ${afterEval.alongRouteConvection.color} ${
-                personalMinValueToShape[afterEval.alongRouteConvection.value]
-              }`}
-            ></i>
-            <i
-              title="Destination ceiling height"
-              className={`dot ${afterEval.destinationCeiling.color} ${
-                personalMinValueToShape[afterEval.destinationCeiling.value]
-              }`}
-            ></i>
-            <i
-              title="Destination surface visibility"
-              className={`dot ${afterEval.destinationVisibility.color} ${
-                personalMinValueToShape[afterEval.destinationVisibility.value]
-              }`}
-            ></i>
-            <i
-              title="Destination crosswinds"
-              className={`dot ${afterEval.destinationCrosswind.color} ${
-                personalMinValueToShape[afterEval.destinationCrosswind.value]
-              }`}
-            ></i>
-          </div>
-        </div>
+        )}
         <div className="label">{simpleTimeOnlyFormat(valueToTime(value), settingsState.default_time_display_unit)}</div>
       </div>
     );
@@ -1508,7 +1510,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       <div className="blocks-container">
         <div
           className={
-            'move-left' +
+            'prevent-select move-left' +
             (currentTime.getTime() - blockhours * 3600 * 1000 < getTimeRangeStart(props.showPast).getTime()
               ? ' disabled'
               : '')
@@ -1519,33 +1521,19 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         </div>
         <div className="blocks-date">
           <div className="blocks-contents">
-            {showBarComponent && (
-              <DepartureAdvisorBarComponent
-                index={barPos}
-                evaluationsByTime={evaluationsByTime}
-                setShowPopup={setShowPopup}
-                isMap={blockTimes.length > 24}
-              />
-            )}
             <div className="horizental-blocks">
-              {blockTimes.map((time, index) => (
-                <div
-                  key={'time' + index}
-                  className={`block ${colorByTimes[index]}`}
-                  onClick={() => handleTimeChange(time)}
-                  onMouseOver={(e) => {
-                    setBarPos(index);
-                    setShowBarComponent(true);
-                  }}
-                  onMouseOut={(e) => {
-                    setShowBarComponent(false);
-                  }}
-                >
-                  {settingsState.default_time_display_unit
-                    ? addLeadingZeroes(time.getHours(), 2)
-                    : addLeadingZeroes(time.getUTCHours(), 2) + 'z'}
-                </div>
-              ))}
+              {evaluationsByTime &&
+                blockTimes.map((time, index) => (
+                  <DepartureAdvisorTimeBlockComponent
+                    index={index}
+                    time={time}
+                    color={colorByTimes[index]}
+                    isMap={blockTimes.length > 24}
+                    evaluationsByTime={evaluationsByTime}
+                    setShowPopup={setShowPopup}
+                    handleTimeChange={handleTimeChange}
+                  ></DepartureAdvisorTimeBlockComponent>
+                ))}
             </div>
             <div className="date-container">
               {blockDays.map((item, index) => (
@@ -1565,7 +1553,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         </div>
         <div
           className={
-            'move-right' +
+            'prevent-select move-right' +
             (currentTime.getTime() + blockhours * hourInMili > valueToTime(maxRange).getTime() ? ' disabled' : '')
           }
           onClick={(e) => handleClick3h(e, true)}

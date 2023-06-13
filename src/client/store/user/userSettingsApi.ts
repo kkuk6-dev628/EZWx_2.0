@@ -52,7 +52,7 @@ const userSettingsApi = apiSlice.injectEndpoints({
             if (!result.data.observation_interval) {
               settings.observation_interval = initialUserSettingsState.settings.observation_interval;
             }
-            dispatch(setUserSettings(settings));
+            // dispatch(setUserSettings(settings));
           }
         } catch (err) {
           toast.error(err, {
