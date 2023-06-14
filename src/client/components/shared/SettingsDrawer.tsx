@@ -119,7 +119,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
               </button>
             </div>
             <div className="button__container">
-              <button onClick={() => handleSaveSettings(false)}>
+              <button onClick={() => handleSaveSettings(true)}>
                 Save Settings {isUpdating && <CircularProgress size={10} sx={{ color: 'white' }} />}
               </button>
             </div>

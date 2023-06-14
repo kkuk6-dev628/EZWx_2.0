@@ -125,6 +125,7 @@ export interface RouteSegment {
     time: string;
     hour: number;
     minute: number;
+    offset: number;
   };
   course: number;
   airport?: RoutePoint;

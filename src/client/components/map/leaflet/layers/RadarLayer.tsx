@@ -202,31 +202,31 @@ const RadarLayer = () => {
         }
       });
       const url2 = `https://mesonet.agron.iastate.edu/data/gis/images/4326/USCOMP/eet_${i}.json`;
-      axios.get(url2).then((data) => {
-        if (!data.data) {
-          return;
-        }
-        if (radarLayers.echoTopHeight[i] && radarLayers.echoTopHeight[i].layer) {
-          if (map.hasLayer(radarLayers.echoTopHeight[i].layer)) {
-            map.removeLayer(radarLayers.echoTopHeight[i].layer);
-          }
-        }
-        const validTimeSpan = new Date(data.data.meta.valid).getTime();
-        radarLayers.echoTopHeight[i] = {
-          meta: { ...data.data.meta },
-          valid_timespan: validTimeSpan,
-          layer: WMS.layer(
-            echoTopHeightsUrl,
-            i === 0 ? echoTopHeightsLayer : `${echoTopHeightsLayer}-m${addLeadingZeroes(i * 5, 2)}m`,
-            {
-              transparent: true,
-              format: 'image/png',
-              tiled: false,
-              identify: false,
-            },
-          ).setOpacity(0),
-        };
-      });
+      // axios.get(url2).then((data) => {
+      //   if (!data.data) {
+      //     return;
+      //   }
+      //   if (radarLayers.echoTopHeight[i] && radarLayers.echoTopHeight[i].layer) {
+      //     if (map.hasLayer(radarLayers.echoTopHeight[i].layer)) {
+      //       map.removeLayer(radarLayers.echoTopHeight[i].layer);
+      //     }
+      //   }
+      //   const validTimeSpan = new Date(data.data.meta.valid).getTime();
+      //   radarLayers.echoTopHeight[i] = {
+      //     meta: { ...data.data.meta },
+      //     valid_timespan: validTimeSpan,
+      //     layer: WMS.layer(
+      //       echoTopHeightsUrl,
+      //       i === 0 ? echoTopHeightsLayer : `${echoTopHeightsLayer}-m${addLeadingZeroes(i * 5, 2)}m`,
+      //       {
+      //         transparent: true,
+      //         format: 'image/png',
+      //         tiled: false,
+      //         identify: false,
+      //       },
+      //     ).setOpacity(0),
+      //   };
+      // });
     }
   };
 

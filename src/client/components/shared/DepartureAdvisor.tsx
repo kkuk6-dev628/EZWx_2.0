@@ -725,20 +725,20 @@ function getWheatherMinimumsAlongRoute(
           personalMinsEvaluation.departureCrosswind.color = personalMinValueToColor[0];
         }
       } else if (index === positions.length - 1) {
-        if (personalMins.ceiling_at_destination[0] <= cloudceiling || cloudceiling === null || cloudceiling === 0) {
+        if (personalMins.ceiling_at_destination[1] <= cloudceiling || cloudceiling === null || cloudceiling === 0) {
           personalMinsEvaluation.destinationCeiling.value = 2;
           personalMinsEvaluation.destinationCeiling.color = personalMinValueToColor[2];
-        } else if (personalMins.ceiling_at_destination[1] <= cloudceiling) {
+        } else if (personalMins.ceiling_at_destination[0] <= cloudceiling) {
           personalMinsEvaluation.destinationCeiling.value = 1;
           personalMinsEvaluation.destinationCeiling.color = personalMinValueToColor[1];
         } else {
           personalMinsEvaluation.destinationCeiling.value = 0;
           personalMinsEvaluation.destinationCeiling.color = personalMinValueToColor[0];
         }
-        if (personalMins.surface_visibility_at_destination[0] <= visibility) {
+        if (personalMins.surface_visibility_at_destination[1] <= visibility) {
           personalMinsEvaluation.destinationVisibility.value = 2;
           personalMinsEvaluation.destinationVisibility.color = personalMinValueToColor[2];
-        } else if (personalMins.surface_visibility_at_destination[1] <= visibility) {
+        } else if (personalMins.surface_visibility_at_destination[0] <= visibility) {
           personalMinsEvaluation.destinationVisibility.value = 1;
           personalMinsEvaluation.destinationVisibility.color = personalMinValueToColor[1];
         } else {
@@ -755,6 +755,9 @@ function getWheatherMinimumsAlongRoute(
         } else {
           personalMinsEvaluation.destinationCrosswind.value = 0;
           personalMinsEvaluation.destinationCrosswind.color = personalMinValueToColor[0];
+        }
+        if (arriveTime > maxForcastTime.getTime()) {
+          isOutTimeRange = true;
         }
       } else {
         cloudceiling && ceilings.push(cloudceiling);
@@ -1114,21 +1117,6 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         if (currentHour > time) {
           return personalMinValueToColor[10];
         } else {
-          const evalByTime = getWheatherMinimumsAlongRoute(
-            queryPoints,
-            settingsState,
-            time.getTime(),
-            activeRoute.useForecastWinds,
-            activeRoute.altitude,
-            settingsState.true_airspeed,
-            getDepartureAdvisorDataResult,
-            queryGfsWindSpeedDataResult,
-            queryGfsWindDirectionDataResult,
-            activeRoute.departure.key,
-            activeRoute.destination.key,
-            airportNbmData,
-          );
-          evaluationsByTime.push({ time: time.getTime(), evaluation: evalByTime });
           const evalByTimeBefore = getWheatherMinimumsAlongRoute(
             queryPoints,
             settingsState,
@@ -1144,6 +1132,21 @@ function DepartureAdvisor(props: { showPast: boolean }) {
             airportNbmData,
           );
           evaluationsByTime.push({ time: time.getTime() - hourInMili, evaluation: evalByTimeBefore });
+          const evalByTime = getWheatherMinimumsAlongRoute(
+            queryPoints,
+            settingsState,
+            time.getTime(),
+            activeRoute.useForecastWinds,
+            activeRoute.altitude,
+            settingsState.true_airspeed,
+            getDepartureAdvisorDataResult,
+            queryGfsWindSpeedDataResult,
+            queryGfsWindDirectionDataResult,
+            activeRoute.departure.key,
+            activeRoute.destination.key,
+            airportNbmData,
+          );
+          evaluationsByTime.push({ time: time.getTime(), evaluation: evalByTime });
           const evalByTimeAfter = getWheatherMinimumsAlongRoute(
             queryPoints,
             settingsState,
@@ -1172,6 +1175,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     }
   }, [
     getDepartureAdvisorDataResult.isSuccess,
+    queryGfsWindDirectionDataResult.isSuccess,
     activeRoute,
     // currentHour,
     settingsState.ceiling_at_departure,
@@ -1525,6 +1529,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
               {evaluationsByTime &&
                 blockTimes.map((time, index) => (
                   <DepartureAdvisorTimeBlockComponent
+                    key={'departure-advisor-block-' + index}
                     index={index}
                     time={time}
                     color={colorByTimes[index]}

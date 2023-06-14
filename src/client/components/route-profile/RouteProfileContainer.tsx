@@ -194,24 +194,26 @@ const RouteProfileContainer = () => {
                 })}
               </RadioGroup>
               <div className="header-right">
-                <div className="show-temperature">
-                  <div className="MuiToggleButtonGroup-root">
-                    <ToggleButton
-                      value="showTemperature"
-                      aria-label="showTemperature"
-                      selected={routeProfileState.showTemperature}
-                      style={{ padding: 2 }}
-                      onChange={() => {
-                        handleUpdateState({
-                          ...routeProfileState,
-                          showTemperature: !routeProfileState.showTemperature,
-                        });
-                      }}
-                    >
-                      <i className="fas fa-thermometer-half fa-2x" aria-hidden="true"></i>
-                    </ToggleButton>
+                {routeProfileState.chartType !== routeProfileChartTypes.turb && (
+                  <div className="show-temperature">
+                    <div className="MuiToggleButtonGroup-root">
+                      <ToggleButton
+                        value="showTemperature"
+                        aria-label="showTemperature"
+                        selected={routeProfileState.showTemperature}
+                        style={{ padding: 2 }}
+                        onChange={() => {
+                          handleUpdateState({
+                            ...routeProfileState,
+                            showTemperature: !routeProfileState.showTemperature,
+                          });
+                        }}
+                      >
+                        <i className="fas fa-thermometer-half fa-2x" aria-hidden="true"></i>
+                      </ToggleButton>
+                    </div>
                   </div>
-                </div>
+                )}
                 {routeProfileState.chartType === routeProfileChartTypes.wind && (
                   <div className="select-data-type">
                     <InputFieldWrapper>

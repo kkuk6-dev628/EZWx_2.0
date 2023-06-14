@@ -1050,6 +1050,7 @@ const RouteProfileDataLoader = () => {
         time: departureTime.format('HH:mm z'),
         hour: departureTime.hour(),
         minute: departureTime.minute(),
+        offset: departureTime.zone(),
       },
     };
     const segments: RouteSegment[] = [initialSegment];
@@ -1104,6 +1105,7 @@ const RouteProfileDataLoader = () => {
             time: departureTime.format('HH:mm z'),
             hour: departureTime.hour(),
             minute: departureTime.minute(),
+            offset: departureTime.zone(),
           },
         };
         segments.push(segment);

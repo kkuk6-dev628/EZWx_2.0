@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import DateSlider from './DateSlider';
 import { PersonalMinsEvaluation, hourInMili, personalMinValueToShape } from './DepartureAdvisor';
-import { simpleTimeFormat } from '../map/common/AreoFunctions';
+import { convertTimeFormat, simpleTimeFormat } from '../map/common/AreoFunctions';
 import { useSelector } from 'react-redux';
 import { selectSettings } from '../../store/user/UserSettings';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -189,7 +189,7 @@ function DepartureAdvisorPopup({ setIsShowDateModal, evaluationsByTime, observat
           <i className="fa-solid fa-backward-step fa-2xl"></i>
         </div>
         <div className="time text">
-          <p>{simpleTimeFormat(new Date(currentTime), settingsState.default_time_display_unit)}</p>
+          <p>{convertTimeFormat(new Date(currentTime), settingsState.default_time_display_unit)}</p>
         </div>
         <div className="time-control" onClick={() => moveTime()}>
           <i className="fa-solid fa-forward-step fa-2xl"></i>

@@ -1034,7 +1034,9 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           ) : null}
           {timeHint ? (
             <Hint value={timeHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
-              <span>{timeHint.segment.departureTime.full}</span>
+              {timeHint.segment.departureTime.offset !== new Date().getTimezoneOffset() && (
+                <span>{timeHint.segment.departureTime.full}</span>
+              )}
               <span>{convertTimeFormat(timeHint.segment.arriveTime, true)}</span>
               <span>{convertTimeFormat(timeHint.segment.arriveTime, false)}</span>
             </Hint>

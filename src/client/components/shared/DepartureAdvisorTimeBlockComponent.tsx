@@ -3,6 +3,7 @@ import { addLeadingZeroes, simpleTimeOnlyFormat } from '../map/common/AreoFuncti
 import { PersonalMinsEvaluation, hourInMili, personalMinValueToShape } from './DepartureAdvisor';
 import { useSelector } from 'react-redux';
 import { selectSettings } from '../../store/user/UserSettings';
+import { getEvaluationByTime } from './DepartureAdvisorPopup';
 
 interface Props {
   index: number;
@@ -30,9 +31,9 @@ function DepartureAdvisorTimeBlockComponent({
   // if (realIndex < 0) {
   //   return;
   // }
-  const beforeEval = realIndex < 0 ? null : evaluationsByTime[realIndex * 3].evaluation;
-  const currEval = realIndex < 0 ? null : evaluationsByTime[realIndex * 3 + 1].evaluation;
-  const afterEval = realIndex < 0 ? null : evaluationsByTime[realIndex * 3 + 2].evaluation;
+  const beforeEval = realIndex < 0 ? null : getEvaluationByTime(evaluationsByTime, time.getTime() - hourInMili);
+  const currEval = realIndex < 0 ? null : getEvaluationByTime(evaluationsByTime, time.getTime());
+  const afterEval = realIndex < 0 ? null : getEvaluationByTime(evaluationsByTime, time.getTime() + hourInMili);
   const positionInPercent = (index * (100 - 4) * 3) / (isMap ? 84 : 72) + 2.5;
   function clickEvaluationBar(e: SyntheticEvent) {
     e.nativeEvent.stopPropagation();
