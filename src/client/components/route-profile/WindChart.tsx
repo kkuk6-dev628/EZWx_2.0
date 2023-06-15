@@ -98,7 +98,7 @@ const WindChart = () => {
           const headwind = flyjs.HeadWindCalculator(windSpeed, windDir, segment.course, 2);
           let backgroundColor = 'blue';
           if (routeProfileApiState.windLayer === 'Head/tailwind') {
-            if (headwind < 0) {
+            if (headwind <= -0.5) {
               backgroundColor = 'green';
             } else if (headwind < 0.5) {
               backgroundColor = 'black';

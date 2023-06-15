@@ -143,17 +143,30 @@ function getLineLengthAndAccDistances(
  */
 function findAirportByPoint(airports: RoutePoint[], point: L.LatLng, radius: number) {
   let airport: RoutePoint;
-  let minDistance = Number.POSITIVE_INFINITY;
+  const proxyAirports: { dist: number; airport: RoutePoint }[] = [];
   for (const routePoint of airports) {
     const dist = point.distanceTo(L.latLng(routePoint.position.coordinates[1], routePoint.position.coordinates[0]));
     if (dist < radius) {
-      if (dist < minDistance) {
-        minDistance = dist;
-        airport = routePoint;
-      }
+      proxyAirports.push({ dist, airport: routePoint });
     }
   }
-  return airport;
+  if (proxyAirports.length > 0) {
+    const sortedAirports = proxyAirports.sort((a, b) => {
+      if (a.airport.type === 'icaoid' && b.airport.type !== 'icaoid') {
+        return -1;
+      }
+      if (a.airport.type !== 'icaoid' && b.airport.type === 'icaoid') {
+        return 1;
+      }
+      if (a.dist < b.dist) {
+        return -1;
+      }
+      if (a.dist > b.dist) {
+        return 1;
+      }
+    });
+    return sortedAirports[0].airport;
+  }
 }
 
 export function getMaxForecastTime(dataset: RouteProfileDataset[]): Date {

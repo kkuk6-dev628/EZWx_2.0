@@ -41,7 +41,7 @@ const App = ({ Component, ...rest }: AppProps) => {
               gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
             `}
       </Script>
-      <title>EZExBrief 2.0</title>
+      <title>EZWxBrief 2.0</title>
       <Header />
       <Component {...pageProps} />
       {showFooter && <Footer />}

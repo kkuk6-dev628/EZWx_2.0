@@ -7,6 +7,7 @@ export interface authUser {
 export type TakeoffWeightCategory = 'light' | 'medium' | 'heavy';
 
 export interface UserSettings {
+  user_id?: string;
   observation_time: number;
   observation_interval: number;
   default_home_airport: string;

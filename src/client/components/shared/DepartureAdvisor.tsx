@@ -696,7 +696,7 @@ function getWheatherMinimumsAlongRoute(
         if (personalMins.ceiling_at_departure[1] <= cloudceiling || cloudceiling === null || cloudceiling === 0) {
           personalMinsEvaluation.departureCeiling.value = 2;
           personalMinsEvaluation.departureCeiling.color = personalMinValueToColor[2];
-        } else if (personalMins.ceiling_at_departure[0] <= cloudceiling) {
+        } else if (personalMins.ceiling_at_departure[0] < cloudceiling) {
           personalMinsEvaluation.departureCeiling.value = 1;
           personalMinsEvaluation.departureCeiling.color = personalMinValueToColor[1];
         } else {
@@ -706,7 +706,7 @@ function getWheatherMinimumsAlongRoute(
         if (personalMins.surface_visibility_at_departure[1] <= visibility || visibility === null) {
           personalMinsEvaluation.departureVisibility.value = 2;
           personalMinsEvaluation.departureVisibility.color = personalMinValueToColor[2];
-        } else if (personalMins.surface_visibility_at_departure[0] <= visibility) {
+        } else if (personalMins.surface_visibility_at_departure[0] < visibility) {
           personalMinsEvaluation.departureVisibility.value = 1;
           personalMinsEvaluation.departureVisibility.color = personalMinValueToColor[1];
         } else {
@@ -714,7 +714,7 @@ function getWheatherMinimumsAlongRoute(
           personalMinsEvaluation.departureVisibility.color = personalMinValueToColor[0];
         }
         const { data: forCrosswind } = getAirportNbmData(airportNbmData, observationTime, departureAirportID);
-        if (!forCrosswind || personalMins.crosswinds_at_departure_airport[0] > forCrosswind.cross_com) {
+        if (!forCrosswind || personalMins.crosswinds_at_departure_airport[0] >= forCrosswind.cross_com) {
           personalMinsEvaluation.departureCrosswind.value = 2;
           personalMinsEvaluation.departureCrosswind.color = personalMinValueToColor[2];
         } else if (personalMins.crosswinds_at_departure_airport[1] > forCrosswind.cross_com) {
@@ -728,7 +728,7 @@ function getWheatherMinimumsAlongRoute(
         if (personalMins.ceiling_at_destination[1] <= cloudceiling || cloudceiling === null || cloudceiling === 0) {
           personalMinsEvaluation.destinationCeiling.value = 2;
           personalMinsEvaluation.destinationCeiling.color = personalMinValueToColor[2];
-        } else if (personalMins.ceiling_at_destination[0] <= cloudceiling) {
+        } else if (personalMins.ceiling_at_destination[0] < cloudceiling) {
           personalMinsEvaluation.destinationCeiling.value = 1;
           personalMinsEvaluation.destinationCeiling.color = personalMinValueToColor[1];
         } else {
@@ -738,7 +738,7 @@ function getWheatherMinimumsAlongRoute(
         if (personalMins.surface_visibility_at_destination[1] <= visibility) {
           personalMinsEvaluation.destinationVisibility.value = 2;
           personalMinsEvaluation.destinationVisibility.color = personalMinValueToColor[2];
-        } else if (personalMins.surface_visibility_at_destination[0] <= visibility) {
+        } else if (personalMins.surface_visibility_at_destination[0] < visibility) {
           personalMinsEvaluation.destinationVisibility.value = 1;
           personalMinsEvaluation.destinationVisibility.color = personalMinValueToColor[1];
         } else {
@@ -746,7 +746,7 @@ function getWheatherMinimumsAlongRoute(
           personalMinsEvaluation.destinationVisibility.color = personalMinValueToColor[0];
         }
         const { data: forCrosswind } = getAirportNbmData(airportNbmData, arriveTime, destAirportID);
-        if (!forCrosswind || personalMins.crosswinds_at_destination_airport[0] > forCrosswind.cross_com) {
+        if (!forCrosswind || personalMins.crosswinds_at_destination_airport[0] >= forCrosswind.cross_com) {
           personalMinsEvaluation.destinationCrosswind.value = 2;
           personalMinsEvaluation.destinationCrosswind.color = personalMinValueToColor[2];
         } else if (personalMins.crosswinds_at_destination_airport[1] > forCrosswind.cross_com) {
@@ -849,7 +849,7 @@ function getWheatherMinimumsAlongRoute(
   if (personalMins.ceiling_along_route[0] <= alongCeiling) {
     personalMinsEvaluation.alongRouteCeiling.value = 2;
     personalMinsEvaluation.alongRouteCeiling.color = personalMinValueToColor[2];
-  } else if (personalMins.ceiling_along_route[1] <= alongCeiling) {
+  } else if (personalMins.ceiling_along_route[1] < alongCeiling) {
     personalMinsEvaluation.alongRouteCeiling.value = 1;
     personalMinsEvaluation.alongRouteCeiling.color = personalMinValueToColor[1];
   } else {
@@ -860,7 +860,7 @@ function getWheatherMinimumsAlongRoute(
   if (personalMins.surface_visibility_along_route[0] <= alongVisibility) {
     personalMinsEvaluation.alongRouteVisibility.value = 2;
     personalMinsEvaluation.alongRouteVisibility.color = personalMinValueToColor[2];
-  } else if (personalMins.surface_visibility_along_route[1] <= alongVisibility) {
+  } else if (personalMins.surface_visibility_along_route[1] < alongVisibility) {
     personalMinsEvaluation.alongRouteVisibility.value = 1;
     personalMinsEvaluation.alongRouteVisibility.color = personalMinValueToColor[1];
   } else {
@@ -870,7 +870,7 @@ function getWheatherMinimumsAlongRoute(
 
   if (isOutTimeRange) {
     personalMinsEvaluation.alongRouteProb = { ...initialEvaluation.alongRouteProb };
-  } else if (personalMins.en_route_icing_probability[0] > alongIcingProb) {
+  } else if (personalMins.en_route_icing_probability[0] >= alongIcingProb) {
     personalMinsEvaluation.alongRouteProb.value = 2;
     personalMinsEvaluation.alongRouteProb.color = personalMinValueToColor[2];
   } else if (personalMins.en_route_icing_probability[1] > alongIcingProb) {
@@ -883,7 +883,7 @@ function getWheatherMinimumsAlongRoute(
 
   if (isOutTimeRange) {
     personalMinsEvaluation.alongRouteSeverity = { ...initialEvaluation.alongRouteSeverity };
-  } else if (personalMins.en_route_icing_intensity[0] > alongIcingSeverity) {
+  } else if (personalMins.en_route_icing_intensity[0] >= alongIcingSeverity) {
     personalMinsEvaluation.alongRouteSeverity.value = 2;
     personalMinsEvaluation.alongRouteSeverity.color = personalMinValueToColor[2];
   } else if (personalMins.en_route_icing_intensity[1] > alongIcingSeverity) {
@@ -896,7 +896,7 @@ function getWheatherMinimumsAlongRoute(
 
   if (isOutTimeRange) {
     personalMinsEvaluation.alongRouteTurbulence = { ...initialEvaluation.alongRouteTurbulence };
-  } else if (personalMins.en_route_turbulence_intensity[0] > alongTurbulence) {
+  } else if (personalMins.en_route_turbulence_intensity[0] >= alongTurbulence) {
     personalMinsEvaluation.alongRouteTurbulence.value = 2;
     personalMinsEvaluation.alongRouteTurbulence.color = personalMinValueToColor[2];
   } else if (personalMins.en_route_turbulence_intensity[1] > alongTurbulence) {
@@ -907,7 +907,7 @@ function getWheatherMinimumsAlongRoute(
     personalMinsEvaluation.alongRouteTurbulence.color = personalMinValueToColor[0];
   }
 
-  if (personalMins.en_route_convective_potential[0] > alongConvection) {
+  if (personalMins.en_route_convective_potential[0] >= alongConvection) {
     personalMinsEvaluation.alongRouteConvection.value = 2;
     personalMinsEvaluation.alongRouteConvection.color = personalMinValueToColor[2];
   } else if (personalMins.en_route_convective_potential[1] > alongConvection) {

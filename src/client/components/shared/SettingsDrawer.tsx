@@ -11,12 +11,13 @@ import {
 } from '../settings-drawer';
 import { StyledSlider } from './Slider';
 import { useSelector } from 'react-redux';
-import { initialUserSettingsState, selectSettings } from '../../store/user/UserSettings';
+import { initialUserSettingsState, selectSettings, setUserSettings } from '../../store/user/UserSettings';
 import { useGetUserSettingsQuery, useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
 import { selectAuth } from '../../store/auth/authSlice';
 import { AutoCompleteInput, Modal, PrimaryButton, SecondaryButton } from '../common';
 import { ColoredRangeSlider, formatForDecimal, formatForInteger } from '../common/ColoredRangeSlider';
 import { toast } from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
 
 export const FetchUserSettings = () => {
   const { id } = useSelector(selectAuth);
@@ -42,6 +43,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const [isShowRestoreSettingModal, setIsShowRestoreSettingModal] = useState(false);
   const [isShowSaveSettingModal, setIsShowSaveSettingModal] = useState(false);
   const [settings, setSettings] = useState(settingsState);
+  const dispatch = useDispatch();
 
   const [updateUserSettings, { isLoading: isUpdating, isSuccess: isSuccessUpdate, error: updateError }] =
     useUpdateUserSettingsMutation();
@@ -624,7 +626,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
             <SecondaryButton
               text="Restore Settings"
               onClick={() => {
-                updateUserSettings({ ...initialUserSettingsState, user_id: id });
+                updateUserSettings({ ...initialUserSettingsState.settings, user_id: id });
+                dispatch(setUserSettings({ ...initialUserSettingsState.settings, user_id: id }));
+                setSettings({ ...initialUserSettingsState.settings, user_id: id });
                 setIsShowRestoreSettingModal(false);
               }}
               isLoading={false}

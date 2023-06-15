@@ -125,7 +125,7 @@ export function makeSkyConditions(
       skyCover: skyCover >= 88 ? 'OVC' : 'BKN',
       cloudBase: ceiling,
     });
-    if (lowestCloud > 0) {
+    if (lowestCloud > 0 && roundCloudHeight(lowestCloud) !== roundCloudHeight(ceiling)) {
       skyConditions.push({
         skyCover: 'SCT',
         cloudBase: lowestCloud,

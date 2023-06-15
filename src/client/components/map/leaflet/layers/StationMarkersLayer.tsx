@@ -493,7 +493,9 @@ export const StationMarkersLayer = () => {
               setFetchedNbmStationData(stationTime.station_table_name);
             },
             (a, b) =>
-              b.properties.pub - a.properties.pub || (a.properties.faaid as string).localeCompare(b.properties.faaid),
+              b.properties.pub - a.properties.pub ||
+              (a.properties.icaoid ? -1 : 1) ||
+              (a.properties.faaid as string).localeCompare(b.properties.faaid),
             undefined,
           );
         };

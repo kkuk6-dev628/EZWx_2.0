@@ -680,7 +680,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                     }
                     label={layerControlState.radarState.baseReflectivity.name}
                   />
-                  <FormControlLabel
+                  {/* <FormControlLabel
                     control={
                       <Checkbox
                         checked={layerControlState.radarState.echoTopHeight.checked}
@@ -698,7 +698,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                       />
                     }
                     label={layerControlState.radarState.echoTopHeight.name}
-                  />
+                  /> */}
                   <FormControlLabel
                     control={
                       <Checkbox
