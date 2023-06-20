@@ -47,12 +47,7 @@ function DepartureAdvisorTimeBlockComponent({
       className={`prevent-select block ${color}`}
       onClick={() => handleTimeChange(time)}
       onMouseOver={(e) => {
-        if (
-          settingsState.observation_time < time.getTime() - hourInMili ||
-          settingsState.observation_time > time.getTime() - hourInMili
-        ) {
-          setShowBarComponent(true);
-        }
+        setShowBarComponent(true);
       }}
       onMouseOut={(e) => {
         setShowBarComponent(false);

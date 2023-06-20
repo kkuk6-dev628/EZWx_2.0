@@ -104,7 +104,7 @@ export const cacheKeys = {
  * @param inMile flag to get retrun nautical miles or kilometers
  * @returns nautical miles or kilometers
  */
-function getLineLength(coordinateList: GeoJSON.Position[], inMile = false): number {
+export function getLineLength(coordinateList: GeoJSON.Position[], inMile = false): number {
   let routeLength = 0;
   const latlngs: L.LatLng[] = L.GeoJSON.coordsToLatLngs(coordinateList);
   latlngs.reduce((a, b) => {
@@ -469,13 +469,13 @@ export function interpolateRouteWithStation(route: Route, divideNumber, airports
   return interpolatedLatlngs;
 }
 
-export function interpolateRoute(route: Route, divideNumber, returnAsLeaflet = false): L.LatLng[] {
+export function interpolateRoute(route: Route, divideNumber, returnAsLeaflet = false, margin = 0): L.LatLng[] {
   const coordinateList = [
     route.departure.position.coordinates,
     ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
     route.destination.position.coordinates,
   ];
-  const totalLength = getLineLength(coordinateList);
+  const totalLength = getLineLength(coordinateList, true);
   const interpolatedLatlngs = new Array<L.LatLng>();
   let latlngs: L.LatLng[] = L.GeoJSON.coordsToLatLngs(coordinateList);
   if (divideNumber === totalNumberOfElevations) {
@@ -487,15 +487,8 @@ export function interpolateRoute(route: Route, divideNumber, returnAsLeaflet = f
       latlngs[latlngs.length - 1].lng,
       2,
     );
-    const extLength = totalLength / 13 / 2;
-    const extStart = fly.enroute(latlngs[0].lat, latlngs[0].lng, courseStart, extLength, 6);
-    const extEnd = fly.enroute(
-      latlngs[latlngs.length - 1].lat,
-      latlngs[latlngs.length - 1].lng,
-      courseEnd,
-      extLength,
-      6,
-    );
+    const extStart = fly.enroute(latlngs[0].lat, latlngs[0].lng, courseStart, margin, 6);
+    const extEnd = fly.enroute(latlngs[latlngs.length - 1].lat, latlngs[latlngs.length - 1].lng, courseEnd, margin, 6);
     latlngs = [
       L.latLng(extStart.latitude.degrees, extStart.longitude.degrees),
       ...latlngs,
@@ -1063,7 +1056,7 @@ const RouteProfileDataLoader = () => {
         time: departureTime.format('HH:mm z'),
         hour: departureTime.hour(),
         minute: departureTime.minute(),
-        offset: departureTime.zone(),
+        offset: departureTime.utcOffset(),
       },
     };
     const segments: RouteSegment[] = [initialSegment];
@@ -1118,7 +1111,7 @@ const RouteProfileDataLoader = () => {
             time: departureTime.format('HH:mm z'),
             hour: departureTime.hour(),
             minute: departureTime.minute(),
-            offset: departureTime.zone(),
+            offset: departureTime.utcOffset(),
           },
         };
         segments.push(segment);
@@ -1150,7 +1143,7 @@ const RouteProfileDataLoader = () => {
     queryGfsWindDirectionDataResult.isSuccess,
     queryNbmFlightCatResult.isSuccess,
     queryNbmWx1Result.isSuccess,
-    hourState,
+    observationTime,
     userSettings.true_airspeed,
     activeRoute,
   ]);

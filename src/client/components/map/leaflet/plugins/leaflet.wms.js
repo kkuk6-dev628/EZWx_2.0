@@ -80,6 +80,15 @@
       this.refreshOverlay();
     },
 
+    onRemove: function () {
+      if (this._subLayers) {
+        delete this._subLayers;
+      }
+      if (this._url) {
+        delete this._url;
+      }
+    },
+
     getEvents: function () {
       if (this.options.identify) {
         return { click: this.identify };

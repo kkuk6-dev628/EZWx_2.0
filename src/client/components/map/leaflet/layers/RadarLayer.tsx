@@ -101,16 +101,16 @@ const RadarLayer = () => {
   useEffect(() => {
     if (!radarLayerState.checked) {
       radarLayers.baseReflectivity.forEach((baseReflectivity) => map.removeLayer(baseReflectivity.layer));
-      radarLayers.echoTopHeight.forEach((echoTopHeight) => map.removeLayer(echoTopHeight.layer));
+      // radarLayers.echoTopHeight.forEach((echoTopHeight) => map.removeLayer(echoTopHeight.layer));
       radarLayers.forecast.forEach((forecast) => forecast.layer && map.removeLayer(forecast.layer));
       return;
     } else {
       radarLayers.baseReflectivity.forEach((baseReflectivity) => map.addLayer(baseReflectivity.layer));
-      radarLayers.echoTopHeight.forEach((echoTopHeight) => map.addLayer(echoTopHeight.layer));
+      // radarLayers.echoTopHeight.forEach((echoTopHeight) => map.addLayer(echoTopHeight.layer));
       radarLayers.forecast.forEach((forecast) => forecast.layer && map.addLayer(forecast.layer));
     }
     radarLayers.baseReflectivity.forEach((baseReflectivity) => baseReflectivity.layer.setOpacity(0));
-    radarLayers.echoTopHeight.forEach((echoTopHeight) => echoTopHeight.layer.setOpacity(0));
+    // radarLayers.echoTopHeight.forEach((echoTopHeight) => echoTopHeight.layer.setOpacity(0));
     radarLayers.forecast.forEach((forecast) => forecast.layer?.setOpacity(0));
     const differenceMinutes = getTimeDifference();
     const opacity = radarLayerState.opacity / 100;
@@ -119,7 +119,7 @@ const RadarLayer = () => {
       if (radarLayerState.baseReflectivity.checked) {
         validRadar = getValidRadar(radarLayers.baseReflectivity, new Date(observationTime).getTime());
       } else if (radarLayerState.echoTopHeight.checked) {
-        validRadar = getValidRadar(radarLayers.echoTopHeight, new Date(observationTime).getTime());
+        // validRadar = getValidRadar(radarLayers.echoTopHeight, new Date(observationTime).getTime());
       }
     } else if (differenceMinutes < forecastMinute1 && radarLayerState.forecastRadar.checked) {
       validRadar = getValidForecastRadar(radarLayers.forecast, new Date(observationTime).getTime());
@@ -151,7 +151,7 @@ const RadarLayer = () => {
   };
 
   const getValidForecastRadar = (radars: Radar[], obsTimeSpan: number): Radar => {
-    const returns = radars.reduce((prev, curr) => {
+    const returns = radars?.reduce((prev, curr) => {
       const prevDiff = obsTimeSpan - prev.valid_timespan;
       const currDiff = obsTimeSpan - curr.valid_timespan;
       if (prevDiff > currDiff && currDiff >= 0) {
@@ -183,20 +183,17 @@ const RadarLayer = () => {
           }
         }
         const validTimeSpan = new Date(data.data.meta.valid).getTime();
-        radarLayers.baseReflectivity[i] = {
-          meta: { ...data.data.meta },
-          valid_timespan: validTimeSpan,
-          layer: WMS.layer(
-            baseReflectivityUrl,
-            i === 0 ? baseReflectivityLayer : `${baseReflectivityLayer}-m${addLeadingZeroes(i * 5, 2)}m`,
-            {
-              transparent: true,
-              format: 'image/png',
-              tiled: false,
-              identify: false,
-            },
-          ).setOpacity(0),
-        };
+        radarLayers.baseReflectivity[i] = { meta: data.data.meta, valid_timespan: validTimeSpan, layer: null };
+        radarLayers.baseReflectivity[i].layer = WMS.layer(
+          baseReflectivityUrl,
+          i === 0 ? baseReflectivityLayer : `${baseReflectivityLayer}-m${addLeadingZeroes(i * 5, 2)}m`,
+          {
+            transparent: true,
+            format: 'image/png',
+            tiled: false,
+            identify: false,
+          },
+        ).setOpacity(0);
         if (i === 10) {
           setFetchedRadarLayers(true);
         }

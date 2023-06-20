@@ -97,6 +97,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
 
   const handleSaveSettings = async (isCloseDrawer = false) => {
     if (id) {
+      dispatch(setUserSettings({ ...settings, user_id: id }));
       await updateUserSettings({ ...settings, user_id: id });
       if (isCloseDrawer) {
         setIsShowSettingsDrawer(false);
@@ -626,9 +627,8 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
             <SecondaryButton
               text="Restore Settings"
               onClick={() => {
-                updateUserSettings({ ...initialUserSettingsState.settings, user_id: id });
-                dispatch(setUserSettings({ ...initialUserSettingsState.settings, user_id: id }));
                 setSettings({ ...initialUserSettingsState.settings, user_id: id });
+                handleSaveSettings(true);
                 setIsShowRestoreSettingModal(false);
               }}
               isLoading={false}

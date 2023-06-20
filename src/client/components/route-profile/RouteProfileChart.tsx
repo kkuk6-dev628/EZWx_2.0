@@ -18,6 +18,7 @@ import { selectActiveRoute } from '../../store/route/routes';
 import {
   cacheKeys,
   flightCategoryDivide,
+  getLineLength,
   getMinMaxValueByElevation,
   getRouteLength,
   getSegmentsCount,
@@ -647,19 +648,38 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   }
 
   useEffect(() => {
-    if (activeRoute && !queryElevationsResult.isSuccess && !queryElevationsResult.isLoading) {
-      const elevationPoints = interpolateRoute(activeRoute, totalNumberOfElevations);
+    if (activeRoute && !queryElevationsResult.isSuccess && !queryElevationsResult.isLoading && startMargin) {
+      const elevationPoints = interpolateRoute(activeRoute, totalNumberOfElevations, false, startMargin);
       queryElevations({ queryPoints: elevationPoints });
     }
-  }, [fetchedDate]);
+  }, [fetchedDate, startMargin]);
 
   useEffect(() => {
     if (queryElevationsResult.isSuccess && queryElevationsResult.data && routeLength) {
       const elevationApiResults = queryElevationsResult.data.geoPoints;
       const elevations = [];
-      const elSegmentLength = (routeLength + startMargin + endMargin) / (elevationApiResults.length - 1);
-      for (let i = 0; i < elevationApiResults.length; i++) {
-        elevations.push({ x: i * elSegmentLength - startMargin, y: meterToFeet(elevationApiResults[i].elevation) });
+      const elevationPoints = interpolateRoute(activeRoute, totalNumberOfElevations, true, startMargin);
+
+      let distance = 0;
+      let previousPos: L.LatLng = null;
+      for (let j = 0; j < elevationPoints.length; j++) {
+        for (let i = 0; i < elevationApiResults.length; i++) {
+          if (
+            Math.abs(elevationPoints[j].lat - elevationApiResults[i].latitude) < 0.000001 &&
+            Math.abs(elevationPoints[j].lng - elevationApiResults[i].longitude) < 0.000001
+          ) {
+            if (previousPos) {
+              const delta = previousPos.distanceTo(elevationPoints[j]);
+              distance += delta;
+            }
+            previousPos = elevationPoints[j];
+            elevations.push({
+              x: distance / 1852 - startMargin,
+              y: meterToFeet(elevationApiResults[i].elevation),
+            });
+            break;
+          }
+        }
       }
       if (elevations.length === 0) return;
       setElevationSeries(elevations);

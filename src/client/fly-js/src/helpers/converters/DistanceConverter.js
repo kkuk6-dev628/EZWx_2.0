@@ -28,8 +28,8 @@ DistanceConvertor.prototype.nauticalMilesTo = function (unitOfMeasurement, unitV
     return this[converterFunc](unitValue, roundTo);
 };
 
-DistanceConvertor.prototype.nauticalMilesToRadians = function (nauticalMiles, roundTo) {
-    return Rounder.round(nauticalMiles * Math.PI / (180 * 60), 2);
+DistanceConvertor.prototype.nauticalMilesToRadians = function (nauticalMiles, roundTo = 6) {
+    return Rounder.round(nauticalMiles * Math.PI / (180 * 60), roundTo);
 };
 
 DistanceConvertor.prototype.nauticalMilesToMiles = function (nauticalMiles, roundTo) {

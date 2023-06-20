@@ -232,6 +232,7 @@
     width: 100%;
     justify-content: space-between;
     color: black;
+    z-index: 2;
     .blocks-contents{
       display: flex;
       flex-direction: column;

@@ -124,7 +124,7 @@ export default function Header() {
   // sticky header
   const [sticky, setSticky] = useState(false);
   const handleScroll = () => {
-    if (window.scrollY > 0) {
+    if (mapMenu && window.scrollY > 0) {
       setSticky(true);
     } else {
       setSticky(false);

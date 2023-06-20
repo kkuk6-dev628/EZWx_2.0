@@ -66,6 +66,9 @@ export const UserSettingsSlice = createSlice({
     setPersonalMinimums: (state, action) => {
       state.personalMinimumsState = action.payload;
     },
+    setObservationTime: (state, action) => {
+      state.settings.observation_time = action.payload;
+    },
   },
 });
 
@@ -91,7 +94,7 @@ export const { setSettingsLoadTime } = SettingsLoadTimeSlice.actions;
 
 export const selectSettingsLoadTime = (state: AppState) => state.settingsLoadTime.settingsLoadTimeState;
 
-export const { setUserSettings, setPersonalMinimums } = UserSettingsSlice.actions;
+export const { setUserSettings, setPersonalMinimums, setObservationTime } = UserSettingsSlice.actions;
 
 export const selectPersonalMinimums = (state: AppState) => state.userSettings.personalMinimumsState;
 export const selectSettings = (state: AppState) => state.userSettings.settings;

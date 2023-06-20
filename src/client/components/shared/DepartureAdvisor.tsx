@@ -5,12 +5,13 @@ import {
   addLeadingZeroes,
   diffMinutes,
   getTimeRangeStart,
+  roundCloudHeight,
   simpleTimeFormat,
   simpleTimeOnlyFormat,
 } from '../map/common/AreoFunctions';
 import { useDispatch, useSelector } from 'react-redux';
 import { Dialog, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { PersonalMinimums, selectSettings, setUserSettings } from '../../store/user/UserSettings';
+import { PersonalMinimums, selectSettings, setObservationTime, setUserSettings } from '../../store/user/UserSettings';
 import { useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
 import { selectAuth } from '../../store/auth/authSlice';
 import {
@@ -680,12 +681,13 @@ function getWheatherMinimumsAlongRoute(
         speed = trueAirSpeed;
       }
       const newTime = new Date(arriveTime).getTime() + (3600 * 1000 * dist) / speed;
-      const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(
+      const { value: ceilingRaw, time: forecastTime } = getValueFromDatasetByElevation(
         departureData.data?.cloudceiling,
         new Date(arriveTime),
         null,
         index,
       );
+      const cloudceiling = roundCloudHeight(ceilingRaw);
       const { value: visibility } = getValueFromDatasetByElevation(
         departureData.data?.visibility,
         new Date(arriveTime),
@@ -1070,23 +1072,63 @@ function DepartureAdvisor(props: { showPast: boolean }) {
 
   useEffect(() => {
     if (activeRoute && getDepartureAdvisorDataResult.isSuccess && evaluationsByTime) {
+      const queryPoints = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide, true);
       const currentTime = new Date();
       currentTime.setMinutes(0, 0, 0);
       const currentTimeMili = currentTime.getTime();
       const currEvaluation =
         settingsState.observation_time < currentTimeMili
           ? { ...initialEvaluation }
-          : getEvaluationByTime(evaluationsByTime, settingsState.observation_time);
+          : getWheatherMinimumsAlongRoute(
+              queryPoints,
+              settingsState,
+              settingsState.observation_time,
+              activeRoute.useForecastWinds,
+              activeRoute.altitude,
+              settingsState.true_airspeed,
+              getDepartureAdvisorDataResult,
+              queryGfsWindSpeedDataResult,
+              queryGfsWindDirectionDataResult,
+              activeRoute.departure.key,
+              activeRoute.destination.key,
+              airportNbmData,
+            );
       setCurrEval(currEvaluation);
       const beforeEvaluation =
         settingsState.observation_time - hourInMili < currentTimeMili
           ? { ...initialEvaluation }
-          : getEvaluationByTime(evaluationsByTime, settingsState.observation_time - hourInMili);
+          : getWheatherMinimumsAlongRoute(
+              queryPoints,
+              settingsState,
+              settingsState.observation_time - hourInMili,
+              activeRoute.useForecastWinds,
+              activeRoute.altitude,
+              settingsState.true_airspeed,
+              getDepartureAdvisorDataResult,
+              queryGfsWindSpeedDataResult,
+              queryGfsWindDirectionDataResult,
+              activeRoute.departure.key,
+              activeRoute.destination.key,
+              airportNbmData,
+            );
       setBeforeEval(beforeEvaluation);
       const afterEvaluation =
         settingsState.observation_time + hourInMili < currentTimeMili
           ? { ...initialEvaluation }
-          : getEvaluationByTime(evaluationsByTime, settingsState.observation_time + hourInMili);
+          : getWheatherMinimumsAlongRoute(
+              queryPoints,
+              settingsState,
+              settingsState.observation_time + hourInMili,
+              activeRoute.useForecastWinds,
+              activeRoute.altitude,
+              settingsState.true_airspeed,
+              getDepartureAdvisorDataResult,
+              queryGfsWindSpeedDataResult,
+              queryGfsWindDirectionDataResult,
+              activeRoute.departure.key,
+              activeRoute.destination.key,
+              airportNbmData,
+            );
       setAfterEval(afterEvaluation);
     }
   }, [
@@ -1194,7 +1236,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
 
   useEffect(() => {
     if (!hideDotsBars && !clickedDotsBars) {
-      setHideDotsBars(true);
+      setTimeout(() => setHideDotsBars(true), 3000);
     }
   }, [settingsState.observation_time, hideDotsBars]);
 
@@ -1226,10 +1268,10 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   function valuetext(value: number) {
     return (
       <div className="slider-label-container">
-        {beforeEval && (
+        {beforeEval && !hideDotsBars && (
           <div
             ref={dotElementRef}
-            className={'bars-container' + (hideDotsBars ? ' fade-out' : '')}
+            className={'bars-container'}
             onClick={clickEvaluationBar}
             onMouseDown={(e) => e.stopPropagation()}
             onMouseOver={() => {
@@ -1475,7 +1517,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     const timespan = time.getTime();
     const newSettings = { ...settingsState, observation_time: timespan };
     if (commit && auth.id) updateUserSettingsAPI(newSettings);
-    dispatch(setUserSettings(newSettings));
+    dispatch(setObservationTime(timespan));
   };
 
   if (
