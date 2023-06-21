@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { LineSeries, CustomSVGSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
-import { cacheKeys, getValueFromDatasetByElevation } from './RouteProfileDataLoader';
+import { cacheKeys, getRouteLength, getSegmentsCount, getValueFromDatasetByElevation } from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';
 import {
   useGetRouteProfileStateQuery,
@@ -67,8 +67,10 @@ const WindChart = () => {
     if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess && segments.length > 0) {
       const windSpeedData = [];
       const dataset = queryGfsWindSpeedDataResult.data;
+      const routeLength = getRouteLength(activeRoute, true);
+      const segmentInterval = routeLength / getSegmentsCount(activeRoute);
       segments.forEach((segment, index) => {
-        const x = segment.accDistance;
+        const x = index * segmentInterval;
         const elevations = windDataElevations[routeProfileApiState.maxAltitude];
         if (!elevations) {
           return;

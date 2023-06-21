@@ -25,7 +25,7 @@ import {
   flightCategoryDivide,
   getSegmentsCount,
   getValueFromDatasetByElevation,
-  interpolateRoute,
+  interpolateRouteByInterval,
 } from '../route-profile/RouteProfileDataLoader';
 import { selectActiveRoute } from '../../store/route/routes';
 import { LatLng } from 'leaflet';
@@ -1058,7 +1058,10 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   useEffect(() => {
     if (activeRoute) {
       getDepartureAdvisorDataResult.reset();
-      const queryPoints = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide);
+      const queryPoints = interpolateRouteByInterval(
+        activeRoute,
+        getSegmentsCount(activeRoute) * flightCategoryDivide,
+      ).map((pt) => L.GeoJSON.latLngToCoords(pt.point));
       const elevations = [];
       if (activeRoute.altitude % 1000 === 0) {
         elevations.push(activeRoute.altitude);
@@ -1072,7 +1075,10 @@ function DepartureAdvisor(props: { showPast: boolean }) {
 
   useEffect(() => {
     if (activeRoute && getDepartureAdvisorDataResult.isSuccess && evaluationsByTime) {
-      const queryPoints = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide, true);
+      const queryPoints = interpolateRouteByInterval(
+        activeRoute,
+        getSegmentsCount(activeRoute) * flightCategoryDivide,
+      ).map((pt) => pt.point);
       const currentTime = new Date();
       currentTime.setMinutes(0, 0, 0);
       const currentTimeMili = currentTime.getTime();
@@ -1151,7 +1157,10 @@ function DepartureAdvisor(props: { showPast: boolean }) {
 
   useEffect(() => {
     if (activeRoute && getDepartureAdvisorDataResult.isSuccess) {
-      const queryPoints = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide, true);
+      const queryPoints = interpolateRouteByInterval(
+        activeRoute,
+        getSegmentsCount(activeRoute) * flightCategoryDivide,
+      ).map((pt) => pt.point);
       const currentHour = new Date();
       currentHour.setMinutes(0, 0, 0);
       const evaluationsByTime = [];

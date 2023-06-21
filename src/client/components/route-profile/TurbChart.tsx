@@ -7,11 +7,7 @@ import {
   getMaxForecastTime,
   getRouteLength,
   getSegmentsCount,
-  getTimeGradientStops,
-  getValueFromDataset,
   getValueFromDatasetByElevation,
-  interpolateRoute,
-  totalNumberOfElevations,
 } from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';
 import {

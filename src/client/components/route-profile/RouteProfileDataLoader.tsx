@@ -47,6 +47,10 @@ import { windQueryElevations } from './WindChart';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { useGetAirportQuery } from '../../store/route/airportApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
+import Point from '../../fly-js/src/Point';
+import Latitude from '../../fly-js/src/Latitude';
+import Longitude from '../../fly-js/src/Longitude';
+import { nauticalMilesToMeters } from '../../fly-js/src/helpers/converters/DistanceConverter';
 
 export const totalNumberOfElevations = 512;
 
@@ -141,12 +145,14 @@ function getLineLengthAndAccDistances(
  * @param  {Number} radius is the meters value
  * @return {RoutePoint}
  */
-function findAirportByPoint(airports: RoutePoint[], point: L.LatLng, radius: number) {
-  let airport: RoutePoint;
+function findAirportByPoint(airports: RoutePoint[], point: L.LatLng, radius: number, exclude: RoutePoint[]) {
   const proxyAirports: { dist: number; airport: RoutePoint }[] = [];
   for (const routePoint of airports) {
     const dist = point.distanceTo(L.latLng(routePoint.position.coordinates[1], routePoint.position.coordinates[0]));
     if (dist < radius) {
+      if (exclude.filter((ex) => ex.key == routePoint.key).length > 0) {
+        continue;
+      }
       proxyAirports.push({ dist, airport: routePoint });
     }
   }
@@ -404,69 +410,142 @@ export function getRouteLength(route: Route, inMile = false): number {
   return routeLengthNm;
 }
 
-interface Airport {
+export interface SegmentPoint {
   point: L.LatLng;
   isRoutePoint: boolean;
   airport?: RoutePoint;
 }
 
-export function interpolateRouteWithStation(route: Route, divideNumber, airports: RoutePoint[]): Airport[] {
-  const coordinateList = [
-    route.departure.position.coordinates,
-    ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
-    route.destination.position.coordinates,
-  ];
-  const totalLength = getLineLength(coordinateList);
-  const interpolatedLatlngs = new Array<Airport>();
-  const latlngs: L.LatLng[] = L.GeoJSON.coordsToLatLngs(coordinateList);
-  latlngs.map((latlng, index) => {
-    if (index < latlngs.length - 1) {
-      const nextLatlng = latlngs[index + 1];
-      const segmentLength = latlng.distanceTo(nextLatlng);
-      const vertices = Math.round((segmentLength * divideNumber) / (totalLength * 1000)) + 1;
-      const segmentInterval = (totalLength * 1000) / divideNumber;
-      //@ts-ignore
-      const polyline = L.Polyline.Arc(latlng, nextLatlng, { color: '#f0fa', weight: 6, pane: 'route-line', vertices });
-      const points: Airport[] = polyline.getLatLngs().map((latlng) => ({ point: latlng }));
-      if (index === 0) {
-        points[0].airport = route.departure;
-        points[0].isRoutePoint = true;
-        let routePoint = route.destination;
-        if (route.routeOfFlight && route.routeOfFlight.length > 0) {
-          routePoint = route.routeOfFlight[0].routePoint;
-        }
-        points[points.length - 1].airport = routePoint;
-        points[points.length - 1].isRoutePoint = true;
-        for (let i = 1; i < points.length - 1; i++) {
-          const airport = findAirportByPoint(airports, points[i].point, segmentInterval / 2);
-          points[i].airport = airport;
-          points[i].isRoutePoint = false;
-        }
-        interpolatedLatlngs.push(...points);
-      } else {
-        if (index > 0 && index < latlngs.length - 2) {
-          /////////////////////
-          // departure, rf[0], rf[1], rf[2], dest
-          //  0,           1,     2,     3,    4
-          //    index === 0, index=1, index=2, index=3
-          points[points.length - 1].airport = route.routeOfFlight[index].routePoint;
-          points[points.length - 1].isRoutePoint = true;
-        } else if (index === latlngs.length - 2) {
-          points[points.length - 1].airport = route.destination;
-          points[points.length - 1].isRoutePoint = true;
-        }
-        for (let i = 0; i < points.length - 1; i++) {
-          const airport = findAirportByPoint(airports, points[i].point, segmentInterval / 2);
-          points[i].airport = airport;
-          points[i].isRoutePoint = false;
-        }
+// export function interpolateRouteWithStation(route: Route, divideNumber, airports: RoutePoint[]): SegmentPoint[] {
+//   const coordinateList = [
+//     route.departure.position.coordinates,
+//     ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
+//     route.destination.position.coordinates,
+//   ];
+//   const totalLength = getLineLength(coordinateList);
+//   const interpolatedLatlngs = new Array<SegmentPoint>();
+//   const latlngs: L.LatLng[] = L.GeoJSON.coordsToLatLngs(coordinateList);
+//   latlngs.map((latlng, index) => {
+//     if (index < latlngs.length - 1) {
+//       const nextLatlng = latlngs[index + 1];
+//       const segmentLength = latlng.distanceTo(nextLatlng);
+//       const vertices = Math.round((segmentLength * divideNumber) / (totalLength * 1000)) + 1;
+//       const segmentInterval = (totalLength * 1000) / divideNumber;
+//       //@ts-ignore
+//       const polyline = L.Polyline.Arc(latlng, nextLatlng, { color: '#f0fa', weight: 6, pane: 'route-line', vertices });
+//       const points: SegmentPoint[] = polyline.getLatLngs().map((latlng) => ({ point: latlng }));
+//       if (index === 0) {
+//         points[0].airport = route.departure;
+//         points[0].isRoutePoint = true;
+//         let routePoint = route.destination;
+//         if (route.routeOfFlight && route.routeOfFlight.length > 0) {
+//           routePoint = route.routeOfFlight[0].routePoint;
+//         }
+//         points[points.length - 1].airport = routePoint;
+//         points[points.length - 1].isRoutePoint = true;
+//         for (let i = 1; i < points.length - 1; i++) {
+//           const airport = findAirportByPoint(
+//             airports,
+//             points[i].point,
+//             segmentInterval / 2,
+//             route.routeOfFlight.map((routeOfFlight) => routeOfFlight.routePoint),
+//           );
+//           points[i].airport = airport;
+//           points[i].isRoutePoint = false;
+//         }
+//         interpolatedLatlngs.push(...points);
+//       } else {
+//         if (index > 0 && index < latlngs.length - 2) {
+//           /////////////////////
+//           // departure, rf[0], rf[1], rf[2], dest
+//           //  0,           1,     2,     3,    4
+//           //    index === 0, index=1, index=2, index=3
+//           points[points.length - 1].airport = route.routeOfFlight[index].routePoint;
+//           points[points.length - 1].isRoutePoint = true;
+//         } else if (index === latlngs.length - 2) {
+//           points[points.length - 1].airport = route.destination;
+//           points[points.length - 1].isRoutePoint = true;
+//         }
+//         for (let i = 0; i < points.length - 1; i++) {
+//           const airport = findAirportByPoint(
+//             airports,
+//             points[i].point,
+//             segmentInterval / 2,
+//             route.routeOfFlight.map((routeOfFlight) => routeOfFlight.routePoint),
+//           );
+//           points[i].airport = airport;
+//           points[i].isRoutePoint = false;
+//         }
 
-        interpolatedLatlngs.push(...points.slice(1));
+//         interpolatedLatlngs.push(...points.slice(1));
+//       }
+//       //@ts-ignore
+//     }
+//   });
+//   return interpolatedLatlngs;
+// }
+
+export function interpolateLegByInterval(start: L.LatLng, end: L.LatLng, interval: number, offset: number) {
+  const latlngs: Point[] = [];
+  let distance = offset;
+  let current: Point = new Point(new Latitude(start.lat), new Longitude(start.lng));
+  let reminderDistance = 0;
+  do {
+    const course = fly.trueCourse(current.latitude.degrees, current.longitude.degrees, end.lat, end.lng, 2);
+    current = fly.enroute(current.latitude.degrees, current.longitude.degrees, course, distance, 6);
+    latlngs.push(current);
+    reminderDistance = fly.distanceTo(current.latitude.degrees, current.longitude.degrees, end.lat, end.lng, 6);
+    distance = interval;
+  } while (reminderDistance > interval);
+  return { reminder: reminderDistance, latlngs };
+}
+
+export function interpolateRouteByInterval(
+  route: Route,
+  divideNumber: number,
+  airports: RoutePoint[] = null,
+  findAirports = false,
+): SegmentPoint[] {
+  const routePoints = [route.departure, ...route.routeOfFlight.map((item) => item.routePoint), route.destination];
+  const totalLength = getLineLength(
+    routePoints.map((routePoint) => routePoint.position.coordinates),
+    true,
+  );
+  const interval = totalLength / divideNumber;
+  const segmentPoints = new Array<SegmentPoint>();
+  let offset = 0;
+  routePoints.reduce((prev, curr, routePointsIndex) => {
+    const prevLatLng = L.GeoJSON.coordsToLatLng(prev.position.coordinates as [number, number]);
+    const currLatLng = L.GeoJSON.coordsToLatLng(curr.position.coordinates as [number, number]);
+    const { reminder: reminder, latlngs: points } = interpolateLegByInterval(prevLatLng, currLatLng, interval, offset);
+    offset = interval - reminder;
+    const segmentPointsInLeg = points.map((point, index) => {
+      const latlng = L.latLng(point.latitude.degrees, point.longitude.degrees);
+      let airport = null;
+      if (findAirports) {
+        airport =
+          index === 0 && routePointsIndex === 1
+            ? prev
+            : index === points.length - 1
+            ? curr
+            : findAirportByPoint(
+                airports,
+                latlng,
+                fly.nauticalMilesTo('Meters', interval / 2, 6),
+                route.routeOfFlight.map((routeOfFlight) => routeOfFlight.routePoint),
+              );
       }
-      //@ts-ignore
-    }
+
+      return {
+        point: latlng,
+        airport,
+        isRoutePoint: index === 0 || index === points.length - 1,
+      };
+    });
+    segmentPoints.push(...segmentPointsInLeg);
+    return curr;
   });
-  return interpolatedLatlngs;
+  return segmentPoints;
 }
 
 export function interpolateRoute(route: Route, divideNumber, returnAsLeaflet = false, margin = 0): L.LatLng[] {
@@ -475,7 +554,7 @@ export function interpolateRoute(route: Route, divideNumber, returnAsLeaflet = f
     ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
     route.destination.position.coordinates,
   ];
-  const totalLength = getLineLength(coordinateList, true);
+  const totalLength = getLineLength(coordinateList, false) * 1000;
   const interpolatedLatlngs = new Array<L.LatLng>();
   let latlngs: L.LatLng[] = L.GeoJSON.coordsToLatLngs(coordinateList);
   if (divideNumber === totalNumberOfElevations) {
@@ -499,7 +578,7 @@ export function interpolateRoute(route: Route, divideNumber, returnAsLeaflet = f
     if (index < latlngs.length - 1) {
       const nextLatlng = latlngs[index + 1];
       const segmentLength = latlng.distanceTo(nextLatlng);
-      const vertices = Math.round((segmentLength * divideNumber) / (totalLength * 1000)) + 1;
+      const vertices = Math.round((segmentLength * divideNumber) / totalLength) + 1;
       //@ts-ignore
       const polyline = L.Polyline.Arc(latlng, nextLatlng, { color: '#f0fa', weight: 6, pane: 'route-line', vertices });
       //@ts-ignore
@@ -737,7 +816,9 @@ const RouteProfileDataLoader = () => {
     isError: boolean;
   }) {
     if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
-      const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
+      const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute)).map((pt) =>
+        L.GeoJSON.latLngToCoords(pt.point),
+      );
       if (!queryGfsWindSpeedDataResult.isLoading && !queryGfsWindSpeedDataResult.isSuccess) {
         queryGfsWindSpeedData({ queryPoints: positions, elevations: windQueryElevations });
       }
@@ -753,7 +834,9 @@ const RouteProfileDataLoader = () => {
   }) {
     if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
       if (!queryGfsWindDirectionDataResult.isLoading && !queryGfsWindDirectionDataResult.isSuccess) {
-        const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
+        const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute)).map((pt) =>
+          L.GeoJSON.latLngToCoords(pt.point),
+        );
         queryGfsWindDirectionData({ queryPoints: positions, elevations: windQueryElevations });
       }
     }
@@ -768,7 +851,9 @@ const RouteProfileDataLoader = () => {
   }) {
     if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
       if (!queryTemperatureDataResult.isSuccess && !queryTemperatureDataResult.isLoading) {
-        const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
+        const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute)).map((pt) =>
+          L.GeoJSON.latLngToCoords(pt.point),
+        );
         queryTemperatureData({ queryPoints: positions });
       }
     }
@@ -783,7 +868,9 @@ const RouteProfileDataLoader = () => {
   }) {
     if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
       if (!queryhumidityDataResult.isLoading && !queryhumidityDataResult.isSuccess) {
-        const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
+        const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute)).map((pt) =>
+          L.GeoJSON.latLngToCoords(pt.point),
+        );
         queryHumidityData({ queryPoints: positions });
       }
     }
@@ -797,7 +884,9 @@ const RouteProfileDataLoader = () => {
     isError: boolean;
   }) {
     if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
-      const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
+      const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute)).map((pt) =>
+        L.GeoJSON.latLngToCoords(pt.point),
+      );
       if (!queryIcingProbDataResult.isLoading && !queryIcingProbDataResult.isSuccess)
         queryIcingProbData({ queryPoints: positions });
       if (!queryIcingSevDataResult.isLoading && !queryIcingSevDataResult.isSuccess)
@@ -815,7 +904,9 @@ const RouteProfileDataLoader = () => {
     isError: boolean;
   }) {
     if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
-      const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
+      const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute)).map((pt) =>
+        L.GeoJSON.latLngToCoords(pt.point),
+      );
       if (!queryCaturbDataResult.isLoading && !queryCaturbDataResult.isSuccess)
         queryCaturbData({ queryPoints: positions });
       if (!queryMwturbDataResult.isLoading && !queryMwturbDataResult.isSuccess)
@@ -831,8 +922,9 @@ const RouteProfileDataLoader = () => {
     isError: boolean;
   }) {
     if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
-      const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute));
-      const positions_2 = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide);
+      const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute)).map((pt) =>
+        L.GeoJSON.latLngToCoords(pt.point),
+      );
       if (!queryNbmDewpointResult.isLoading && !queryNbmDewpointResult.isSuccess)
         queryNbmDewpoint({ queryPoints: positions });
       if (!queryNbmGustResult.isLoading && !queryNbmGustResult.isSuccess) queryNbmGust({ queryPoints: positions });
@@ -853,7 +945,10 @@ const RouteProfileDataLoader = () => {
     isError: boolean;
   }) {
     if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
-      const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide);
+      const positions = interpolateRouteByInterval(
+        activeRoute,
+        getSegmentsCount(activeRoute) * flightCategoryDivide,
+      ).map((pt) => L.GeoJSON.latLngToCoords(pt.point));
       if (!queryNbmFlightCatResult.isLoading && !queryNbmFlightCatResult.isSuccess)
         queryNbmFlightCategory({ queryPoints: positions });
     }
@@ -1033,7 +1128,7 @@ const RouteProfileDataLoader = () => {
   }
 
   function buildSegments() {
-    const positions = interpolateRouteWithStation(activeRoute, getSegmentsCount(activeRoute), airportsTable);
+    const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute), airportsTable, true);
     const departureTime = getFuzzyLocalTimeFromPoint(observationTime, [positions[0].point.lng, positions[0].point.lat]);
 
     const initialSegment: RouteSegment = {
@@ -1060,7 +1155,7 @@ const RouteProfileDataLoader = () => {
       },
     };
     const segments: RouteSegment[] = [initialSegment];
-    positions.reduce((acc: RouteSegment, curr: Airport, index) => {
+    positions.reduce((acc: RouteSegment, curr: SegmentPoint, index) => {
       try {
         const dist = fly.distanceTo(acc.position.lat, acc.position.lng, curr.point.lat, curr.point.lng, 2);
         const course = fly.trueCourse(acc.position.lat, acc.position.lng, curr.point.lat, curr.point.lng, 2);

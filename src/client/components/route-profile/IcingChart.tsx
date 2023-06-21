@@ -12,7 +12,7 @@ import {
   getTimeGradientStops,
   getValueFromDataset,
   getValueFromDatasetByElevation,
-  interpolateRoute,
+  interpolateRouteByInterval,
   totalNumberOfElevations,
 } from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';

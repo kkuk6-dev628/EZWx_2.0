@@ -4,17 +4,11 @@ import { VerticalRectSeries, LineSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
   cacheKeys,
-  getMaxForecastElevation,
   getMaxForecastTime,
   getRouteLength,
   getSegmentsCount,
-  getTimeGradientStops,
-  getValueFromDataset,
   getValueFromDatasetByElevation,
   getValuesFromDatasetAllElevationByElevation,
-  getValuesFromDatasetAllElevationByTime,
-  interpolateRoute,
-  totalNumberOfElevations,
   flightCategoryDivide,
 } from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';
@@ -23,9 +17,7 @@ import {
   useQueryNbmFlightCategoryMutation,
   useQueryHumidityDataMutation,
   useQueryIcingSevDataMutation,
-  useQueryNbmCloudCeilingMutation,
   useQueryNbmCloudbaseMutation,
-  useQueryNbmSkycoverMutation,
   useGetDepartureAdvisorDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';

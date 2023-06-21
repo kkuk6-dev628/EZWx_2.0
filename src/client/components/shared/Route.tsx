@@ -16,7 +16,6 @@ import 'leaflet-arc';
 import { Button } from '@mui/material';
 import MultipleSelect from './MultipleSelect';
 import DialogTitle from '@mui/material/DialogTitle';
-import { interpolateRoute } from '../route-profile/RouteProfileDataLoader';
 import { useRouter } from 'next/router';
 
 interface Props {

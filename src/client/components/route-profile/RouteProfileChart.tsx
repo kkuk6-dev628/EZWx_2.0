@@ -16,6 +16,7 @@ import {
 } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
+  SegmentPoint,
   cacheKeys,
   flightCategoryDivide,
   getLineLength,
@@ -24,8 +25,7 @@ import {
   getSegmentsCount,
   getTimeGradientStops,
   getValueFromDatasetByElevation,
-  interpolateRoute,
-  interpolateRouteWithStation,
+  interpolateRouteByInterval,
   totalNumberOfElevations,
 } from './RouteProfileDataLoader';
 import { initialUserSettingsState, selectSettings } from '../../store/user/UserSettings';
@@ -323,6 +323,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   const [elevationSeries, setElevationSeries] = useState([]);
   const [segmentsCount, setSegmentsCount] = useState(0);
   const [routeLength, setRouteLength] = useState(0);
+  const [segmentInterval, setSegmentInterval] = useState(0);
   const [startMargin, setStartMargin] = useState(0);
   const [endMargin, setEndMargin] = useState(0);
   const [viewW, setViewW] = useState<number>(window.innerWidth);
@@ -402,6 +403,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       }));
       const length = getRouteLength(activeRoute, true);
       setRouteLength(length);
+      setSegmentInterval(length / getSegmentsCount(activeRoute));
       const count = segments.length;
       setSegmentsCount(count);
       const start = count ? (0.7 * length) / (count - 1) : 0;
@@ -525,7 +527,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         segment.arriveTime,
       );
       return {
-        x: segment.accDistance,
+        x: segmentIndex * segmentInterval,
         y: routeProfileApiState.maxAltitude * 100,
         tooltip: {
           time: forecastTime,
@@ -534,6 +536,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           lowestCloud: cloudbase,
           skycover,
           weathers: weathers,
+          position: segment.position,
         },
         customComponent: () => {
           return (
@@ -649,8 +652,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
 
   useEffect(() => {
     if (activeRoute && !queryElevationsResult.isSuccess && !queryElevationsResult.isLoading && startMargin) {
-      const elevationPoints = interpolateRoute(activeRoute, totalNumberOfElevations, false, startMargin);
-      queryElevations({ queryPoints: elevationPoints });
+      const elevationPoints = interpolateRouteByInterval(activeRoute, totalNumberOfElevations);
+      queryElevations({ queryPoints: elevationPoints.map((pt) => L.GeoJSON.latLngToCoords(pt.point)) });
     }
   }, [fetchedDate, startMargin]);
 
@@ -658,7 +661,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     if (queryElevationsResult.isSuccess && queryElevationsResult.data && routeLength) {
       const elevationApiResults = queryElevationsResult.data.geoPoints;
       const elevations = [];
-      const elevationPoints = interpolateRoute(activeRoute, totalNumberOfElevations, true, startMargin);
+      const elevationPoints = interpolateRouteByInterval(activeRoute, totalNumberOfElevations).map((pt) => pt.point);
 
       let distance = 0;
       let previousPos: L.LatLng = null;
@@ -688,13 +691,15 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
 
   function buildFlightCategorySeries() {
     if (activeRoute && queryNbmFlightCatResult.isSuccess) {
-      const positions = interpolateRoute(activeRoute, getSegmentsCount(activeRoute) * 10, true);
+      const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute) * 10).map(
+        (pt) => pt.point,
+      );
       const flightCategoryData = [];
       let accDistance = 0;
       let arriveTime = new Date(observationTime).getTime();
       let dist = 0;
       let course = 0;
-      positions.forEach((curr: LatLng, index) => {
+      positions.forEach((curr: L.LatLng, index) => {
         try {
           const nextPos = index < positions.length - 1 ? positions[index + 1] : null;
           dist = index < positions.length - 1 ? fly.distanceTo(curr.lat, curr.lng, nextPos.lat, nextPos.lng, 2) : dist;
@@ -767,6 +772,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
               time: forecastTime,
               clouds: skyConditions,
               visibility: visibility,
+              position: curr,
             },
           });
           accDistance += dist;
@@ -825,7 +831,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           )}
           <VerticalGridLines
             tickValues={Array.from({ length: segmentsCount * 2 - 1 }, (_value, index) =>
-              Math.round((index * routeLength) / ((segmentsCount - 1) * 2)),
+              Math.round((index * segmentInterval) / 2),
             )}
             style={{
               stroke: 'grey',
@@ -851,7 +857,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             }}
           />
           <XAxis
-            tickValues={segments.map((segment) => segment.accDistance)}
+            tickValues={segments.map((segment, index) => index * segmentInterval)}
             tickFormat={(v, index) => {
               if (segmentsCount > 0 && segments[index]) {
                 const distInMile = segments[index].accDistance;
@@ -904,7 +910,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
               onValueMouseOut={() => setTimeHint(null)}
               data={segments.map((segment, index) => {
                 return {
-                  x: segment.accDistance,
+                  x: index * segmentInterval,
                   y: 0,
                   yOffset: 72,
                   segment: segment,
@@ -1103,6 +1109,12 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                   })}
                 </div>
               </div>
+              <span>
+                <b>Latitude:</b>&nbsp;{weatherHint.tooltip.position.lat}
+              </span>
+              <span>
+                <b>Longitude:</b>&nbsp;{weatherHint.tooltip.position.lng}
+              </span>
             </Hint>
           )}
           {flightCatHint && (
@@ -1137,6 +1149,12 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                 {!userSettings.default_visibility_unit
                   ? visibilityMileToFraction(flightCatHint.tooltip.visibility)
                   : visibilityMileToMeter(flightCatHint.tooltip.visibility)}
+              </span>
+              <span>
+                <b>Latitude:</b>&nbsp;{flightCatHint.tooltip.position.lat}
+              </span>
+              <span>
+                <b>Longitude:</b>&nbsp;{flightCatHint.tooltip.position.lng}
               </span>
             </Hint>
           )}

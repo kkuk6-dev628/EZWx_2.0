@@ -133,7 +133,7 @@ Point.prototype.enroute = function (trueCourse, nauticalMiles, roundTo) {
     var trueCourseRad = AngleConverter.degToRad(trueCourse);
 
     var newLat = Math.asin(Math.sin(lat1) * Math.cos(distance) + Math.cos(lat1) * Math.sin(distance) * Math.cos(trueCourseRad));
-    var newLon = ((lon1 - Math.asin(Math.sin(trueCourseRad) * Math.sin(distance) / Math.cos(newLat)) + Math.PI) % (2 * Math.PI)) - Math.PI;
+    var newLon = lon1 + Math.atan2(Math.sin(trueCourseRad) * Math.sin(distance) * Math.cos(lat1), Math.cos(distance) - Math.sin(lat1) * Math.sin(newLat));
 
     var enroutePoint = new Point(new Latitude(0.0), new Longitude(0.0));
 
