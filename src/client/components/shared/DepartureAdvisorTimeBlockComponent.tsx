@@ -45,7 +45,10 @@ function DepartureAdvisorTimeBlockComponent({
     <div
       key={'time' + index}
       className={`prevent-select block ${color}`}
-      onClick={() => handleTimeChange(time)}
+      onClick={() => {
+        setShowBarComponent(false);
+        handleTimeChange(time);
+      }}
       onMouseOver={(e) => {
         setShowBarComponent(true);
       }}

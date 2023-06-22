@@ -52,7 +52,7 @@ import Latitude from '../../fly-js/src/Latitude';
 import Longitude from '../../fly-js/src/Longitude';
 import { nauticalMilesToMeters } from '../../fly-js/src/helpers/converters/DistanceConverter';
 
-export const totalNumberOfElevations = 512;
+export const totalNumberOfElevations = 200;
 
 export const contourMin = -100;
 
@@ -410,6 +410,10 @@ export function getRouteLength(route: Route, inMile = false): number {
   return routeLengthNm;
 }
 
+export function getSegmentInterval(route: Route, segmentsCount: number) {
+  return getRouteLength(route, true) / segmentsCount;
+}
+
 export interface SegmentPoint {
   point: L.LatLng;
   isRoutePoint: boolean;
@@ -489,6 +493,10 @@ export function interpolateLegByInterval(start: L.LatLng, end: L.LatLng, interva
   const latlngs: Point[] = [];
   let distance = offset;
   let current: Point = new Point(new Latitude(start.lat), new Longitude(start.lng));
+  const legLength = fly.distanceTo(start.lat, start.lng, end.lat, end.lng, 6);
+  if (legLength <= distance) {
+    return { reminder: distance - legLength, latlngs: [] };
+  }
   let reminderDistance = 0;
   do {
     const course = fly.trueCourse(current.latitude.degrees, current.longitude.degrees, end.lat, end.lng, 2);
@@ -1179,13 +1187,15 @@ const RouteProfileDataLoader = () => {
   }
 
   function buildSegments() {
+    const segmentsCount = getSegmentsCount(activeRoute);
     const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute), airportsTable, true);
+    const interval = getSegmentInterval(activeRoute, segmentsCount);
     const departureTime = getFuzzyLocalTimeFromPoint(observationTime, [positions[0].point.lng, positions[0].point.lat]);
 
     const initialSegment: RouteSegment = {
       position: { lat: positions[0].point.lat, lng: positions[0].point.lng },
       accDistance: 0,
-      arriveTime: new Date(observationTime).getTime(),
+      arriveTime: observationTime,
       course: fly.trueCourse(
         positions[0].point.lat,
         positions[0].point.lng,
@@ -1206,23 +1216,22 @@ const RouteProfileDataLoader = () => {
       },
     };
     const segments: RouteSegment[] = [initialSegment];
-    positions.reduce((acc: RouteSegment, curr: SegmentPoint, index) => {
+    let arriveTime = observationTime;
+    positions.reduce((prev: SegmentPoint, curr: SegmentPoint, index) => {
       try {
-        const dist = fly.distanceTo(acc.position.lat, acc.position.lng, curr.point.lat, curr.point.lng, 2);
-        const course = fly.trueCourse(acc.position.lat, acc.position.lng, curr.point.lat, curr.point.lng, 2);
-        if (!dist) return acc;
+        const course = fly.trueCourse(prev.point.lat, prev.point.lng, curr.point.lat, curr.point.lng, 2);
         let speed: number;
         if (activeRoute.useForecastWinds) {
           if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess) {
             const { value: speedValue } = getValueFromDatasetByElevation(
               queryGfsWindSpeedDataResult.data,
-              new Date(acc.arriveTime),
+              new Date(arriveTime),
               activeRoute.altitude,
               index,
             );
             const { value: dirValue } = getValueFromDatasetByElevation(
               queryGfsWindDirectionDataResult.data,
-              new Date(acc.arriveTime),
+              new Date(arriveTime),
               activeRoute.altitude,
               index,
             );
@@ -1240,12 +1249,12 @@ const RouteProfileDataLoader = () => {
         } else {
           speed = userSettings.true_airspeed;
         }
-        const newTime = new Date(acc.arriveTime).getTime() + (3600 * 1000 * dist) / speed;
+        const newTime = arriveTime + (3600 * 1000 * interval) / speed;
         const departureTime = getFuzzyLocalTimeFromPoint(newTime, [curr.point.lng, curr.point.lat]);
 
         const segment: RouteSegment = {
           position: { lat: curr.point.lat, lng: curr.point.lng },
-          accDistance: acc.accDistance + dist,
+          accDistance: interval * index,
           arriveTime: newTime,
           course: course,
           airport: curr.airport,
@@ -1261,12 +1270,13 @@ const RouteProfileDataLoader = () => {
           },
         };
         segments.push(segment);
-        return { ...segment };
+        arriveTime = newTime;
+        return curr;
       } catch (err) {
         console.warn(err);
-        return acc;
+        return prev;
       }
-    }, initialSegment);
+    });
 
     const airportPoints = segments.map((seg) => (seg.airport ? seg.airport.position.coordinates : null));
     if (!queryNbmAllAirportResult.isSuccess && !queryNbmAllAirportResult.isLoading)

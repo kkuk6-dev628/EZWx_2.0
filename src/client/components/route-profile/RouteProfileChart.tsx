@@ -23,6 +23,7 @@ import {
   getLineLength,
   getMinMaxValueByElevation,
   getRouteLength,
+  getSegmentInterval,
   getSegmentsCount,
   getTimeGradientStops,
   getValueFromDatasetByElevation,
@@ -406,7 +407,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       setRouteLength(length);
       const interval = length / getSegmentsCount(activeRoute);
       setSegmentInterval(interval);
-      const count = segments.length;
+      const count = getSegmentsCount(activeRoute);
       setSegmentsCount(count);
       const start = count ? 0.7 * interval : 0;
       const end = count ? 0.7 * interval : 0;
@@ -564,16 +565,16 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     if (segments.length > 0) {
       let tooltip = null;
       const weatherSeries = [];
-      const segmentInterval = getRouteLength(activeRoute, true) / getSegmentsCount(activeRoute);
+      const segmentsCount = getSegmentsCount(activeRoute);
+      const interval = getSegmentInterval(activeRoute, segmentsCount);
       const airportLabels = segments.map((seg, segmentIndex) => {
         const labelStyle = {
           fill: 'green',
           dominantBaseline: 'text-after-edge',
           textAnchor: 'middle',
-          fontSize: segmentIndex === 0 || segmentIndex === segmentsCount - 1 ? 14 : 11,
+          fontSize: segmentIndex === 0 || segmentIndex === segmentsCount ? 14 : 11,
           fontWeight: 600,
         };
-        const interval = getRouteLength(activeRoute, true) / getSegmentsCount(activeRoute);
         const weatherData = buildWeatherSeries(seg, segmentIndex, interval);
         weatherSeries.push(weatherData);
         if (seg.airportNbmProps) {
@@ -641,7 +642,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         }
 
         return {
-          x: segmentInterval * segmentIndex + airportDist,
+          x: interval * segmentIndex + airportDist,
           y: 0,
           yOffset: seg.isRoutePoint ? 36 : 44,
           label: seg.airport?.key || seg.position.lat.toFixed(2) + '/' + seg.position.lng.toFixed(2),
@@ -693,6 +694,9 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
               );
               distance += delta;
             }
+            if (distance > routeLength + endMargin + startMargin) {
+              break;
+            }
             previousPos = elevationPoints[j];
             elevations.push({
               x: distance - startMargin,
@@ -708,22 +712,24 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   }, [queryElevationsResult.isSuccess, routeLength]);
 
   function buildFlightCategorySeries() {
-    if (activeRoute && queryNbmFlightCatResult.isSuccess) {
-      const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute) * 10).map(
-        (pt) => pt.point,
-      );
+    if (activeRoute && queryNbmFlightCatResult.isSuccess && getDepartureAdvisorDataResult.isSuccess) {
+      const positions = interpolateRouteByInterval(
+        activeRoute,
+        getSegmentsCount(activeRoute) * flightCategoryDivide,
+      ).map((pt) => pt.point);
+      const interval = getSegmentInterval(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide);
       const flightCategoryData = [];
-      let accDistance = 0;
+      // let accDistance = 0;
       let arriveTime = new Date(observationTime).getTime();
-      let dist = 0;
+      // let dist = 0;
       let course = 0;
       positions.forEach((curr: L.LatLng, index) => {
         try {
           const nextPos = index < positions.length - 1 ? positions[index + 1] : null;
-          dist = index < positions.length - 1 ? fly.distanceTo(curr.lat, curr.lng, nextPos.lat, nextPos.lng, 2) : dist;
+          // dist = index < positions.length - 1 ? fly.distanceTo(curr.lat, curr.lng, nextPos.lat, nextPos.lng, 2) : dist;
           course =
             index < positions.length - 1 ? fly.trueCourse(curr.lat, curr.lng, nextPos.lat, nextPos.lng, 2) : course;
-          if (index < positions.length - 1 && !dist) return;
+          // if (index < positions.length - 1 && !dist) return;
           let speed: number;
           if (activeRoute.useForecastWinds) {
             if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess) {
@@ -753,7 +759,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           } else {
             speed = userSettings.true_airspeed;
           }
-          const newTime = new Date(arriveTime).getTime() + (3600 * 1000 * dist) / speed;
+          const newTime = new Date(arriveTime).getTime() + (3600 * 1000 * interval) / speed;
           const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(
             getDepartureAdvisorDataResult.data?.cloudceiling,
             new Date(arriveTime),
@@ -781,8 +787,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           const skyConditions = makeSkyConditions(cloudbase, cloudceiling, skycover);
           const flightCategoryColor = getFlightCategoryColor(visibility, cloudceiling);
           flightCategoryData.push({
-            x0: accDistance - dist / 2,
-            x: accDistance + dist / 2,
+            x0: interval * index - interval / 2,
+            x: interval * index + interval / 2,
             y0: (-routeProfileApiState.maxAltitude * 100) / 50,
             y: -routeProfileApiState.maxAltitude / 5,
             color: flightCategoryColor,
@@ -793,7 +799,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
               position: curr,
             },
           });
-          accDistance += dist;
+          // accDistance += dist;
           arriveTime = newTime;
         } catch (err) {
           console.warn(err);
@@ -805,7 +811,12 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
 
   useEffect(() => {
     buildFlightCategorySeries();
-  }, [segments, queryNbmFlightCatResult.isSuccess, routeProfileApiState.maxAltitude]);
+  }, [
+    segments,
+    queryNbmFlightCatResult.isSuccess,
+    getDepartureAdvisorDataResult.isSuccess,
+    routeProfileApiState.maxAltitude,
+  ]);
 
   return (
     <>
@@ -848,7 +859,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             />
           )}
           <VerticalGridLines
-            tickValues={Array.from({ length: segmentsCount * 2 - 1 }, (_value, index) =>
+            tickValues={Array.from({ length: segmentsCount * 2 + 1 }, (_value, index) =>
               Math.round((index * segmentInterval) / 2),
             )}
             style={{
@@ -878,7 +889,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             tickValues={segments.map((segment, index) => index * segmentInterval)}
             tickFormat={(v, index) => {
               if (segmentsCount > 0 && segments[index]) {
-                const distInMile = segments[index].accDistance;
+                const distInMile = index * segmentInterval;
                 const dist = Math.round(
                   userSettings.default_distance_unit ? flyjs.nauticalMilesTo('Kilometers', distInMile, 0) : distInMile,
                 );
@@ -894,29 +905,6 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
               line: { stroke: '#ADDDE100' },
               ticks: { stroke: '#ADDDE100' },
               text: { stroke: 'none', fill: 'white', fontWeight: 600, marginTop: 36 },
-            }}
-          />
-          <YAxis
-            tickValues={Array.from({ length: 10 + 1 }, (_value, index) =>
-              Math.round((index * routeProfileApiState.maxAltitude * 100) / 5),
-            )}
-            tickFormat={(v) => v / 100}
-            style={{
-              line: { stroke: '#ADDDE100' },
-              ticks: { stroke: '#ADDDE100' },
-              text: { stroke: 'none', fill: 'white', fontWeight: 600 },
-            }}
-          />
-          <YAxis
-            tickValues={Array.from({ length: 10 + 1 }, (_value, index) =>
-              Math.round((index * routeProfileApiState.maxAltitude * 100) / 5),
-            )}
-            tickFormat={(v) => v / 100}
-            orientation="right"
-            style={{
-              line: { stroke: '#ADDDE100' },
-              ticks: { stroke: '#ADDDE100' },
-              text: { stroke: 'none', fill: 'white', fontWeight: 600 },
             }}
           />
           {segments && segments.length > 4 ? (
@@ -1071,6 +1059,29 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
               ]}
             />
           )}
+          <YAxis
+            tickValues={Array.from({ length: 10 + 1 }, (_value, index) =>
+              Math.round((index * routeProfileApiState.maxAltitude * 100) / 5),
+            )}
+            tickFormat={(v) => v / 100}
+            style={{
+              line: { stroke: '#ADDDE100' },
+              ticks: { stroke: '#ADDDE100' },
+              text: { stroke: 'none', fill: 'white', fontWeight: 600 },
+            }}
+          />
+          <YAxis
+            tickValues={Array.from({ length: 10 + 1 }, (_value, index) =>
+              Math.round((index * routeProfileApiState.maxAltitude * 100) / 5),
+            )}
+            tickFormat={(v) => v / 100}
+            orientation="right"
+            style={{
+              line: { stroke: '#ADDDE100' },
+              ticks: { stroke: '#ADDDE100' },
+              text: { stroke: 'none', fill: 'white', fontWeight: 600 },
+            }}
+          />
           {showElevationHint ? (
             <Hint value={elevationHint}>
               <div style={{ background: 'white', color: 'black', padding: 4, borderRadius: 4 }}>{elevationHint.y}</div>

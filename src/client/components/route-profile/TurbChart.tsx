@@ -6,6 +6,7 @@ import {
   cacheKeys,
   getMaxForecastTime,
   getRouteLength,
+  getSegmentInterval,
   getSegmentsCount,
   getValueFromDatasetByElevation,
 } from './RouteProfileDataLoader';
@@ -51,9 +52,8 @@ const TurbChart = (props) => {
 
   function buildTurbSeries() {
     if (queryCaturbDataResult.isSuccess && queryMwturbDataResult.isSuccess) {
-      const routeLength = getRouteLength(activeRoute, true);
       const segmentCount = getSegmentsCount(activeRoute);
-      const segmentLength = routeLength / segmentCount;
+      const segmentLength = getSegmentInterval(activeRoute, segmentCount);
       const maxForecastTime = getMaxForecastTime(queryCaturbDataResult.data);
       const turbData = [];
       let existTurbulence = false;
