@@ -56,7 +56,7 @@ flyjs.trueCourse = function (fromLat, fromLon, toLat, toLon, roundTo) {
 /**
 * Return unit of measurement converted from nautical miles value
 *
-* @param  {String} unitOfMeasurement to convert to
+* @param  {string} unitOfMeasurement to convert to
 * @param  {Number} unitValue is the nautical miles value one wishes to convert
 * @param  {Number} Number decimal places for rouding
 * @return {Number} Unit of measurement converted from nautical miles value
@@ -68,7 +68,7 @@ flyjs.nauticalMilesTo = function (unitOfMeasurement, unitValue, roundTo) {
 /**
 * Return unit of measurement converted from miles value
 *
-* @param  {Number} unitOfMeasurement to convert to
+* @param  {string} unitOfMeasurement to convert to
 * @param  {Number} unitValue is the miles value one wishes to convert
 * @param  {Number} Number decimal places for rouding
 * @return {Number} Unit of measurement converted from miles value
@@ -80,7 +80,7 @@ flyjs.milesTo = function (unitOfMeasurement, unitValue, roundTo) {
 /**
 * Return unit of measurement converted from kilometers value
 *
-* @param  {Number} unitOfMeasurement to convert to
+* @param  {string} unitOfMeasurement to convert to
 * @param  {Number} unitValue is the kilometers value one wishes to convert
 * @param  {Number} Number decimal places for rouding
 * @return {Number} Unit of measurement converted from kilometers value
@@ -93,7 +93,7 @@ flyjs.kilometersTo = function (unitOfMeasurement, unitValue, roundTo) {
 /**
 * Return unit of measurement converted from knots value
 *
-* @param  {Number} unitOfMeasurement to convert to
+* @param  {string} unitOfMeasurement to convert to
 * @param  {Number} unitValue is the knots value one wishes to convert
 * @param  {Number} Number decimal places for rouding
 * @return {Number} Unit of measurement converted from knots value
@@ -105,7 +105,7 @@ flyjs.knotsTo = function (unitOfMeasurement, unitValue, roundTo) {
 /**
 * Return unit of measurement converted from mps value
 *
-* @param  {Number} unitOfMeasurement to convert to
+* @param  {string} unitOfMeasurement to convert to
 * @param  {Number} unitValue is the mps value one wishes to convert
 * @param  {Number} Number decimal places for rouding
 * @return {Number} Unit of measurement converted from mps value
@@ -118,7 +118,7 @@ flyjs.mpsTo = function (unitOfMeasurement, unitValue, roundTo) {
 /**
 * Return unit of measurement converted from mps value
 *
-* @param  {Number} unitOfMeasurement to convert to
+* @param  {string} unitOfMeasurement to convert to
 * @param  {Number} unitValue is the mph value one wishes to convert
 * @param  {Number} Number decimal places for rouding
 * @return {Number} Unit of measurement converted from knots value

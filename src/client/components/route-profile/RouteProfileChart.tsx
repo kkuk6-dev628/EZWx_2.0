@@ -18,6 +18,7 @@ import { selectActiveRoute } from '../../store/route/routes';
 import {
   SegmentPoint,
   cacheKeys,
+  extendLine,
   flightCategoryDivide,
   getLineLength,
   getMinMaxValueByElevation,
@@ -403,11 +404,12 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       }));
       const length = getRouteLength(activeRoute, true);
       setRouteLength(length);
-      setSegmentInterval(length / getSegmentsCount(activeRoute));
+      const interval = length / getSegmentsCount(activeRoute);
+      setSegmentInterval(interval);
       const count = segments.length;
       setSegmentsCount(count);
-      const start = count ? (0.7 * length) / (count - 1) : 0;
-      const end = count ? (0.7 * length) / (count - 1) : 0;
+      const start = count ? 0.7 * interval : 0;
+      const end = count ? 0.7 * interval : 0;
       setStartMargin(start);
       setEndMargin(end);
       const stops = getTimeGradientStops(times);
@@ -433,7 +435,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     setViewH(window.innerHeight);
   };
 
-  function buildWeatherSeries(segment: RouteSegment, segmentIndex: number) {
+  function buildWeatherSeries(segment: RouteSegment, segmentIndex: number, segmentInterval: number) {
     if (segment) {
       const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(
         getDepartureAdvisorDataResult.data?.cloudceiling,
@@ -562,6 +564,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     if (segments.length > 0) {
       let tooltip = null;
       const weatherSeries = [];
+      const segmentInterval = getRouteLength(activeRoute, true) / getSegmentsCount(activeRoute);
       const airportLabels = segments.map((seg, segmentIndex) => {
         const labelStyle = {
           fill: 'green',
@@ -570,7 +573,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           fontSize: segmentIndex === 0 || segmentIndex === segmentsCount - 1 ? 14 : 11,
           fontWeight: 600,
         };
-        const weatherData = buildWeatherSeries(seg, segmentIndex);
+        const interval = getRouteLength(activeRoute, true) / getSegmentsCount(activeRoute);
+        const weatherData = buildWeatherSeries(seg, segmentIndex, interval);
         weatherSeries.push(weatherData);
         if (seg.airportNbmProps) {
           labelStyle.fill = getFlightCategoryColor(seg.airportNbmProps.visibility, seg.airportNbmProps.cloudceiling);
@@ -637,7 +641,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         }
 
         return {
-          x: seg.accDistance + airportDist,
+          x: segmentInterval * segmentIndex + airportDist,
           y: 0,
           yOffset: seg.isRoutePoint ? 36 : 44,
           label: seg.airport?.key || seg.position.lat.toFixed(2) + '/' + seg.position.lng.toFixed(2),
@@ -653,7 +657,11 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   useEffect(() => {
     if (activeRoute && !queryElevationsResult.isSuccess && !queryElevationsResult.isLoading && startMargin) {
       const elevationPoints = interpolateRouteByInterval(activeRoute, totalNumberOfElevations);
-      queryElevations({ queryPoints: elevationPoints.map((pt) => L.GeoJSON.latLngToCoords(pt.point)) });
+      const extended = extendLine(
+        elevationPoints.map((p) => p.point),
+        startMargin,
+      );
+      queryElevations({ queryPoints: extended.map((pt) => L.GeoJSON.latLngToCoords(pt)) });
     }
   }, [fetchedDate, startMargin]);
 
@@ -661,7 +669,11 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     if (queryElevationsResult.isSuccess && queryElevationsResult.data && routeLength) {
       const elevationApiResults = queryElevationsResult.data.geoPoints;
       const elevations = [];
-      const elevationPoints = interpolateRouteByInterval(activeRoute, totalNumberOfElevations).map((pt) => pt.point);
+      const segmentPoints = interpolateRouteByInterval(activeRoute, totalNumberOfElevations);
+      const elevationPoints = extendLine(
+        segmentPoints.map((p) => p.point),
+        startMargin,
+      );
 
       let distance = 0;
       let previousPos: L.LatLng = null;
@@ -672,12 +684,18 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             Math.abs(elevationPoints[j].lng - elevationApiResults[i].longitude) < 0.000001
           ) {
             if (previousPos) {
-              const delta = previousPos.distanceTo(elevationPoints[j]);
+              const delta = fly.distanceTo(
+                previousPos.lat,
+                previousPos.lng,
+                elevationPoints[j].lat,
+                elevationPoints[j].lng,
+                6,
+              );
               distance += delta;
             }
             previousPos = elevationPoints[j];
             elevations.push({
-              x: distance / 1852 - startMargin,
+              x: distance - startMargin,
               y: meterToFeet(elevationApiResults[i].elevation),
             });
             break;

@@ -521,31 +521,82 @@ export function interpolateRouteByInterval(
     offset = interval - reminder;
     const segmentPointsInLeg = points.map((point, index) => {
       const latlng = L.latLng(point.latitude.degrees, point.longitude.degrees);
+      const airportRadius = index === 0 ? interval * 0.3 : interval * 0.5;
       let airport = null;
       if (findAirports) {
         airport =
           index === 0 && routePointsIndex === 1
             ? prev
-            : index === points.length - 1
+            : index === points.length - 1 && routePointsIndex < routePoints.length - 1
             ? curr
-            : findAirportByPoint(
-                airports,
-                latlng,
-                fly.nauticalMilesTo('Meters', interval / 2, 6),
-                route.routeOfFlight.map((routeOfFlight) => routeOfFlight.routePoint),
-              );
+            : findAirportByPoint(airports, latlng, fly.nauticalMilesTo('Meters', airportRadius, 6), [
+                ...route.routeOfFlight.map((routeOfFlight) => routeOfFlight.routePoint),
+                route.departure,
+                route.destination,
+              ]);
       }
 
       return {
         point: latlng,
         airport,
-        isRoutePoint: index === 0 || index === points.length - 1,
+        isRoutePoint:
+          (index === 0 && routePointsIndex === 1) ||
+          (index === points.length - 1 && routePointsIndex < routePoints.length - 1),
       };
     });
     segmentPoints.push(...segmentPointsInLeg);
     return curr;
   });
+  segmentPoints.push({
+    point: L.GeoJSON.coordsToLatLng(route.destination.position.coordinates as any),
+    isRoutePoint: true,
+    airport: route.destination,
+  });
   return segmentPoints;
+}
+
+export function extendLine(latlngs: L.LatLng[], extDistance: number): L.LatLng[] {
+  const interval = fly.distanceTo(latlngs[0].lat, latlngs[0].lng, latlngs[1].lat, latlngs[1].lng, 6);
+  const courseStart = fly.trueCourse(latlngs[1].lat, latlngs[1].lng, latlngs[0].lat, latlngs[0].lng, 2);
+  const courseEnd = fly.trueCourse(
+    latlngs[latlngs.length - 2].lat,
+    latlngs[latlngs.length - 2].lng,
+    latlngs[latlngs.length - 1].lat,
+    latlngs[latlngs.length - 1].lng,
+    2,
+  );
+  const startExtends = [];
+  let accDist = 0;
+  let extLatLng = latlngs[0];
+  while (accDist < extDistance) {
+    const extStart = fly.enroute(extLatLng.lat, extLatLng.lng, courseStart, interval, 6);
+    extLatLng = L.latLng(extStart.latitude.degrees, extStart.longitude.degrees);
+    startExtends.push(extLatLng);
+    accDist += interval;
+  }
+  const lastStart = fly.enroute(latlngs[0].lat, latlngs[0].lng, courseStart, extDistance, 6);
+  const lastStartLatLng = L.latLng(lastStart.latitude.degrees, lastStart.longitude.degrees);
+  startExtends.push(lastStartLatLng);
+
+  const endExtends = [];
+  accDist = 0;
+  let extEndLatLng = latlngs[latlngs.length - 1];
+  while (accDist < extDistance) {
+    const extEnd = fly.enroute(extEndLatLng.lat, extEndLatLng.lng, courseEnd, interval, 6);
+    extEndLatLng = L.latLng(extEnd.latitude.degrees, extEnd.longitude.degrees);
+    endExtends.push(extEndLatLng);
+    accDist += interval;
+  }
+  const lastEnd = fly.enroute(
+    latlngs[latlngs.length - 1].lat,
+    latlngs[latlngs.length - 1].lng,
+    courseEnd,
+    extDistance,
+    6,
+  );
+  const lastEndLatLng = L.latLng(lastEnd.latitude.degrees, lastEnd.longitude.degrees);
+  endExtends.push(lastEndLatLng);
+  return [...startExtends.reverse(), ...latlngs, ...endExtends];
 }
 
 export function interpolateRoute(route: Route, divideNumber, returnAsLeaflet = false, margin = 0): L.LatLng[] {
