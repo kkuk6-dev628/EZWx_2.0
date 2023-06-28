@@ -400,6 +400,22 @@ export function getValueFromDatasetByElevation(
   }
 }
 
+export function getIndexByElevation(datasetAll: RouteProfileDataset[], position: GeoJSON.Position): number {
+  if (!datasetAll || datasetAll.length === 0) {
+    return -1;
+  }
+  let closestIndex = 0;
+  let closestDistance = Infinity;
+  datasetAll[0].data.forEach((dataset, index) => {
+    const distance = fly.distanceTo(position[1], position[0], dataset.position[1], dataset.position[0], 6);
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestIndex = index;
+    }
+  });
+  return closestIndex;
+}
+
 export function getRouteLength(route: Route, inMile = false): number {
   const coordinateList = [
     route.departure.position.coordinates,
@@ -495,7 +511,7 @@ export function interpolateLegByInterval(start: L.LatLng, end: L.LatLng, interva
   let current: Point = new Point(new Latitude(start.lat), new Longitude(start.lng));
   const legLength = fly.distanceTo(start.lat, start.lng, end.lat, end.lng, 6);
   if (legLength <= distance) {
-    return { reminder: distance - legLength, latlngs: [] };
+    return { reminder: legLength, latlngs: [] };
   }
   let reminderDistance = 0;
   do {
@@ -522,43 +538,46 @@ export function interpolateRouteByInterval(
   const interval = totalLength / divideNumber;
   const segmentPoints = new Array<SegmentPoint>();
   let offset = 0;
+  let attachLegStart = true;
   routePoints.reduce((prev, curr, routePointsIndex) => {
     const prevLatLng = L.GeoJSON.coordsToLatLng(prev.position.coordinates as [number, number]);
     const currLatLng = L.GeoJSON.coordsToLatLng(curr.position.coordinates as [number, number]);
     const { reminder: reminder, latlngs: points } = interpolateLegByInterval(prevLatLng, currLatLng, interval, offset);
-    offset = interval - reminder;
+    offset = points.length === 0 ? offset - reminder : interval - reminder;
     const segmentPointsInLeg = points.map((point, index) => {
       const latlng = L.latLng(point.latitude.degrees, point.longitude.degrees);
       const airportRadius = index === 0 ? interval * 0.3 : interval * 0.5;
       let airport = null;
       if (findAirports) {
-        airport =
-          index === 0 && routePointsIndex === 1
-            ? prev
-            : index === points.length - 1 && routePointsIndex < routePoints.length - 1
-            ? curr
-            : findAirportByPoint(airports, latlng, fly.nauticalMilesTo('Meters', airportRadius, 6), [
-                ...route.routeOfFlight.map((routeOfFlight) => routeOfFlight.routePoint),
-                route.departure,
-                route.destination,
-              ]);
+        airport = findAirportByPoint(airports, latlng, fly.nauticalMilesTo('Meters', airportRadius, 6), [
+          ...route.routeOfFlight.map((routeOfFlight) => routeOfFlight.routePoint),
+          route.departure,
+          route.destination,
+        ]);
       }
 
       return {
         point: latlng,
         airport,
         isRoutePoint:
-          (index === 0 && routePointsIndex === 1) ||
-          (index === points.length - 1 && routePointsIndex < routePoints.length - 1),
+          (index === 0 && attachLegStart) || (index === points.length - 1 && routePointsIndex < routePoints.length - 1),
       };
     });
+    attachLegStart = points.length === 0;
     segmentPoints.push(...segmentPointsInLeg);
     return curr;
   });
   segmentPoints.push({
     point: L.GeoJSON.coordsToLatLng(route.destination.position.coordinates as any),
     isRoutePoint: true,
-    airport: route.destination,
+    // airport: findAirports
+    //   ? findAirportByPoint(
+    //       airports,
+    //       L.latLng(route.destination.position.coordinates[1], route.destination.position.coordinates[0]),
+    //       fly.nauticalMilesTo('Meters', interval * 0.5, 6),
+    //       [...route.routeOfFlight.map((routeOfFlight) => routeOfFlight.routePoint), route.departure, route.destination],
+    //     )
+    //   : null,
   });
   return segmentPoints;
 }
@@ -1145,7 +1164,7 @@ const RouteProfileDataLoader = () => {
       queryNbmFlightCatResult.data?.cloudbase,
       time,
       null,
-      segmentIndex,
+      segmentIndex * flightCategoryDivide,
     );
     const { value: cloudceiling } = getValueFromDatasetByElevation(
       getDepartureAdvisorDataResult.data?.cloudceiling,
@@ -1291,7 +1310,12 @@ const RouteProfileDataLoader = () => {
   }, [observationTime]);
 
   useEffect(() => {
-    if (activeRoute && isLoadedAirports) {
+    if (
+      activeRoute &&
+      isLoadedAirports &&
+      queryGfsWindDirectionDataResult.isSuccess &&
+      queryGfsWindSpeedDataResult.isSuccess
+    ) {
       buildSegments();
     }
   }, [

@@ -10,6 +10,7 @@ interface Props {
   time: Date;
   color: string;
   isMap: boolean;
+  show3Bar: boolean;
   evaluationsByTime: { time: number; evaluation: PersonalMinsEvaluation }[];
   setShowPopup: (show: boolean) => void;
   handleTimeChange: (time: Date) => void;
@@ -19,6 +20,7 @@ function DepartureAdvisorTimeBlockComponent({
   time,
   color,
   isMap,
+  show3Bar,
   evaluationsByTime,
   setShowPopup,
   handleTimeChange,
@@ -50,7 +52,7 @@ function DepartureAdvisorTimeBlockComponent({
         handleTimeChange(time);
       }}
       onMouseOver={(e) => {
-        setShowBarComponent(true);
+        show3Bar && setShowBarComponent(true);
       }}
       onMouseOut={(e) => {
         setShowBarComponent(false);

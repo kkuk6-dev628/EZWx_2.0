@@ -233,6 +233,17 @@
     justify-content: space-between;
     color: black;
     z-index: 2;
+    .blocks-date{
+      // overflow-x: auto;
+    }
+    ::-webkit-scrollbar{
+      width: 8px;
+      height: 8px;
+      color: var(--color-primary);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-secondary);
+    }
     .blocks-contents{
       display: flex;
       flex-direction: column;

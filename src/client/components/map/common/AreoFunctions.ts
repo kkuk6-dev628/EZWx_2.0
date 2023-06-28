@@ -26,6 +26,14 @@ export function roundCloudHeight(heightInFeet) {
   return Math.round(heightInFeet / 1000) * 1000;
 }
 
+export function getAbsoluteDate(date: Date | number | string): number {
+  return new Date(date).getTime() / 24 / 3600 / 1000;
+}
+
+export function absoluteDateToTime(days: number): Date {
+  return new Date(days * 24 * 3600 * 1000);
+}
+
 export const getAltitudeString = (value: string, isHundred = true, fzlbase?: string, fzltop?: string): string => {
   if (value === 'SFC' || value == '0') {
     return 'Surface';

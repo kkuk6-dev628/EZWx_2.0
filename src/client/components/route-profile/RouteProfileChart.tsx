@@ -20,6 +20,7 @@ import {
   cacheKeys,
   extendLine,
   flightCategoryDivide,
+  getIndexByElevation,
   getLineLength,
   getMinMaxValueByElevation,
   getRouteLength,
@@ -39,6 +40,11 @@ import {
   useQueryGfsWindSpeedDataMutation,
   useQueryTemperatureDataMutation,
   useGetDepartureAdvisorDataMutation,
+  useQueryNbmDewpointMutation,
+  useQueryNbmGustMutation,
+  useQueryNbmTempMutation,
+  useQueryNbmWindDirMutation,
+  useQueryNbmWindSpeedMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectFetchedDate, selectRouteSegments } from '../../store/route-profile/RouteProfile';
@@ -58,13 +64,18 @@ import {
   visibilityMileToMeter,
 } from '../map/common/AreoFunctions';
 import fly, * as flyjs from '../../fly-js/fly';
-import { flightCategoryToColor, getNbmWeatherMarkerIcon } from '../map/leaflet/layers/StationMarkersLayer';
+import {
+  flightCategoryToColor,
+  getNbmFlightCategory,
+  getNbmWeatherMarkerIcon,
+} from '../map/leaflet/layers/StationMarkersLayer';
 import { MetarSkyValuesToString } from '../map/common/AreoConstants';
 import { Conrec } from '../../conrec-js/conrec';
 import { AirportNbmData, RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
 import Route from '../shared/Route';
 import { LatLng } from 'leaflet';
 import { makeWeatherString } from '../map/leaflet/popups/StationForecastPopup';
+import { hourInMili } from '../shared/DepartureAdvisor';
 
 export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
   if (viewWidth < 900) {
@@ -353,11 +364,26 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   const [, queryGfsWindSpeedDataResult] = useQueryGfsWindSpeedDataMutation({
     fixedCacheKey: cacheKeys.gfsWindspeed,
   });
+  const [, queryNbmWindDirResult] = useQueryNbmWindDirMutation({
+    fixedCacheKey: cacheKeys.nbmWindDir,
+  });
+  const [, queryNbmWindSpeedResult] = useQueryNbmWindSpeedMutation({
+    fixedCacheKey: cacheKeys.nbmWindSpeed,
+  });
   const [, queryNbmFlightCatResult] = useQueryNbmFlightCategoryMutation({
     fixedCacheKey: cacheKeys.nbmCloudCeiling,
   });
-  const [getDepartureAdvisorData, getDepartureAdvisorDataResult] = useGetDepartureAdvisorDataMutation({
+  const [, getDepartureAdvisorDataResult] = useGetDepartureAdvisorDataMutation({
     fixedCacheKey: cacheKeys.departureAdvisor,
+  });
+  const [, queryNbmDewpointResult] = useQueryNbmDewpointMutation({
+    fixedCacheKey: cacheKeys.nbmDewpoint,
+  });
+  const [, queryNbmGustResult] = useQueryNbmGustMutation({
+    fixedCacheKey: cacheKeys.nbmGust,
+  });
+  const [, queryNbmTempResult] = useQueryNbmTempMutation({
+    fixedCacheKey: cacheKeys.nbmTemp,
   });
 
   const { data: airportNbmData, isSuccess: isAirportNbmLoaded } = useGetAirportNbmQuery(
@@ -405,7 +431,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       }));
       const length = getRouteLength(activeRoute, true);
       setRouteLength(length);
-      const interval = length / getSegmentsCount(activeRoute);
+      const interval = getSegmentInterval(activeRoute, getSegmentsCount(activeRoute));
       setSegmentInterval(interval);
       const count = getSegmentsCount(activeRoute);
       setSegmentsCount(count);
@@ -567,16 +593,19 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       const weatherSeries = [];
       const segmentsCount = getSegmentsCount(activeRoute);
       const interval = getSegmentInterval(activeRoute, segmentsCount);
+      const labelStyle = {
+        fill: 'green',
+        dominantBaseline: 'text-after-edge',
+        textAnchor: 'middle',
+        fontSize: 11,
+        fontWeight: 600,
+      };
       const airportLabels = segments.map((seg, segmentIndex) => {
-        const labelStyle = {
-          fill: 'green',
-          dominantBaseline: 'text-after-edge',
-          textAnchor: 'middle',
-          fontSize: segmentIndex === 0 || segmentIndex === segmentsCount ? 14 : 11,
-          fontWeight: 600,
-        };
         const weatherData = buildWeatherSeries(seg, segmentIndex, interval);
         weatherSeries.push(weatherData);
+        if (segmentIndex === 0 || segmentIndex === segments.length - 1) {
+          return;
+        }
         if (seg.airportNbmProps) {
           labelStyle.fill = getFlightCategoryColor(seg.airportNbmProps.visibility, seg.airportNbmProps.cloudceiling);
           const lowestCloud = seg.airportNbmProps.cloudbase;
@@ -595,11 +624,6 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             temperature: seg.airportNbmProps.temperature,
             dewpoint: seg.airportNbmProps.dewpoint,
           };
-          if (segmentIndex === 0 || segmentIndex === segments.length - 1) {
-            const { data: forCrosswind } = getAirportNbmData(airportNbmData, seg.arriveTime, seg.airport?.key);
-            tooltip.crosscom = forCrosswind?.cross_com;
-            tooltip.crossRunwayId = forCrosswind?.cross_r_id;
-          }
         } else {
           labelStyle.fill = getFlightCategoryColor(seg.segmentNbmProps.visibility, seg.segmentNbmProps.cloudceiling);
           tooltip = {
@@ -614,14 +638,14 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             temperature: seg.segmentNbmProps.temperature,
             dewpoint: seg.segmentNbmProps.dewpoint,
           };
-          if (segmentIndex === 0 || segmentIndex === segments.length - 1) {
-            const { data: forCrosswind } = getAirportNbmData(airportNbmData, seg.arriveTime, seg.airport?.key);
-            tooltip.crosscom = forCrosswind?.cross_com;
-            tooltip.crossRunwayId = forCrosswind?.cross_r_id;
-          }
+          // if (segmentIndex === 0 || segmentIndex === segments.length - 1) {
+          //   const { data: forCrosswind } = getAirportNbmData(airportNbmData, seg.arriveTime, seg.airport?.key);
+          //   tooltip.crosscom = forCrosswind?.cross_com;
+          //   tooltip.crossRunwayId = forCrosswind?.cross_r_id;
+          // }
         }
         let airportDist = 0;
-        if (segmentIndex > 0 && seg.airport) {
+        if (seg.airport) {
           const airportDelta =
             flyjs.distanceTo(
               seg.position.lat,
@@ -642,15 +666,120 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         }
 
         return {
-          x: interval * segmentIndex + airportDist,
+          x: seg.accDistance + airportDist,
           y: 0,
-          yOffset: seg.isRoutePoint ? 36 : 44,
+          yOffset: 44,
           label: seg.airport?.key || seg.position.lat.toFixed(2) + '/' + seg.position.lng.toFixed(2),
           style: labelStyle,
           tooltip: tooltip,
         };
       });
-      setAirportLabelSeries(airportLabels);
+      const routePoints = [
+        activeRoute.departure,
+        ...activeRoute.routeOfFlight.map((rf) => rf.routePoint),
+        activeRoute.destination,
+      ];
+      let accDistance = 0;
+      const routePointsLabels = routePoints.map((rp, index) => {
+        const dataIndex = getIndexByElevation(
+          getDepartureAdvisorDataResult.data?.cloudceiling,
+          rp.position.coordinates,
+        );
+        const distance =
+          index === 0
+            ? 0
+            : fly.distanceTo(
+                routePoints[index - 1].position.coordinates[1],
+                routePoints[index - 1].position.coordinates[0],
+                rp.position.coordinates[1],
+                rp.position.coordinates[0],
+                6,
+              );
+        accDistance += distance;
+        const speed = userSettings.true_airspeed;
+        const arriveTime = observationTime + (hourInMili * distance) / speed;
+        const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(
+          getDepartureAdvisorDataResult.data?.cloudceiling,
+          new Date(arriveTime),
+          null,
+          dataIndex,
+        );
+        const { value: visibility } = getValueFromDatasetByElevation(
+          getDepartureAdvisorDataResult.data?.visibility,
+          new Date(arriveTime),
+          null,
+          dataIndex,
+        );
+        const { value: skycover } = getValueFromDatasetByElevation(
+          queryNbmFlightCatResult.data?.skycover,
+          new Date(arriveTime),
+          null,
+          dataIndex,
+        );
+        const { value: cloudbase } = getValueFromDatasetByElevation(
+          queryNbmFlightCatResult.data?.cloudbase,
+          new Date(arriveTime),
+          null,
+          dataIndex,
+        );
+        const { value: windspeed } = getValueFromDatasetByElevation(
+          queryNbmWindSpeedResult.data,
+          new Date(arriveTime),
+          null,
+          getIndexByElevation(queryNbmWindSpeedResult.data, rp.position.coordinates),
+        );
+        const { value: winddir } = getValueFromDatasetByElevation(
+          queryNbmWindDirResult.data,
+          new Date(arriveTime),
+          null,
+          getIndexByElevation(queryNbmWindDirResult.data, rp.position.coordinates),
+        );
+        const { value: gust } = getValueFromDatasetByElevation(
+          queryNbmGustResult.data,
+          new Date(arriveTime),
+          null,
+          getIndexByElevation(queryNbmGustResult.data, rp.position.coordinates),
+        );
+        const { value: temperature } = getValueFromDatasetByElevation(
+          queryNbmTempResult.data,
+          new Date(arriveTime),
+          null,
+          getIndexByElevation(queryNbmTempResult.data, rp.position.coordinates),
+        );
+        const { value: dewpoint } = getValueFromDatasetByElevation(
+          queryNbmDewpointResult.data,
+          new Date(arriveTime),
+          null,
+          getIndexByElevation(queryNbmDewpointResult.data, rp.position.coordinates),
+        );
+        labelStyle.fill = getFlightCategoryColor(visibility, cloudceiling);
+        tooltip = {
+          time: arriveTime,
+          clouds: makeSkyConditions(cloudbase, cloudceiling, skycover),
+          ceiling: cloudceiling,
+          lowestCloud: cloudbase,
+          visibility: visibility,
+          windspeed: windspeed,
+          winddir: winddir,
+          windgust: gust,
+          temperature: temperature,
+          dewpoint: dewpoint,
+        };
+        if (index === 0 || index === routePoints.length - 1) {
+          const { data: forCrosswind } = getAirportNbmData(airportNbmData, arriveTime, rp.key);
+          tooltip.crosscom = forCrosswind?.cross_com;
+          tooltip.crossRunwayId = forCrosswind?.cross_r_id;
+        }
+        return {
+          x: accDistance,
+          y: 0,
+          yOffset: 36,
+          label: rp.key,
+          style: { ...labelStyle, fontSize: index === 0 || index === routePoints.length - 1 ? 14 : 11 },
+          tooltip: tooltip,
+        };
+      });
+      setAirportLabelSeries([...airportLabels.filter((el) => el), ...routePointsLabels]);
       setWeatherIconData(weatherSeries);
     }
   }
@@ -1247,7 +1376,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                       : Math.round(knotsToMph(airportHint.tooltip.windgust)) + ' mph'}
                   </span>
                 )}
-              {airportHint.tooltip.crosscom && (
+              {airportHint.tooltip.crosscom > 0 && (
                 <span>
                   <b>Crosswind component:</b>&nbsp;
                   {!userSettings.default_wind_speed_unit
