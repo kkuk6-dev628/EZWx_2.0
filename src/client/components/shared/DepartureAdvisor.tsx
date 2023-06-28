@@ -2,8 +2,10 @@
 import Slider from '@mui/material/Slider';
 import React, { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import {
+  absoluteDateToTime,
   addLeadingZeroes,
   diffMinutes,
+  getAbsoluteDate,
   getTimeRangeStart,
   roundCloudHeight,
   simpleTimeFormat,
@@ -947,6 +949,8 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       skip: activeRoute === null,
     },
   );
+  const scrollContentRef = useRef<HTMLDivElement>();
+  const scrollParentRef = useRef<HTMLDivElement>();
 
   const blockhours = 3;
   const stepsPerHour = 12;
@@ -960,7 +964,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const [currentHour, setCurrentHour] = useState(new Date().getUTCHours());
 
   const maxRange = timeRange * stepsPerHour;
-  const blockInterval = blockhours * stepsPerHour;
+  const [width, setWidth] = useState<number>(window.innerWidth);
   const startTime = getTimeRangeStart(props.showPast);
   startTime.setUTCHours(startTime.getUTCHours() + 1, 0, 0, 0);
   const [blockTimes, setBlockTimes] = useState(calcBlockTimes());
@@ -981,13 +985,12 @@ function DepartureAdvisor(props: { showPast: boolean }) {
 
   function calcBlockDays() {
     if (settingsState.default_time_display_unit) {
-      const startDate = startTime.getDate();
+      const startDate = getAbsoluteDate(startTime);
       const endTime = new Date(startTime);
       endTime.setHours(startTime.getHours() + timeRange);
-      const endDate = endTime.getDate();
+      const endDate = getAbsoluteDate(endTime);
       return Array.from({ length: endDate - startDate + 1 }, (_, i) => {
-        const date = new Date(startTime);
-        date.setDate(i + startDate);
+        const date = absoluteDateToTime(startDate + i);
         let width = 24 / timeRange;
         if (i === 0) {
           width = (24 - startTime.getHours()) / timeRange;
@@ -1000,13 +1003,12 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         };
       });
     } else {
-      const startDate = startTime.getUTCDate();
+      const startDate = getAbsoluteDate(startTime);
       const endTime = new Date(startTime);
       endTime.setHours(startTime.getHours() + timeRange);
-      const endDate = endTime.getUTCDate();
+      const endDate = getAbsoluteDate(endTime);
       return Array.from({ length: endDate - startDate + 1 }, (_, i) => {
-        const date = new Date(startTime);
-        date.setUTCDate(i + startDate);
+        const date = absoluteDateToTime(startDate + i);
         let width = 24 / timeRange;
         if (i === 0) {
           width = (24 - startTime.getUTCHours()) / timeRange;
@@ -1032,27 +1034,38 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     const interval = setInterval(() => setCurrentHour(new Date().getHours()), 1000);
     return () => clearInterval(interval);
   }, []);
-  // useEffect(() => {
-  //   window.addEventListener('resize', handleWindowSizeChange);
-  //   return () => {
-  //     window.removeEventListener('resize', handleWindowSizeChange);
-  //   };
-  // }, []);
+  useEffect(() => {
+    window.addEventListener('resize', handleWindowSizeChange);
+    return () => {
+      window.removeEventListener('resize', handleWindowSizeChange);
+    };
+  }, []);
 
-  // const handleWindowSizeChange = () => {
-  //   if (window.innerWidth >= 1000) {
-  //     setBlockCount(28);
-  //   } else if (window.innerWidth > 720) {
-  //     setBlockCount(16);
-  //   }
-  // };
+  const handleWindowSizeChange = () => {
+    setWidth(window.innerWidth);
+  };
 
+  const isMobile = width < 960;
+
+  function scrollBlocks() {
+    if (scrollParentRef.current && scrollContentRef.current) {
+      const scrollParent = scrollParentRef.current;
+      const scrollContent = scrollContentRef.current;
+      const overflow = scrollContent.clientWidth - scrollParent.clientWidth;
+      if (overflow > 0) {
+        const timePos = timeToValue(new Date(settingsState.observation_time)) / maxRange;
+        const scrollPos = timePos * overflow;
+        scrollParent.scrollTo({ left: scrollPos });
+      }
+    }
+  }
   useEffect(() => {
     const hour = new Date(settingsState.observation_time);
     hour.setMinutes(0, 0, 0);
     setHour(hour.getTime());
     setHideDotsBars(false);
     setClickedDotsBars(false);
+    if (isMobile) scrollBlocks();
   }, [settingsState.observation_time]);
 
   useEffect(() => {
@@ -1574,8 +1587,8 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         >
           -3h
         </div>
-        <div className="blocks-date">
-          <div className="blocks-contents">
+        <div className="blocks-date" ref={scrollParentRef} style={{ overflowX: isMobile ? 'auto' : null }}>
+          <div className="blocks-contents" ref={scrollContentRef}>
             <div className="horizental-blocks">
               {evaluationsByTime &&
                 blockTimes.map((time, index) => (
@@ -1585,6 +1598,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
                     time={time}
                     color={colorByTimes[index]}
                     isMap={blockTimes.length > 24}
+                    show3Bar={!isMobile}
                     evaluationsByTime={evaluationsByTime}
                     setShowPopup={setShowPopup}
                     handleTimeChange={handleTimeChange}
