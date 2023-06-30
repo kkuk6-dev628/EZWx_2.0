@@ -1053,9 +1053,16 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       const scrollContent = scrollContentRef.current;
       const overflow = scrollContent.clientWidth - scrollParent.clientWidth;
       if (overflow > 0) {
-        const timePos = timeToValue(new Date(settingsState.observation_time)) / maxRange;
-        const scrollPos = timePos * overflow;
-        scrollParent.scrollTo({ left: scrollPos });
+        const timePos = (scrollContent.clientWidth * timeToValue(new Date(settingsState.observation_time))) / maxRange;
+        if (timePos - scrollParent.scrollLeft < 0) {
+          scrollParent.scrollLeft -= scrollParent.scrollLeft - timePos + 20;
+        } else if (timePos - scrollParent.scrollLeft < 20) {
+          scrollParent.scrollLeft -= 20;
+        } else if (scrollParent.clientWidth + scrollParent.scrollLeft - timePos < 0) {
+          scrollParent.scrollLeft += timePos - scrollParent.clientWidth - scrollParent.scrollLeft + 20;
+        } else if (scrollParent.clientWidth + scrollParent.scrollLeft - timePos < 20) {
+          scrollParent.scrollLeft += 20;
+        }
       }
     }
   }
@@ -1587,7 +1594,11 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         >
           -3h
         </div>
-        <div className="blocks-date" ref={scrollParentRef} style={{ overflowX: isMobile ? 'auto' : null }}>
+        <div
+          className="blocks-date"
+          ref={scrollParentRef}
+          style={isMobile ? { overflow: 'hidden', height: hideDotsBars ? 78 : 210 } : null}
+        >
           <div className="blocks-contents" ref={scrollContentRef}>
             <div className="horizental-blocks">
               {evaluationsByTime &&
@@ -1619,6 +1630,23 @@ function DepartureAdvisor(props: { showPast: boolean }) {
                 </div>
               ))}
             </div>
+            <Slider
+              className="time-slider"
+              key={`time-range-slider`}
+              aria-label="Time Slider"
+              // defaultValue={timeToValue(defaultTime)}
+              value={timeToValue(currentTime)}
+              max={maxRange}
+              valueLabelFormat={valuetext}
+              step={1}
+              valueLabelDisplay="on"
+              onChange={(_e, newValue: number) => {
+                handleTimeChange(valueToTime(newValue), false);
+              }}
+              onChangeCommitted={(_e, newValue: number) => {
+                handleTimeChange(valueToTime(newValue));
+              }}
+            />
           </div>
         </div>
         <div
@@ -1631,23 +1659,6 @@ function DepartureAdvisor(props: { showPast: boolean }) {
           +3h
         </div>
       </div>
-      <Slider
-        className="time-slider"
-        key={`time-range-slider`}
-        aria-label="Time Slider"
-        // defaultValue={timeToValue(defaultTime)}
-        value={timeToValue(currentTime)}
-        max={maxRange}
-        valueLabelFormat={valuetext}
-        step={1}
-        valueLabelDisplay="on"
-        onChange={(_e, newValue: number) => {
-          handleTimeChange(valueToTime(newValue), false);
-        }}
-        onChangeCommitted={(_e, newValue: number) => {
-          handleTimeChange(valueToTime(newValue));
-        }}
-      />
     </div>
   );
 }

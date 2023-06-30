@@ -1,5 +1,4 @@
 .departure-advisor{
-  background-color: var(--color-primary);
   position: absolute;
   width: 100%;
   padding-top: 4px;
@@ -206,7 +205,7 @@
   .time-slider{
     margin: 0 auto;
     color: white;
-    width: calc(100% - 80px);
+    width: 100%;
     padding: 8px 0;
   }
   .interval-select{
@@ -216,7 +215,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin-bottom: 48px;
+    margin-bottom: 42px;
     .fade-out{
       opacity: 0;
       transition: all 250ms linear 3s;  
@@ -231,6 +230,7 @@
     display: flex;
     width: 100%;
     justify-content: space-between;
+    align-items: flex-end;
     color: black;
     z-index: 2;
     .blocks-date{
@@ -247,7 +247,7 @@
     .blocks-contents{
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-end;
       width: calc(100vw - 80px);
       min-width: 960px;
       height: 100%;
@@ -286,10 +286,10 @@
     }
     .move-left, .move-right{
       background-color: aliceblue;
-      width: 24px;
-      height: 42px;
-      line-height: 42px;
-      margin: 1px 8px;
+      width: 30px;
+      height: 52px;
+      line-height: 52px;
+      margin: 8px;
       cursor: pointer;
     }
     .move-left{
