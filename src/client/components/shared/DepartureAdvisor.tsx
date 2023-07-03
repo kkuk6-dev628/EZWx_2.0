@@ -25,6 +25,7 @@ import {
 import {
   cacheKeys,
   flightCategoryDivide,
+  getRouteLength,
   getSegmentsCount,
   getValueFromDatasetByElevation,
   interpolateRouteByInterval,
@@ -147,23 +148,23 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
                 return 1;
                 break;
               case 2:
-                return 2;
+                return 1;
                 break;
               case 3:
-                return 3;
+                return 2;
                 break;
             }
             break;
           case 6:
             switch (wxInten1) {
               case 1:
-                return 2;
+                return 1;
                 break;
               case 2:
-                return 3;
+                return 2;
                 break;
               case 3:
-                return 4;
+                return 3;
                 break;
             }
             break;
@@ -173,10 +174,10 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
                 return 3;
                 break;
               case 2:
-                return 4;
+                return 3;
                 break;
               case 3:
-                return 5;
+                return 4;
                 break;
             }
             break;
@@ -187,6 +188,19 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
           case 5:
             switch (wxInten1) {
               case 1:
+                return 1;
+                break;
+              case 2:
+                return 2;
+                break;
+              case 3:
+                return 2;
+                break;
+            }
+            break;
+          case 6:
+            switch (wxInten1) {
+              case 1:
                 return 2;
                 break;
               case 2:
@@ -197,19 +211,6 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
                 break;
             }
             break;
-          case 6:
-            switch (wxInten1) {
-              case 1:
-                return 3;
-                break;
-              case 2:
-                return 4;
-                break;
-              case 3:
-                return 5;
-                break;
-            }
-            break;
           case 7:
             switch (wxInten1) {
               case 1:
@@ -219,7 +220,7 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
                 return 4;
                 break;
               case 3:
-                return 5;
+                return 4;
                 break;
             }
             break;
@@ -230,23 +231,23 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
           case 5:
             switch (wxInten1) {
               case 1:
-                return 3;
+                return 2;
                 break;
               case 2:
-                return 4;
+                return 3;
                 break;
               case 3:
-                return 5;
+                return 3;
                 break;
             }
             break;
           case 6:
             switch (wxInten1) {
               case 1:
-                return 3;
+                return 2;
                 break;
               case 2:
-                return 4;
+                return 3;
                 break;
               case 3:
                 return 4;
@@ -256,13 +257,13 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
           case 7:
             switch (wxInten1) {
               case 1:
-                return 4;
+                return 3;
                 break;
               case 2:
-                return 5;
+                return 4;
                 break;
               case 3:
-                return 5;
+                return 4;
                 break;
             }
             break;
@@ -276,7 +277,7 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
                 return 3;
                 break;
               case 2:
-                return 4;
+                return 3;
                 break;
               case 3:
                 return 4;
@@ -292,7 +293,7 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
                 return 4;
                 break;
               case 3:
-                return 5;
+                return 4;
                 break;
             }
             break;
@@ -322,23 +323,23 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
                 return 1;
                 break;
               case 2:
-                return 2;
+                return 1;
                 break;
               case 3:
-                return 3;
+                return 2;
                 break;
             }
             break;
           case 6:
             switch (wxInten1) {
               case 1:
-                return 2;
+                return 1;
                 break;
               case 2:
-                return 3;
+                return 2;
                 break;
               case 3:
-                return 4;
+                return 3;
                 break;
             }
             break;
@@ -348,10 +349,10 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
                 return 3;
                 break;
               case 2:
-                return 4;
+                return 3;
                 break;
               case 3:
-                return 5;
+                return 4;
                 break;
             }
             break;
@@ -362,6 +363,19 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
           case 5:
             switch (wxInten1) {
               case 1:
+                return 1;
+                break;
+              case 2:
+                return 2;
+                break;
+              case 3:
+                return 2;
+                break;
+            }
+            break;
+          case 6:
+            switch (wxInten1) {
+              case 1:
                 return 2;
                 break;
               case 2:
@@ -372,19 +386,6 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
                 break;
             }
             break;
-          case 6:
-            switch (wxInten1) {
-              case 1:
-                return 3;
-                break;
-              case 2:
-                return 4;
-                break;
-              case 3:
-                return 5;
-                break;
-            }
-            break;
           case 7:
             switch (wxInten1) {
               case 1:
@@ -394,7 +395,7 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
                 return 4;
                 break;
               case 3:
-                return 5;
+                return 4;
                 break;
             }
             break;
@@ -405,23 +406,23 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
           case 5:
             switch (wxInten1) {
               case 1:
-                return 3;
+                return 2;
                 break;
               case 2:
-                return 4;
+                return 3;
                 break;
               case 3:
-                return 5;
+                return 3;
                 break;
             }
             break;
           case 6:
             switch (wxInten1) {
               case 1:
-                return 3;
+                return 2;
                 break;
               case 2:
-                return 4;
+                return 3;
                 break;
               case 3:
                 return 4;
@@ -431,10 +432,10 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
           case 7:
             switch (wxInten1) {
               case 1:
-                return 4;
+                return 3;
                 break;
               case 2:
-                return 5;
+                return 4;
                 break;
               case 3:
                 return 5;
@@ -451,7 +452,7 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
                 return 3;
                 break;
               case 2:
-                return 4;
+                return 3;
                 break;
               case 3:
                 return 4;
@@ -467,7 +468,7 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
                 return 4;
                 break;
               case 3:
-                return 5;
+                return 4;
                 break;
             }
             break;
@@ -495,10 +496,10 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
             return 1;
             break;
           case 2:
-            return 2;
+            return 1;
             break;
           case 3:
-            return 3;
+            return 2;
             break;
         }
         break;
@@ -508,30 +509,30 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
             return 2;
             break;
           case 2:
-            return 3;
+            return 2;
             break;
           case 3:
-            return 4;
+            return 3;
             break;
         }
         break;
       case 3:
         switch (wxInten1) {
           case 1:
-            return 3;
+            return 2;
             break;
           case 2:
-            return 4;
+            return 3;
             break;
           case 3:
-            return 5;
+            return 4;
             break;
         }
         break;
       case 4:
         switch (wxInten1) {
           case 1:
-            return 4;
+            return 3;
             break;
           case 2:
             return 4;
@@ -550,10 +551,10 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
             return 1;
             break;
           case 2:
-            return 2;
+            return 1;
             break;
           case 3:
-            return 3;
+            return 2;
             break;
         }
         break;
@@ -563,30 +564,30 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
             return 2;
             break;
           case 2:
-            return 3;
+            return 2;
             break;
           case 3:
-            return 4;
+            return 3;
             break;
         }
         break;
       case 3:
         switch (wxInten2) {
           case 1:
-            return 3;
+            return 2;
             break;
           case 2:
-            return 4;
+            return 3;
             break;
           case 3:
-            return 5;
+            return 4;
             break;
         }
         break;
       case 4:
         switch (wxInten2) {
           case 1:
-            return 4;
+            return 3;
             break;
           case 2:
             return 4;
@@ -621,6 +622,8 @@ function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxPr
         return 4;
         break;
     }
+  } else {
+    return 0;
   }
 }
 
@@ -954,13 +957,13 @@ function DepartureAdvisor(props: { showPast: boolean }) {
 
   const blockhours = 3;
   const stepsPerHour = 12;
-  const timeRange = props.showPast ? 84 : 72;
+  const [timeRange, setTimeRange] = useState(props.showPast ? 84 : 72);
   const [currEval, setCurrEval] = useState(initialEvaluation);
   const [beforeEval, setBeforeEval] = useState(null);
   const [afterEval, setAfterEval] = useState(initialEvaluation);
   const [colorByTimes, setColorByTimes] = useState<string[]>(Array.from({ length: 8 }));
   const [hour, setHour] = useState(0);
-  const blockCount = timeRange / blockhours;
+  const blockCount = Math.floor(timeRange / blockhours);
   const [currentHour, setCurrentHour] = useState(new Date().getUTCHours());
 
   const maxRange = timeRange * stepsPerHour;
@@ -984,43 +987,27 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   }
 
   function calcBlockDays() {
-    if (settingsState.default_time_display_unit) {
-      const startDate = getAbsoluteDate(startTime);
-      const endTime = new Date(startTime);
-      endTime.setHours(startTime.getHours() + timeRange);
-      const endDate = getAbsoluteDate(endTime);
-      return Array.from({ length: endDate - startDate + 1 }, (_, i) => {
-        const date = absoluteDateToTime(startDate + i);
-        let width = 24 / timeRange;
-        if (i === 0) {
-          width = (24 - startTime.getHours()) / timeRange;
-        } else if (i === endDate - startDate) {
-          width = endTime.getHours() / timeRange;
-        }
-        return {
-          date: date,
-          width: width * 100,
-        };
-      });
-    } else {
-      const startDate = getAbsoluteDate(startTime);
-      const endTime = new Date(startTime);
-      endTime.setHours(startTime.getHours() + timeRange);
-      const endDate = getAbsoluteDate(endTime);
-      return Array.from({ length: endDate - startDate + 1 }, (_, i) => {
-        const date = absoluteDateToTime(startDate + i);
-        let width = 24 / timeRange;
-        if (i === 0) {
-          width = (24 - startTime.getUTCHours()) / timeRange;
-        } else if (i === endDate - startDate) {
-          width = endTime.getUTCHours() / timeRange;
-        }
-        return {
-          date: date,
-          width: width * 100,
-        };
-      });
+    let date = blockTimes[0];
+    let width = 0;
+    let blockCountInDate = 0;
+    const dateBlocks = [];
+    for (const blockTime of blockTimes) {
+      if (
+        settingsState.default_time_display_unit
+          ? date.getDate() === blockTime.getDate()
+          : date.getUTCDate() === blockTime.getUTCDate()
+      ) {
+        blockCountInDate++;
+      } else {
+        width = blockCountInDate / blockCount;
+        dateBlocks.push({ date: date, width: width * 100 });
+        blockCountInDate = 1;
+        date = blockTime;
+      }
     }
+    width = blockCountInDate / blockCount;
+    dateBlocks.push({ date: date, width: width * 100 });
+    return dateBlocks;
   }
 
   useEffect(() => {
@@ -1078,6 +1065,9 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   useEffect(() => {
     if (activeRoute) {
       getDepartureAdvisorDataResult.reset();
+      const routeLength = getRouteLength(activeRoute, true);
+      const flytime = Math.round(routeLength / settingsState.true_airspeed);
+      setTimeRange(Math.floor(((props.showPast ? 84 : 72) - flytime) / 3) * 3);
       const queryPoints = interpolateRouteByInterval(
         activeRoute,
         getSegmentsCount(activeRoute) * flightCategoryDivide,

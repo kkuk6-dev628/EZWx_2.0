@@ -1369,7 +1369,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
               {airportHint.tooltip.windgust > 10 &&
                 Math.abs(airportHint.tooltip.windgust - airportHint.tooltip.windspeed) > 4 && (
                   <span>
-                    <b>Wind Gust:</b>&nbsp;
+                    <b>Wind gust:</b>&nbsp;
                     {!userSettings.default_wind_speed_unit
                       ? Math.round(airportHint.tooltip.windgust) +
                         (Math.round(airportHint.tooltip.windgust) <= 1 ? ' knot' : ' knots')
