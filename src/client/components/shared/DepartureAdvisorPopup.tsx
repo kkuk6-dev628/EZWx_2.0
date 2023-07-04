@@ -12,7 +12,7 @@ export function getEvaluationByTime(
   evaluationData: { time: number; evaluation: PersonalMinsEvaluation }[],
   time: number,
 ): PersonalMinsEvaluation {
-  if (!evaluationData) return;
+  if (!evaluationData || evaluationData.length === 0) return;
   const evaluation = evaluationData.reduce((prev, curr) => {
     const diffPrev = time - prev.time;
     const diffCurr = time - curr.time;

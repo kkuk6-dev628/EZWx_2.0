@@ -88,6 +88,9 @@ export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
   if (viewHeight < 680) {
     return 320;
   } else {
+    if (_viewWidth < 840) {
+      return viewHeight - 320;
+    }
     return viewHeight - 240;
   }
 };
@@ -458,8 +461,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   }, []);
 
   const handleWindowSizeChange = () => {
-    setViewW(window.innerWidth);
-    setViewH(window.innerHeight);
+    setViewW(document.documentElement.clientWidth);
+    setViewH(document.documentElement.clientHeight);
   };
 
   function buildWeatherSeries(segment: RouteSegment, segmentIndex: number, segmentInterval: number) {

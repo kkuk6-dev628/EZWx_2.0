@@ -970,8 +970,8 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const [width, setWidth] = useState<number>(window.innerWidth);
   const startTime = getTimeRangeStart(props.showPast);
   startTime.setUTCHours(startTime.getUTCHours() + 1, 0, 0, 0);
-  const [blockTimes, setBlockTimes] = useState(calcBlockTimes());
-  const [blockDays, setBlockDays] = useState(calcBlockDays());
+  const [blockTimes, setBlockTimes] = useState([]);
+  const [blockDays, setBlockDays] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [evaluationsByTime, setEvaluationsByTime] = useState<any[]>();
   const dotElementRef = useRef(null);
@@ -986,12 +986,12 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     });
   }
 
-  function calcBlockDays() {
-    let date = blockTimes[0];
+  function calcBlockDays(times) {
+    let date = times[0];
     let width = 0;
     let blockCountInDate = 0;
     const dateBlocks = [];
-    for (const blockTime of blockTimes) {
+    for (const blockTime of times) {
       if (
         settingsState.default_time_display_unit
           ? date.getDate() === blockTime.getDate()
@@ -1011,11 +1011,11 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   }
 
   useEffect(() => {
-    const days = calcBlockDays();
-    setBlockDays(days);
     const times = calcBlockTimes();
     setBlockTimes(times);
-  }, [currentHour, settingsState.default_time_display_unit]);
+    const days = calcBlockDays(times);
+    setBlockDays(days);
+  }, [currentHour, settingsState.default_time_display_unit, blockCount]);
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentHour(new Date().getHours()), 1000);
@@ -1053,6 +1053,18 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       }
     }
   }
+
+  useEffect(() => {
+    if (queryGfsWindDirectionDataResult.isSuccess && getDepartureAdvisorDataResult.isSuccess) {
+      const gfsForecastTime = getMaxForecastTime(queryGfsWindDirectionDataResult.data);
+      const nbmForecastTime = getMaxForecastTime(getDepartureAdvisorDataResult.data?.cloudceiling);
+      const minGfsNbm = Math.min(gfsForecastTime.getTime(), nbmForecastTime.getTime());
+      const forecastTime = Math.floor((minGfsNbm - new Date().getTime()) / 3600 / 1000) + 1;
+      const routeLength = getRouteLength(activeRoute, true);
+      const flytime = Math.round(routeLength / settingsState.true_airspeed);
+      setTimeRange(Math.round(((props.showPast ? 12 : 0) + forecastTime - flytime) / 3) * 3);
+    }
+  }, [queryGfsWindDirectionDataResult.isSuccess, getDepartureAdvisorDataResult.isSuccess]);
   useEffect(() => {
     const hour = new Date(settingsState.observation_time);
     hour.setMinutes(0, 0, 0);
@@ -1065,9 +1077,6 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   useEffect(() => {
     if (activeRoute) {
       getDepartureAdvisorDataResult.reset();
-      const routeLength = getRouteLength(activeRoute, true);
-      const flytime = Math.round(routeLength / settingsState.true_airspeed);
-      setTimeRange(Math.floor(((props.showPast ? 84 : 72) - flytime) / 3) * 3);
       const queryPoints = interpolateRouteByInterval(
         activeRoute,
         getSegmentsCount(activeRoute) * flightCategoryDivide,
