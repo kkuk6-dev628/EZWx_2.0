@@ -99,7 +99,7 @@ const WindChart = () => {
           );
           const headwind = flyjs.HeadWindCalculator(windSpeed, windDir, segment.course, 2);
           let backgroundColor = 'blue';
-          if (routeProfileApiState.windLayer === 'Head/tailwind') {
+          if (routeProfileApiState.windLayer === 'HEAD/TAIL') {
             if (headwind <= -0.5) {
               backgroundColor = 'green';
             } else if (headwind < 0.5) {
@@ -109,7 +109,7 @@ const WindChart = () => {
             }
           }
           const windText =
-            routeProfileApiState.windLayer === 'Windspeed' ? Math.round(windSpeed) : Math.abs(Math.round(headwind));
+            routeProfileApiState.windLayer === 'SPEED' ? Math.round(windSpeed) : Math.abs(Math.round(headwind));
           const ry = 10;
           const rx = windText > 99 ? ry + 4 : ry;
           windSpeedData.push({

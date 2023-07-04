@@ -1059,7 +1059,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       const gfsForecastTime = getMaxForecastTime(queryGfsWindDirectionDataResult.data);
       const nbmForecastTime = getMaxForecastTime(getDepartureAdvisorDataResult.data?.cloudceiling);
       const minGfsNbm = Math.min(gfsForecastTime.getTime(), nbmForecastTime.getTime());
-      const forecastTime = Math.floor((minGfsNbm - new Date().getTime()) / 3600 / 1000) + 1;
+      const forecastTime = Math.floor((minGfsNbm - new Date().getTime()) / 3600 / 1000) + 2;
       const routeLength = getRouteLength(activeRoute, true);
       const flytime = Math.round(routeLength / settingsState.true_airspeed);
       setTimeRange(Math.round(((props.showPast ? 12 : 0) + forecastTime - flytime) / 3) * 3);

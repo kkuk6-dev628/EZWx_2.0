@@ -45,13 +45,24 @@ const routeProfileChartTypes: {
   icing: 'Icing',
   turb: 'Turb',
 };
+const routeProfileChartTypeLabels: {
+  wind: string;
+  clouds: string;
+  icing: string;
+  turb: string;
+} = {
+  wind: 'WIND',
+  clouds: 'CLDS',
+  icing: 'ICE',
+  turb: 'TURB',
+};
 
 const routeProfileWindDataTypes: {
   windspeed: RouteProfileWindDataType;
   headtail: RouteProfileWindDataType;
 } = {
-  windspeed: 'Windspeed',
-  headtail: 'Head/tailwind',
+  windspeed: 'SPEED',
+  headtail: 'HEAD/TAIL',
 };
 
 const routeProfileIcingDataTypes: {
@@ -166,33 +177,33 @@ const RouteProfileContainer = () => {
           <div className="route-profile-container">
             <RouteProfileDataLoader key={dataLoadTime} />
             <div className="route-profile-header">
-              <RadioGroup
-                className="select-chart-type"
-                value={routeProfileState.chartType ? routeProfileState.chartType : routeProfileChartTypes.wind}
-                onChange={(_e, value) => {
-                  handleUpdateState({
-                    ...routeProfileState,
-                    chartType: value as unknown as RouteProfileChartType,
-                  });
-                }}
-              >
-                {Object.entries(routeProfileChartTypes).map(([key, value]) => {
-                  return (
-                    <FormControlLabel
-                      key={value}
-                      value={value}
-                      control={
-                        <Radio
-                          color="primary"
-                          icon={<CheckBoxOutlineBlankOutlined />}
-                          checkedIcon={<CheckBoxOutlinedIcon />}
+              <div className="header-left">
+                <InputFieldWrapper>
+                  <div className="input_radio_container">
+                    {Object.entries(routeProfileChartTypes).map(([key, value]) => {
+                      return (
+                        <RadioButton
+                          id={key}
+                          key={value}
+                          value={value}
+                          title={routeProfileChartTypeLabels[key]}
+                          selectedValue={
+                            routeProfileState.chartType ? routeProfileState.chartType : routeProfileChartTypes.wind
+                          }
+                          description=""
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            handleUpdateState({
+                              ...routeProfileState,
+                              chartType: value as unknown as RouteProfileChartType,
+                            });
+                          }}
                         />
-                      }
-                      label={value}
-                    />
-                  );
-                })}
-              </RadioGroup>
+                      );
+                    })}
+                  </div>
+                </InputFieldWrapper>
+              </div>
+
               <div className="header-right">
                 {routeProfileState.chartType !== routeProfileChartTypes.turb && (
                   <div className="show-temperature">
@@ -291,28 +302,31 @@ const RouteProfileContainer = () => {
                   </div>
                 )}
                 <div className="select-altitude">
-                  <InputFieldWrapper>
-                    <div className="input_radio_container">
-                      {routeProfileMaxAltitudes.map((value) => {
-                        return (
-                          <RadioButton
-                            id={value}
-                            key={value}
-                            value={value}
-                            title={value}
-                            selectedValue={routeProfileState.maxAltitude}
-                            description=""
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                              handleUpdateState({
-                                ...routeProfileState,
-                                maxAltitude: parseInt(e.target.value) as RouteProfileMaxAltitudes,
-                              });
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
-                  </InputFieldWrapper>
+                  <button
+                    className="btn-altitude left"
+                    onClick={() => {
+                      const newValue = routeProfileState.maxAltitude === 500 ? 300 : 200;
+                      handleUpdateState({
+                        ...routeProfileState,
+                        maxAltitude: newValue,
+                      });
+                    }}
+                  >
+                    -
+                  </button>
+                  <div className="label-altitude">{routeProfileState.maxAltitude}</div>
+                  <button
+                    className="btn-altitude right"
+                    onClick={() => {
+                      const newValue = routeProfileState.maxAltitude === 200 ? 300 : 500;
+                      handleUpdateState({
+                        ...routeProfileState,
+                        maxAltitude: newValue,
+                      });
+                    }}
+                  >
+                    +
+                  </button>
                 </div>
               </div>
             </div>

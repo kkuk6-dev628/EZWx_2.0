@@ -2,7 +2,7 @@ import { RoutePoint } from './route';
 
 export type RouteProfileChartType = 'Wind' | 'Clouds' | 'Icing' | 'Turb';
 
-export type RouteProfileWindDataType = 'Windspeed' | 'Head/tailwind';
+export type RouteProfileWindDataType = 'SPEED' | 'HEAD/TAIL';
 
 export type RouteProfileIcingDataType = 'Prob' | 'Sev' | 'SLD';
 

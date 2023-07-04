@@ -35,10 +35,12 @@
       display: flex;
       justify-content: space-between;
       flex-wrap: wrap;
-      @media screen and (max-width: 500px) {
-        flex-direction: column;
+      .header-left{
+        margin-left: 36px;
+        @media screen and (max-width: 500px) {
+          margin-left: 0;
+        }
       }
-
       .select-chart-type{
         color: whitesmoke;
         margin: 8px 24px;
@@ -68,17 +70,44 @@
         @media screen and (max-width: 900px) {
           margin-right: 4px;
         }
+        .select-altitude{
+          display: flex;
+          flex-direction: row;
+          color: white;
+          border: 1px solid white;
+          overflow: hidden;
+          border-radius: 5px;
+          height: 33px;
+          margin: 4px;
+          align-items: center;
+          .btn-altitude{
+            background-color: var(--color-yellow);
+            color: var(--color-dark);
+            height: 100%;
+            width: 14px;
+            border: none;
+            padding: 0;
+            font-size: 14px;
+            font-weight: bold;
+          }
+          .label-altitude{
+            margin: 0 4px;
+          }
+        }
       }
       .input_radio_container{
-        margin: 16px;
+        margin: 8px;
         @media screen and (max-width: 900px) {
-          margin: 16px 4px;
+          margin: 4px;
         }
       }
       .MuiToggleButtonGroup-root{
-        margin: 16px;
+        margin: 8px;
         border: 1px solid white;
         border-radius: 5px;
+        @media screen and (max-width: 900px) {
+          margin: 4px;
+        }
       }
       .MuiToggleButton-root{
         padding: 8px 4px;
@@ -94,6 +123,11 @@
       .RadioButton_radio__label__container__mLRn4 {
         padding: 8px 4px;
         min-width: 36px;
+        @media screen and (max-width: 500px) {
+          margin: 0;
+          padding: 8px 2px;
+          min-width: none;
+        }
       }
     }
     .route-profile-chart-container{
