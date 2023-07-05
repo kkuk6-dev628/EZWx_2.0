@@ -11,7 +11,7 @@
 
   @media screen and (max-width: 500px) {
     flex-direction: column;
-    height: 690px;
+    height: calc(100vh - 49px);
   }
   @media screen and (max-height: 680px) {
     height: 420px;
@@ -22,19 +22,19 @@
   .route-profile-container{
     width: calc(100vw - 78px);
     background-color: var(--color-primary);
-    border-radius: 8px;
-    margin-top: 2px;
-    margin-right: 8px;
-    margin-bottom: 24px;
+    border-radius: 0;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
     @media screen and (max-width: 500px) {
       width: 100vw;
-      height: 620px;
+      height: 100%;
     }
 
     .route-profile-header{
       display: flex;
       justify-content: space-between;
-      flex-wrap: wrap;
+      overflow-x: auto;
       .header-left{
         margin-left: 36px;
         @media screen and (max-width: 500px) {
@@ -137,6 +137,9 @@
       }
       .scrollable-chart-content{
         overflow: auto;
+        @media screen and (max-height: 680px) {
+          height: calc(100vh - 180px);
+        }
       }
       ::-webkit-scrollbar{
         width: 8px;

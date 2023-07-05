@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
 
-const ZuluClock = () => {
+const ZuluClock = ({ textColor }) => {
   const [zuluTime, setZuluTime] = useState(simpleTimeOnlyFormat(new Date(), false));
   useEffect(() => {
     const interval = setInterval(() => setZuluTime(simpleTimeOnlyFormat(new Date(), false)), 1000);
@@ -9,8 +9,10 @@ const ZuluClock = () => {
   }, []);
 
   return (
-    <button key="zulu-clock" className={`tabs__btn tabs__btn--hide_responsive`}>
-      <p className="btn__text">{zuluTime}</p>
+    <button key="zulu-clock" className={`zulu-clock tabs__btn`}>
+      <p className="btn__text" style={{ color: textColor }}>
+        {zuluTime}
+      </p>
     </button>
   );
 };

@@ -12,6 +12,11 @@
   @supports (-webkit-touch-callout: none) {
     padding-bottom: 24px; 
   }
+  @media screen and (max-height: 500px) {
+    width: calc(100% - 90px);
+    margin-left: 90px;
+  }
+
   .bars-container{
     display: flex;
     width: 60px;

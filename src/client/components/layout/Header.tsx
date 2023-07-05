@@ -9,6 +9,7 @@ import { SvgDropDown, SvgMenuBurger, SvgProfile, SvgRoundClose, SvgSave, SvgSett
 import dynamic from 'next/dynamic';
 import { useSelector } from 'react-redux';
 import { selectAuth } from '../../store/auth/authSlice';
+import ZuluClock from '../shared/ZuluClock';
 const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
 const links = [
@@ -165,9 +166,12 @@ export default function Header() {
               {mapMenu && <button className="header__tab__text"></button>}
             </div>
           ) : (
-            <button onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)} className="header__menu btn">
-              {activeResponsiveMenu ? <SvgRoundClose /> : <SvgMenuBurger />}
-            </button>
+            <div className="header__left">
+              <button onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)} className="header__menu btn">
+                {activeResponsiveMenu ? <SvgRoundClose /> : <SvgMenuBurger />}
+              </button>
+              <ZuluClock textColor="white" />
+            </div>
           )}
           <div className="header__mid">
             <ul className="header__nav">

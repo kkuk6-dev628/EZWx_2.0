@@ -86,10 +86,10 @@ export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
 };
 export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
   if (viewHeight < 680) {
-    return 320;
+    return 480;
   } else {
     if (_viewWidth < 840) {
-      return viewHeight - 320;
+      return viewHeight - 250;
     }
     return viewHeight - 240;
   }

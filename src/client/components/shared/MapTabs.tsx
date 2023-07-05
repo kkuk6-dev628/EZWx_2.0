@@ -18,7 +18,7 @@ function MapTabs({ tabMenus }: TabMenus) {
   const [showDropDown, setShowDropDown] = useState(false);
   return (
     <div className="tabs">
-      <ZuluClock />
+      <ZuluClock textColor="black" />
       {tabMenus.map((tabMenu) => (
         <button
           key={tabMenu.id}

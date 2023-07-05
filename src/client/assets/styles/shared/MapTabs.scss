@@ -8,13 +8,19 @@
   background-color: var(--color-white);
   max-width: 70px;
   width: 100%;
+  .zulu-clock{
+    display: block;
+    @media screen and (max-width: 1024px) {
+      display: none;
+    }
+  }
   p {
     font-size: rem($fs-xl);
   }
   @media screen and (max-width: 500px) {
     position: relative;
     flex-direction: row;
-    height: auto;
+    height: 50px;
     max-width: 100%;
     width: 100%;
     padding: 10px 0;
