@@ -13,6 +13,7 @@ import {
   GradientDefs,
   VerticalRectSeries,
   CustomSVGSeries,
+  LineMarkSeries,
 } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
@@ -78,22 +79,26 @@ import { makeWeatherString } from '../map/leaflet/popups/StationForecastPopup';
 import { hourInMili } from '../shared/DepartureAdvisor';
 
 export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
-  if (viewWidth < 900) {
+  if (viewWidth < iPadPortraitWidth) {
     return 900;
   } else {
-    return viewWidth - 106;
+    return viewWidth - 140;
   }
 };
 export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
-  if (viewHeight < 680) {
-    return 480;
+  if (viewHeight < mobileLandscapeHeight) {
+    return viewHeight - 200;
   } else {
-    if (_viewWidth < 840) {
-      return viewHeight - 250;
+    if (_viewWidth < iPadPortraitWidth) {
+      return viewHeight - 260;
     }
-    return viewHeight - 240;
+    return viewHeight - 220;
   }
 };
+
+export const mobileLandscapeHeight = 680;
+
+export const iPadPortraitWidth = 840;
 
 export const temperatureContourColors = {
   positive: '#FBF209',
@@ -396,6 +401,9 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     },
   );
 
+  const isMobile = viewH < mobileLandscapeHeight || viewW < mobileLandscapeHeight;
+  const windIconScale = isMobile ? 1 : 2;
+
   function buildTemperatureContourSeries() {
     if (queryTemperatureDataResult.isSuccess && segments.length > 0) {
       if (routeProfileApiState.showTemperature) {
@@ -451,7 +459,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     if (segments.length > 0 && airportNbmData && isAirportNbmLoaded) {
       buildAirportLabelSeries();
     }
-  }, [isAirportNbmLoaded, segments, routeProfileApiState.maxAltitude]);
+  }, [isAirportNbmLoaded, segments, routeProfileApiState.maxAltitude, viewH]);
 
   useEffect(() => {
     window.addEventListener('resize', handleWindowSizeChange);
@@ -575,11 +583,11 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             <text x={0} y={0}>
               <tspan
                 x="0"
-                y="-24"
+                y={-8 * windIconScale}
                 fill={color}
                 dominantBaseline="middle"
                 textAnchor="middle"
-                className={icon + ' fa-2x'}
+                className={icon + ' fa-' + windIconScale + 'x'}
               >
                 {weatherFontContents[icon]}
               </tspan>
@@ -671,7 +679,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         return {
           x: seg.accDistance + airportDist,
           y: 0,
-          yOffset: 44,
+          yOffset: isMobile ? 28 : 44,
           label: seg.airport?.key || seg.position.lat.toFixed(2) + '/' + seg.position.lng.toFixed(2),
           style: labelStyle,
           tooltip: tooltip,
@@ -776,7 +784,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         return {
           x: accDistance,
           y: 0,
-          yOffset: 36,
+          yOffset: isMobile ? 20 : 36,
           label: rp.key,
           style: { ...labelStyle, fontSize: index === 0 || index === routePoints.length - 1 ? 14 : 11 },
           tooltip: tooltip,
@@ -954,12 +962,13 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     <>
       {segmentsCount && (
         <XYPlot
+          key={viewH}
           height={calcChartHeight(viewW, viewH)}
           width={calcChartWidth(viewW, viewH)}
           color="white"
           yDomain={[0, routeProfileApiState.maxAltitude * 100]}
           xDomain={[-startMargin, routeLength + endMargin]}
-          margin={{ right: 40, bottom: 80, top: 48 }}
+          margin={{ right: 40, bottom: isMobile ? 64 : 72, top: 16 * windIconScale }}
         >
           <GradientDefs>
             <linearGradient id="linear-gradient">
@@ -1025,8 +1034,9 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                 const dist = Math.round(
                   userSettings.default_distance_unit ? flyjs.nauticalMilesTo('Kilometers', distInMile, 0) : distInMile,
                 );
+                const offset = isMobile ? '2.4em' : '3.6em';
                 return (
-                  <tspan dy="3.6em" className="chart-label">
+                  <tspan dy={offset} className="chart-label">
                     <tspan className="chart-label-dist">{dist}</tspan>
                   </tspan>
                 );
@@ -1050,7 +1060,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                 return {
                   x: index * segmentInterval,
                   y: 0,
-                  yOffset: 72,
+                  yOffset: isMobile ? 50 : 72,
                   segment: segment,
                   label: userSettings.default_time_display_unit
                     ? segment.departureTime.time
@@ -1142,7 +1152,15 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                 x: -startMargin,
                 y: routeProfileApiState.maxAltitude * 100,
                 customComponent: () => {
-                  return <rect x="0" y="-48" width={calcChartWidth(viewW, viewH) - 80} height={48} fill="white" />;
+                  return (
+                    <rect
+                      x="0"
+                      y={-16 * windIconScale}
+                      width={calcChartWidth(viewW, viewH) - 80}
+                      height={16 * windIconScale}
+                      fill="white"
+                    />
+                  );
                 },
               },
             ]}

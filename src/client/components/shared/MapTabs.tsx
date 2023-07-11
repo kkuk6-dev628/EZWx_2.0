@@ -37,6 +37,7 @@ function MapTabs({ tabMenus }: TabMenus) {
           <button
             className=" tabs__btn--dropdown"
             onClick={() => {
+              tabMenus[3].handler(tabMenus[3].id);
               setShowDropDown(false);
             }}
           >
@@ -46,7 +47,7 @@ function MapTabs({ tabMenus }: TabMenus) {
           <button
             className="tabs__btn--dropdown"
             onClick={() => {
-              tabMenus[5].handler(tabMenus[5].id);
+              tabMenus[4].handler(tabMenus[4].id);
               setShowDropDown(false);
             }}
           >
@@ -56,6 +57,7 @@ function MapTabs({ tabMenus }: TabMenus) {
           <button
             className=" tabs__btn--dropdown"
             onClick={() => {
+              tabMenus[5].handler(tabMenus[5].id);
               setShowDropDown(false);
             }}
           >

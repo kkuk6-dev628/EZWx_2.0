@@ -63,16 +63,16 @@ const responsiveLink = [
     name: 'Dashboard',
     link: '/dashboard',
   },
-  {
-    id: 2,
-    name: 'Plan a route',
-    link: '/route-profile',
-  },
-  {
-    id: 3,
-    name: 'Airport weather',
-    link: '/airport-weather',
-  },
+  // {
+  //   id: 2,
+  //   name: 'Plan a route',
+  //   link: '/route-profile',
+  // },
+  // {
+  //   id: 3,
+  //   name: 'Airport weather',
+  //   link: '/airport-weather',
+  // },
   {
     id: 4,
     name: 'Imagery',
@@ -167,6 +167,11 @@ export default function Header() {
             </div>
           ) : (
             <div className="header__left">
+              <Link href="/home">
+                <div className="header__img__area">
+                  <Image src="/images/avater.png" width={48} height={48} loading="eager" alt="logo" />
+                </div>
+              </Link>
               <button onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)} className="header__menu btn">
                 {activeResponsiveMenu ? <SvgRoundClose /> : <SvgMenuBurger />}
               </button>

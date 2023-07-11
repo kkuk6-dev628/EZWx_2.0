@@ -3,7 +3,7 @@ import { AirportNbmData, RouteProfileDataset, RouteProfileState } from '../../in
 
 const initialRouteProfileState: RouteProfileState = {
   chartType: 'Wind',
-  windLayer: 'Windspeed',
+  windLayer: 'SPEED',
   icingLayers: ['Prob'],
   turbLayers: ['CAT'],
   maxAltitude: 500,

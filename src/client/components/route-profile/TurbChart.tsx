@@ -4,11 +4,13 @@ import { VerticalRectSeries, LineSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
   cacheKeys,
+  flightCategoryDivide,
   getMaxForecastTime,
   getRouteLength,
   getSegmentInterval,
   getSegmentsCount,
   getValueFromDatasetByElevation,
+  interpolateRouteByInterval,
 } from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';
 import {
@@ -19,6 +21,8 @@ import {
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import RouteProfileChart from './RouteProfileChart';
 import { convertTimeFormat } from '../map/common/AreoFunctions';
+import flyjs from '../../fly-js/fly';
+import { hourInMili } from '../shared/DepartureAdvisor';
 
 export const takeoffEdrTable = {
   light: { light: 13, moderate: 16, severe: 36, extreme: 64 },
@@ -55,6 +59,10 @@ const TurbChart = (props) => {
       const segmentCount = getSegmentsCount(activeRoute);
       const segmentLength = getSegmentInterval(activeRoute, segmentCount);
       const maxForecastTime = getMaxForecastTime(queryCaturbDataResult.data);
+      const queryPoints = interpolateRouteByInterval(
+        activeRoute,
+        getSegmentsCount(activeRoute) * flightCategoryDivide,
+      ).map((pt) => pt.point);
       const turbData = [];
       let existTurbulence = false;
       if (observationTime > maxForecastTime.getTime()) {
@@ -64,8 +72,20 @@ const TurbChart = (props) => {
         return;
       }
       setNoForecast(false);
-      segments.forEach((segment, index) => {
+      let accDistance = 0;
+      let distance = 0;
+      queryPoints.forEach((segment, index) => {
         const maxElevation = routeProfileApiState.maxAltitude * 100;
+        if (index > 0) {
+          distance = flyjs.distanceTo(
+            queryPoints[index - 1].lat,
+            queryPoints[index - 1].lng,
+            segment.lat,
+            segment.lng,
+            6,
+          );
+          accDistance += distance;
+        }
         for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
           let edr = 0;
           let edrTime;
@@ -73,11 +93,12 @@ const TurbChart = (props) => {
           let color = colorsByEdr.none;
           let category = 'None';
           let opacity = 0.8;
-          if (segment.arriveTime > maxForecastTime.getTime()) {
+          const arriveTime = observationTime + (hourInMili * accDistance) / userSettings.true_airspeed;
+          if (arriveTime > maxForecastTime.getTime()) {
             category = 'N/A';
             color = colorsByEdr.na;
             edr = null;
-            edrTime = segment.arriveTime;
+            edrTime = arriveTime;
             if (routeProfileApiState.turbLayers.includes('CAT') && routeProfileApiState.turbLayers.includes('MWT')) {
               edrType = 'Combined EDR';
             } else if (routeProfileApiState.turbLayers.includes('CAT')) {
@@ -89,13 +110,13 @@ const TurbChart = (props) => {
             if (routeProfileApiState.turbLayers.includes('CAT') && routeProfileApiState.turbLayers.includes('MWT')) {
               const caturb = getValueFromDatasetByElevation(
                 queryCaturbDataResult.data,
-                new Date(segment.arriveTime),
+                new Date(arriveTime),
                 elevation,
                 index,
               );
               const mwturb = getValueFromDatasetByElevation(
                 queryMwturbDataResult.data,
-                new Date(segment.arriveTime),
+                new Date(arriveTime),
                 elevation,
                 index,
               );
@@ -105,7 +126,7 @@ const TurbChart = (props) => {
             } else if (routeProfileApiState.turbLayers.includes('CAT')) {
               const data = getValueFromDatasetByElevation(
                 queryCaturbDataResult.data,
-                new Date(segment.arriveTime),
+                new Date(arriveTime),
                 elevation,
                 index,
               );
@@ -115,7 +136,7 @@ const TurbChart = (props) => {
             } else if (routeProfileApiState.turbLayers.includes('MWT')) {
               ({ value: edr, time: edrTime } = getValueFromDatasetByElevation(
                 queryMwturbDataResult.data,
-                new Date(segment.arriveTime),
+                new Date(arriveTime),
                 elevation,
                 index,
               ));
@@ -143,15 +164,15 @@ const TurbChart = (props) => {
             }
             opacity = edr < edrCategory.light ? 0 : 0.5;
             if (edrTime === null) {
-              edrTime = segment.arriveTime;
+              edrTime = arriveTime;
               color = colorsByEdr.na;
               category = 'N/A';
             }
           }
           turbData.push({
-            x0: Math.round(index * segmentLength - segmentLength / 2),
+            x0: Math.round(accDistance - distance),
             y0: elevation - 500,
-            x: Math.round(index * segmentLength + segmentLength / 2),
+            x: Math.round(accDistance),
             y: elevation + 500,
             color: color,
             opacity: opacity,

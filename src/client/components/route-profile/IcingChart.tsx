@@ -4,6 +4,7 @@ import { VerticalRectSeries, LineSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
   cacheKeys,
+  flightCategoryDivide,
   getMaxForecastElevation,
   getMaxForecastTime,
   getMinMaxValueByElevation,
@@ -30,6 +31,8 @@ import { celsiusToFahrenheit, convertTimeFormat, round } from '../map/common/Are
 import { colorsByEdr, takeoffEdrTable } from './TurbChart';
 import { Route } from '../../interfaces/route';
 import { RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
+import flyjs from '../../fly-js/fly';
+import { hourInMili } from '../shared/DepartureAdvisor';
 
 const icingSevLegend = [
   { value: 0, color: '#F6F6F6', label: 'None' },
@@ -101,6 +104,10 @@ const IcingChart = (props) => {
       const segmentCount = getSegmentsCount(activeRoute);
       const segmentLength = routeLength / segmentCount;
       const icingData = [];
+      const queryPoints = interpolateRouteByInterval(
+        activeRoute,
+        getSegmentsCount(activeRoute) * flightCategoryDivide,
+      ).map((pt) => pt.point);
       const existIcing = false;
       const maxForecastTime = getMaxForecastTime(queryIcingProbDataResult.data);
       const maxForecastElevation = getMaxForecastElevation(queryIcingProbDataResult.data);
@@ -112,9 +119,25 @@ const IcingChart = (props) => {
       }
       setNoForecast(false);
       setNoDepicted(true);
+      let accDistance = 0;
+      let distance = 0;
 
-      segments.forEach((segment, index) => {
+      queryPoints.forEach((segment, index) => {
+        if (accDistance > routeLength) {
+          return;
+        }
         const maxElevation = Math.min(routeProfileApiState.maxAltitude * 100, maxForecastElevation);
+        if (index > 0) {
+          distance = flyjs.distanceTo(
+            queryPoints[index - 1].lat,
+            queryPoints[index - 1].lng,
+            segment.lat,
+            segment.lng,
+            6,
+          );
+          accDistance += distance;
+        }
+        const arriveTime = observationTime + (hourInMili * accDistance) / userSettings.true_airspeed;
         for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
           let time;
           let color = colorsByEdr.none;
@@ -122,11 +145,11 @@ const IcingChart = (props) => {
           let opacity = visibleOpacity;
           const severity = 'None';
           let hint;
-          if (segment.arriveTime > maxForecastTime.getTime()) {
+          if (arriveTime > maxForecastTime.getTime()) {
             color = '#666';
             opacity = 0.8;
             hint = {
-              time: segment.arriveTime,
+              time: new Date(arriveTime),
               altitude: elevation,
               prob: 'None',
               sev: 'None',
@@ -135,22 +158,22 @@ const IcingChart = (props) => {
           } else {
             let { value: prob, time: provTime } = getValueFromDatasetByElevation(
               queryIcingProbDataResult.data,
-              new Date(segment.arriveTime),
+              new Date(arriveTime),
               elevation,
               index,
             );
             prob = Math.round(prob);
-            provTime = provTime ?? new Date(segment.arriveTime);
+            provTime = provTime ?? new Date(arriveTime);
             let { value: sld } = getValueFromDatasetByElevation(
               queryIcingSldDataResult.data,
-              new Date(segment.arriveTime),
+              new Date(arriveTime),
               elevation,
               index,
             );
             sld = Math.round(sld);
             let { value: sev } = getValueFromDatasetByElevation(
               queryIcingSevDataResult.data,
-              new Date(segment.arriveTime),
+              new Date(arriveTime),
               elevation,
               index,
             );
@@ -219,9 +242,9 @@ const IcingChart = (props) => {
             };
           }
           icingData.push({
-            x0: Math.round(index * segmentLength - segmentLength / 2),
+            x0: Math.round(accDistance - distance),
             y0: elevation - 500,
-            x: Math.round(index * segmentLength + segmentLength / 2),
+            x: Math.round(accDistance),
             y: elevation + 500,
             color: color,
             opacity: opacity,

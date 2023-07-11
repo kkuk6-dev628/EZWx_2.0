@@ -962,9 +962,10 @@ const RouteProfileDataLoader = () => {
     isError: boolean;
   }) {
     if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
-      const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute)).map((pt) =>
-        L.GeoJSON.latLngToCoords(pt.point),
-      );
+      const positions = interpolateRouteByInterval(
+        activeRoute,
+        getSegmentsCount(activeRoute) * flightCategoryDivide,
+      ).map((pt) => L.GeoJSON.latLngToCoords(pt.point));
       if (!queryIcingProbDataResult.isLoading && !queryIcingProbDataResult.isSuccess)
         queryIcingProbData({ queryPoints: positions });
       if (!queryIcingSevDataResult.isLoading && !queryIcingSevDataResult.isSuccess)
@@ -982,9 +983,10 @@ const RouteProfileDataLoader = () => {
     isError: boolean;
   }) {
     if (activeRoute && (!dependencyResult || (!dependencyResult.isLoading && !dependencyResult.isUninitialized))) {
-      const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute)).map((pt) =>
-        L.GeoJSON.latLngToCoords(pt.point),
-      );
+      const positions = interpolateRouteByInterval(
+        activeRoute,
+        getSegmentsCount(activeRoute) * flightCategoryDivide,
+      ).map((pt) => L.GeoJSON.latLngToCoords(pt.point));
       if (!queryCaturbDataResult.isLoading && !queryCaturbDataResult.isSuccess)
         queryCaturbData({ queryPoints: positions });
       if (!queryMwturbDataResult.isLoading && !queryMwturbDataResult.isSuccess)
@@ -1323,7 +1325,7 @@ const RouteProfileDataLoader = () => {
     queryGfsWindDirectionDataResult.isSuccess,
     queryNbmFlightCatResult.isSuccess,
     queryNbmWx1Result.isSuccess,
-    observationTime,
+    hourState,
     userSettings.true_airspeed,
     activeRoute,
   ]);
