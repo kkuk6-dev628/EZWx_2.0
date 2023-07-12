@@ -121,6 +121,10 @@ const LeafletMap = () => {
       case 'profile':
         if (activeRoute) {
           router.push('/route-profile');
+        } else if (auth.id) {
+          setIsShowModal(true);
+        } else {
+          toast.error('Please sign in to create route!');
         }
         break;
       default:

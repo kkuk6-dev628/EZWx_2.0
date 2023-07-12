@@ -301,6 +301,7 @@ const IcingChart = (props) => {
 
             return (
               <VerticalRectSeries
+                key="noForecast-message"
                 colorType="literal"
                 data={[
                   {

@@ -36,7 +36,9 @@ const BaseMapLayers = () => {
     <div className="route__layer">
       <BaseMapLayerControl position="topright"></BaseMapLayerControl>
       <GroupedLayer
-        checked={baseMapLayerStatus.usProvincesState.checked}
+        checked={
+          baseMapLayerStatus && baseMapLayerStatus.usProvincesState ? baseMapLayerStatus.usProvincesState.checked : true
+        }
         addLayerToStore={(layer) => {
           baseMapLayers.usProvinces = layer;
         }}

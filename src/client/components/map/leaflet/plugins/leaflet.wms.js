@@ -128,8 +128,10 @@
     },
 
     removeSubLayer: function (name) {
-      delete this._subLayers[name];
-      this.refreshOverlay();
+      if (this._subLayers) {
+        delete this._subLayers[name];
+        this.refreshOverlay();
+      }
     },
 
     refreshOverlay: function () {

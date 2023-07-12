@@ -61,6 +61,15 @@ export interface PersonalMinsEvaluation {
   destinationCrosswind: { value: personalMinValue; color: personalMinColor };
 }
 
+export const icingSeverityOrders = {
+  0: 0,
+  1: 2,
+  2: 3,
+  3: -1,
+  4: 1,
+  5: 4,
+};
+
 export const personalMinValueToColor: {
   0: personalMinColor;
   1: personalMinColor;
@@ -795,7 +804,7 @@ function getWheatherMinimumsAlongRoute(
             index,
           );
           icingProb && icingProbs.push(icingProb);
-          icingSeverity && icingSeverities.push(icingSeverity);
+          icingSeverity && icingSeverities.push(icingSeverityOrders[icingSeverity] || -1);
           turbulences.push(Math.max(cat, mwt));
         } else {
           isOutTimeRange = true;
@@ -961,9 +970,11 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const [currEval, setCurrEval] = useState(initialEvaluation);
   const [beforeEval, setBeforeEval] = useState(null);
   const [afterEval, setAfterEval] = useState(initialEvaluation);
-  const [colorByTimes, setColorByTimes] = useState<string[]>(Array.from({ length: 8 }));
   const [hour, setHour] = useState(0);
   const blockCount = Math.floor(timeRange / blockhours);
+  const [colorByTimes, setColorByTimes] = useState<string[]>(
+    Array.from({ length: blockCount }, () => personalMinValueToColor[10]),
+  );
   const [currentHour, setCurrentHour] = useState(new Date().getUTCHours());
 
   const maxRange = timeRange * stepsPerHour;
@@ -1094,66 +1105,27 @@ function DepartureAdvisor(props: { showPast: boolean }) {
 
   useEffect(() => {
     if (activeRoute && getDepartureAdvisorDataResult.isSuccess && evaluationsByTime) {
-      const queryPoints = interpolateRouteByInterval(
-        activeRoute,
-        getSegmentsCount(activeRoute) * flightCategoryDivide,
-      ).map((pt) => pt.point);
+      // const queryPoints = interpolateRouteByInterval(
+      //   activeRoute,
+      //   getSegmentsCount(activeRoute) * flightCategoryDivide,
+      // ).map((pt) => pt.point);
       const currentTime = new Date();
       currentTime.setMinutes(0, 0, 0);
       const currentTimeMili = currentTime.getTime();
       const currEvaluation =
         settingsState.observation_time < currentTimeMili
           ? { ...initialEvaluation }
-          : getWheatherMinimumsAlongRoute(
-              queryPoints,
-              settingsState,
-              settingsState.observation_time,
-              activeRoute.useForecastWinds,
-              activeRoute.altitude,
-              settingsState.true_airspeed,
-              getDepartureAdvisorDataResult,
-              queryGfsWindSpeedDataResult,
-              queryGfsWindDirectionDataResult,
-              activeRoute.departure.key,
-              activeRoute.destination.key,
-              airportNbmData,
-            );
+          : getEvaluationByTime(evaluationsByTime, settingsState.observation_time);
       setCurrEval(currEvaluation);
       const beforeEvaluation =
         settingsState.observation_time - hourInMili < currentTimeMili
           ? { ...initialEvaluation }
-          : getWheatherMinimumsAlongRoute(
-              queryPoints,
-              settingsState,
-              settingsState.observation_time - hourInMili,
-              activeRoute.useForecastWinds,
-              activeRoute.altitude,
-              settingsState.true_airspeed,
-              getDepartureAdvisorDataResult,
-              queryGfsWindSpeedDataResult,
-              queryGfsWindDirectionDataResult,
-              activeRoute.departure.key,
-              activeRoute.destination.key,
-              airportNbmData,
-            );
+          : getEvaluationByTime(evaluationsByTime, settingsState.observation_time - hourInMili);
       setBeforeEval(beforeEvaluation);
       const afterEvaluation =
         settingsState.observation_time + hourInMili < currentTimeMili
           ? { ...initialEvaluation }
-          : getWheatherMinimumsAlongRoute(
-              queryPoints,
-              settingsState,
-              settingsState.observation_time + hourInMili,
-              activeRoute.useForecastWinds,
-              activeRoute.altitude,
-              settingsState.true_airspeed,
-              getDepartureAdvisorDataResult,
-              queryGfsWindSpeedDataResult,
-              queryGfsWindDirectionDataResult,
-              activeRoute.departure.key,
-              activeRoute.destination.key,
-              airportNbmData,
-            );
+          : getEvaluationByTime(evaluationsByTime, settingsState.observation_time + hourInMili);
       setAfterEval(afterEvaluation);
     }
   }, [
@@ -1600,7 +1572,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         >
           <div className="blocks-contents" ref={scrollContentRef}>
             <div className="horizental-blocks">
-              {evaluationsByTime &&
+              {true &&
                 blockTimes.map((time, index) => (
                   <DepartureAdvisorTimeBlockComponent
                     key={'departure-advisor-block-' + index}

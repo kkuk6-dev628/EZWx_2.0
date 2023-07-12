@@ -1,7 +1,7 @@
 body>div{
   background: var(--color-primary);
 }
-.MuiDialog-root{
+.MuiDialog-root, .MuiModal-root{
   background-color: transparent;
 }
 .departure-advisor-background{
@@ -22,6 +22,7 @@ body>div{
   .tabs{
     position: relative;
     height: calc(100vh - 170px);
+    z-index: 800;
     // height: calc(100vh - 150px);
     @media screen and (orientation: portrait) {
       position: relative;
@@ -36,6 +37,7 @@ body>div{
     }
     @media screen and (max-height: 500px) {
       height: calc(100vh - 49px);
+      z-index: 900;
     }
   }
   .route-profile-container{

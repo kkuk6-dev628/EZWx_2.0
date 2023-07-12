@@ -51,7 +51,7 @@ export const layerControlApi = createApi({
     getBaseLayerControlState: builder.query({
       query: () => ({ url: '/base', method: 'Get' }),
       transformResponse: (response: BaseMapLayerControlState) => {
-        if (!response) {
+        if (!response || !response.usProvincesState) {
           return initialBaseLayerControlState;
         }
         return response;

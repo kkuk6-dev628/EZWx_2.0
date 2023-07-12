@@ -151,6 +151,9 @@ const RadarLayer = () => {
   };
 
   const getValidForecastRadar = (radars: Radar[], obsTimeSpan: number): Radar => {
+    if (radars.length === 0) {
+      return;
+    }
     const returns = radars?.reduce((prev, curr) => {
       const prevDiff = obsTimeSpan - prev.valid_timespan;
       const currDiff = obsTimeSpan - curr.valid_timespan;
