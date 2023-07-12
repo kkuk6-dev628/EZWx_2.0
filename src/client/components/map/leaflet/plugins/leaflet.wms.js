@@ -123,6 +123,7 @@
     },
 
     addSubLayer: function (name) {
+      if (!this._subLayers) this._subLayers = [];
       this._subLayers[name] = true;
       this.refreshOverlay();
     },
@@ -135,6 +136,7 @@
     },
 
     refreshOverlay: function () {
+      if (!this._subLayers || this._subLayers.length === 0) return;
       var subLayers = Object.keys(this._subLayers).join(',');
       if (!this._map) {
         return;
