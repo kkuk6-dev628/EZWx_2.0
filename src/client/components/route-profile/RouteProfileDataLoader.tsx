@@ -886,6 +886,26 @@ const RouteProfileDataLoader = () => {
     queryNbmAllAirportResult.reset();
   }
 
+  function gfsWindElevations(activeRoute: Route) {
+    const elevations = [...windQueryElevations];
+    if (activeRoute.useForecastWinds) {
+      if (activeRoute.altitude % 1000 === 0) {
+        if (!elevations.includes(activeRoute.altitude)) {
+          elevations.push(activeRoute.altitude);
+        }
+      } else {
+        const floor = Math.floor(activeRoute.altitude / 1000) * 1000;
+        const above = floor + 1000;
+        if (!elevations.includes(floor)) {
+          elevations.push(floor);
+        }
+        if (!elevations.includes(above)) {
+          elevations.push(above);
+        }
+      }
+    }
+    return elevations;
+  }
   function queryGfsWindSpeed(dependencyResult: {
     status: QueryStatus;
     isUninitialized: boolean;
@@ -898,7 +918,8 @@ const RouteProfileDataLoader = () => {
         L.GeoJSON.latLngToCoords(pt.point),
       );
       if (!queryGfsWindSpeedDataResult.isLoading && !queryGfsWindSpeedDataResult.isSuccess) {
-        queryGfsWindSpeedData({ queryPoints: positions, elevations: windQueryElevations });
+        const elevations = gfsWindElevations(activeRoute);
+        queryGfsWindSpeedData({ queryPoints: positions, elevations });
       }
     }
   }
@@ -915,7 +936,8 @@ const RouteProfileDataLoader = () => {
         const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute)).map((pt) =>
           L.GeoJSON.latLngToCoords(pt.point),
         );
-        queryGfsWindDirectionData({ queryPoints: positions, elevations: windQueryElevations });
+        const elevations = gfsWindElevations(activeRoute);
+        queryGfsWindDirectionData({ queryPoints: positions, elevations: elevations });
       }
     }
   }

@@ -169,7 +169,6 @@ const RouteProfileContainer = () => {
             style={{ position: 'absolute' }}
             open={showRouteEditor}
             onClose={() => setShowRouteEditor(false)}
-            aria-labelledby="draggable-dialog-title"
           >
             <Route setIsShowModal={setShowRouteEditor} />
           </Dialog>

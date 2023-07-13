@@ -215,7 +215,6 @@ const LeafletMap = () => {
           style={{ position: 'absolute' }}
           open={isShowModal}
           onClose={() => setIsShowModal(false)}
-          aria-labelledby="draggable-dialog-title"
         >
           <Route setIsShowModal={setIsShowModal} />
         </Dialog>

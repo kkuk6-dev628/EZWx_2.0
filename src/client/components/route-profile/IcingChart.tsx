@@ -34,7 +34,7 @@ import { RouteProfileDataset, RouteSegment } from '../../interfaces/route-profil
 import flyjs from '../../fly-js/fly';
 import { hourInMili } from '../shared/DepartureAdvisor';
 
-const icingSevLegend = [
+export const icingSevLegend = [
   { value: 0, color: '#F6F6F6', label: 'None' },
   { value: 4, color: '#CEFFFC', label: 'Trace' },
   { value: 1, color: '#99CEFF', label: 'Light' },

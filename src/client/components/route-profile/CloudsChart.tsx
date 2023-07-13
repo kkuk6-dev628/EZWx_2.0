@@ -10,6 +10,7 @@ import {
   getValueFromDatasetByElevation,
   getValuesFromDatasetAllElevationByElevation,
   flightCategoryDivide,
+  getIndexByElevation,
 } from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';
 import {
@@ -26,6 +27,7 @@ import { useQueryElevationApiMutation } from '../../store/route-profile/elevatio
 import flyjs from '../../fly-js/fly';
 import { colorsByEdr } from './TurbChart';
 import { meterToFeet } from '../map/common/AreoFunctions';
+import { icingSevLegend } from './IcingChart';
 
 const humidityThresholds = {
   1000: 98,
@@ -219,15 +221,25 @@ const CloudsChart = (props) => {
               }
             }
           });
-
+          const dataIndex = getIndexByElevation(queryIcingSevDataResult.data, [
+            segment.position.lng,
+            segment.position.lat,
+          ]);
           const icingSevData = getValuesFromDatasetAllElevationByElevation(
             queryIcingSevDataResult.data,
             new Date(segment.arriveTime),
-            index,
+            dataIndex,
           );
           icingSevData.forEach((icingSev) => {
             if (icingSev.elevation > start) {
               if (icingSev.value > 0 && icingSev.elevation <= routeProfileApiState.maxAltitude * 100) {
+                let sevData;
+                for (const sevItem of icingSevLegend) {
+                  if (sevItem.value === icingSev.value) {
+                    sevData = sevItem;
+                    break;
+                  }
+                }
                 cloudData.push({
                   x0: Math.round(index * segmentLength - segmentLength / 2),
                   y0: icingSev.elevation - 500,
@@ -235,7 +247,7 @@ const CloudsChart = (props) => {
                   y: icingSev.elevation + 500,
                   color: colorSecond,
                   opacity: opacity,
-                  hint: { severe: icingSev.value, skycover },
+                  hint: { severe: sevData.label, skycover },
                 });
               }
             }

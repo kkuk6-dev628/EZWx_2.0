@@ -27,7 +27,7 @@ export const initialUserSettingsState: {
   personalMinimumsState: {
     LIFR: { cat: 'LIFR', color: '#f0f', ceiling: 0, visibility: 0 },
     IFR: { cat: 'IFR', color: '#f00', ceiling: 500, visibility: 1 },
-    MVFR: { cat: 'MVFR', color: '#00f', ceiling: 1000, visibility: 3 },
+    MVFR: { cat: 'MVFR', color: '#4949FF', ceiling: 1000, visibility: 3 },
     VFR: { cat: 'VFR', color: '#008300', ceiling: 3000, visibility: 5 },
   },
   settings: {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import DateSlider from './DateSlider';
-import { PersonalMinsEvaluation, hourInMili, personalMinValueToShape } from './DepartureAdvisor';
+import { PersonalMinsEvaluation, hourInMili, initialEvaluation, personalMinValueToShape } from './DepartureAdvisor';
 import { convertTimeFormat, simpleTimeFormat } from '../map/common/AreoFunctions';
 import { useSelector } from 'react-redux';
 import { selectSettings } from '../../store/user/UserSettings';
@@ -12,7 +12,7 @@ export function getEvaluationByTime(
   evaluationData: { time: number; evaluation: PersonalMinsEvaluation }[],
   time: number,
 ): PersonalMinsEvaluation {
-  if (!evaluationData || evaluationData.length === 0) return;
+  if (!evaluationData || evaluationData.length === 0) return initialEvaluation;
   const evaluation = evaluationData.reduce((prev, curr) => {
     const diffPrev = time - prev.time;
     const diffCurr = time - curr.time;
@@ -21,7 +21,7 @@ export function getEvaluationByTime(
     }
     return prev;
   });
-  return evaluation.evaluation;
+  return evaluation.evaluation ? evaluation.evaluation : initialEvaluation;
 }
 //i pass setIsShowModal and showModal as a prop to the modal component
 interface Props {
@@ -47,8 +47,10 @@ function DepartureAdvisorPopup({ setIsShowDateModal, evaluationsByTime, observat
   return (
     <div className="departure-advisor-popup">
       <DialogTitle className="departure-advisor-popup-title">
-        <p className="text">Departure Advisor</p>
-        <button onClick={() => setIsShowDateModal(false)} className="departure-advisor-popup-close">
+        <p className="text" id="draggable-dialog-title">
+          Departure Advisor
+        </p>
+        <button onClick={() => setIsShowDateModal(false)} className="departure-advisor-popup-close" type="button">
           <AiOutlineClose className="departure-advisor-popup-close-icon" />
         </button>
       </DialogTitle>

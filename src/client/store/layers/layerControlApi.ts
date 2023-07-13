@@ -14,7 +14,7 @@ export const layerControlApi = createApi({
     getLayerControlState: builder.query({
       query: () => ({ url: '', method: 'Get' }),
       transformResponse: (response: LayerControlState) => {
-        if (!response) {
+        if (!response || !response.stationMarkersState) {
           return initialLayerControlState;
         }
         return response;

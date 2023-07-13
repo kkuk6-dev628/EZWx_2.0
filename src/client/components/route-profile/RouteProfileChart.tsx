@@ -604,14 +604,14 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       const weatherSeries = [];
       const segmentsCount = getSegmentsCount(activeRoute);
       const interval = getSegmentInterval(activeRoute, segmentsCount);
-      const labelStyle = {
-        fill: 'green',
-        dominantBaseline: 'text-after-edge',
-        textAnchor: 'middle',
-        fontSize: 11,
-        fontWeight: 600,
-      };
       const airportLabels = segments.map((seg, segmentIndex) => {
+        const labelStyle = {
+          fill: 'green',
+          dominantBaseline: 'text-after-edge',
+          textAnchor: 'middle',
+          fontSize: 11,
+          fontWeight: 600,
+        };
         const weatherData = buildWeatherSeries(seg, segmentIndex, interval);
         weatherSeries.push(weatherData);
         if (segmentIndex === 0 || segmentIndex === segments.length - 1) {
@@ -679,7 +679,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         return {
           x: seg.accDistance + airportDist,
           y: 0,
-          yOffset: isMobile ? 28 : 44,
+          yOffset: isMobile ? 36 : 44,
           label: seg.airport?.key || seg.position.lat.toFixed(2) + '/' + seg.position.lng.toFixed(2),
           style: labelStyle,
           tooltip: tooltip,
@@ -692,6 +692,13 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       ];
       let accDistance = 0;
       const routePointsLabels = routePoints.map((rp, index) => {
+        const labelStyle = {
+          fill: 'green',
+          dominantBaseline: 'text-after-edge',
+          textAnchor: 'middle',
+          fontSize: 11,
+          fontWeight: 600,
+        };
         const dataIndex = getIndexByElevation(
           getDepartureAdvisorDataResult.data?.cloudceiling,
           rp.position.coordinates,
@@ -784,7 +791,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         return {
           x: accDistance,
           y: 0,
-          yOffset: isMobile ? 20 : 36,
+          yOffset: isMobile ? 26 : 36,
           label: rp.key,
           style: { ...labelStyle, fontSize: index === 0 || index === routePoints.length - 1 ? 14 : 11 },
           tooltip: tooltip,
@@ -1034,7 +1041,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                 const dist = Math.round(
                   userSettings.default_distance_unit ? flyjs.nauticalMilesTo('Kilometers', distInMile, 0) : distInMile,
                 );
-                const offset = isMobile ? '2.4em' : '3.6em';
+                const offset = isMobile ? '2.7em' : '3.6em';
                 return (
                   <tspan dy={offset} className="chart-label">
                     <tspan className="chart-label-dist">{dist}</tspan>
@@ -1060,7 +1067,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                 return {
                   x: index * segmentInterval,
                   y: 0,
-                  yOffset: isMobile ? 50 : 72,
+                  yOffset: isMobile ? 58 : 72,
                   segment: segment,
                   label: userSettings.default_time_display_unit
                     ? segment.departureTime.time

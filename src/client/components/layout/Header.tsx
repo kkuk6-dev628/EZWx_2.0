@@ -176,6 +176,7 @@ export default function Header() {
                 {activeResponsiveMenu ? <SvgRoundClose /> : <SvgMenuBurger />}
               </button>
               <ZuluClock textColor="white" />
+              {/* <div style={{ color: 'white' }}>version 20230713</div> */}
             </div>
           )}
           <div className="header__mid">
