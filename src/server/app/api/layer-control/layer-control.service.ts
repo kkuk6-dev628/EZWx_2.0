@@ -28,7 +28,8 @@ export class LayerControlService {
     //   await this.layerControlRepository.update({ id: layerControlState.id }, layerControlState);
     //   return layerControlState.id;
     // }
-    return (await this.layerControlRepository.upsert(layerControlState, ['userId'])).generatedMaps[0].id;
+    const result = (await this.layerControlRepository.upsert(layerControlState, ['userId'])).generatedMaps[0];
+    return { ...layerControlState, id: result.id };
   }
 
   async getBaseLayerControlState(user: User) {
@@ -44,6 +45,7 @@ export class LayerControlService {
     //   await this.baseLayerControlRepository.update({ id: baseLayerControlState.id }, baseLayerControlState);
     //   return baseLayerControlState.id;
     // }
-    return (await this.baseLayerControlRepository.upsert(baseLayerControlState, ['userId'])).generatedMaps[0].id;
+    const result = (await this.baseLayerControlRepository.upsert(baseLayerControlState, ['userId'])).generatedMaps[0];
+    return { ...baseLayerControlState, id: result.id };
   }
 }

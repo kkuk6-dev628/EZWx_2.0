@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { GroupedLayer } from '../layer-control/MeteoLayerControl';
-import { TileLayer } from 'react-leaflet';
+import { TileLayer, useMapEvent } from 'react-leaflet';
 import { useBaseMapLayersContext } from '../layer-control/BaseMapLayerControlContext';
 import WFSLayer from './WFSLayer';
 import BaseMapLayerControl from '../layer-control/BaseMapLayerControl';
@@ -8,11 +8,16 @@ import { useSelector } from 'react-redux';
 import { selectBaseMapLayerControl } from '../../../../store/layers/BaseMapLayerControl';
 import { db } from '../../../caching/dexieDb';
 import { wfsUrl2 } from '../../common/AreoConstants';
+import { LeafletEvent } from 'leaflet';
 
 const BaseMapLayers = () => {
   const baseMapLayers = useBaseMapLayersContext();
   const baseMapLayerStatus = useSelector(selectBaseMapLayerControl);
 
+  // const map = useMapEvent('moveend', (e: LeafletEvent) => {
+  //   const bounds = map.getBounds();
+  //   console.log(bounds);
+  // });
   // useEffect(() => {
   //   L.GridLayer.GridDebug = L.GridLayer.extend({
   //     createTile: function (coords) {

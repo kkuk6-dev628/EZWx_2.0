@@ -67,8 +67,7 @@ function DepartureAdvisorTimeBlockComponent({
           beforeEval={beforeEval}
           currEval={currEval}
           afterEval={afterEval}
-          position={0}
-          setShowBar={setShowBarComponent}
+          left={0}
           setShowPopup={setShowPopup}
         ></DepartureAdvisor3Bars>
       )}

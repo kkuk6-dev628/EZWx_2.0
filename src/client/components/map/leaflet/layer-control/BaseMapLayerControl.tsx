@@ -1,5 +1,5 @@
 import { DomEvent, Layer } from 'leaflet';
-import { createContext, ReactElement, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, ReactElement, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useMapEvent } from 'react-leaflet';
 import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
@@ -20,6 +20,7 @@ import {
   useUpdateBaseLayerControlStateMutation,
 } from '../../../../store/layers/layerControlApi';
 import { selectAuth } from '../../../../store/auth/authSlice';
+import { useCookies } from 'react-cookie';
 
 export const InBaseLayerControl = createContext<{ value: boolean }>({
   value: false,
@@ -42,7 +43,9 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
   const baseMapLayerStatus = useSelector(selectBaseMapLayerControl);
   const [updateBaseLayerControlState] = useUpdateBaseLayerControlStateMutation();
   const auth = useSelector(selectAuth);
-  const { data: serverData } = auth.id ? useGetBaseLayerControlStateQuery('') : { data: initialBaseLayerControlState };
+  const [cookies] = useCookies(['logged_in']);
+  const { data: serverData } =
+    auth.id || cookies.logged_in ? useGetBaseLayerControlStateQuery('') : { data: initialBaseLayerControlState };
 
   useEffect(() => {
     if (serverData?.bounds?.length) map.fitBounds(serverData.bounds);
@@ -140,26 +143,27 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
 
   const isMobile = width <= 768;
 
-  useEffect(() => {
-    if (ref?.current) {
+  const handleDisableMapInteraction = useCallback((node) => {
+    if (node) {
       if (isMobile) {
-        DomEvent.disableClickPropagation(ref.current);
+        DomEvent.disableClickPropagation(node);
+        DomEvent.disableScrollPropagation(node);
       } else {
-        ref.current.addEventListener('mouseover', function () {
+        node.addEventListener('mouseover', function () {
           disableMapInteraction(true);
         });
         // Re-enable dragging when user's cursor leaves the element
-        ref.current.addEventListener('mouseout', function () {
+        node.addEventListener('mouseout', function () {
           disableMapInteraction(false);
         });
       }
-      DomEvent.disableScrollPropagation(ref.current);
+      DomEvent.disableScrollPropagation(node);
       // L.DomEvent.on(ref.current, 'mousemove contextmenu drag', L.DomEvent.stop);
     }
-  }, [ref?.current]);
+  }, []);
 
   return (
-    <div className={positionClass + ' layer-control-container'} ref={ref}>
+    <div className={positionClass + ' layer-control-container'} ref={handleDisableMapInteraction}>
       {baseMapLayerStatus.show && (
         <div id="layer-control" className="leaflet-control leaflet-bar layer-control">
           <FetchData />

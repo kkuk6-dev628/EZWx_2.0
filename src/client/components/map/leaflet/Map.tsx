@@ -45,6 +45,7 @@ import { jsonClone } from '../../utils/ObjectUtil';
 import { BaseMapLayerControlState, LayerControlState } from '../../../interfaces/layerControl';
 import { selectLayerControlState, setLayerControlState } from '../../../store/layers/LayerControl';
 import { selectActiveRoute } from '../../../store/route/routes';
+import { useCookies } from 'react-cookie';
 
 export const PaperComponent = (props) => {
   return (
@@ -56,7 +57,7 @@ export const PaperComponent = (props) => {
 
 const maxScreenDimension = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
 const minZoom = maxScreenDimension > 1024 ? 4 : 3;
-const defaultBounds = [
+export const defaultBounds = [
   [55.0, -130.0],
   [20.0, -60.0],
 ];
@@ -69,6 +70,8 @@ const LeafletMap = () => {
   const dispatch = useDispatch();
   const baseMapLayerControl = useSelector(selectBaseMapLayerControl);
   const auth = useSelector(selectAuth);
+  const [cookies] = useCookies(['logged_in']);
+  const loggedin = auth.id || cookies.logged_in;
   const activeRoute = useSelector(selectActiveRoute);
   useGetWaypointsQuery('');
   useGetAirportQuery('');
@@ -85,20 +88,18 @@ const LeafletMap = () => {
     }
   }, [pathname]);
 
-  const setLayerControlShow = async (layerControlShow: boolean) => {
-    const newLayerControlState = await getLayerControlState(auth.id).unwrap();
-    const cloned = jsonClone(newLayerControlState) as LayerControlState;
+  const setLayerControlShow = (layerControlShow: boolean) => {
+    const cloned = jsonClone(layerControlState) as LayerControlState;
     cloned.show = layerControlShow;
     dispatch(setLayerControlState(cloned));
-    if (auth.id) updateLayerControlState(cloned);
+    if (loggedin) updateLayerControlState(cloned);
   };
 
   const setBaseLayerControlShow = async (baseLayerControlShow: boolean) => {
-    const newBaseLayerControlState = await getBaseLayerControlState(auth.id).unwrap();
-    const cloned = jsonClone(newBaseLayerControlState) as BaseMapLayerControlState;
+    const cloned = jsonClone(baseMapLayerControl) as BaseMapLayerControlState;
     cloned.show = baseLayerControlShow;
     dispatch(setBaseMapLayerControl(cloned));
-    if (auth.id) updateBaseLayerControlState(cloned);
+    if (loggedin) updateBaseLayerControlState(cloned);
   };
 
   const handler = (id: string) => {
@@ -112,7 +113,7 @@ const LeafletMap = () => {
         setBaseLayerControlShow(!baseMapLayerControl.show);
         break;
       case 'route':
-        if (auth.id) {
+        if (loggedin) {
           setIsShowModal(true);
         } else {
           toast.error('Please sign in to create route!');
@@ -121,7 +122,7 @@ const LeafletMap = () => {
       case 'profile':
         if (activeRoute) {
           router.push('/route-profile');
-        } else if (auth.id) {
+        } else if (loggedin) {
           setIsShowModal(true);
         } else {
           toast.error('Please sign in to create route!');
@@ -198,6 +199,11 @@ const LeafletMap = () => {
         renderer={L.canvas()}
         minZoom={minZoom}
         maxZoom={18}
+        maxBounds={[
+          [-120, -200],
+          [120, 180],
+        ]}
+        maxBoundsViscosity={1.0}
       >
         <BaseMapLayers></BaseMapLayers>
         <MeteoLayers></MeteoLayers>

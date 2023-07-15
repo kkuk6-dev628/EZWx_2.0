@@ -72,4 +72,19 @@ export class AuthService {
       displayName: user.displayName,
     };
   }
+  async getUser(userid): Promise<{ id: number; email: string; displayName: string }> {
+    const user = await this.userService.findOne({
+      where: {
+        id: userid,
+      },
+    });
+
+    if (!user) throw new ForbiddenException('User id incorrect! ' + userid);
+
+    return {
+      id: user.id,
+      email: user.email,
+      displayName: user.displayName,
+    };
+  }
 }

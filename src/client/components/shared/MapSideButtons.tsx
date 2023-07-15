@@ -7,6 +7,8 @@ import { useGetLayerControlStateQuery, useGetBaseLayerControlStateQuery } from '
 import { useGetRoutesQuery } from '../../store/route/routeApi';
 import { useGetUserSettingsQuery } from '../../store/user/userSettingsApi';
 import { SvgRefresh } from '../utils/SvgIcons';
+import { useMap } from 'react-leaflet';
+import { defaultBounds } from '../map/leaflet/Map';
 
 const MapSideButtons = () => {
   const auth = useSelector(selectAuth);
@@ -34,6 +36,11 @@ const MapSideButtons = () => {
     };
   }
 
+  const map = useMap();
+  function goToHomeView() {
+    map.fitBounds(defaultBounds as any);
+  }
+
   return (
     <div className="pos_relative" ref={ref}>
       <div className="map__btns__container">
@@ -45,6 +52,14 @@ const MapSideButtons = () => {
           }}
         >
           <SvgRefresh />
+        </div>
+        <div
+          className="user__action__btns"
+          onClick={() => {
+            goToHomeView();
+          }}
+        >
+          <i className="far fa-home fa-sm"></i>
         </div>
       </div>
     </div>

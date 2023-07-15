@@ -4,7 +4,7 @@
   .map__btns__container {
     position: absolute;
     right: 0;
-    bottom: -164px;
+    top: 108px;
     z-index: 899;
     display: flex;
     margin-right: 10px;
@@ -14,7 +14,7 @@
       background-color: var(--color-white);
       margin: 5px 0px;
       color: var(--color-primary);
-      border-radius: 24%;
+      border-radius: 4px;
       padding: 5px;
       height: 36px;
       width: 36px;

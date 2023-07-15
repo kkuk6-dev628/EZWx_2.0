@@ -906,6 +906,57 @@ const RouteProfileDataLoader = () => {
     }
     return elevations;
   }
+  function querySegmentData() {
+    if (!activeRoute) {
+      return;
+    }
+    const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute)).map((pt) =>
+      L.GeoJSON.latLngToCoords(pt.point),
+    );
+    const elevations = gfsWindElevations(activeRoute);
+    if (!queryGfsWindSpeedDataResult.isLoading && !queryGfsWindSpeedDataResult.isSuccess) {
+      queryGfsWindSpeedData({ queryPoints: positions, elevations });
+    }
+    if (!queryGfsWindDirectionDataResult.isLoading && !queryGfsWindDirectionDataResult.isSuccess) {
+      queryGfsWindDirectionData({ queryPoints: positions, elevations: elevations });
+    }
+    if (!queryTemperatureDataResult.isSuccess && !queryTemperatureDataResult.isLoading) {
+      queryTemperatureData({ queryPoints: positions });
+    }
+    if (!queryhumidityDataResult.isLoading && !queryhumidityDataResult.isSuccess) {
+      queryHumidityData({ queryPoints: positions });
+    }
+    if (!queryNbmDewpointResult.isLoading && !queryNbmDewpointResult.isSuccess)
+      queryNbmDewpoint({ queryPoints: positions });
+    if (!queryNbmGustResult.isLoading && !queryNbmGustResult.isSuccess) queryNbmGust({ queryPoints: positions });
+    if (!queryNbmTempResult.isLoading && !queryNbmTempResult.isSuccess) queryNbmTemp({ queryPoints: positions });
+    if (!queryNbmWindDirResult.isLoading && !queryNbmWindDirResult.isSuccess)
+      queryNbmWindDir({ queryPoints: positions });
+    if (!queryNbmWindSpeedResult.isLoading && !queryNbmWindSpeedResult.isSuccess)
+      queryNbmWindSpeed({ queryPoints: positions });
+    if (!queryNbmWx1Result.isLoading && !queryNbmWx1Result.isSuccess) queryNbmWx1({ queryPoints: positions });
+  }
+
+  function queryHighResData() {
+    if (!activeRoute) {
+      return;
+    }
+    const positions = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide).map(
+      (pt) => L.GeoJSON.latLngToCoords(pt.point),
+    );
+    if (!queryIcingProbDataResult.isLoading && !queryIcingProbDataResult.isSuccess)
+      queryIcingProbData({ queryPoints: positions });
+    if (!queryIcingSevDataResult.isLoading && !queryIcingSevDataResult.isSuccess)
+      queryIcingSevData({ queryPoints: positions });
+    if (!queryIcingSldDataResult.isLoading && !queryIcingSldDataResult.isSuccess)
+      queryIcingSldData({ queryPoints: positions });
+    if (!queryCaturbDataResult.isLoading && !queryCaturbDataResult.isSuccess)
+      queryCaturbData({ queryPoints: positions });
+    if (!queryMwturbDataResult.isLoading && !queryMwturbDataResult.isSuccess)
+      queryMwturbData({ queryPoints: positions });
+    if (!queryNbmFlightCatResult.isLoading && !queryNbmFlightCatResult.isSuccess)
+      queryNbmFlightCategory({ queryPoints: positions });
+  }
   function queryGfsWindSpeed(dependencyResult: {
     status: QueryStatus;
     isUninitialized: boolean;
@@ -1063,125 +1114,130 @@ const RouteProfileDataLoader = () => {
     dispatch(setFetchedDate(Date.now()));
   }, [activeRoute]);
 
-  switch (routeProfileApiState.chartType) {
-    case 'Wind':
-      useEffect(() => {
-        queryGfsWindSpeed(null);
-      }, [fetchedDate]);
-      useEffect(() => {
-        queryGfsWindDir(queryGfsWindSpeedDataResult);
-      }, [queryGfsWindSpeedDataResult.isLoading]);
-      useEffect(() => {
-        queryGfsTemp(queryGfsWindDirectionDataResult);
-      }, [queryGfsWindDirectionDataResult.isLoading]);
-      useEffect(() => {
-        queryNbm(queryTemperatureDataResult);
-      }, [queryTemperatureDataResult.isLoading]);
-      useEffect(() => {
-        queryNbmFlightCat(queryNbmWindSpeedResult);
-      }, [queryNbmWindSpeedResult.isLoading]);
-      useEffect(() => {
-        queryIcing(queryNbmFlightCatResult);
-      }, [queryNbmFlightCatResult.isLoading]);
+  useEffect(() => {
+    querySegmentData();
+    queryHighResData();
+    isLoading = !queryGfsWindDirectionDataResult.isSuccess;
+  }, [fetchedDate]);
+  // switch (routeProfileApiState.chartType) {
+  //   case 'Wind':
+  //     useEffect(() => {
+  //       queryGfsWindSpeed(null);
+  //     }, [fetchedDate]);
+  //     useEffect(() => {
+  //       queryGfsWindDir(queryGfsWindSpeedDataResult);
+  //     }, [queryGfsWindSpeedDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryGfsTemp(queryGfsWindDirectionDataResult);
+  //     }, [queryGfsWindDirectionDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryNbm(queryTemperatureDataResult);
+  //     }, [queryTemperatureDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryNbmFlightCat(queryNbmWindSpeedResult);
+  //     }, [queryNbmWindSpeedResult.isLoading]);
+  //     useEffect(() => {
+  //       queryIcing(queryNbmFlightCatResult);
+  //     }, [queryNbmFlightCatResult.isLoading]);
 
-      useEffect(() => {
-        queryTurb(queryNbmFlightCatResult);
-      }, [queryNbmFlightCatResult.isLoading]);
+  //     useEffect(() => {
+  //       queryTurb(queryNbmFlightCatResult);
+  //     }, [queryNbmFlightCatResult.isLoading]);
 
-      useEffect(() => {
-        queryGfsHumi(queryIcingProbDataResult);
-      }, [queryIcingProbDataResult.isLoading]);
-      isLoading = !queryGfsWindDirectionDataResult.isSuccess;
-      break;
-    case 'Turb':
-      useEffect(() => {
-        queryTurb(null);
-      }, [fetchedDate]);
+  //     useEffect(() => {
+  //       queryGfsHumi(queryIcingProbDataResult);
+  //     }, [queryIcingProbDataResult.isLoading]);
+  //     isLoading = !queryGfsWindDirectionDataResult.isSuccess;
+  //     break;
+  //   case 'Turb':
+  //     useEffect(() => {
+  //       queryTurb(null);
+  //     }, [fetchedDate]);
 
-      useEffect(() => {
-        queryGfsWindSpeed(queryCaturbDataResult);
-      }, [queryCaturbDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryGfsWindSpeed(queryCaturbDataResult);
+  //     }, [queryCaturbDataResult.isLoading]);
 
-      useEffect(() => {
-        queryGfsWindDir(queryGfsWindSpeedDataResult);
-      }, [queryGfsWindSpeedDataResult.isLoading]);
-      useEffect(() => {
-        queryNbm(queryGfsWindDirectionDataResult);
-      }, [queryGfsWindDirectionDataResult.isLoading]);
-      useEffect(() => {
-        queryNbmFlightCat(queryNbmWindSpeedResult);
-      }, [queryNbmWindSpeedResult.isLoading]);
-      useEffect(() => {
-        queryGfsTemp(queryNbmFlightCatResult);
-      }, [queryNbmFlightCatResult.isLoading]);
-      useEffect(() => {
-        queryIcing(queryTemperatureDataResult);
-      }, [queryTemperatureDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryGfsWindDir(queryGfsWindSpeedDataResult);
+  //     }, [queryGfsWindSpeedDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryNbm(queryGfsWindDirectionDataResult);
+  //     }, [queryGfsWindDirectionDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryNbmFlightCat(queryNbmWindSpeedResult);
+  //     }, [queryNbmWindSpeedResult.isLoading]);
+  //     useEffect(() => {
+  //       queryGfsTemp(queryNbmFlightCatResult);
+  //     }, [queryNbmFlightCatResult.isLoading]);
+  //     useEffect(() => {
+  //       queryIcing(queryTemperatureDataResult);
+  //     }, [queryTemperatureDataResult.isLoading]);
 
-      useEffect(() => {
-        queryGfsHumi(queryIcingProbDataResult);
-      }, [queryIcingProbDataResult.isLoading]);
-      isLoading = !queryCaturbDataResult.isSuccess;
-      break;
-    case 'Icing':
-      useEffect(() => {
-        queryIcing(null);
-      }, [fetchedDate]);
-      useEffect(() => {
-        queryGfsWindSpeed(queryIcingProbDataResult);
-      }, [queryIcingProbDataResult.isLoading]);
-      useEffect(() => {
-        queryGfsWindDir(queryGfsWindSpeedDataResult);
-      }, [queryGfsWindSpeedDataResult.isLoading]);
-      useEffect(() => {
-        queryGfsTemp(queryGfsWindDirectionDataResult);
-      }, [queryGfsWindDirectionDataResult.isLoading]);
-      useEffect(() => {
-        queryNbm(queryTemperatureDataResult);
-      }, [queryTemperatureDataResult.isLoading]);
-      useEffect(() => {
-        queryNbmFlightCat(queryNbmWindSpeedResult);
-      }, [queryNbmWindSpeedResult.isLoading]);
+  //     useEffect(() => {
+  //       queryGfsHumi(queryIcingProbDataResult);
+  //     }, [queryIcingProbDataResult.isLoading]);
+  //     isLoading = !queryCaturbDataResult.isSuccess;
+  //     break;
+  //   case 'Icing':
+  //     useEffect(() => {
+  //       queryIcing(null);
+  //     }, [fetchedDate]);
+  //     useEffect(() => {
+  //       queryGfsWindSpeed(queryIcingProbDataResult);
+  //     }, [queryIcingProbDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryGfsWindDir(queryGfsWindSpeedDataResult);
+  //     }, [queryGfsWindSpeedDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryGfsTemp(queryGfsWindDirectionDataResult);
+  //     }, [queryGfsWindDirectionDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryNbm(queryTemperatureDataResult);
+  //     }, [queryTemperatureDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryNbmFlightCat(queryNbmWindSpeedResult);
+  //     }, [queryNbmWindSpeedResult.isLoading]);
 
-      useEffect(() => {
-        queryTurb(queryNbmFlightCatResult);
-      }, [queryNbmFlightCatResult.isLoading]);
+  //     useEffect(() => {
+  //       queryTurb(queryNbmFlightCatResult);
+  //     }, [queryNbmFlightCatResult.isLoading]);
 
-      useEffect(() => {
-        queryGfsHumi(queryCaturbDataResult);
-      }, [queryCaturbDataResult.isLoading]);
-      isLoading = !queryIcingProbDataResult.isSuccess;
-      break;
-    case 'Clouds':
-      useEffect(() => {
-        queryNbmFlightCat(null);
-      }, [fetchedDate]);
-      useEffect(() => {
-        queryNbm(queryNbmFlightCatResult);
-      }, [queryNbmFlightCatResult.isLoading]);
-      useEffect(() => {
-        queryIcing(queryNbmWindSpeedResult);
-      }, [queryNbmWindSpeedResult.isLoading]);
-      useEffect(() => {
-        queryGfsHumi(queryIcingSevDataResult);
-      }, [queryIcingSevDataResult.isLoading]);
-      useEffect(() => {
-        queryGfsTemp(queryhumidityDataResult);
-      }, [queryhumidityDataResult.isLoading]);
-      useEffect(() => {
-        queryGfsWindDir(queryTemperatureDataResult);
-      }, [queryTemperatureDataResult.isLoading]);
-      useEffect(() => {
-        queryGfsWindSpeed(queryGfsWindDirectionDataResult);
-      }, [queryGfsWindDirectionDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryGfsHumi(queryCaturbDataResult);
+  //     }, [queryCaturbDataResult.isLoading]);
+  //     isLoading = !queryIcingProbDataResult.isSuccess;
+  //     break;
+  //   case 'Clouds':
+  //     useEffect(() => {
+  //       queryNbmFlightCat(null);
+  //     }, [fetchedDate]);
+  //     useEffect(() => {
+  //       queryNbm(queryNbmFlightCatResult);
+  //     }, [queryNbmFlightCatResult.isLoading]);
+  //     useEffect(() => {
+  //       queryIcing(queryNbmWindSpeedResult);
+  //     }, [queryNbmWindSpeedResult.isLoading]);
+  //     useEffect(() => {
+  //       queryGfsHumi(queryIcingSevDataResult);
+  //     }, [queryIcingSevDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryGfsTemp(queryhumidityDataResult);
+  //     }, [queryhumidityDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryGfsWindDir(queryTemperatureDataResult);
+  //     }, [queryTemperatureDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryGfsWindSpeed(queryGfsWindDirectionDataResult);
+  //     }, [queryGfsWindDirectionDataResult.isLoading]);
 
-      useEffect(() => {
-        queryTurb(queryGfsWindSpeedDataResult);
-      }, [queryGfsWindSpeedDataResult.isLoading]);
+  //     useEffect(() => {
+  //       queryTurb(queryGfsWindSpeedDataResult);
+  //     }, [queryGfsWindSpeedDataResult.isLoading]);
 
-      isLoading = !queryIcingProbDataResult.isSuccess;
-      break;
-  }
+  //     isLoading = !queryIcingProbDataResult.isSuccess;
+  //     break;
+  // }
 
   function readNbmProperties(time: Date, segmentIndex): NbmProperties {
     const { value: cloudbase, time: forecastTime } = getValueFromDatasetByElevation(

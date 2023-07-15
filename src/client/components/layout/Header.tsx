@@ -10,6 +10,8 @@ import dynamic from 'next/dynamic';
 import { useSelector } from 'react-redux';
 import { selectAuth } from '../../store/auth/authSlice';
 import ZuluClock from '../shared/ZuluClock';
+import { useCookies } from 'react-cookie';
+import { useGetUserQuery } from '../../store/auth/authApi';
 const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
 const links = [
@@ -95,6 +97,8 @@ export default function Header() {
   const [userSettingDrawer, setIsShowSettingsDrawer] = useState(false);
   const [favoritesDrawer, setFavoritesDrawer] = useState(false);
   const auth = useSelector(selectAuth);
+  const [cookies] = useCookies(['logged_in']);
+  useGetUserQuery(null, { refetchOnMountOrArgChange: true });
 
   useEffect(() => {
     if (pathname === '/map' || pathname === '/imagery' || pathname === '/route-profile') {
@@ -102,25 +106,17 @@ export default function Header() {
     } else {
       setMapMenu(false);
     }
-    if (auth.id) {
+    if (auth.id || cookies.logged_in) {
       setIsUserLoginUser(true);
     } else {
       setIsUserLoginUser(false);
     }
   }, [pathname]);
+
   const handleActiveMenu = (id) => {
     setActiveMenu(id);
     setActiveResponsiveMenu(false);
   };
-
-  useEffect(() => {
-    if (localStorage.getItem('auth')) {
-      // console.log('auth', localStorage.getItem('auth'));
-      setIsUserLoginUser(true);
-    } else {
-      setIsUserLoginUser(false);
-    }
-  }, []);
 
   // sticky header
   const [sticky, setSticky] = useState(false);

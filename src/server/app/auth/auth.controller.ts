@@ -1,8 +1,9 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthSignupDto, AuthSinginDto } from './dto';
 import { ValidationPipe } from '@nestjs/common';
 import { Response } from 'express';
+import { JwtAuthGuard } from './jwt/jwt-auth.guard';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -15,6 +16,7 @@ export class AuthController {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
       })
+      .cookie('logged_in', true)
       .status(HttpStatus.OK)
       .json({ message: 'Signup successfully 😊 👌', id, email, displayName });
   }
@@ -27,6 +29,7 @@ export class AuthController {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
       })
+      .cookie('logged_in', true)
       .status(HttpStatus.OK)
       .json({
         message: 'Logged in successfully 😊 👌',
@@ -36,10 +39,17 @@ export class AuthController {
       });
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('getUser')
+  async getUser(@Request() request) {
+    return this.authService.getUser(request.user.id);
+  }
+
   @Get('signout')
   @HttpCode(HttpStatus.NO_CONTENT)
   async signout(@Res() res: Response) {
     res.clearCookie('access_token', { httpOnly: true });
+    res.clearCookie('logged_in');
     res.send({ message: 'Signout Successful' });
   }
 }

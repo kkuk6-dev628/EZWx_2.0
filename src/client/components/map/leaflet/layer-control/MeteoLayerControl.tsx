@@ -1,5 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { ChangeEvent, ReactElement, useEffect, useRef, createContext, useContext, useState } from 'react';
+import React, {
+  ChangeEvent,
+  ReactElement,
+  useEffect,
+  useRef,
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+} from 'react';
 import { Radio, RadioGroup } from '@material-ui/core';
 import { useMap } from 'react-leaflet';
 import { Layer, DomEvent, LayerGroup, CircleMarker, FeatureGroup } from 'leaflet';
@@ -42,6 +51,7 @@ import { useDispatch } from 'react-redux';
 import { selectAuth } from '../../../../store/auth/authSlice';
 import { useGetUserSettingsQuery } from '../../../../store/user/userSettingsApi';
 import { useGetAirportQuery } from '../../../../store/route/airportApi';
+import { useCookies } from 'react-cookie';
 
 interface IProps {
   children?: ReactElement[];
@@ -66,13 +76,14 @@ export const InLayerControl = createContext<{ value: boolean }>({
 const MeteoLayerControl = ({ position, children }: IProps) => {
   const positionClass = (position && POSITION_CLASSES[position]) || POSITION_CLASSES.topright;
   const auth = useSelector(selectAuth);
+  const [cookies] = useCookies(['logged_in']);
   const ref = useRef<HTMLDivElement>();
   const meteoLayers = useMeteoLayersContext();
   const [updateLayerControlStateAPI] = useUpdateLayerControlStateMutation();
   const layerControlState = useSelector(selectLayerControlState);
   const dispatch = useDispatch();
   let refetchUserSettings;
-  if (auth.id) {
+  if (auth.id || cookies.logged_in) {
     const { refetch } = useGetUserSettingsQuery(auth.id);
     refetchUserSettings = () => {
       refetch();
@@ -191,29 +202,28 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
   }, []);
 
   const isMobile = width <= 768;
-
-  useEffect(() => {
-    if (ref?.current) {
+  const handleDisableMapInteraction = useCallback((node) => {
+    if (node) {
       if (isMobile) {
-        DomEvent.disableClickPropagation(ref.current);
+        DomEvent.disableClickPropagation(node);
+        DomEvent.disableScrollPropagation(node);
       } else {
-        ref.current.addEventListener('mouseover', function () {
+        node.addEventListener('mouseover', function () {
           disableMapInteraction(true);
         });
         // Re-enable dragging when user's cursor leaves the element
-        ref.current.addEventListener('mouseout', function () {
+        node.addEventListener('mouseout', function () {
           disableMapInteraction(false);
         });
       }
-      DomEvent.disableScrollPropagation(ref.current);
+      DomEvent.disableScrollPropagation(node);
       // L.DomEvent.on(ref.current, 'mousemove contextmenu drag', L.DomEvent.stop);
-      // Disable dragging when user's cursor enters the element
     }
-  }, [ref?.current]);
+  }, []);
 
   return (
     //@ts-ignore
-    <div className={positionClass + ' layer-control-container'} ref={ref}>
+    <div className={positionClass + ' layer-control-container'} ref={handleDisableMapInteraction}>
       {layerControlState.show && (
         <div id="layer-control" className="leaflet-control leaflet-bar layer-control">
           <div className="layer-control__header">
