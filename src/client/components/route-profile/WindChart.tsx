@@ -4,12 +4,7 @@ import { LineSeries, CustomSVGSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import { cacheKeys, getRouteLength, getSegmentsCount, getValueFromDatasetByElevation } from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';
-import {
-  useGetRouteProfileStateQuery,
-  useQueryGfsWindDirectionDataMutation,
-  useQueryGfsWindSpeedDataMutation,
-  useQueryTemperatureDataMutation,
-} from '../../store/route-profile/routeProfileApi';
+import { useGetRouteProfileStateQuery, useQueryGfsDataMutation } from '../../store/route-profile/routeProfileApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import { celsiusToFahrenheit, convertTimeFormat, getStandardTemp, round } from '../map/common/AreoFunctions';
 import flyjs from '../../fly-js/fly';
@@ -53,20 +48,14 @@ const WindChart = () => {
   const [windSpeedSeries, setWindSpeedSeries] = useState(null);
   const [windHintValue, setWindHintValue] = useState(null);
 
-  const [, queryTemperatureDataResult] = useQueryTemperatureDataMutation({
-    fixedCacheKey: cacheKeys.gfsTemperature,
-  });
-  const [, queryGfsWindDirectionDataResult] = useQueryGfsWindDirectionDataMutation({
-    fixedCacheKey: cacheKeys.gfsWinddirection,
-  });
-  const [, queryGfsWindSpeedDataResult] = useQueryGfsWindSpeedDataMutation({
-    fixedCacheKey: cacheKeys.gfsWindspeed,
+  const [, queryGfsDataResult] = useQueryGfsDataMutation({
+    fixedCacheKey: cacheKeys.gData,
   });
 
   function buildWindSeries() {
-    if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess && segments.length > 0) {
+    if (queryGfsDataResult.isSuccess && segments.length > 0) {
       const windSpeedData = [];
-      const dataset = queryGfsWindSpeedDataResult.data;
+      const dataset = queryGfsDataResult.data?.windSpeed;
       const routeLength = getRouteLength(activeRoute, true);
       const segmentInterval = routeLength / getSegmentsCount(activeRoute);
       segments.forEach((segment, index) => {
@@ -86,13 +75,13 @@ const WindChart = () => {
             continue;
           }
           const { value: windDir } = getValueFromDatasetByElevation(
-            queryGfsWindDirectionDataResult.data,
+            queryGfsDataResult.data?.windDirection,
             new Date(segment.arriveTime),
             el,
             index,
           );
           const { value: temperature } = getValueFromDatasetByElevation(
-            queryTemperatureDataResult.data,
+            queryGfsDataResult.data?.temperature,
             new Date(segment.arriveTime),
             el,
             index,
@@ -190,14 +179,7 @@ const WindChart = () => {
 
   useEffect(() => {
     buildWindSeries();
-  }, [
-    queryGfsWindSpeedDataResult.isSuccess,
-    queryGfsWindDirectionDataResult.isSuccess,
-    queryTemperatureDataResult.isSuccess,
-    segments,
-    routeProfileApiState.maxAltitude,
-    routeProfileApiState.windLayer,
-  ]);
+  }, [queryGfsDataResult.isSuccess, segments, routeProfileApiState.maxAltitude, routeProfileApiState.windLayer]);
 
   return (
     <RouteProfileChart showDayNightBackground={true} noDataMessage={null}>

@@ -18,9 +18,8 @@ import { useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi'
 import { selectAuth } from '../../store/auth/authSlice';
 import {
   useGetAirportNbmQuery,
-  useGetDepartureAdvisorDataMutation,
-  useQueryGfsWindDirectionDataMutation,
-  useQueryGfsWindSpeedDataMutation,
+  useQueryDepartureAdvisorDataMutation,
+  useQueryGfsDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import {
   cacheKeys,
@@ -674,7 +673,7 @@ function getWheatherMinimumsAlongRoute(
       if (index < positions.length - 1 && !dist) return;
       let speed: number;
       if (useForecastWinds) {
-        if (gfsWindspeed.isSuccess && gfsWinddirection.isSuccess) {
+        if (gfsWindspeed && gfsWinddirection) {
           const { value: speedValue } = getValueFromDatasetByElevation(
             gfsWindspeed.data,
             new Date(arriveTime),
@@ -947,14 +946,11 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const auth = useSelector(selectAuth);
   const [hideDotsBars, setHideDotsBars] = useState(true);
   const [clickedDotsBars, setClickedDotsBars] = useState(false);
-  const [getDepartureAdvisorData, getDepartureAdvisorDataResult] = useGetDepartureAdvisorDataMutation({
+  const [getDepartureAdvisorData, getDepartureAdvisorDataResult] = useQueryDepartureAdvisorDataMutation({
     fixedCacheKey: cacheKeys.departureAdvisor,
   });
-  const [queryGfsWindDirectionData, queryGfsWindDirectionDataResult] = useQueryGfsWindDirectionDataMutation({
-    fixedCacheKey: cacheKeys.gfsWinddirection,
-  });
-  const [queryGfsWindSpeedData, queryGfsWindSpeedDataResult] = useQueryGfsWindSpeedDataMutation({
-    fixedCacheKey: cacheKeys.gfsWindspeed,
+  const [, queryGfsDataResult] = useQueryGfsDataMutation({
+    fixedCacheKey: cacheKeys.gData,
   });
   const { data: airportNbmData, isSuccess: isAirportNbmLoaded } = useGetAirportNbmQuery(
     activeRoute ? [activeRoute.departure.key, activeRoute.destination.key] : [],
@@ -1067,8 +1063,8 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   }
 
   useEffect(() => {
-    if (queryGfsWindDirectionDataResult.isSuccess && getDepartureAdvisorDataResult.isSuccess) {
-      const gfsForecastTime = getMaxForecastTime(queryGfsWindDirectionDataResult.data);
+    if (queryGfsDataResult.isSuccess && getDepartureAdvisorDataResult.isSuccess) {
+      const gfsForecastTime = getMaxForecastTime(queryGfsDataResult.data?.windSpeed);
       const nbmForecastTime = getMaxForecastTime(getDepartureAdvisorDataResult.data?.cloudceiling);
       const minGfsNbm = Math.min(gfsForecastTime.getTime(), nbmForecastTime.getTime());
       const forecastTime = Math.floor((minGfsNbm - new Date().getTime()) / 3600 / 1000) + 2;
@@ -1076,7 +1072,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       const flytime = Math.round(routeLength / settingsState.true_airspeed);
       setTimeRange(Math.round(((props.showPast ? 12 : 0) + forecastTime - flytime) / 3) * 3);
     }
-  }, [queryGfsWindDirectionDataResult.isSuccess, getDepartureAdvisorDataResult.isSuccess]);
+  }, [queryGfsDataResult.isSuccess, getDepartureAdvisorDataResult.isSuccess]);
   useEffect(() => {
     const hour = new Date(settingsState.observation_time);
     hour.setMinutes(0, 0, 0);
@@ -1168,8 +1164,8 @@ function DepartureAdvisor(props: { showPast: boolean }) {
             activeRoute.altitude,
             settingsState.true_airspeed,
             getDepartureAdvisorDataResult,
-            queryGfsWindSpeedDataResult,
-            queryGfsWindDirectionDataResult,
+            queryGfsDataResult.data?.windSpeed,
+            queryGfsDataResult.data?.windDirection,
             activeRoute.departure.key,
             activeRoute.destination.key,
             airportNbmData,
@@ -1183,8 +1179,8 @@ function DepartureAdvisor(props: { showPast: boolean }) {
             activeRoute.altitude,
             settingsState.true_airspeed,
             getDepartureAdvisorDataResult,
-            queryGfsWindSpeedDataResult,
-            queryGfsWindDirectionDataResult,
+            queryGfsDataResult.data?.windSpeed,
+            queryGfsDataResult.data?.windDirection,
             activeRoute.departure.key,
             activeRoute.destination.key,
             airportNbmData,
@@ -1198,8 +1194,8 @@ function DepartureAdvisor(props: { showPast: boolean }) {
             activeRoute.altitude,
             settingsState.true_airspeed,
             getDepartureAdvisorDataResult,
-            queryGfsWindSpeedDataResult,
-            queryGfsWindDirectionDataResult,
+            queryGfsDataResult.data?.windSpeed,
+            queryGfsDataResult.data?.windDirection,
             activeRoute.departure.key,
             activeRoute.destination.key,
             airportNbmData,
@@ -1218,7 +1214,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     }
   }, [
     getDepartureAdvisorDataResult.isSuccess,
-    queryGfsWindDirectionDataResult.isSuccess,
+    queryGfsDataResult.isSuccess,
     activeRoute,
     // currentHour,
     settingsState.ceiling_at_departure,

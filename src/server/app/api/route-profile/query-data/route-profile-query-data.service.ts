@@ -173,121 +173,47 @@ export class RouteProfileQueryDataService {
     return results;
   }
 
-  async queryCat(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.clearAirTubRepository);
-  }
-
-  async queryMwturb(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.mwturbRepository);
-  }
-
-  async queryHumidity(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.humidityRepository);
-  }
-
-  async queryTemperature(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.temperaturRepository);
-  }
-
-  async queryGfsWindDirection(query: RouteProfileQueryDto) {
-    // const result = await this.queryRasterDataset(query.queryPoints, this.gfsWindDirectionRepository);
-    const result = await this.queryRasterDatasetByElevations(
+  async queryGfsData(query: RouteProfileQueryDto) {
+    const gfsHumidity = await this.queryRasterDataset(query.queryPoints, this.humidityRepository);
+    const gfsTemperature = await this.queryRasterDataset(query.queryPoints, this.temperaturRepository);
+    const gfsWindDirection = await this.queryRasterDatasetByElevations(
       query.queryPoints,
       query.elevations,
       this.gfsWindDirectionRepository,
     );
-    return result;
-  }
-
-  async queryGfsWindSpeed(query: RouteProfileQueryDto) {
-    return await this.queryRasterDatasetByElevations(query.queryPoints, query.elevations, this.gfsWindSpeedRepository);
-    // return await this.queryRasterDataset(query.queryPoints, this.gfsWindSpeedRepository);
-  }
-
-  async queryIcingProb(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.icingProbRepository);
-  }
-
-  async queryIcingSev(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.icingSevRepository);
-  }
-
-  async queryIcingSld(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.icingSldRepository);
-  }
-
-  async queryNbmCloudbase(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.nbmCloudBaseRepository);
-  }
-
-  async queryNbmCloudceiling(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.nbmCloudCeilingRepository);
-  }
-
-  async queryNbmDewpoint(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.nbmDewpointRepository);
-  }
-
-  async queryNbmGust(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.nbmGustRepository);
-  }
-
-  async queryNbmSkycover(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.nbmSkycoverRepository);
-  }
-
-  async queryNbmT2m(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.nbmT2mRepository);
-  }
-
-  async queryNbmVis(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.nbmVisRepository);
-  }
-
-  async queryNbmWindDirection(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.nbmWindDirectionRepository);
-  }
-
-  async queryNbmWindSpeed(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.nbmWindSpeedRepository);
-  }
-
-  async queryNbmWx1(query: RouteProfileQueryDto) {
-    return await this.queryRasterDataset(query.queryPoints, this.nbmWx1Repository);
+    const gfsWindSpeed = await this.queryRasterDatasetByElevations(
+      query.queryPoints,
+      query.elevations,
+      this.gfsWindSpeedRepository,
+    );
+    return {
+      humidity: gfsHumidity,
+      temperature: gfsTemperature,
+      windDirection: gfsWindDirection,
+      windSpeed: gfsWindSpeed,
+    };
   }
 
   async queryAllNbmValues(query: RouteProfileQueryDto) {
     const cloudbase = await this.queryRasterDataset(query.queryPoints, this.nbmCloudBaseRepository);
-    const cloudceiling = await this.queryRasterDataset(query.queryPoints, this.nbmCloudCeilingRepository);
     const dewpoint = await this.queryRasterDataset(query.queryPoints, this.nbmDewpointRepository);
     const gust = await this.queryRasterDataset(query.queryPoints, this.nbmGustRepository);
     const skycover = await this.queryRasterDataset(query.queryPoints, this.nbmSkycoverRepository);
     const temperature = await this.queryRasterDataset(query.queryPoints, this.nbmT2mRepository);
-    const visibility = await this.queryRasterDataset(query.queryPoints, this.nbmVisRepository);
     const winddir = await this.queryRasterDataset(query.queryPoints, this.nbmWindDirectionRepository);
     const windspeed = await this.queryRasterDataset(query.queryPoints, this.nbmWindSpeedRepository);
-    return { cloudbase, cloudceiling, dewpoint, gust, skycover, temperature, visibility, winddir, windspeed };
-  }
-
-  async queryFlightCategory(query: RouteProfileQueryDto) {
-    const cloudbase = await this.queryRasterDataset(query.queryPoints, this.nbmCloudBaseRepository);
-    const skycover = await this.queryRasterDataset(query.queryPoints, this.nbmSkycoverRepository);
-    return { cloudbase, skycover };
-  }
-
-  async queryIcingAll(query: RouteProfileQueryDto) {
-    const prob = await this.queryRasterDataset(query.queryPoints, this.icingProbRepository);
-    const severity = await this.queryRasterDataset(query.queryPoints, this.icingSevRepository);
-    return { prob, severity };
+    return { cloudbase, dewpoint, gust, skycover, temperature, winddir, windspeed };
   }
 
   async query4DepartureAdvisor(query: RouteProfileQueryDto) {
+    // turbulences
     const cat = await this.queryRasterDatasetByElevations(
       query.queryPoints,
       query.elevations,
       this.clearAirTubRepository,
     );
     const mwt = await this.queryRasterDatasetByElevations(query.queryPoints, query.elevations, this.mwturbRepository);
+    // Icings
     const prob = await this.queryRasterDatasetByElevations(
       query.queryPoints,
       query.elevations,
@@ -298,6 +224,8 @@ export class RouteProfileQueryDataService {
       query.elevations,
       this.icingSevRepository,
     );
+    const sld = await this.queryRasterDataset(query.queryPoints, this.icingSldRepository);
+    // nbms
     const cloudceiling = await this.queryRasterDataset(query.queryPoints, this.nbmCloudCeilingRepository);
     const visibility = await this.queryRasterDataset(query.queryPoints, this.nbmVisRepository);
     const wx_1 = await this.queryRasterDataset(query.queryPoints, this.nbmWx1Repository);
@@ -311,6 +239,7 @@ export class RouteProfileQueryDataService {
       mwt,
       prob,
       severity,
+      sld,
       cloudceiling,
       visibility,
       wx_1,

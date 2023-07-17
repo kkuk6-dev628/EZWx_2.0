@@ -36,16 +36,9 @@ import { initialUserSettingsState, selectSettings } from '../../store/user/UserS
 import {
   useGetAirportNbmQuery,
   useGetRouteProfileStateQuery,
-  useQueryNbmFlightCategoryMutation,
-  useQueryGfsWindDirectionDataMutation,
-  useQueryGfsWindSpeedDataMutation,
-  useQueryTemperatureDataMutation,
-  useGetDepartureAdvisorDataMutation,
-  useQueryNbmDewpointMutation,
-  useQueryNbmGustMutation,
-  useQueryNbmTempMutation,
-  useQueryNbmWindDirMutation,
-  useQueryNbmWindSpeedMutation,
+  useQueryDepartureAdvisorDataMutation,
+  useQueryGfsDataMutation,
+  useQueryNbmAllMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectFetchedDate, selectRouteSegments } from '../../store/route-profile/RouteProfile';
@@ -357,41 +350,20 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   const [airportHint, setAirportHint] = useState(null);
 
   const [gradientStops, setGradientStops] = useState([]);
-  const [, queryTemperatureDataResult] = useQueryTemperatureDataMutation({
-    fixedCacheKey: cacheKeys.gfsTemperature,
-  });
   const [contourLabelData, setContourLabelData] = useState(null);
   const [temperatureContures, setTemperatureContours] = useState(null);
   const [weatherIconData, setWeatherIconData] = useState(null);
   const [weatherHint, setWeatherHint] = useState(null);
   const [flightCategorySeries, setFlightCategorySeries] = useState(null);
   const [flightCatHint, setFlightCatHint] = useState(null);
-  const [, queryGfsWindDirectionDataResult] = useQueryGfsWindDirectionDataMutation({
-    fixedCacheKey: cacheKeys.gfsWinddirection,
+  const [, queryGfsDataResult] = useQueryGfsDataMutation({
+    fixedCacheKey: cacheKeys.gData,
   });
-  const [, queryGfsWindSpeedDataResult] = useQueryGfsWindSpeedDataMutation({
-    fixedCacheKey: cacheKeys.gfsWindspeed,
+  const [, queryNbmAllResult] = useQueryNbmAllMutation({
+    fixedCacheKey: cacheKeys.nbm,
   });
-  const [, queryNbmWindDirResult] = useQueryNbmWindDirMutation({
-    fixedCacheKey: cacheKeys.nbmWindDir,
-  });
-  const [, queryNbmWindSpeedResult] = useQueryNbmWindSpeedMutation({
-    fixedCacheKey: cacheKeys.nbmWindSpeed,
-  });
-  const [, queryNbmFlightCatResult] = useQueryNbmFlightCategoryMutation({
-    fixedCacheKey: cacheKeys.nbmCloudCeiling,
-  });
-  const [, getDepartureAdvisorDataResult] = useGetDepartureAdvisorDataMutation({
+  const [, getDepartureAdvisorDataResult] = useQueryDepartureAdvisorDataMutation({
     fixedCacheKey: cacheKeys.departureAdvisor,
-  });
-  const [, queryNbmDewpointResult] = useQueryNbmDewpointMutation({
-    fixedCacheKey: cacheKeys.nbmDewpoint,
-  });
-  const [, queryNbmGustResult] = useQueryNbmGustMutation({
-    fixedCacheKey: cacheKeys.nbmGust,
-  });
-  const [, queryNbmTempResult] = useQueryNbmTempMutation({
-    fixedCacheKey: cacheKeys.nbmTemp,
   });
 
   const { data: airportNbmData, isSuccess: isAirportNbmLoaded } = useGetAirportNbmQuery(
@@ -405,11 +377,11 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   const windIconScale = isMobile ? 1 : 2;
 
   function buildTemperatureContourSeries() {
-    if (queryTemperatureDataResult.isSuccess && segments.length > 0) {
+    if (queryGfsDataResult.isSuccess && segments.length > 0) {
       if (routeProfileApiState.showTemperature) {
         const { contours, contourLabels } = buildContour(
           activeRoute,
-          queryTemperatureDataResult.data,
+          queryGfsDataResult.data?.temperature,
           segments,
           routeProfileApiState.maxAltitude,
           !userSettings.default_temperature_unit,
@@ -426,7 +398,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   useEffect(() => {
     buildTemperatureContourSeries();
   }, [
-    queryTemperatureDataResult.isSuccess,
+    queryGfsDataResult.isSuccess,
     segments,
     userSettings.default_temperature_unit,
     routeProfileApiState.maxAltitude,
@@ -456,12 +428,6 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   }, [segments, routeProfileApiState.maxAltitude]);
 
   useEffect(() => {
-    if (segments.length > 0 && airportNbmData && isAirportNbmLoaded) {
-      buildAirportLabelSeries();
-    }
-  }, [isAirportNbmLoaded, segments, routeProfileApiState.maxAltitude, viewH]);
-
-  useEffect(() => {
     window.addEventListener('resize', handleWindowSizeChange);
     return () => {
       window.removeEventListener('resize', handleWindowSizeChange);
@@ -488,13 +454,13 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         segmentIndex * flightCategoryDivide,
       );
       const { value: skycover } = getValueFromDatasetByElevation(
-        queryNbmFlightCatResult.data?.skycover,
+        queryNbmAllResult.data?.skycover,
         new Date(segment.arriveTime),
         null,
         segmentIndex * flightCategoryDivide,
       );
       const { value: cloudbase } = getValueFromDatasetByElevation(
-        queryNbmFlightCatResult.data?.cloudbase,
+        queryNbmAllResult.data?.cloudbase,
         new Date(segment.arriveTime),
         null,
         segmentIndex * flightCategoryDivide,
@@ -728,47 +694,49 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           null,
           dataIndex,
         );
+
+        const nbmDataIndex = getIndexByElevation(queryNbmAllResult.data?.windspeed, rp.position.coordinates);
         const { value: skycover } = getValueFromDatasetByElevation(
-          queryNbmFlightCatResult.data?.skycover,
+          queryNbmAllResult.data?.skycover,
           new Date(arriveTime),
           null,
-          dataIndex,
+          nbmDataIndex,
         );
         const { value: cloudbase } = getValueFromDatasetByElevation(
-          queryNbmFlightCatResult.data?.cloudbase,
+          queryNbmAllResult.data?.cloudbase,
           new Date(arriveTime),
           null,
-          dataIndex,
+          nbmDataIndex,
         );
         const { value: windspeed } = getValueFromDatasetByElevation(
-          queryNbmWindSpeedResult.data,
+          queryNbmAllResult.data?.windspeed,
           new Date(arriveTime),
           null,
-          getIndexByElevation(queryNbmWindSpeedResult.data, rp.position.coordinates),
+          nbmDataIndex,
         );
         const { value: winddir } = getValueFromDatasetByElevation(
-          queryNbmWindDirResult.data,
+          queryNbmAllResult.data?.winddir,
           new Date(arriveTime),
           null,
-          getIndexByElevation(queryNbmWindDirResult.data, rp.position.coordinates),
+          nbmDataIndex,
         );
         const { value: gust } = getValueFromDatasetByElevation(
-          queryNbmGustResult.data,
+          queryNbmAllResult.data?.gust,
           new Date(arriveTime),
           null,
-          getIndexByElevation(queryNbmGustResult.data, rp.position.coordinates),
+          nbmDataIndex,
         );
         const { value: temperature } = getValueFromDatasetByElevation(
-          queryNbmTempResult.data,
+          queryNbmAllResult.data?.temperature,
           new Date(arriveTime),
           null,
-          getIndexByElevation(queryNbmTempResult.data, rp.position.coordinates),
+          nbmDataIndex,
         );
         const { value: dewpoint } = getValueFromDatasetByElevation(
-          queryNbmDewpointResult.data,
+          queryNbmAllResult.data?.dewpoint,
           new Date(arriveTime),
           null,
-          getIndexByElevation(queryNbmDewpointResult.data, rp.position.coordinates),
+          nbmDataIndex,
         );
         labelStyle.fill = getFlightCategoryColor(visibility, cloudceiling);
         tooltip = {
@@ -801,6 +769,12 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       setWeatherIconData(weatherSeries);
     }
   }
+
+  useEffect(() => {
+    if (segments.length > 0 && airportNbmData && isAirportNbmLoaded && queryNbmAllResult.isSuccess) {
+      buildAirportLabelSeries();
+    }
+  }, [isAirportNbmLoaded, segments, routeProfileApiState.maxAltitude, viewH, queryNbmAllResult.isSuccess]);
 
   useEffect(() => {
     if (activeRoute && !queryElevationsResult.isSuccess && !queryElevationsResult.isLoading && startMargin) {
@@ -859,7 +833,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   }, [queryElevationsResult.isSuccess, routeLength]);
 
   function buildFlightCategorySeries() {
-    if (activeRoute && queryNbmFlightCatResult.isSuccess && getDepartureAdvisorDataResult.isSuccess) {
+    if (activeRoute && queryNbmAllResult.isSuccess && getDepartureAdvisorDataResult.isSuccess) {
       const positions = interpolateRouteByInterval(
         activeRoute,
         getSegmentsCount(activeRoute) * flightCategoryDivide,
@@ -879,15 +853,15 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           // if (index < positions.length - 1 && !dist) return;
           let speed: number;
           if (activeRoute.useForecastWinds) {
-            if (queryGfsWindSpeedDataResult.isSuccess && queryGfsWindDirectionDataResult.isSuccess) {
+            if (queryNbmAllResult.isSuccess) {
               const { value: speedValue } = getValueFromDatasetByElevation(
-                queryGfsWindSpeedDataResult.data,
+                queryNbmAllResult.data?.windspeed,
                 new Date(arriveTime),
                 activeRoute.altitude,
                 Math.round(index / flightCategoryDivide),
               );
               const { value: dirValue } = getValueFromDatasetByElevation(
-                queryGfsWindDirectionDataResult.data,
+                queryNbmAllResult.data?.winddir,
                 new Date(arriveTime),
                 activeRoute.altitude,
                 Math.round(index / flightCategoryDivide),
@@ -920,13 +894,13 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
             index,
           );
           const { value: skycover } = getValueFromDatasetByElevation(
-            queryNbmFlightCatResult.data?.skycover,
+            queryNbmAllResult.data?.skycover,
             new Date(arriveTime),
             null,
             index,
           );
           const { value: cloudbase } = getValueFromDatasetByElevation(
-            queryNbmFlightCatResult.data?.cloudbase,
+            queryNbmAllResult.data?.cloudbase,
             new Date(arriveTime),
             null,
             index,
@@ -960,7 +934,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     buildFlightCategorySeries();
   }, [
     segments,
-    queryNbmFlightCatResult.isSuccess,
+    queryNbmAllResult.isSuccess,
     getDepartureAdvisorDataResult.isSuccess,
     routeProfileApiState.maxAltitude,
   ]);

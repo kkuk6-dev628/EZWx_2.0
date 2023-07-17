@@ -93,112 +93,32 @@ export const routeProfileApi = createApi({
       query: (data) => ({ url: '', method: 'Post', body: data }),
       invalidatesTags: ['RouteProfileState'],
     }),
-    queryAirportProperties: builder.mutation({
-      query: (data) => ({ url: 'data/airport-props', method: 'Post', body: data }),
-      // transformResponse: transformElevationBands,
-    }),
-    queryCaturbData: builder.mutation({
-      query: (data) => ({ url: 'data/cat', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryMwturbData: builder.mutation({
-      query: (data) => ({ url: 'data/mwturb', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryHumidityData: builder.mutation({
-      query: (data) => ({ url: 'data/g-humidity', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryTemperatureData: builder.mutation({
-      query: (data) => ({ url: 'data/g-temperature', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryGfsWindDirectionData: builder.mutation({
-      query: (data) => ({ url: 'data/g-winddirection', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryGfsWindSpeedData: builder.mutation({
-      query: (data) => ({ url: 'data/g-windspeed', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryIcingProbData: builder.mutation({
-      query: (data) => ({ url: 'data/icing-prob', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryIcingSevData: builder.mutation({
-      query: (data) => ({ url: 'data/icing-sev', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryIcingSldData: builder.mutation({
-      query: (data) => ({ url: 'data/icing-sld', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryNbmCloudbase: builder.mutation({
-      query: (data) => ({ url: 'data/n-cloudbase', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryNbmCloudCeiling: builder.mutation({
-      query: (data) => ({ url: 'data/n-cloudceiling', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryNbmDewpoint: builder.mutation({
-      query: (data) => ({ url: 'data/n-dewpoint', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryNbmGust: builder.mutation({
-      query: (data) => ({ url: 'data/n-gust', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryNbmSkycover: builder.mutation({
-      query: (data) => ({ url: 'data/n-skycover', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryNbmTemp: builder.mutation({
-      query: (data) => ({ url: 'data/n-t2m', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryNbmVis: builder.mutation({
-      query: (data) => ({ url: 'data/n-vis', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryNbmWindDir: builder.mutation({
-      query: (data) => ({ url: 'data/n-winddirection', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryNbmWindSpeed: builder.mutation({
-      query: (data) => ({ url: 'data/n-windspeed', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryNbmWx1: builder.mutation({
-      query: (data) => ({ url: 'data/n-wx-1', method: 'Post', body: data }),
-      transformResponse: transformTimeBands,
-    }),
-    queryNbmFlightCategory: builder.mutation({
-      query: (data) => ({ url: 'data/n-ceiling-vis', method: 'Post', body: data }),
+    queryGfsData: builder.mutation({
+      query: (data) => ({ url: 'data/g-data', method: 'Post', body: data }),
       transformResponse: (response: any) => {
         return {
-          skycover: transformTimeBands(response.skycover),
-          cloudbase: transformTimeBands(response.cloudbase),
+          humidity: transformTimeBands(response.humidity),
+          temperature: transformTimeBands(response.temperature),
+          windDirection: transformTimeBands(response.windDirection),
+          windSpeed: transformTimeBands(response.windSpeed),
         };
       },
     }),
     queryNbmAll: builder.mutation({
-      query: (data) => ({ url: 'data/n-all', method: 'Post', body: data }),
+      query: (data) => ({ url: 'data/n-data', method: 'Post', body: data }),
       transformResponse: (response: any) => {
         return {
           cloudbase: transformTimeBands(response.cloudbase),
-          cloudceiling: transformTimeBands(response.cloudceiling),
           dewpoint: transformTimeBands(response.dewpoint),
           gust: transformTimeBands(response.gust),
           skycover: transformTimeBands(response.skycover),
           temperature: transformTimeBands(response.temperature),
-          visibility: transformTimeBands(response.visibility),
           winddir: transformTimeBands(response.winddir),
           windspeed: transformTimeBands(response.windspeed),
         };
       },
     }),
-    getDepartureAdvisorData: builder.mutation({
+    queryDepartureAdvisorData: builder.mutation({
       query: (data) => ({ url: 'data/d-advisor', method: 'Post', body: data }),
       transformResponse: (response: any) => {
         return {
@@ -206,6 +126,7 @@ export const routeProfileApi = createApi({
           mwt: transformTimeBands(response.mwt),
           prob: transformTimeBands(response.prob),
           severity: transformTimeBands(response.severity),
+          sld: transformTimeBands(response.sld),
           cloudceiling: transformTimeBands(response.cloudceiling),
           visibility: transformTimeBands(response.visibility),
           wx_1: transformTimeBands(response.wx_1),
@@ -225,27 +146,7 @@ export const {
   useGetRouteProfileStateQuery,
   useLazyGetRouteProfileStateQuery,
   useUpdateRouteProfileStateMutation,
-  useQueryAirportPropertiesMutation,
-  useQueryCaturbDataMutation,
-  useQueryMwturbDataMutation,
-  useQueryHumidityDataMutation,
-  useQueryTemperatureDataMutation,
-  useQueryGfsWindDirectionDataMutation,
-  useQueryGfsWindSpeedDataMutation,
-  useQueryIcingProbDataMutation,
-  useQueryIcingSevDataMutation,
-  useQueryIcingSldDataMutation,
-  useQueryNbmCloudbaseMutation,
-  useQueryNbmCloudCeilingMutation,
-  useQueryNbmDewpointMutation,
-  useQueryNbmGustMutation,
-  useQueryNbmSkycoverMutation,
-  useQueryNbmTempMutation,
-  useQueryNbmVisMutation,
-  useQueryNbmWindDirMutation,
-  useQueryNbmWindSpeedMutation,
-  useQueryNbmWx1Mutation,
-  useQueryNbmFlightCategoryMutation,
   useQueryNbmAllMutation,
-  useGetDepartureAdvisorDataMutation,
+  useQueryDepartureAdvisorDataMutation,
+  useQueryGfsDataMutation,
 } = routeProfileApi;

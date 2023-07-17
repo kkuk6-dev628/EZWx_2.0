@@ -15,11 +15,9 @@ import {
 import { selectSettings } from '../../store/user/UserSettings';
 import {
   useGetRouteProfileStateQuery,
-  useQueryNbmFlightCategoryMutation,
-  useQueryHumidityDataMutation,
-  useQueryIcingSevDataMutation,
-  useQueryNbmCloudbaseMutation,
-  useGetDepartureAdvisorDataMutation,
+  useQueryDepartureAdvisorDataMutation,
+  useQueryGfsDataMutation,
+  useQueryNbmAllMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import RouteProfileChart from './RouteProfileChart';
@@ -90,20 +88,14 @@ const CloudsChart = (props) => {
   const { data: routeProfileApiState } = useGetRouteProfileStateQuery(null, {
     refetchOnMountOrArgChange: true,
   });
-  const [, queryNbmCloudbaseResult] = useQueryNbmCloudbaseMutation({
-    fixedCacheKey: cacheKeys.nbmCloudbase,
+  const [, queryGfsDataResult] = useQueryGfsDataMutation({
+    fixedCacheKey: cacheKeys.gData,
   });
-  const [, queryNbmFlightCatResult] = useQueryNbmFlightCategoryMutation({
-    fixedCacheKey: cacheKeys.nbmCloudCeiling,
-  });
-  const [, queryIcingSevDataResult] = useQueryIcingSevDataMutation({
-    fixedCacheKey: cacheKeys.icingSev,
-  });
-  const [, queryhumidityDataResult] = useQueryHumidityDataMutation({
-    fixedCacheKey: cacheKeys.gfsHumidity,
-  });
-  const [, getDepartureAdvisorDataResult] = useGetDepartureAdvisorDataMutation({
+  const [, queryDepartureAdvisorDataResult] = useQueryDepartureAdvisorDataMutation({
     fixedCacheKey: cacheKeys.departureAdvisor,
+  });
+  const [, queryNbmAllAirportResult] = useQueryNbmAllMutation({
+    fixedCacheKey: cacheKeys.nbm,
   });
 
   function getElevationByPosition(position: { lat: number; lng: number }, inFeet = true): number {
@@ -122,13 +114,13 @@ const CloudsChart = (props) => {
   }
 
   function buildCloudSeries() {
-    if (queryNbmFlightCatResult.isSuccess && queryIcingSevDataResult.isSuccess) {
+    if (queryDepartureAdvisorDataResult.isSuccess && queryNbmAllAirportResult.isSuccess) {
       const routeLength = getRouteLength(activeRoute, true);
       const segmentCount = getSegmentsCount(activeRoute);
       const segmentLength = routeLength / segmentCount;
       const cloudData = [];
       const existIcing = false;
-      const maxForecastTime = getMaxForecastTime(queryNbmFlightCatResult.data.skycover);
+      const maxForecastTime = getMaxForecastTime(queryNbmAllAirportResult.data?.skycover);
       segments.forEach((segment, index) => {
         const elevation = getElevationByPosition(segment.position);
         let colorFirst = cloudColor1;
@@ -140,7 +132,7 @@ const CloudsChart = (props) => {
           opacity = 0.5;
         } else {
           const { value: skycover } = getValueFromDatasetByElevation(
-            queryNbmFlightCatResult.data?.skycover,
+            queryNbmAllAirportResult.data?.skycover,
             new Date(segment.arriveTime),
             null,
             index * flightCategoryDivide,
@@ -150,13 +142,13 @@ const CloudsChart = (props) => {
           }
 
           let { value: cloudbase } = getValueFromDatasetByElevation(
-            queryNbmFlightCatResult.data?.cloudbase,
+            queryNbmAllAirportResult.data?.cloudbase,
             new Date(segment.arriveTime),
             null,
             index * flightCategoryDivide,
           );
           let { value: cloudceiling } = getValueFromDatasetByElevation(
-            getDepartureAdvisorDataResult.data?.cloudceiling,
+            queryDepartureAdvisorDataResult.data?.cloudceiling,
             new Date(segment.arriveTime),
             null,
             index * flightCategoryDivide,
@@ -198,7 +190,7 @@ const CloudsChart = (props) => {
           }
 
           const humidityData = getValuesFromDatasetAllElevationByElevation(
-            queryhumidityDataResult.data,
+            queryGfsDataResult.data?.humidity,
             new Date(segment.arriveTime),
             index,
           );
@@ -221,12 +213,12 @@ const CloudsChart = (props) => {
               }
             }
           });
-          const dataIndex = getIndexByElevation(queryIcingSevDataResult.data, [
+          const dataIndex = getIndexByElevation(queryDepartureAdvisorDataResult.data?.severity, [
             segment.position.lng,
             segment.position.lat,
           ]);
           const icingSevData = getValuesFromDatasetAllElevationByElevation(
-            queryIcingSevDataResult.data,
+            queryDepartureAdvisorDataResult.data?.severity,
             new Date(segment.arriveTime),
             dataIndex,
           );
@@ -262,9 +254,9 @@ const CloudsChart = (props) => {
     buildCloudSeries();
   }, [
     segments,
-    queryIcingSevDataResult.isSuccess,
-    queryNbmFlightCatResult.isSuccess,
-    queryhumidityDataResult.isSuccess,
+    queryDepartureAdvisorDataResult.isSuccess,
+    queryNbmAllAirportResult.isSuccess,
+    queryGfsDataResult.isSuccess,
     routeProfileApiState.maxAltitude,
   ]);
   return (

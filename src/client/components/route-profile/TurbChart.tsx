@@ -15,8 +15,7 @@ import {
 import { selectSettings } from '../../store/user/UserSettings';
 import {
   useGetRouteProfileStateQuery,
-  useQueryCaturbDataMutation,
-  useQueryMwturbDataMutation,
+  useQueryDepartureAdvisorDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import RouteProfileChart from './RouteProfileChart';
@@ -47,18 +46,19 @@ const TurbChart = (props) => {
     refetchOnMountOrArgChange: true,
   });
   const segments = useSelector(selectRouteSegments);
-  const [, queryCaturbDataResult] = useQueryCaturbDataMutation({ fixedCacheKey: cacheKeys.caturb });
-  const [, queryMwturbDataResult] = useQueryMwturbDataMutation({ fixedCacheKey: cacheKeys.mwturb });
+  const [, queryDepartureAdvisorDataResult] = useQueryDepartureAdvisorDataMutation({
+    fixedCacheKey: cacheKeys.departureAdvisor,
+  });
   const [turbSeries, setTurbSeries] = useState([]);
   const [turbHint, setTurbHint] = useState(null);
   const [noForecast, setNoForecast] = useState(false);
   const [noDepicted, setNoDepicted] = useState(false);
 
   function buildTurbSeries() {
-    if (queryCaturbDataResult.isSuccess && queryMwturbDataResult.isSuccess) {
+    if (queryDepartureAdvisorDataResult.isSuccess) {
       const segmentCount = getSegmentsCount(activeRoute);
       const segmentLength = getSegmentInterval(activeRoute, segmentCount);
-      const maxForecastTime = getMaxForecastTime(queryCaturbDataResult.data);
+      const maxForecastTime = getMaxForecastTime(queryDepartureAdvisorDataResult.data?.cat);
       const queryPoints = interpolateRouteByInterval(
         activeRoute,
         getSegmentsCount(activeRoute) * flightCategoryDivide,
@@ -109,13 +109,13 @@ const TurbChart = (props) => {
           } else {
             if (routeProfileApiState.turbLayers.includes('CAT') && routeProfileApiState.turbLayers.includes('MWT')) {
               const caturb = getValueFromDatasetByElevation(
-                queryCaturbDataResult.data,
+                queryDepartureAdvisorDataResult.data?.cat,
                 new Date(arriveTime),
                 elevation,
                 index,
               );
               const mwturb = getValueFromDatasetByElevation(
-                queryMwturbDataResult.data,
+                queryDepartureAdvisorDataResult.data?.mwt,
                 new Date(arriveTime),
                 elevation,
                 index,
@@ -125,7 +125,7 @@ const TurbChart = (props) => {
               edrType = 'Combined EDR';
             } else if (routeProfileApiState.turbLayers.includes('CAT')) {
               const data = getValueFromDatasetByElevation(
-                queryCaturbDataResult.data,
+                queryDepartureAdvisorDataResult.data?.cat,
                 new Date(arriveTime),
                 elevation,
                 index,
@@ -135,7 +135,7 @@ const TurbChart = (props) => {
               edrType = 'Clear Air EDR';
             } else if (routeProfileApiState.turbLayers.includes('MWT')) {
               ({ value: edr, time: edrTime } = getValueFromDatasetByElevation(
-                queryMwturbDataResult.data,
+                queryDepartureAdvisorDataResult.data?.mwt,
                 new Date(arriveTime),
                 elevation,
                 index,
@@ -194,8 +194,7 @@ const TurbChart = (props) => {
   useEffect(() => {
     buildTurbSeries();
   }, [
-    queryCaturbDataResult.isSuccess,
-    queryMwturbDataResult.isSuccess,
+    queryDepartureAdvisorDataResult.isSuccess,
     segments,
     routeProfileApiState.turbLayers,
     routeProfileApiState.maxAltitude,
