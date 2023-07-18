@@ -17,6 +17,7 @@ import {
   useGetRouteProfileStateQuery,
   useQueryDepartureAdvisorDataMutation,
   useQueryGfsDataMutation,
+  useQueryIcingTurbDataMutation,
   useQueryNbmAllMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
@@ -97,6 +98,9 @@ const CloudsChart = (props) => {
   const [, queryNbmAllAirportResult] = useQueryNbmAllMutation({
     fixedCacheKey: cacheKeys.nbm,
   });
+  const [, queryIcingTurbDataResult] = useQueryIcingTurbDataMutation({
+    fixedCacheKey: cacheKeys.icingTurb,
+  });
 
   function getElevationByPosition(position: { lat: number; lng: number }, inFeet = true): number {
     if (!queryElevationsResult.data || !queryElevationsResult.data.geoPoints) {
@@ -114,7 +118,11 @@ const CloudsChart = (props) => {
   }
 
   function buildCloudSeries() {
-    if (queryDepartureAdvisorDataResult.isSuccess && queryNbmAllAirportResult.isSuccess) {
+    if (
+      queryDepartureAdvisorDataResult.isSuccess &&
+      queryNbmAllAirportResult.isSuccess &&
+      queryIcingTurbDataResult.isSuccess
+    ) {
       const routeLength = getRouteLength(activeRoute, true);
       const segmentCount = getSegmentsCount(activeRoute);
       const segmentLength = routeLength / segmentCount;
@@ -213,12 +221,12 @@ const CloudsChart = (props) => {
               }
             }
           });
-          const dataIndex = getIndexByElevation(queryDepartureAdvisorDataResult.data?.severity, [
+          const dataIndex = getIndexByElevation(queryIcingTurbDataResult.data?.sev, [
             segment.position.lng,
             segment.position.lat,
           ]);
           const icingSevData = getValuesFromDatasetAllElevationByElevation(
-            queryDepartureAdvisorDataResult.data?.severity,
+            queryIcingTurbDataResult.data?.sev,
             new Date(segment.arriveTime),
             dataIndex,
           );
@@ -255,6 +263,7 @@ const CloudsChart = (props) => {
   }, [
     segments,
     queryDepartureAdvisorDataResult.isSuccess,
+    queryIcingTurbDataResult.isSuccess,
     queryNbmAllAirportResult.isSuccess,
     queryGfsDataResult.isSuccess,
     routeProfileApiState.maxAltitude,

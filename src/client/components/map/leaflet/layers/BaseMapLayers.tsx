@@ -49,7 +49,7 @@ const BaseMapLayers = () => {
         }}
       >
         <WFSLayer
-          url={wfsUrl2}
+          url="https://eztile2.ezwxbrief.com/geoserver/topp/ows"
           maxFeatures={256}
           typeName="topp:states"
           interactive={false}

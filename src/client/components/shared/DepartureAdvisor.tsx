@@ -17,7 +17,7 @@ import { PersonalMinimums, selectSettings, setObservationTime, setUserSettings }
 import { useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
 import { selectAuth } from '../../store/auth/authSlice';
 import {
-  useGetAirportNbmQuery,
+  useQueryAirportNbmMutation,
   useQueryDepartureAdvisorDataMutation,
   useQueryGfsDataMutation,
 } from '../../store/route-profile/routeProfileApi';
@@ -41,6 +41,7 @@ import { getMaxForecastTime } from '../route-profile/RouteProfileDataLoader';
 import { PaperComponent } from '../map/leaflet/Map';
 import DepartureAdvisorTimeBlockComponent from './DepartureAdvisorTimeBlockComponent';
 import DepartureAdvisor3Bars from './DepartureAdvisor3Bars';
+import { useGetAirportQuery } from '../../store/route/airportApi';
 
 type personalMinValue = 0 | 1 | 2 | 10;
 type personalMinColor = 'red' | 'yellow' | 'green' | 'grey';
@@ -952,12 +953,10 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const [, queryGfsDataResult] = useQueryGfsDataMutation({
     fixedCacheKey: cacheKeys.gData,
   });
-  const { data: airportNbmData, isSuccess: isAirportNbmLoaded } = useGetAirportNbmQuery(
-    activeRoute ? [activeRoute.departure.key, activeRoute.destination.key] : [],
-    {
-      skip: activeRoute === null,
-    },
-  );
+  const [queryAirportNbm, queryAirportNbmResult] = useQueryAirportNbmMutation({
+    fixedCacheKey: cacheKeys.nbmAllAirport,
+  });
+  const { isSuccess: isLoadedAirports, data: airportsTable } = useGetAirportQuery('');
   const scrollContentRef = useRef<HTMLDivElement>();
   const scrollParentRef = useRef<HTMLDivElement>();
 
@@ -1047,16 +1046,17 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       const scrollParent = scrollParentRef.current;
       const scrollContent = scrollContentRef.current;
       const overflow = scrollContent.clientWidth - scrollParent.clientWidth;
+      const scrollMargin = 30;
       if (overflow > 0) {
         const timePos = (scrollContent.clientWidth * timeToValue(new Date(settingsState.observation_time))) / maxRange;
         if (timePos - scrollParent.scrollLeft < 0) {
-          scrollParent.scrollLeft -= scrollParent.scrollLeft - timePos + 20;
-        } else if (timePos - scrollParent.scrollLeft < 20) {
-          scrollParent.scrollLeft -= 20;
+          scrollParent.scrollLeft -= scrollParent.scrollLeft - timePos + scrollMargin;
+        } else if (timePos - scrollParent.scrollLeft < scrollMargin) {
+          scrollParent.scrollLeft -= scrollMargin;
         } else if (scrollParent.clientWidth + scrollParent.scrollLeft - timePos < 0) {
-          scrollParent.scrollLeft += timePos - scrollParent.clientWidth - scrollParent.scrollLeft + 20;
-        } else if (scrollParent.clientWidth + scrollParent.scrollLeft - timePos < 20) {
-          scrollParent.scrollLeft += 20;
+          scrollParent.scrollLeft += timePos - scrollParent.clientWidth - scrollParent.scrollLeft + scrollMargin;
+        } else if (scrollParent.clientWidth + scrollParent.scrollLeft - timePos < scrollMargin) {
+          scrollParent.scrollLeft += scrollMargin;
         }
       }
     }
@@ -1084,7 +1084,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
 
   useEffect(() => {
     if (activeRoute) {
-      getDepartureAdvisorDataResult.reset();
+      // getDepartureAdvisorDataResult.reset();
       const queryPoints = interpolateRouteByInterval(
         activeRoute,
         getSegmentsCount(activeRoute) * flightCategoryDivide,
@@ -1099,6 +1099,15 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       getDepartureAdvisorData({ queryPoints, elevations });
     }
   }, [activeRoute]);
+
+  useEffect(() => {
+    if (activeRoute && isLoadedAirports) {
+      const airports = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute), airportsTable, true).map(
+        (pt) => pt.airport?.key,
+      );
+      queryAirportNbm(airports.filter((a) => a));
+    }
+  }, [activeRoute, isLoadedAirports]);
 
   useEffect(() => {
     if (activeRoute && getDepartureAdvisorDataResult.isSuccess && evaluationsByTime) {
@@ -1168,7 +1177,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
             queryGfsDataResult.data?.windDirection,
             activeRoute.departure.key,
             activeRoute.destination.key,
-            airportNbmData,
+            queryAirportNbmResult.data,
           );
           evaluationsByTime.push({ time: time.getTime() - hourInMili, evaluation: evalByTimeBefore });
           const evalByTime = getWheatherMinimumsAlongRoute(
@@ -1183,7 +1192,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
             queryGfsDataResult.data?.windDirection,
             activeRoute.departure.key,
             activeRoute.destination.key,
-            airportNbmData,
+            queryAirportNbmResult.data,
           );
           evaluationsByTime.push({ time: time.getTime(), evaluation: evalByTime });
           const evalByTimeAfter = getWheatherMinimumsAlongRoute(
@@ -1198,7 +1207,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
             queryGfsDataResult.data?.windDirection,
             activeRoute.departure.key,
             activeRoute.destination.key,
-            airportNbmData,
+            queryAirportNbmResult.data,
           );
           evaluationsByTime.push({ time: time.getTime() + hourInMili, evaluation: evalByTimeAfter });
           const minValue = Math.min(
@@ -1236,12 +1245,6 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       setTimeout(() => setShowBarComponent(false), 3000);
     }
   }, [settingsState.observation_time, showBarComponent]);
-
-  useEffect(() => {
-    if (dotElementRef.current) {
-      // dotElementRef.current.addEventListener('click', clickEvaluationBar);
-    }
-  }, [dotElementRef.current]);
 
   const valueToTime = (value: number): Date => {
     const origin = getTimeRangeStart(props.showPast);

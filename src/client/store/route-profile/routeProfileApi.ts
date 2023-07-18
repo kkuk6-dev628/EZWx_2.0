@@ -69,12 +69,6 @@ export const routeProfileApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl }),
   tagTypes: ['RouteProfileState'],
   endpoints: (builder) => ({
-    getAirportNbm: builder.query<{ time: string; data: AirportNbmData[] }[], string[]>({
-      query: (faaids: string[]) => ({
-        url: 'data/airport-nbm?faaids=' + faaids.join(','),
-        method: 'Get',
-      }),
-    }),
     getRouteProfileState: builder.query({
       query: () => ({ url: '', method: 'Get' }),
       transformResponse: (response: RouteProfileState): RouteProfileState => {
@@ -93,6 +87,13 @@ export const routeProfileApi = createApi({
       query: (data) => ({ url: '', method: 'Post', body: data }),
       invalidatesTags: ['RouteProfileState'],
     }),
+    queryAirportNbm: builder.mutation<{ time: string; data: AirportNbmData[] }[], string[]>({
+      query: (faaids: string[]) => ({
+        url: 'data/airport-nbm',
+        method: 'Post',
+        body: { faaids: faaids },
+      }),
+    }),
     queryGfsData: builder.mutation({
       query: (data) => ({ url: 'data/g-data', method: 'Post', body: data }),
       transformResponse: (response: any) => {
@@ -101,6 +102,18 @@ export const routeProfileApi = createApi({
           temperature: transformTimeBands(response.temperature),
           windDirection: transformTimeBands(response.windDirection),
           windSpeed: transformTimeBands(response.windSpeed),
+        };
+      },
+    }),
+    queryIcingTurbData: builder.mutation({
+      query: (data) => ({ url: 'data/it-data', method: 'Post', body: data }),
+      transformResponse: (response: any) => {
+        return {
+          cat: transformTimeBands(response.cat),
+          mwt: transformTimeBands(response.mwt),
+          sev: transformTimeBands(response.sev),
+          sld: transformTimeBands(response.sld),
+          prob: transformTimeBands(response.prob),
         };
       },
     }),
@@ -126,7 +139,6 @@ export const routeProfileApi = createApi({
           mwt: transformTimeBands(response.mwt),
           prob: transformTimeBands(response.prob),
           severity: transformTimeBands(response.severity),
-          sld: transformTimeBands(response.sld),
           cloudceiling: transformTimeBands(response.cloudceiling),
           visibility: transformTimeBands(response.visibility),
           wx_1: transformTimeBands(response.wx_1),
@@ -142,11 +154,12 @@ export const routeProfileApi = createApi({
 });
 
 export const {
-  useGetAirportNbmQuery,
+  useQueryAirportNbmMutation,
   useGetRouteProfileStateQuery,
   useLazyGetRouteProfileStateQuery,
   useUpdateRouteProfileStateMutation,
   useQueryNbmAllMutation,
   useQueryDepartureAdvisorDataMutation,
   useQueryGfsDataMutation,
+  useQueryIcingTurbDataMutation,
 } = routeProfileApi;

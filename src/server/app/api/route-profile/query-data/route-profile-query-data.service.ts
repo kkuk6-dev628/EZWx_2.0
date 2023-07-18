@@ -194,6 +194,15 @@ export class RouteProfileQueryDataService {
     };
   }
 
+  async queryIcingTurbData(query: RouteProfileQueryDto) {
+    const sld = await this.queryRasterDataset(query.queryPoints, this.icingSldRepository);
+    const sev = await this.queryRasterDataset(query.queryPoints, this.icingSevRepository);
+    const prob = await this.queryRasterDataset(query.queryPoints, this.icingProbRepository);
+    const cat = await this.queryRasterDataset(query.queryPoints, this.clearAirTubRepository);
+    const mwt = await this.queryRasterDataset(query.queryPoints, this.mwturbRepository);
+    return { sld, sev, prob, cat, mwt };
+  }
+
   async queryAllNbmValues(query: RouteProfileQueryDto) {
     const cloudbase = await this.queryRasterDataset(query.queryPoints, this.nbmCloudBaseRepository);
     const dewpoint = await this.queryRasterDataset(query.queryPoints, this.nbmDewpointRepository);
@@ -224,7 +233,7 @@ export class RouteProfileQueryDataService {
       query.elevations,
       this.icingSevRepository,
     );
-    const sld = await this.queryRasterDataset(query.queryPoints, this.icingSldRepository);
+    // const sld = await this.queryRasterDataset(query.queryPoints, this.icingSldRepository);
     // nbms
     const cloudceiling = await this.queryRasterDataset(query.queryPoints, this.nbmCloudCeilingRepository);
     const visibility = await this.queryRasterDataset(query.queryPoints, this.nbmVisRepository);
@@ -239,7 +248,6 @@ export class RouteProfileQueryDataService {
       mwt,
       prob,
       severity,
-      sld,
       cloudceiling,
       visibility,
       wx_1,
@@ -251,7 +259,7 @@ export class RouteProfileQueryDataService {
     };
   }
 
-  async queryAirportNbm(query: { faaids: string }) {
+  async queryAirportNbm(faaids: string[]) {
     const result = [];
     const timeTables = await this.dataSource
       .createQueryBuilder()
@@ -286,8 +294,8 @@ export class RouteProfileQueryDataService {
           'wx_inten_3',
         ])
         .from(`${timeTable.table}`, null)
-        .where(`${timeTable.table}.faaid IN (:...faaids)`, { faaids: query.faaids.split(',') })
-        .orWhere(`${timeTable.table}.icaoid IN (:...faaids)`, { faaids: query.faaids.split(',') })
+        .where(`${timeTable.table}.faaid IN (:...faaids)`, { faaids: faaids })
+        .orWhere(`${timeTable.table}.icaoid IN (:...faaids)`, { faaids: faaids })
         .getRawMany();
       result.push({ time: timeTable.time, data: rows });
     }

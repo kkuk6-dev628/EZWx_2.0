@@ -34,7 +34,7 @@ import {
 } from './RouteProfileDataLoader';
 import { initialUserSettingsState, selectSettings } from '../../store/user/UserSettings';
 import {
-  useGetAirportNbmQuery,
+  useQueryAirportNbmMutation,
   useGetRouteProfileStateQuery,
   useQueryDepartureAdvisorDataMutation,
   useQueryGfsDataMutation,
@@ -366,12 +366,9 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     fixedCacheKey: cacheKeys.departureAdvisor,
   });
 
-  const { data: airportNbmData, isSuccess: isAirportNbmLoaded } = useGetAirportNbmQuery(
-    activeRoute ? [activeRoute.departure.key, activeRoute.destination.key] : [],
-    {
-      skip: activeRoute === null,
-    },
-  );
+  const [, queryAirportNbmResult] = useQueryAirportNbmMutation({
+    fixedCacheKey: cacheKeys.nbmAllAirport,
+  });
 
   const isMobile = viewH < mobileLandscapeHeight || viewW < mobileLandscapeHeight;
   const windIconScale = isMobile ? 1 : 2;
@@ -506,8 +503,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         wxProbCov1,
         wxInten1,
         skycover,
-        segment.segmentNbmProps.windspeed,
-        segment.segmentNbmProps.gust,
+        segment.segmentNbmProps.w_speed,
+        segment.segmentNbmProps.w_gust,
         false,
       );
       const weathers = [weather1];
@@ -517,8 +514,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           wxProbCov2,
           wxInten2,
           skycover,
-          segment.segmentNbmProps.windspeed,
-          segment.segmentNbmProps.gust,
+          segment.segmentNbmProps.w_speed,
+          segment.segmentNbmProps.w_gust,
           false,
         );
         weathers.push(weather2);
@@ -526,8 +523,8 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       const color = getFlightCategoryColor(visibility, cloudceiling);
       const icon = getNbmWeatherMarkerIcon(
         segment.segmentNbmProps.wx_1,
-        segment.segmentNbmProps.windspeed,
-        segment.segmentNbmProps.gust,
+        segment.segmentNbmProps.w_speed,
+        segment.segmentNbmProps.w_gust,
         skycover,
         segment.position,
         segment.arriveTime,
@@ -583,44 +580,36 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         if (segmentIndex === 0 || segmentIndex === segments.length - 1) {
           return;
         }
-        if (seg.airportNbmProps) {
-          labelStyle.fill = getFlightCategoryColor(seg.airportNbmProps.visibility, seg.airportNbmProps.cloudceiling);
-          const lowestCloud = seg.airportNbmProps.cloudbase;
-          const ceiling = seg.airportNbmProps.cloudceiling;
-          const skyCover = seg.airportNbmProps.skycover;
-          const skyConditionsAsc = makeSkyConditions(lowestCloud, ceiling, skyCover);
-          tooltip = {
-            time: seg.airportNbmProps.time,
-            clouds: skyConditionsAsc,
-            ceiling: ceiling,
-            lowestCloud,
-            visibility: seg.airportNbmProps.visibility,
-            windspeed: seg.airportNbmProps.windspeed,
-            winddir: seg.airportNbmProps.winddir,
-            windgust: seg.airportNbmProps.gust,
-            temperature: seg.airportNbmProps.temperature,
-            dewpoint: seg.airportNbmProps.dewpoint,
-          };
+        let nbmData: AirportNbmData = null;
+        let nbmTime: number = seg.arriveTime;
+        if (seg.airport) {
+          const airportNbm = getAirportNbmData(queryAirportNbmResult.data, seg.arriveTime, seg.airport.key);
+          if (airportNbm.data) {
+            nbmData = airportNbm.data;
+            nbmTime = airportNbm.time.getTime();
+          } else {
+            nbmData = seg.segmentNbmProps;
+          }
         } else {
-          labelStyle.fill = getFlightCategoryColor(seg.segmentNbmProps.visibility, seg.segmentNbmProps.cloudceiling);
-          tooltip = {
-            time: seg.arriveTime,
-            clouds: weatherData.tooltip.clouds,
-            ceiling: weatherData.tooltip.ceiling,
-            lowestCloud: weatherData.tooltip.lowestCloud,
-            visibility: seg.segmentNbmProps.visibility,
-            windspeed: seg.segmentNbmProps.windspeed,
-            winddir: seg.segmentNbmProps.winddir,
-            windgust: seg.segmentNbmProps.gust,
-            temperature: seg.segmentNbmProps.temperature,
-            dewpoint: seg.segmentNbmProps.dewpoint,
-          };
-          // if (segmentIndex === 0 || segmentIndex === segments.length - 1) {
-          //   const { data: forCrosswind } = getAirportNbmData(airportNbmData, seg.arriveTime, seg.airport?.key);
-          //   tooltip.crosscom = forCrosswind?.cross_com;
-          //   tooltip.crossRunwayId = forCrosswind?.cross_r_id;
-          // }
+          nbmData = seg.segmentNbmProps;
         }
+        labelStyle.fill = getFlightCategoryColor(nbmData.vis, nbmData.ceil);
+        const lowestCloud = nbmData.l_cloud;
+        const ceiling = nbmData.ceil;
+        const skyCover = nbmData.skycov;
+        const skyConditionsAsc = makeSkyConditions(lowestCloud, ceiling, skyCover);
+        tooltip = {
+          time: nbmTime,
+          clouds: skyConditionsAsc,
+          ceiling: ceiling,
+          lowestCloud,
+          visibility: nbmData.vis,
+          windspeed: nbmData.w_speed,
+          winddir: nbmData.w_dir,
+          windgust: nbmData.w_gust,
+          temperature: nbmData.temp_c,
+          dewpoint: nbmData.dewp_c,
+        };
         let airportDist = 0;
         if (seg.airport) {
           const airportDelta =
@@ -752,7 +741,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           dewpoint: dewpoint,
         };
         if (index === 0 || index === routePoints.length - 1) {
-          const { data: forCrosswind } = getAirportNbmData(airportNbmData, arriveTime, rp.key);
+          const { data: forCrosswind } = getAirportNbmData(queryAirportNbmResult.data, arriveTime, rp.key);
           tooltip.crosscom = forCrosswind?.cross_com;
           tooltip.crossRunwayId = forCrosswind?.cross_r_id;
         }
@@ -771,10 +760,22 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
   }
 
   useEffect(() => {
-    if (segments.length > 0 && airportNbmData && isAirportNbmLoaded && queryNbmAllResult.isSuccess) {
+    if (
+      segments.length > 0 &&
+      queryAirportNbmResult.isSuccess &&
+      queryNbmAllResult.isSuccess &&
+      getDepartureAdvisorDataResult.isSuccess
+    ) {
       buildAirportLabelSeries();
     }
-  }, [isAirportNbmLoaded, segments, routeProfileApiState.maxAltitude, viewH, queryNbmAllResult.isSuccess]);
+  }, [
+    queryAirportNbmResult.isSuccess,
+    segments,
+    routeProfileApiState.maxAltitude,
+    viewH,
+    queryNbmAllResult.isSuccess,
+    getDepartureAdvisorDataResult.isSuccess,
+  ]);
 
   useEffect(() => {
     if (activeRoute && !queryElevationsResult.isSuccess && !queryElevationsResult.isLoading && startMargin) {
@@ -949,7 +950,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
           color="white"
           yDomain={[0, routeProfileApiState.maxAltitude * 100]}
           xDomain={[-startMargin, routeLength + endMargin]}
-          margin={{ right: 40, bottom: isMobile ? 64 : 72, top: 16 * windIconScale }}
+          margin={{ right: 40, bottom: isMobile ? 64 : 72, top: 16 * windIconScale + 4 }}
         >
           <GradientDefs>
             <linearGradient id="linear-gradient">
@@ -1136,9 +1137,9 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                   return (
                     <rect
                       x="0"
-                      y={-16 * windIconScale}
+                      y={-16 * windIconScale - 2}
                       width={calcChartWidth(viewW, viewH) - 80}
-                      height={16 * windIconScale}
+                      height={16 * windIconScale + 4}
                       fill="white"
                     />
                   );

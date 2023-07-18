@@ -11,9 +11,9 @@ export class RouteProfileQueryDataController {
     return this.routeProfileQueryDataService.query4DepartureAdvisor(query);
   }
 
-  @Get('airport-nbm')
-  airportNbm(@Query() query: { faaids: string }) {
-    return this.routeProfileQueryDataService.queryAirportNbm(query);
+  @Post('airport-nbm')
+  airportNbm(@Body() query: { faaids: string[] }) {
+    return this.routeProfileQueryDataService.queryAirportNbm(query.faaids);
   }
   @Post('g-data')
   queryGfsData(@Body() query: RouteProfileQueryDto) {
@@ -22,5 +22,9 @@ export class RouteProfileQueryDataController {
   @Post('n-data')
   queryNbmAll(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryAllNbmValues(query);
+  }
+  @Post('it-data')
+  queryIcingTurb(@Body() query: RouteProfileQueryDto) {
+    return this.routeProfileQueryDataService.queryIcingTurbData(query);
   }
 }

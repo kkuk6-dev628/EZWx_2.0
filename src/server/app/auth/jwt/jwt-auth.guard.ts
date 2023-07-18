@@ -16,8 +16,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (err || !user) {
       // console.log('unauthorized...');
       // throw err || new UnauthorizedException();
-      response.write(JSON.stringify({ needSignin: true }));
-      response.end();
+      response.status(403);
+      response.redirect('/signin');
     }
     return user;
   }

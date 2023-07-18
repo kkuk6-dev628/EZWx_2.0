@@ -20,6 +20,7 @@ import { selectSettings } from '../../store/user/UserSettings';
 import {
   useGetRouteProfileStateQuery,
   useQueryDepartureAdvisorDataMutation,
+  useQueryIcingTurbDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import RouteProfileChart from './RouteProfileChart';
@@ -77,6 +78,9 @@ const IcingChart = (props) => {
   const [, queryDepartureAdvisorDataResult] = useQueryDepartureAdvisorDataMutation({
     fixedCacheKey: cacheKeys.departureAdvisor,
   });
+  const [, queryIcingTurbDataResult] = useQueryIcingTurbDataMutation({
+    fixedCacheKey: cacheKeys.icingTurb,
+  });
 
   const [icingSeries, setIcingSeries] = useState(null);
   const [icingHint, setIcingHint] = useState(null);
@@ -84,7 +88,7 @@ const IcingChart = (props) => {
   const segments = useSelector(selectRouteSegments);
 
   function buildIcingSeries() {
-    if (segments && segments.length > 0 && queryDepartureAdvisorDataResult.isSuccess) {
+    if (segments && segments.length > 0 && queryIcingTurbDataResult.isSuccess) {
       const routeLength = getRouteLength(activeRoute, true);
       const segmentCount = getSegmentsCount(activeRoute);
       const segmentLength = routeLength / segmentCount;
@@ -94,8 +98,8 @@ const IcingChart = (props) => {
         getSegmentsCount(activeRoute) * flightCategoryDivide,
       ).map((pt) => pt.point);
       const existIcing = false;
-      const maxForecastTime = getMaxForecastTime(queryDepartureAdvisorDataResult.data?.prob);
-      const maxForecastElevation = getMaxForecastElevation(queryDepartureAdvisorDataResult.data?.prob);
+      const maxForecastTime = getMaxForecastTime(queryIcingTurbDataResult.data?.prob);
+      const maxForecastElevation = getMaxForecastElevation(queryIcingTurbDataResult.data?.prob);
       if (observationTime > maxForecastTime.getTime()) {
         setNoForecast(true);
         setNoDepicted(false);
@@ -142,7 +146,7 @@ const IcingChart = (props) => {
             };
           } else {
             let { value: prob, time: provTime } = getValueFromDatasetByElevation(
-              queryDepartureAdvisorDataResult.data?.prob,
+              queryIcingTurbDataResult.data?.prob,
               new Date(arriveTime),
               elevation,
               index,
@@ -150,14 +154,14 @@ const IcingChart = (props) => {
             prob = Math.round(prob);
             provTime = provTime ?? new Date(arriveTime);
             let { value: sld } = getValueFromDatasetByElevation(
-              queryDepartureAdvisorDataResult.data?.sld,
+              queryIcingTurbDataResult.data?.sld,
               new Date(arriveTime),
               elevation,
               index,
             );
             sld = Math.round(sld);
             let { value: sev } = getValueFromDatasetByElevation(
-              queryDepartureAdvisorDataResult.data?.severity,
+              queryIcingTurbDataResult.data?.sev,
               new Date(arriveTime),
               elevation,
               index,
@@ -217,7 +221,6 @@ const IcingChart = (props) => {
                 setNoDepicted(false);
               }
             }
-
             hint = {
               time: provTime,
               altitude: elevation,
@@ -246,6 +249,7 @@ const IcingChart = (props) => {
     buildIcingSeries();
   }, [
     queryDepartureAdvisorDataResult.isSuccess,
+    queryIcingTurbDataResult.isSuccess,
     segments,
     routeProfileApiState.icingLayers,
     routeProfileApiState.maxAltitude,
