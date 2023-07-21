@@ -83,7 +83,7 @@ export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
     return viewHeight - 200;
   } else {
     if (_viewWidth < iPadPortraitWidth) {
-      return viewHeight - 260;
+      return viewHeight - 270;
     }
     return viewHeight - 220;
   }
@@ -324,7 +324,19 @@ function getFlightCategoryColor(visibility, ceiling): string {
   return flightCategoryToColor(finalCat);
 }
 
-const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground: boolean; noDataMessage: string }) => {
+const RouteProfileChart = (props: {
+  children: ReactNode;
+  showDayNightBackground: boolean;
+  noDataMessage: string;
+  setValue2PixelRate?: (
+    dx: number,
+    dy: number,
+    marginX: number,
+    marginY: number,
+    width: number,
+    height: number,
+  ) => void;
+}) => {
   const activeRoute = useSelector(selectActiveRoute);
   const userSettings = useSelector(selectSettings);
   const observationTime = userSettings.observation_time;
@@ -522,7 +534,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
       }
       const color = getFlightCategoryColor(visibility, cloudceiling);
       const icon = getNbmWeatherMarkerIcon(
-        segment.segmentNbmProps.wx_1,
+        wx_1,
         segment.segmentNbmProps.w_speed,
         segment.segmentNbmProps.w_gust,
         skycover,
@@ -748,7 +760,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
         return {
           x: accDistance,
           y: 0,
-          yOffset: isMobile ? 26 : 36,
+          yOffset: isMobile ? 26 : 34,
           label: rp.key,
           style: { ...labelStyle, fontSize: index === 0 || index === routePoints.length - 1 ? 14 : 11 },
           tooltip: tooltip,
@@ -940,6 +952,22 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
     routeProfileApiState.maxAltitude,
   ]);
 
+  useEffect(() => {
+    const dx = (calcChartWidth(viewW, viewH) - 40) / (routeLength + startMargin + endMargin);
+    const dy =
+      (calcChartHeight(viewW, viewH) - (isMobile ? 64 : 72) - (16 * windIconScale + 4)) /
+      (routeProfileApiState.maxAltitude * 100);
+    if (props.setValue2PixelRate)
+      props.setValue2PixelRate(
+        dx,
+        dy,
+        40 + dx * startMargin + 4,
+        16 * windIconScale + 4 + 36,
+        calcChartWidth(viewW, viewH),
+        calcChartHeight(viewW, viewH),
+      );
+  }, [routeProfileApiState.maxAltitude, viewW, viewH, routeLength, startMargin, windIconScale, isMobile]);
+
   return (
     <>
       {segmentsCount && (
@@ -1042,7 +1070,7 @@ const RouteProfileChart = (props: { children: ReactNode; showDayNightBackground:
                 return {
                   x: index * segmentInterval,
                   y: 0,
-                  yOffset: isMobile ? 58 : 72,
+                  yOffset: isMobile ? 58 : 68,
                   segment: segment,
                   label: userSettings.default_time_display_unit
                     ? segment.departureTime.time

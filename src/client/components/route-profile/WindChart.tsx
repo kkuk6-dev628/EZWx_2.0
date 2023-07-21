@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { LineSeries, CustomSVGSeries, Hint, LabelSeries } from 'react-vis';
+import { LineSeries, CustomSVGSeries, Hint, LabelSeries, MarkSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import { cacheKeys, getRouteLength, getSegmentsCount, getValueFromDatasetByElevation } from './RouteProfileDataLoader';
 import { selectSettings } from '../../store/user/UserSettings';
@@ -44,6 +44,10 @@ const WindChart = () => {
     refetchOnMountOrArgChange: true,
   });
   const segments = useSelector(selectRouteSegments);
+
+  const [value2PixelRate, setValue2PixelRate] = useState({ dx: 1, dy: 1 });
+  const [chartMargin, setChartMargin] = useState({ x: 0, y: 0 });
+  const [chartSize, setChartSize] = useState({ x: 0, y: 0 });
 
   const [windSpeedSeries, setWindSpeedSeries] = useState(null);
   const [windHintValue, setWindHintValue] = useState(null);
@@ -182,20 +186,43 @@ const WindChart = () => {
   }, [queryGfsDataResult.isSuccess, segments, routeProfileApiState.maxAltitude, routeProfileApiState.windLayer]);
 
   return (
-    <RouteProfileChart showDayNightBackground={true} noDataMessage={null}>
+    <RouteProfileChart
+      showDayNightBackground={true}
+      noDataMessage={null}
+      setValue2PixelRate={(dx, dy, marginX, marginY, width, height) => {
+        setValue2PixelRate({ dx, dy });
+        setChartMargin({ x: marginX, y: marginY });
+        setChartSize({ x: width, y: height });
+      }}
+    >
+      {windHintValue && (
+        <MarkSeries
+          data={[{ x: windHintValue.x, y: windHintValue.y, size: 40 }]}
+          colorType="literal"
+          sizeRange={[5, 13]}
+        ></MarkSeries>
+      )}
       {windSpeedSeries && (
         <CustomSVGSeries
-          customComponent="square"
+          customComponent="circle"
           data={windSpeedSeries}
-          onValueMouseOver={(value) => {
-            const gfsTemp = userSettings.default_temperature_unit
-              ? celsiusToFahrenheit(value.tooltip.temp, 1)
-              : value.tooltip.temp;
-            const stdTemp = getStandardTemp(value.y, userSettings.default_temperature_unit);
-            value.tooltip.departureTemp = round(gfsTemp - stdTemp, 1);
-            setWindHintValue(value);
+          onNearestXY={(value, { event }) => {
+            const px = chartMargin.x + value2PixelRate.dx * value.x;
+            const py = chartSize.y - value2PixelRate.dy * value.y - chartMargin.y;
+            const distance = Math.pow(Math.pow(px - event.offsetX, 2) + Math.pow(py - event.offsetY, 2), 0.5);
+            // console.log(px, py, event.offsetX, event.offsetY, distance);
+            if (event.offsetY > chartMargin.y && distance < chartSize.y / 20) {
+              const gfsTemp = userSettings.default_temperature_unit
+                ? celsiusToFahrenheit(value.tooltip.temp, 1)
+                : value.tooltip.temp;
+              const stdTemp = getStandardTemp(value.y, userSettings.default_temperature_unit);
+              value.tooltip.departureTemp = round(gfsTemp - stdTemp, 1);
+              setWindHintValue(value);
+            } else {
+              setWindHintValue(null);
+            }
           }}
-          onValueMouseOut={() => setWindHintValue(null)}
+          // onValueMouseOut={() => setWindHintValue(null)}
         ></CustomSVGSeries>
       )}
       {windHintValue && (

@@ -1,4 +1,4 @@
-import { SyntheticEvent } from 'react';
+import { SyntheticEvent, useEffect } from 'react';
 import { PersonalMinsEvaluation, personalMinValueToShape } from './DepartureAdvisor';
 
 interface Props {

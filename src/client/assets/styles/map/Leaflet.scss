@@ -128,7 +128,9 @@
 .leaflet-bar-timecontrol{
   display: contents;
 }
-
+.leaflet-top, .leaflet-bottom{
+  z-index: 800;
+}
 .metar-ceiling-icon {
     width: 50px !important;
     height: 20px !important;

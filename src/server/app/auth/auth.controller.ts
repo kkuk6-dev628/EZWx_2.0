@@ -45,7 +45,7 @@ export class AuthController {
     return this.authService.getUser(request.user.id);
   }
 
-  @Get('signout')
+  @Post('signout')
   @HttpCode(HttpStatus.NO_CONTENT)
   async signout(@Res() res: Response) {
     res.clearCookie('access_token', { httpOnly: true });

@@ -1,6 +1,6 @@
 import { authUser } from '../../interfaces/users';
 import { apiSlice } from './../api/apiSlice';
-import { userLoggedIn } from './authSlice';
+import { userLoggedIn, userLoggedOut } from './authSlice';
 
 const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -70,21 +70,16 @@ const authApi = apiSlice.injectEndpoints({
         }
       },
     }),
-    signout: builder.query<null, null>({
+    signout: builder.mutation<null, null>({
       query: () => ({
         url: '/auth/signout',
+        method: 'POST',
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           await queryFulfilled;
-
-          dispatch(
-            userLoggedIn({
-              email: '',
-              id: '',
-              displayName: '',
-            }),
-          );
+          dispatch(userLoggedOut());
+          window.location = '/home' as any;
         } catch (err) {
           // do nothing
           console.log('Error: ', err);
@@ -94,4 +89,4 @@ const authApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useSigninMutation, useSignupMutation, useGetUserQuery } = authApi;
+export const { useSigninMutation, useSignupMutation, useGetUserQuery, useSignoutMutation } = authApi;

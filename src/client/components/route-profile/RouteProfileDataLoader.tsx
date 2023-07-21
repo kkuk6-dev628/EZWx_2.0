@@ -1095,7 +1095,7 @@ const RouteProfileDataLoader = () => {
     }
   }, [
     queryGfsDataResult.isSuccess,
-    hourState,
+    observationTime,
     userSettings.true_airspeed,
     activeRoute,
     queryDepartureAdvisorDataResult.isSuccess,

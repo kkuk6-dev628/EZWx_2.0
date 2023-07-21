@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAuth, userLoggedOut } from '../../store/auth/authSlice';
 import { api } from '../../utils';
+import { useSigninMutation, useSignoutMutation } from '../../store/auth/authApi';
 
 //handleProfileModal
 
@@ -18,6 +19,7 @@ function ProfileModal({ handleProfileModal, setIsUserLoginUser }: ProfileModalPr
   const router = useRouter();
   const user = useSelector(selectAuth);
   const dispatch = useDispatch();
+  const [signoutApi, signoutApiResult] = useSignoutMutation();
 
   const changeRoute = () => {
     handleProfileModal();
@@ -27,17 +29,7 @@ function ProfileModal({ handleProfileModal, setIsUserLoginUser }: ProfileModalPr
 
   const handleSignout = () => {
     handleProfileModal();
-    api({
-      method: 'get',
-      url: '/auth/signout',
-      withCredentials: true,
-    })
-      .then((res) => {
-        console.log(res.data);
-        dispatch(userLoggedOut());
-        window.location.href = '/home';
-      })
-      .catch((err) => console.log(err.message));
+    signoutApi(null);
   };
 
   return (

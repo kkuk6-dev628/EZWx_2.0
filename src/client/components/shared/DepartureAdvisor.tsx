@@ -146,6 +146,9 @@ export const initialEvaluation: PersonalMinsEvaluation = {
   },
 };
 
+const scrollLeftPadding = 24;
+const scrollRightPadding = 24;
+
 // return values 0: None, 1: Very Low, 2: Low, 3: Mod, 4: Hi, 5: Very Hi
 function evaluateConvection(wx_1: number, wx_2: number, wxInten1, wxInten2, wxProbCov1, wxProbCov2) {
   if (wx_1 === 5 && wx_2 === 4) {
@@ -945,8 +948,8 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   let currentTime: Date;
   const [updateUserSettingsAPI] = useUpdateUserSettingsMutation();
   const auth = useSelector(selectAuth);
-  const [hideDotsBars, setHideDotsBars] = useState(true);
-  const [clickedDotsBars, setClickedDotsBars] = useState(false);
+  const [isLeftEdges, setIsLeftEdges] = useState(false);
+  const [isRightEdges, setIsRightEdges] = useState(false);
   const [getDepartureAdvisorData, getDepartureAdvisorDataResult] = useQueryDepartureAdvisorDataMutation({
     fixedCacheKey: cacheKeys.departureAdvisor,
   });
@@ -984,6 +987,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const dotElementRef = useRef(null);
   const [showBarComponent, setShowBarComponent] = useState(false);
   const [barPos, setBarPos] = useState(0);
+  const [barTimeoutHandle, setBarTimeoutHandle] = useState(0);
 
   function calcBlockTimes() {
     return Array.from({ length: blockCount }, (_v, index) => {
@@ -1047,20 +1051,27 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       const scrollContent = scrollContentRef.current;
       const overflow = scrollContent.clientWidth - scrollParent.clientWidth;
       const scrollMargin = 30;
+      const padding = isMobile ? 20 : 0;
       if (overflow > 0) {
         const timePos = (scrollContent.clientWidth * timeToValue(new Date(settingsState.observation_time))) / maxRange;
         if (timePos - scrollParent.scrollLeft < 0) {
           scrollParent.scrollLeft -= scrollParent.scrollLeft - timePos + scrollMargin;
         } else if (timePos - scrollParent.scrollLeft < scrollMargin) {
           scrollParent.scrollLeft -= scrollMargin;
-        } else if (scrollParent.clientWidth + scrollParent.scrollLeft - timePos < 0) {
-          scrollParent.scrollLeft += timePos - scrollParent.clientWidth - scrollParent.scrollLeft + scrollMargin;
-        } else if (scrollParent.clientWidth + scrollParent.scrollLeft - timePos < scrollMargin) {
-          scrollParent.scrollLeft += scrollMargin;
+        } else if (scrollParent.clientWidth + scrollParent.scrollLeft < scrollContent.clientWidth) {
+          if (scrollParent.clientWidth + scrollParent.scrollLeft - timePos < 0) {
+            scrollParent.scrollLeft += timePos - scrollParent.clientWidth - scrollParent.scrollLeft + scrollMargin;
+          } else if (scrollParent.clientWidth + scrollParent.scrollLeft - timePos < scrollMargin) {
+            scrollParent.scrollLeft += scrollMargin;
+          }
         }
       }
     }
   }
+
+  useEffect(() => {
+    setShowBarComponent(false);
+  }, []);
 
   useEffect(() => {
     if (queryGfsDataResult.isSuccess && getDepartureAdvisorDataResult.isSuccess) {
@@ -1073,14 +1084,24 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       setTimeRange(Math.round(((props.showPast ? 12 : 0) + forecastTime - flytime) / 3) * 3);
     }
   }, [queryGfsDataResult.isSuccess, getDepartureAdvisorDataResult.isSuccess]);
+
   useEffect(() => {
     const hour = new Date(settingsState.observation_time);
     hour.setMinutes(0, 0, 0);
     setHour(hour.getTime());
-    setShowBarComponent(true);
-    setClickedDotsBars(false);
+    const sliderValue = timeToValue(new Date(settingsState.observation_time));
+    setIsLeftEdges(sliderValue < scrollLeftPadding);
+    setIsRightEdges(sliderValue > maxRange - scrollRightPadding);
     if (isMobile) scrollBlocks();
+    setBarPos(calcBarPos(new Date(settingsState.observation_time)));
   }, [settingsState.observation_time]);
+
+  useEffect(() => {
+    if (isRightEdges && isMobile) {
+      scrollBlocks();
+    }
+    setBarPos(calcBarPos(new Date(settingsState.observation_time)));
+  }, [isRightEdges, isLeftEdges]);
 
   useEffect(() => {
     if (activeRoute) {
@@ -1240,12 +1261,6 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     settingsState.en_route_turbulence_intensity,
   ]);
 
-  useEffect(() => {
-    if (showBarComponent) {
-      setTimeout(() => setShowBarComponent(false), 3000);
-    }
-  }, [settingsState.observation_time, showBarComponent]);
-
   const valueToTime = (value: number): Date => {
     const origin = getTimeRangeStart(props.showPast);
     origin.setMinutes(value * 5);
@@ -1258,13 +1273,6 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     return Math.floor(diff / 5);
   };
 
-  function clickEvaluationBar(e: SyntheticEvent) {
-    e.nativeEvent.stopPropagation();
-    setHideDotsBars(false);
-    setClickedDotsBars(true);
-    evaluationsByTime && setShowPopup(true);
-  }
-
   function valuetext(value: number) {
     return (
       <div className="slider-label-container">
@@ -1273,9 +1281,24 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     );
   }
 
+  function calcBarPos(time: Date) {
+    const timePos = timeToValue(time) / maxRange;
+    const scrollContent = scrollContentRef.current;
+    if (scrollContent) {
+      if (isLeftEdges) {
+        const posPix = timePos * (scrollContent.clientWidth - scrollLeftPadding);
+        const pos = (posPix + scrollLeftPadding) / scrollContent.clientWidth;
+        return pos * 100;
+      } else if (isRightEdges) {
+        const posPix = timePos * (scrollContent.clientWidth - scrollRightPadding);
+        const pos = posPix / scrollContent.clientWidth;
+        return pos * 100;
+      }
+    }
+    return timePos * 100;
+  }
+
   const handleTimeChange = (time: Date, commit = true) => {
-    setHideDotsBars(false);
-    setBarPos((100 * timeToValue(time)) / maxRange);
     const timespan = time.getTime();
     const newSettings = { ...settingsState, observation_time: timespan };
     if (commit && auth.id) updateUserSettingsAPI(newSettings);
@@ -1296,6 +1319,17 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     e.currentTarget.disabled = true;
     const newTime = settingsState.observation_time + (isForward ? 1 : -1) * 3 * 3600 * 1000;
     handleTimeChange(new Date(newTime), true);
+  }
+
+  function setBarTimeout() {
+    if (barTimeoutHandle) {
+      clearTimeout(barTimeoutHandle);
+    }
+    const handle = setTimeout(() => {
+      setShowBarComponent(false);
+      setBarTimeoutHandle(0);
+    }, 3000);
+    setBarTimeoutHandle(handle as any);
   }
 
   return (
@@ -1330,9 +1364,12 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         <div
           className="blocks-date"
           ref={scrollParentRef}
-          style={isMobile ? { overflow: 'hidden', height: hideDotsBars ? 78 : 210 } : null}
+          style={isMobile ? { overflow: 'hidden', height: showBarComponent ? 210 : 78 } : null}
         >
-          <div className="blocks-contents" ref={scrollContentRef}>
+          <div
+            className={'blocks-contents' + (isLeftEdges ? ' left-edge' : isRightEdges ? ' right-edge' : '')}
+            ref={scrollContentRef}
+          >
             {beforeEval && showBarComponent && (
               <DepartureAdvisor3Bars
                 beforeEval={beforeEval}
@@ -1354,7 +1391,11 @@ function DepartureAdvisor(props: { showPast: boolean }) {
                     show3Bar={!isMobile}
                     evaluationsByTime={evaluationsByTime}
                     setShowPopup={setShowPopup}
-                    handleTimeChange={handleTimeChange}
+                    handleTimeChange={(newValue: Date) => {
+                      handleTimeChange(newValue);
+                      setShowBarComponent(true);
+                      setBarTimeout();
+                    }}
                   ></DepartureAdvisorTimeBlockComponent>
                 ))}
             </div>
@@ -1384,9 +1425,12 @@ function DepartureAdvisor(props: { showPast: boolean }) {
               valueLabelDisplay="on"
               onChange={(_e, newValue: number) => {
                 handleTimeChange(valueToTime(newValue), false);
+                setShowBarComponent(true);
               }}
               onChangeCommitted={(_e, newValue: number) => {
                 handleTimeChange(valueToTime(newValue));
+                setShowBarComponent(true);
+                setBarTimeout();
               }}
             />
           </div>

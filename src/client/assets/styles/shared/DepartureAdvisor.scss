@@ -258,6 +258,17 @@
       min-width: 960px;
       height: 100%;
       position: relative;
+      // @media (max-width: 550px) {
+      //   margin-left: 20px;
+      // }
+
+      &.left-edge{
+        padding-left: 32px;
+      }
+      &.right-edge{
+        padding-right: 32px;
+      }
+
       .bars-container{
         position: absolute;
         margin-left: -21px;
@@ -314,6 +325,10 @@
       border-radius: 36px 0 0 36px;
       padding-left: 3px;
       padding-right: 3px;
+      // @media (max-width: 550px) {
+      //   margin-right: -14px;
+      // }
+
     }
     .move-right{
       border-radius: 0 36px 36px 0;
@@ -358,6 +373,8 @@
     display: flex;
     justify-content: space-between;
     padding: 8px 4px 8px 20px;
+    padding-right: 8px;
+    margin-right: 0px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     cursor: move;
@@ -371,6 +388,8 @@
     color: white;
     cursor: pointer;
     font-size: 20px;
+    margin-right: 0px;
+    padding-right: 0px;
   }
 }
 
