@@ -61,7 +61,28 @@ export const UserSettingsSlice = createSlice({
   initialState: initialUserSettingsState,
   reducers: {
     setUserSettings: (state, action) => {
-      state.settings = action.payload;
+      state.settings.observation_time = action.payload.observation_time;
+      state.settings.observation_interval = action.payload.observation_interval;
+      state.settings.default_home_airport = action.payload.default_home_airport;
+      state.settings.default_temperature_unit = action.payload.default_temperature_unit;
+      state.settings.default_time_display_unit = action.payload.default_time_display_unit;
+      state.settings.default_wind_speed_unit = action.payload.default_wind_speed_unit;
+      state.settings.default_distance_unit = action.payload.default_distance_unit;
+      state.settings.default_visibility_unit = action.payload.default_visibility_unit;
+      state.settings.max_takeoff_weight_category = action.payload.max_takeoff_weight_category;
+      state.settings.true_airspeed = action.payload.true_airspeed;
+      state.settings.ceiling_at_departure = action.payload.ceiling_at_departure;
+      state.settings.surface_visibility_at_departure = action.payload.surface_visibility_at_departure;
+      state.settings.crosswinds_at_departure_airport = action.payload.crosswinds_at_departure_airport;
+      state.settings.ceiling_along_route = action.payload.ceiling_along_route;
+      state.settings.surface_visibility_along_route = action.payload.surface_visibility_along_route;
+      state.settings.en_route_icing_probability = action.payload.en_route_icing_probability;
+      state.settings.en_route_icing_intensity = action.payload.en_route_icing_intensity;
+      state.settings.en_route_turbulence_intensity = action.payload.en_route_turbulence_intensity;
+      state.settings.en_route_convective_potential = action.payload.en_route_convective_potential;
+      state.settings.ceiling_at_destination = action.payload.ceiling_at_destination;
+      state.settings.surface_visibility_at_destination = action.payload.surface_visibility_at_destination;
+      state.settings.crosswinds_at_destination_airport = action.payload.crosswinds_at_destination_airport;
     },
     setPersonalMinimums: (state, action) => {
       state.personalMinimumsState = action.payload;

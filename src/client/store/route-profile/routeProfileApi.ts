@@ -67,7 +67,7 @@ const transformTimeBands = (response: any[]): RouteProfileDataset[] => {
 export const routeProfileApi = createApi({
   reducerPath: 'routeProfileApi',
   baseQuery: fetchBaseQuery({ baseUrl }),
-  tagTypes: ['RouteProfileState'],
+  tagTypes: ['RouteProfileState', 'LastDepartureDataTime'],
   endpoints: (builder) => ({
     getRouteProfileState: builder.query({
       query: () => ({ url: '', method: 'Get' }),
@@ -82,6 +82,16 @@ export const routeProfileApi = createApi({
         return initialRouteProfileState;
       },
       providesTags: [{ type: 'RouteProfileState', id: 'LIST' }],
+    }),
+    getLastDepartureDataTime: builder.query({
+      query: () => ({ url: 'data/last-dep-time', method: 'Get' }),
+      providesTags: [{ type: 'LastDepartureDataTime', id: 'LIST' }],
+      transformResponse: (response: { least: string }[]): number => {
+        if (!response || response.length === 0) {
+          return 0;
+        }
+        return new Date(response[0].least).getTime();
+      },
     }),
     updateRouteProfileState: builder.mutation({
       query: (data) => ({ url: '', method: 'Post', body: data }),
@@ -147,6 +157,8 @@ export const routeProfileApi = createApi({
           wxInten2: transformTimeBands(response.wxInten2),
           wxProbCov1: transformTimeBands(response.wxProbCov1),
           wxProbCov2: transformTimeBands(response.wxProbCov2),
+          windDirection: transformTimeBands(response.gWindDir),
+          windSpeed: transformTimeBands(response.gWindSpeed),
         };
       },
     }),
@@ -155,6 +167,7 @@ export const routeProfileApi = createApi({
 
 export const {
   useQueryAirportNbmMutation,
+  useGetLastDepartureDataTimeQuery,
   useGetRouteProfileStateQuery,
   useLazyGetRouteProfileStateQuery,
   useUpdateRouteProfileStateMutation,

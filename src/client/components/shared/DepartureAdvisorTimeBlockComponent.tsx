@@ -37,7 +37,7 @@ function DepartureAdvisorTimeBlockComponent({
   const beforeEval = realIndex < 0 ? null : getEvaluationByTime(evaluationsByTime, time.getTime() - hourInMili);
   const currEval = realIndex < 0 ? null : getEvaluationByTime(evaluationsByTime, time.getTime());
   const afterEval = realIndex < 0 ? null : getEvaluationByTime(evaluationsByTime, time.getTime() + hourInMili);
-  const positionInPercent = (index * (100 - 4) * 3) / (isMap ? 84 : 72) + 2.5;
+  const isPast = time.getTime() < new Date().getTime();
   function clickEvaluationBar(e: SyntheticEvent) {
     e.nativeEvent.stopPropagation();
     setHideDotsBars(false);
@@ -53,7 +53,7 @@ function DepartureAdvisorTimeBlockComponent({
         handleTimeChange(time);
       }}
       onMouseOver={(e) => {
-        show3Bar && setShowBarComponent(true);
+        show3Bar && setShowBarComponent(!isPast);
       }}
       onMouseOut={(e) => {
         setShowBarComponent(false);

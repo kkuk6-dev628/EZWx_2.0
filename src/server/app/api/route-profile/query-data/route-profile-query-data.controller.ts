@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { RouteProfileQueryDataService } from './route-profile-query-data.service';
-import { RouteProfileQueryDto, RouteSegmentsDto } from './route-profile-query.dto';
+import { RouteProfileQueryDto } from './route-profile-query.dto';
+import { JwtAuthGuard } from 'src/server/app/auth/jwt/jwt-auth.guard';
 
 @Controller('api/route-profile/data')
 export class RouteProfileQueryDataController {
@@ -26,5 +27,10 @@ export class RouteProfileQueryDataController {
   @Post('it-data')
   queryIcingTurb(@Body() query: RouteProfileQueryDto) {
     return this.routeProfileQueryDataService.queryIcingTurbData(query);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('last-dep-time')
+  queryLastDepartureDataTime() {
+    return this.routeProfileQueryDataService.queryLastDepartureDataTime();
   }
 }

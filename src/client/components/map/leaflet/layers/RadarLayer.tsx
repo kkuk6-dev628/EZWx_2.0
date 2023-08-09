@@ -6,6 +6,7 @@ import { selectLayerControlState } from '../../../../store/layers/LayerControl';
 import { selectSettings } from '../../../../store/user/UserSettings';
 import { addLeadingZeroes } from '../../common/AreoFunctions';
 import WMS from '../plugins/leaflet.wms';
+import { hourInMili } from '../../../shared/DepartureAdvisor';
 
 interface Radar {
   valid_timespan: number;
@@ -147,6 +148,7 @@ const RadarLayer = () => {
       }
       return prev;
     });
+    if (Math.abs(obsTimeSpan - returns.valid_timespan) > 5 * 60 * 1000) return null;
     return returns;
   };
 
@@ -162,6 +164,7 @@ const RadarLayer = () => {
       }
       return prev;
     });
+    if (Math.abs(obsTimeSpan - returns.valid_timespan) > hourInMili) return null;
     return returns;
   };
 

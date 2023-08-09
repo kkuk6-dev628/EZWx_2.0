@@ -233,6 +233,16 @@ export class RouteProfileQueryDataService {
       query.elevations,
       this.icingSevRepository,
     );
+    const gWindDir = await this.queryRasterDatasetByElevations(
+      query.queryPoints,
+      query.elevations,
+      this.gfsWindDirectionRepository,
+    );
+    const gWindSpeed = await this.queryRasterDatasetByElevations(
+      query.queryPoints,
+      query.elevations,
+      this.gfsWindSpeedRepository,
+    );
     // const sld = await this.queryRasterDataset(query.queryPoints, this.icingSldRepository);
     // nbms
     const cloudceiling = await this.queryRasterDataset(query.queryPoints, this.nbmCloudCeilingRepository);
@@ -256,6 +266,8 @@ export class RouteProfileQueryDataService {
       wxInten2,
       wxProbCov1,
       wxProbCov2,
+      gWindDir,
+      gWindSpeed,
     };
   }
 
@@ -300,5 +312,16 @@ export class RouteProfileQueryDataService {
       result.push({ time: timeTable.time, data: rows });
     }
     return result;
+  }
+
+  async queryLastDepartureDataTime() {
+    const greatest = await this.dataSource
+      .createQueryBuilder()
+      .select(['least(max(gfs_windspeed_mapping.time), max(nbm_cloudceiling.time))'])
+      .from('gfs_windspeed_mapping', null)
+      .from('nbm_cloudceiling', null)
+      .getRawMany();
+
+    return greatest;
   }
 }

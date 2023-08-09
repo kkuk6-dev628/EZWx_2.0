@@ -8,12 +8,6 @@ const baseQuery = fetchBaseQuery({
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  baseQuery: async (args, api, extraOptions) => {
-    const result = await baseQuery(args, api, extraOptions);
-    if (result.error) {
-      console.log('Error ', result.error);
-    }
-    return result;
-  },
+  baseQuery: fetchBaseQuery({ baseUrl: '/' }),
   endpoints: (builder) => ({}),
 });

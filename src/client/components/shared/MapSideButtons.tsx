@@ -9,9 +9,11 @@ import { useGetUserSettingsQuery } from '../../store/user/userSettingsApi';
 import { SvgRefresh } from '../utils/SvgIcons';
 import { useMap } from 'react-leaflet';
 import { defaultBounds } from '../map/leaflet/Map';
+import { useCookies } from 'react-cookie';
 
 const MapSideButtons = () => {
   const auth = useSelector(selectAuth);
+  const [cookies] = useCookies(['logged_in']);
   const dispatch = useDispatch();
   const ref = useRef();
   useEffect(() => {
@@ -23,7 +25,7 @@ const MapSideButtons = () => {
   }, [ref?.current]);
 
   let refetchAllSettings;
-  if (auth.id) {
+  if (auth.id || cookies.logged_in) {
     const { refetch: refetchLayerControl } = useGetLayerControlStateQuery('');
     const { refetch: refetchRoutes } = useGetRoutesQuery(null);
     const { refetch: refetchBaseLayerControl } = useGetBaseLayerControlStateQuery('');

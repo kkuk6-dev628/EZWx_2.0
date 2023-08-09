@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { selectSettings } from '../../store/user/UserSettings';
 import DialogTitle from '@mui/material/DialogTitle';
 import { convectivePotential, icingIntensity } from './SettingsDrawer';
+import { useGetLastDepartureDataTimeQuery } from '../../store/route-profile/routeProfileApi';
 
 export function getEvaluationByTime(
   evaluationData: { time: number; evaluation: PersonalMinsEvaluation }[],
@@ -36,12 +37,16 @@ function DepartureAdvisorPopup({ setIsShowDateModal, evaluationsByTime, observat
   const [evaluation, setEvaluation] = useState<PersonalMinsEvaluation>(
     getEvaluationByTime(evaluationsByTime, observationTime),
   );
+  const { isSuccess: isLoadedLastTime, data: lastDepartureTime } = useGetLastDepartureDataTimeQuery('');
   useEffect(() => {
     const evaluation = getEvaluationByTime(evaluationsByTime, currentTime);
     setEvaluation(evaluation);
   }, [currentTime]);
 
   function moveTime(isForward = true) {
+    const now = new Date().getTime();
+    if (!isForward && currentTime < now) return;
+    if (isForward && currentTime > lastDepartureTime) return;
     setCurrentTime((prevState) => (isForward ? prevState + hourInMili : prevState - hourInMili));
   }
   return (

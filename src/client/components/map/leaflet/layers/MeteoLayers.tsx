@@ -268,7 +268,7 @@ const MeteoLayers = () => {
         <CWALayer></CWALayer>
       </GroupedLayer>
       <GroupedLayer
-        checked={layerControlState.sigmetState.checked && layerControlState.sigmetState.convection.checked}
+        checked={layerControlState.sigmetState.checked && layerControlState.sigmetState.outlooks.checked}
         addLayerToStore={(layer) => {
           meteoLayers.convectiveOutlooks = layer;
         }}

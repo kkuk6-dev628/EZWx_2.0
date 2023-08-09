@@ -14,7 +14,66 @@ import { useCookies } from 'react-cookie';
 import { useGetUserQuery } from '../../store/auth/authApi';
 const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
-const links = [
+const menusHome = [
+  {
+    id: 1,
+    name: 'Home',
+    link: '/home',
+  },
+  {
+    id: 2,
+    name: 'Dashboard',
+    link: '/dashboard',
+  },
+  {
+    id: 3,
+    name: 'Map',
+    link: '/map',
+  },
+  {
+    id: 4,
+    name: 'Airport',
+    link: '/airport',
+  },
+  {
+    id: 5,
+    name: 'Imagery',
+    link: '/imagery',
+  },
+  {
+    id: 6,
+    name: 'Pilots guide',
+    link: '/pilots-guide',
+  },
+  {
+    id: 7,
+    name: 'About us',
+    link: '#',
+    children: [
+      {
+        id: 9,
+        name: 'Contact Us',
+        link: '/contact',
+      },
+      {
+        id: 10,
+        name: 'Support',
+        link: '/support',
+      },
+      {
+        id: 11,
+        name: 'Team EZWxBrief',
+        link: '/team',
+      },
+    ],
+  },
+  {
+    id: 8,
+    name: 'FAQ',
+    link: '/faq',
+  },
+];
+const menusHomeNotAuth = [
   {
     id: 1,
     name: 'Home',
@@ -35,7 +94,7 @@ const links = [
   {
     id: 5,
     name: 'Try EZWxBrief',
-    link: '/map',
+    link: '/try-ezwxbrief',
   },
   {
     id: 6,
@@ -54,34 +113,59 @@ const links = [
   },
   {
     id: 9,
-    name: 'About',
-    link: '/about',
+    name: 'About us',
+    link: '#',
+    children: [
+      {
+        id: 9,
+        name: 'Contact Us',
+        link: '/contact',
+      },
+      {
+        id: 10,
+        name: 'Support',
+        link: '/support',
+      },
+      {
+        id: 11,
+        name: 'Team EZWxBrief',
+        link: '/team',
+      },
+    ],
   },
 ];
 
-const responsiveLink = [
+const menusMap = [
   {
     id: 1,
     name: 'Dashboard',
     link: '/dashboard',
   },
-  // {
-  //   id: 2,
-  //   name: 'Plan a route',
-  //   link: '/route-profile',
-  // },
-  // {
-  //   id: 3,
-  //   name: 'Airport weather',
-  //   link: '/airport-weather',
-  // },
   {
-    id: 4,
+    id: 2,
     name: 'Imagery',
     link: '/imagery',
   },
   {
-    id: 6,
+    id: 3,
+    name: 'Pilots guide',
+    link: '/pilots-guide',
+  },
+];
+
+const menusMapNotAuth = [
+  {
+    id: 1,
+    name: 'Dashboard',
+    link: '/dashboard',
+  },
+  {
+    id: 2,
+    name: 'Imagery',
+    link: '/imagery',
+  },
+  {
+    id: 3,
     name: 'Pilots guide',
     link: '/pilots-guide',
   },
@@ -113,11 +197,13 @@ export default function Header() {
     }
   }, [pathname]);
 
-  const handleActiveMenu = (id) => {
+  const handleActiveMenu = (id, hideResponsiveMenu) => {
     setActiveMenu(id);
-    setActiveResponsiveMenu(false);
+    setActiveResponsiveMenu(hideResponsiveMenu);
   };
 
+  const homeMenu = isUserLoginUser ? menusHome : menusHomeNotAuth;
+  const workMenu = isUserLoginUser ? menusMap : menusMapNotAuth;
   // sticky header
   const [sticky, setSticky] = useState(false);
   const handleScroll = () => {
@@ -178,14 +264,14 @@ export default function Header() {
           <div className="header__mid">
             <ul className="header__nav">
               {mapMenu
-                ? responsiveLink.map((link) => (
+                ? workMenu.map((link) => (
                     <li key={link.id} className="header__nav__item">
                       <Link className="header__nav__anc" href={link.link}>
                         <span className="header__nav__link">{link.name}</span>
                       </Link>
                     </li>
                   ))
-                : links.map((link) => (
+                : homeMenu.map((link) => (
                     <li key={link.id} className="header__nav__item">
                       <Link className="header__nav__anc" href={link.link}>
                         <span className="header__nav__link">{link.name}</span>
@@ -273,19 +359,21 @@ export default function Header() {
         activeMenu={activeMenu}
         handleActiveMenu={handleActiveMenu}
         mapMenu={mapMenu}
+        workMenu={workMenu}
+        homeMenu={homeMenu}
       />
     </div>
   );
 }
 
-const ResponsiveMenu = ({ activeResponsiveMenu, activeMenu, handleActiveMenu, mapMenu }) => {
+const ResponsiveMenu = ({ activeResponsiveMenu, activeMenu, handleActiveMenu, mapMenu, workMenu, homeMenu }) => {
   return (
     <div className={`responsive__menu ${activeResponsiveMenu ? 'responsive__menu__show' : ''}`}>
       {mapMenu
-        ? responsiveLink.map((link) => (
+        ? workMenu.map((link) => (
             <div key={link.id}>
               <div
-                onClick={() => handleActiveMenu(link.id)}
+                onClick={() => handleActiveMenu(link.id, link.children !== undefined)}
                 key={link.id}
                 className={`responsive__menu__item ${
                   activeMenu && activeMenu === link.id ? 'responsive__menu__active' : ''
@@ -297,10 +385,10 @@ const ResponsiveMenu = ({ activeResponsiveMenu, activeMenu, handleActiveMenu, ma
               </div>
             </div>
           ))
-        : links.map((link) => (
+        : homeMenu.map((link) => (
             <div key={link.id}>
               <div
-                onClick={() => handleActiveMenu(link.id)}
+                onClick={() => handleActiveMenu(link.id, link.children !== undefined)}
                 key={link.id}
                 className={`responsive__menu__item ${
                   activeMenu && activeMenu === link.id ? 'responsive__menu__active' : ''

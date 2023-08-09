@@ -793,6 +793,7 @@ const RouteProfileDataLoader = () => {
 
   function resetDataCaches() {
     queryElevationsResult.reset();
+    queryGfsDataResult.reset();
     queryNbmAllResult.reset();
     queryDepartureAdvisorDataResult.reset();
     queryIcingTurbDataResult.reset();
@@ -831,6 +832,7 @@ const RouteProfileDataLoader = () => {
     // console.log(new Date(fetchedDate).toISOString(), new Date().toISOString());
     resetDataCaches();
     dispatch(setFetchedDate(Date.now()));
+    setIsLoading(true);
   }, [activeRoute]);
 
   useEffect(() => {
