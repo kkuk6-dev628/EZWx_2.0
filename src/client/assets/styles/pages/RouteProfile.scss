@@ -159,6 +159,18 @@ body>div{
         }
       }
     }
+    .label-chart{
+      display: flex;
+      flex-direction: row;
+      .fixed-label{
+        display: flex;
+        flex-direction: column;
+        color: white;
+        justify-content: space-between;
+        padding-bottom: 68px;
+        padding-top: 32px;
+      }
+    }
     .route-profile-chart-container{
       margin: 4px;
       @media screen and (max-width: 500px) {

@@ -84,6 +84,11 @@ const routeProfileTurbDataTypes: {
 };
 
 const routeProfileMaxAltitudes: RouteProfileMaxAltitudes[] = [500, 300, 200];
+const chartLabels = {
+  200: [200, 160, 120, 80, 40, 0],
+  300: [300, 240, 180, 120, 60, 0],
+  500: [500, 400, 300, 200, 100, 0],
+};
 
 const RouteProfileContainer = () => {
   const { data: routeProfileApiState, isSuccess: isRouteProfileStateLoaded } = useGetRouteProfileStateQuery(null, {
@@ -329,12 +334,24 @@ const RouteProfileContainer = () => {
                 </div>
               </div>
             </div>
-            <div className="route-profile-chart-container">
-              <div className="scrollable-chart-content">
-                {routeProfileState.chartType === 'Wind' && <WindChart />}
-                {routeProfileState.chartType === 'Clouds' && <CloudsChart></CloudsChart>}
-                {routeProfileState.chartType === 'Icing' && <IcingChart></IcingChart>}
-                {routeProfileState.chartType === 'Turb' && <TurbChart></TurbChart>}
+            <div className="label-chart">
+              <div className="fixed-label">
+                {chartLabels[routeProfileApiState.maxAltitude].map((label) => (
+                  <div>{label}</div>
+                ))}
+              </div>
+              <div className="route-profile-chart-container">
+                <div className="scrollable-chart-content">
+                  {routeProfileState.chartType === 'Wind' && <WindChart />}
+                  {routeProfileState.chartType === 'Clouds' && <CloudsChart></CloudsChart>}
+                  {routeProfileState.chartType === 'Icing' && <IcingChart></IcingChart>}
+                  {routeProfileState.chartType === 'Turb' && <TurbChart></TurbChart>}
+                </div>
+              </div>
+              <div className="fixed-label">
+                {chartLabels[routeProfileApiState.maxAltitude].map((label) => (
+                  <div>{label}</div>
+                ))}
               </div>
             </div>
           </div>

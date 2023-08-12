@@ -29,15 +29,15 @@ interface Props {
   setIsShowDateModal: (isShowModal: boolean) => void;
   evaluationsByTime: any[];
   observationTime: number;
+  lastDepartureTime: number;
 }
 
-function DepartureAdvisorPopup({ setIsShowDateModal, evaluationsByTime, observationTime }: Props) {
+function DepartureAdvisorPopup({ setIsShowDateModal, evaluationsByTime, observationTime, lastDepartureTime }: Props) {
   const settingsState = useSelector(selectSettings);
   const [currentTime, setCurrentTime] = useState(observationTime);
   const [evaluation, setEvaluation] = useState<PersonalMinsEvaluation>(
     getEvaluationByTime(evaluationsByTime, observationTime),
   );
-  const { isSuccess: isLoadedLastTime, data: lastDepartureTime } = useGetLastDepartureDataTimeQuery('');
   useEffect(() => {
     const evaluation = getEvaluationByTime(evaluationsByTime, currentTime);
     setEvaluation(evaluation);

@@ -668,7 +668,9 @@ function getWheatherMinimumsAlongRoute(
   const turbulences = [];
   const convections = [];
   let isOutTimeRange = false;
-  const maxForcastTime = getMaxForecastTime(departureData.data?.prob);
+  const maxTurbTime = getMaxForecastTime(departureData.data?.cat);
+  const maxIcingTime = getMaxForecastTime(departureData.data?.prob);
+  const maxConvTime = getMaxForecastTime(departureData.data?.wx_1);
 
   let hasNoWindData = false;
 
@@ -685,13 +687,13 @@ function getWheatherMinimumsAlongRoute(
             gfsWindspeed,
             new Date(arriveTime),
             routeAltitude,
-            Math.round(index / flightCategoryDivide),
+            index,
           );
           const { value: dirValue } = getValueFromDatasetByElevation(
             gfsWinddirection,
             new Date(arriveTime),
             routeAltitude,
-            Math.round(index / flightCategoryDivide),
+            index,
           );
           const { groundSpeed } = fly.calculateHeadingAndGroundSpeed(trueAirSpeed, course, speedValue, dirValue, 2);
           speed = groundSpeed;
@@ -780,25 +782,29 @@ function getWheatherMinimumsAlongRoute(
           personalMinsEvaluation.destinationCrosswind.value = 0;
           personalMinsEvaluation.destinationCrosswind.color = personalMinValueToColor[0];
         }
-        if (arriveTime > maxForcastTime.getTime()) {
+        if (arriveTime > maxTurbTime.getTime() + hourInMili) {
           isOutTimeRange = true;
         }
       } else {
         cloudceiling && ceilings.push(cloudceiling);
         visibility && visibilities.push(visibility);
-        if (routeAltitude <= 30000 && arriveTime <= maxForcastTime.getTime()) {
-          const { value: icingProb } = getValueFromDatasetByElevation(
-            departureData.data?.prob,
-            new Date(arriveTime),
-            null,
-            index,
-          );
-          const { value: icingSeverity } = getValueFromDatasetByElevation(
-            departureData.data?.severity,
-            new Date(arriveTime),
-            null,
-            index,
-          );
+        if (arriveTime <= maxTurbTime.getTime() + hourInMili) {
+          if (routeAltitude <= 30000) {
+            const { value: icingProb } = getValueFromDatasetByElevation(
+              departureData.data?.prob,
+              new Date(arriveTime),
+              null,
+              index,
+            );
+            const { value: icingSeverity } = getValueFromDatasetByElevation(
+              departureData.data?.severity,
+              new Date(arriveTime),
+              null,
+              index,
+            );
+            icingProb !== null && icingProbs.push(icingProb);
+            icingSeverity !== null && icingSeverities.push(icingSeverityOrders[icingSeverity] || -1);
+          }
           const { value: cat } = getValueFromDatasetByElevation(
             departureData.data?.cat,
             new Date(arriveTime),
@@ -811,8 +817,6 @@ function getWheatherMinimumsAlongRoute(
             null,
             index,
           );
-          icingProb && icingProbs.push(icingProb);
-          icingSeverity && icingSeverities.push(icingSeverityOrders[icingSeverity] || -1);
           turbulences.push(Math.max(cat, mwt));
         } else {
           isOutTimeRange = true;
@@ -855,7 +859,7 @@ function getWheatherMinimumsAlongRoute(
           index,
         );
         const convection = evaluateConvection(wx_1, wx_2, wxInten1, wxInten2, wxProbCov1, wxProbCov2);
-        convection && convections.push(convection);
+        convection !== null && convections.push(convection);
       }
       accDistance += dist;
       arriveTime = newTime;
@@ -892,7 +896,7 @@ function getWheatherMinimumsAlongRoute(
     personalMinsEvaluation.alongRouteVisibility.color = personalMinValueToColor[0];
   }
 
-  if (isOutTimeRange) {
+  if (arriveTime > maxIcingTime.getTime() + hourInMili || alongIcingProb === -Infinity) {
     personalMinsEvaluation.alongRouteProb = { ...initialEvaluation.alongRouteProb };
   } else if (personalMins.en_route_icing_probability[0] >= alongIcingProb) {
     personalMinsEvaluation.alongRouteProb.value = 2;
@@ -905,7 +909,7 @@ function getWheatherMinimumsAlongRoute(
     personalMinsEvaluation.alongRouteProb.color = personalMinValueToColor[0];
   }
 
-  if (isOutTimeRange) {
+  if (arriveTime > maxIcingTime.getTime() + hourInMili || alongIcingSeverity === -Infinity) {
     personalMinsEvaluation.alongRouteSeverity = { ...initialEvaluation.alongRouteSeverity };
   } else if (personalMins.en_route_icing_intensity[0] >= alongIcingSeverity) {
     personalMinsEvaluation.alongRouteSeverity.value = 2;
@@ -918,7 +922,7 @@ function getWheatherMinimumsAlongRoute(
     personalMinsEvaluation.alongRouteSeverity.color = personalMinValueToColor[0];
   }
 
-  if (isOutTimeRange) {
+  if (arriveTime > maxTurbTime.getTime() + hourInMili || alongTurbulence === -Infinity) {
     personalMinsEvaluation.alongRouteTurbulence = { ...initialEvaluation.alongRouteTurbulence };
   } else if (personalMins.en_route_turbulence_intensity[0] >= alongTurbulence) {
     personalMinsEvaluation.alongRouteTurbulence.value = 2;
@@ -931,7 +935,9 @@ function getWheatherMinimumsAlongRoute(
     personalMinsEvaluation.alongRouteTurbulence.color = personalMinValueToColor[0];
   }
 
-  if (personalMins.en_route_convective_potential[0] >= alongConvection) {
+  if (arriveTime > maxConvTime.getTime() + hourInMili || alongConvection === -Infinity) {
+    personalMinsEvaluation.alongRouteConvection = { ...initialEvaluation.alongRouteConvection };
+  } else if (personalMins.en_route_convective_potential[0] >= alongConvection) {
     personalMinsEvaluation.alongRouteConvection.value = 2;
     personalMinsEvaluation.alongRouteConvection.color = personalMinValueToColor[2];
   } else if (personalMins.en_route_convective_potential[1] > alongConvection) {
@@ -1044,6 +1050,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const [barPos, setBarPos] = useState(0);
   const [barTimeoutHandle, setBarTimeoutHandle] = useState(0);
   const [flyTime, setFlyTime] = useState(0);
+  const [lastTime, setLastTime] = useState(Date.now());
 
   function calcBlockTimes() {
     return Array.from({ length: blockCount }, (_v, index) => {
@@ -1170,6 +1177,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       const lastTime = (props.showPast ? 12 : 0) + forecastTime - flyTimeInHour;
       const lastTime3Hours = Math.floor(lastTime / 3) * 3;
       const lastTimespan = (startHour + lastTime3Hours) * hourInMili;
+      setLastTime(lastTimespan);
       if (settingsState.observation_time > lastTimespan) {
         handleTimeChange(new Date(lastTimespan), true);
       }
@@ -1268,7 +1276,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   ]);
 
   useEffect(() => {
-    if (activeRoute && getDepartureAdvisorDataResult.isSuccess) {
+    if (activeRoute && getDepartureAdvisorDataResult.isSuccess && queryAirportNbmResult.isSuccess) {
       const queryPoints = interpolateRouteByInterval(
         activeRoute,
         getSegmentsCount(activeRoute) * flightCategoryDivide,
@@ -1346,6 +1354,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     }
   }, [
     getDepartureAdvisorDataResult.isSuccess,
+    queryAirportNbmResult.isSuccess,
     activeRoute,
     // currentHour,
     blockTimes,
@@ -1450,6 +1459,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
           setIsShowDateModal={setShowPopup}
           evaluationsByTime={evaluationsByTime}
           observationTime={settingsState.observation_time}
+          lastDepartureTime={lastTime}
         />
       </Dialog>
 

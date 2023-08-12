@@ -489,6 +489,21 @@ export function interpolateLegByInterval(start: L.LatLng, end: L.LatLng, interva
   return { reminder: reminderDistance, latlngs };
 }
 
+export function calcEndMargin(route: Route) {
+  return calcHighResolution(route) * 7;
+}
+
+export function calcHighResolution(route: Route) {
+  const routePoints = [route.departure, ...route.routeOfFlight.map((item) => item.routePoint), route.destination];
+  const totalLength = getLineLength(
+    routePoints.map((routePoint) => routePoint.position.coordinates),
+    true,
+  );
+  const divideNumber = getSegmentsCount(route) * flightCategoryDivide;
+  const interval = totalLength / divideNumber;
+  return interval;
+}
+
 export function interpolateRouteByInterval(
   route: Route,
   divideNumber: number,

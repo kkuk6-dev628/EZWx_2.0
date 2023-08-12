@@ -4,7 +4,10 @@ import { VerticalRectSeries, LineSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
   cacheKeys,
+  calcEndMargin,
+  calcHighResolution,
   flightCategoryDivide,
+  getIndexByElevation,
   getMaxForecastTime,
   getRouteLength,
   getSegmentInterval,
@@ -23,6 +26,7 @@ import RouteProfileChart from './RouteProfileChart';
 import { convertTimeFormat } from '../map/common/AreoFunctions';
 import flyjs from '../../fly-js/fly';
 import { hourInMili } from '../shared/DepartureAdvisor';
+import fly from '../../fly-js/fly';
 
 export const takeoffEdrTable = {
   light: { light: 13, moderate: 16, severe: 36, extreme: 64 },
@@ -59,7 +63,7 @@ const TurbChart = (props) => {
   const [noDepicted, setNoDepicted] = useState(false);
 
   function buildTurbSeries() {
-    if (queryIcingTurbDataResult.isSuccess) {
+    if (queryIcingTurbDataResult.isSuccess && queryDepartureAdvisorDataResult.isSuccess) {
       const maxForecastTime = getMaxForecastTime(queryIcingTurbDataResult.data?.cat);
       const queryPoints = interpolateRouteByInterval(
         activeRoute,
@@ -67,26 +71,50 @@ const TurbChart = (props) => {
       ).map((pt) => pt.point);
       const turbData = [];
       let existTurbulence = false;
-      if (observationTime > maxForecastTime.getTime()) {
+      if (observationTime > maxForecastTime.getTime() + hourInMili) {
         setNoForecast(true);
         setNoDepicted(false);
         setTurbSeries([]);
         return;
       }
       setNoForecast(false);
+      const maxElevation = routeProfileApiState.maxAltitude * 100;
       let accDistance = 0;
-      let distance = 0;
+      const distance = calcHighResolution(activeRoute);
+      let hasNoData = false;
+      let arriveTime = observationTime;
+      let course = 0;
       queryPoints.forEach((segment, index) => {
-        const maxElevation = routeProfileApiState.maxAltitude * 100;
         if (index > 0) {
-          distance = flyjs.distanceTo(
-            queryPoints[index - 1].lat,
-            queryPoints[index - 1].lng,
-            segment.lat,
-            segment.lng,
-            6,
-          );
           accDistance += distance;
+        }
+        let speed = userSettings.true_airspeed;
+        if (activeRoute.useForecastWinds) {
+          const nextPos = index < queryPoints.length - 1 ? queryPoints[index + 1] : null;
+          course =
+            index < queryPoints.length - 1
+              ? fly.trueCourse(segment.lat, segment.lng, nextPos.lat, nextPos.lng, 2)
+              : course;
+          const { value: windSpeed } = getValueFromDatasetByElevation(
+            queryDepartureAdvisorDataResult.data?.windSpeed,
+            new Date(arriveTime),
+            activeRoute.altitude,
+            index,
+          );
+          const { value: windDirection } = getValueFromDatasetByElevation(
+            queryDepartureAdvisorDataResult.data?.windDirection,
+            new Date(arriveTime),
+            activeRoute.altitude,
+            index,
+          );
+          const { groundSpeed } = fly.calculateHeadingAndGroundSpeed(
+            userSettings.true_airspeed,
+            course,
+            windSpeed,
+            windDirection,
+            2,
+          );
+          speed = groundSpeed;
         }
         for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
           let edr = 0;
@@ -95,12 +123,12 @@ const TurbChart = (props) => {
           let color = colorsByEdr.none;
           let category = 'None';
           let opacity = 0.8;
-          const arriveTime = observationTime + (hourInMili * accDistance) / userSettings.true_airspeed;
-          if (arriveTime > maxForecastTime.getTime()) {
+          if (arriveTime > maxForecastTime.getTime() + hourInMili) {
             category = 'N/A';
             color = colorsByEdr.na;
             edr = null;
             edrTime = arriveTime;
+            hasNoData = true;
             if (routeProfileApiState.turbLayers.includes('CAT') && routeProfileApiState.turbLayers.includes('MWT')) {
               edrType = 'Combined EDR';
             } else if (routeProfileApiState.turbLayers.includes('CAT')) {
@@ -172,9 +200,9 @@ const TurbChart = (props) => {
             }
           }
           turbData.push({
-            x0: Math.round(accDistance - distance),
+            x0: accDistance - distance,
             y0: elevation - 500,
-            x: Math.round(accDistance),
+            x: accDistance,
             y: elevation + 500,
             color: color,
             opacity: opacity,
@@ -187,7 +215,28 @@ const TurbChart = (props) => {
             },
           });
         }
+        arriveTime = arriveTime + (hourInMili * distance) / speed;
       });
+      if (hasNoData) {
+        const end = calcEndMargin(activeRoute) + getRouteLength(activeRoute, true) - accDistance;
+        let endDistance = 0;
+        const hint = turbData[turbData.length - 1].hint;
+        while (end - endDistance > 0.5 * distance) {
+          for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
+            turbData.push({
+              x0: accDistance + endDistance,
+              y0: elevation - 500,
+              x: accDistance + endDistance + distance,
+              y: elevation + 500,
+              color: colorsByEdr.na,
+              opacity: 0.8,
+              hint: hint,
+            });
+          }
+          endDistance += distance;
+        }
+      }
+
       setNoDepicted(!existTurbulence);
       setTurbSeries(turbData);
     }
@@ -227,7 +276,7 @@ const TurbChart = (props) => {
           onValueClick={(value) => setTurbHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })}
         ></VerticalRectSeries>
       )}
-      {noForecast ||
+      {/* {noForecast ||
         (noDepicted &&
           [1].map((_) => {
             const routeLength = getRouteLength(activeRoute, true);
@@ -255,7 +304,7 @@ const TurbChart = (props) => {
                 ]}
               />
             );
-          }))}
+          }))} */}
       {turbHint && (
         <Hint value={turbHint} className="turbulence-tooltip">
           <span>

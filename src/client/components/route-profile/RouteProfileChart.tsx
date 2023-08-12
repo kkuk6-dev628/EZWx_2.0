@@ -19,6 +19,8 @@ import { selectActiveRoute } from '../../store/route/routes';
 import {
   SegmentPoint,
   cacheKeys,
+  calcEndMargin,
+  calcHighResolution,
   extendLine,
   flightCategoryDivide,
   getIndexByElevation,
@@ -423,12 +425,12 @@ const RouteProfileChart = (props: {
       }));
       const length = getRouteLength(activeRoute, true);
       setRouteLength(length);
-      const interval = getSegmentInterval(activeRoute, getSegmentsCount(activeRoute));
-      setSegmentInterval(interval);
       const count = getSegmentsCount(activeRoute);
+      const interval = getSegmentInterval(activeRoute, count);
+      setSegmentInterval(interval);
       setSegmentsCount(count);
-      const start = count ? 0.7 * interval : 0;
-      const end = count ? 0.7 * interval : 0;
+      const start = calcEndMargin(activeRoute);
+      const end = calcEndMargin(activeRoute);
       setStartMargin(start);
       setEndMargin(end);
       const stops = getTimeGradientStops(times);
@@ -811,6 +813,7 @@ const RouteProfileChart = (props: {
       );
 
       let distance = 0;
+      const step = calcHighResolution(activeRoute);
       let previousPos: L.LatLng = null;
       for (let j = 0; j < elevationPoints.length; j++) {
         for (let i = 0; i < elevationApiResults.length; i++) {
@@ -819,16 +822,9 @@ const RouteProfileChart = (props: {
             Math.abs(elevationPoints[j].lng - elevationApiResults[i].longitude) < 0.000001
           ) {
             if (previousPos) {
-              const delta = fly.distanceTo(
-                previousPos.lat,
-                previousPos.lng,
-                elevationPoints[j].lat,
-                elevationPoints[j].lng,
-                6,
-              );
-              distance += delta;
+              distance += step;
             }
-            if (distance > routeLength + endMargin + startMargin) {
+            if (routeLength + endMargin + startMargin - distance < -0.1 * step) {
               break;
             }
             previousPos = elevationPoints[j];
@@ -851,10 +847,10 @@ const RouteProfileChart = (props: {
         activeRoute,
         getSegmentsCount(activeRoute) * flightCategoryDivide,
       ).map((pt) => pt.point);
-      const interval = getSegmentInterval(activeRoute, getSegmentsCount(activeRoute) * flightCategoryDivide);
+      const interval = calcHighResolution(activeRoute);
       const flightCategoryData = [];
       // let accDistance = 0;
-      let arriveTime = new Date(observationTime).getTime();
+      let arriveTime = observationTime;
       // let dist = 0;
       let course = 0;
       positions.forEach((curr: L.LatLng, index) => {
@@ -866,18 +862,18 @@ const RouteProfileChart = (props: {
           // if (index < positions.length - 1 && !dist) return;
           let speed: number;
           if (activeRoute.useForecastWinds) {
-            if (queryNbmAllResult.isSuccess) {
+            if (getDepartureAdvisorDataResult.isSuccess) {
               const { value: speedValue } = getValueFromDatasetByElevation(
-                queryNbmAllResult.data?.windspeed,
+                getDepartureAdvisorDataResult.data?.windSpeed,
                 new Date(arriveTime),
                 activeRoute.altitude,
-                Math.round(index / flightCategoryDivide),
+                index,
               );
               const { value: dirValue } = getValueFromDatasetByElevation(
-                queryNbmAllResult.data?.winddir,
+                getDepartureAdvisorDataResult.data?.windDirection,
                 new Date(arriveTime),
                 activeRoute.altitude,
-                Math.round(index / flightCategoryDivide),
+                index,
               );
               const { groundSpeed } = fly.calculateHeadingAndGroundSpeed(
                 userSettings.true_airspeed,
@@ -893,7 +889,7 @@ const RouteProfileChart = (props: {
           } else {
             speed = userSettings.true_airspeed;
           }
-          const newTime = new Date(arriveTime).getTime() + (3600 * 1000 * interval) / speed;
+          const newTime = arriveTime + (hourInMili * interval) / speed;
           const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(
             getDepartureAdvisorDataResult.data?.cloudceiling,
             new Date(arriveTime),
@@ -978,7 +974,7 @@ const RouteProfileChart = (props: {
           color="white"
           yDomain={[0, routeProfileApiState.maxAltitude * 100]}
           xDomain={[-startMargin, routeLength + endMargin]}
-          margin={{ right: 40, bottom: isMobile ? 64 : 72, top: 16 * windIconScale + 4 }}
+          margin={{ left: 0, right: 0, bottom: isMobile ? 64 : 72, top: 16 * windIconScale + 4 }}
         >
           <GradientDefs>
             <linearGradient id="linear-gradient">
@@ -1166,7 +1162,7 @@ const RouteProfileChart = (props: {
                     <rect
                       x="0"
                       y={-16 * windIconScale - 2}
-                      width={calcChartWidth(viewW, viewH) - 80}
+                      width={calcChartWidth(viewW, viewH)}
                       height={16 * windIconScale + 4}
                       fill="white"
                     />
@@ -1219,30 +1215,7 @@ const RouteProfileChart = (props: {
               ]}
             />
           )}
-          <YAxis
-            tickValues={Array.from({ length: 10 + 1 }, (_value, index) =>
-              Math.round((index * routeProfileApiState.maxAltitude * 100) / 5),
-            )}
-            tickFormat={(v) => v / 100}
-            style={{
-              line: { stroke: '#ADDDE100' },
-              ticks: { stroke: '#ADDDE100' },
-              text: { stroke: 'none', fill: 'white', fontWeight: 600 },
-            }}
-          />
-          <YAxis
-            tickValues={Array.from({ length: 10 + 1 }, (_value, index) =>
-              Math.round((index * routeProfileApiState.maxAltitude * 100) / 5),
-            )}
-            tickFormat={(v) => v / 100}
-            orientation="right"
-            style={{
-              line: { stroke: '#ADDDE100' },
-              ticks: { stroke: '#ADDDE100' },
-              text: { stroke: 'none', fill: 'white', fontWeight: 600 },
-            }}
-          />
-          {showElevationHint ? (
+          {showElevationHint && elevationHint ? (
             <Hint value={elevationHint}>
               <div style={{ background: 'white', color: 'black', padding: 4, borderRadius: 4 }}>{elevationHint.y}</div>
             </Hint>
@@ -1259,7 +1232,7 @@ const RouteProfileChart = (props: {
           {weatherHint && (
             <Hint value={weatherHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'bottom' }}>
               <span>
-                <b>Time:</b>&nbsp;{convertTimeFormat(weatherHint.tooltip.time, false)}
+                <b>Time:</b>&nbsp;{convertTimeFormat(weatherHint.tooltip.time, userSettings.default_time_display_unit)}
               </span>
               <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
                 <div>
@@ -1309,7 +1282,8 @@ const RouteProfileChart = (props: {
           {flightCatHint && (
             <Hint value={flightCatHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
               <span>
-                <b>Time:</b>&nbsp;{convertTimeFormat(flightCatHint.tooltip.time, false)}
+                <b>Time:</b>&nbsp;
+                {convertTimeFormat(flightCatHint.tooltip.time, userSettings.default_time_display_unit)}
               </span>
               <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
                 <div>
@@ -1350,7 +1324,7 @@ const RouteProfileChart = (props: {
           {airportHint && airportHint.tooltip ? (
             <Hint value={airportHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
               <span>
-                <b>Time:</b>&nbsp;{convertTimeFormat(airportHint.tooltip.time, false)}
+                <b>Time:</b>&nbsp;{convertTimeFormat(airportHint.tooltip.time, userSettings.default_time_display_unit)}
               </span>
               <div style={{ display: 'flex', lineHeight: 1, color: 'black' }}>
                 <div>

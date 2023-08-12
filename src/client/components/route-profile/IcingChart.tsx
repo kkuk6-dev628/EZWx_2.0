@@ -4,11 +4,15 @@ import { VerticalRectSeries, LineSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
   cacheKeys,
+  calcEndMargin,
+  calcHighResolution,
   flightCategoryDivide,
+  getIndexByElevation,
   getMaxForecastElevation,
   getMaxForecastTime,
   getMinMaxValueByElevation,
   getRouteLength,
+  getSegmentInterval,
   getSegmentsCount,
   getTimeGradientStops,
   getValueFromDataset,
@@ -31,6 +35,7 @@ import { Route } from '../../interfaces/route';
 import { RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
 import flyjs from '../../fly-js/fly';
 import { hourInMili } from '../shared/DepartureAdvisor';
+import fly from '../../fly-js/fly';
 
 export const icingSevLegend = [
   { value: 0, color: '#F6F6F6', label: 'None' },
@@ -100,7 +105,7 @@ const IcingChart = (props) => {
       const existIcing = false;
       const maxForecastTime = getMaxForecastTime(queryIcingTurbDataResult.data?.prob);
       const maxForecastElevation = getMaxForecastElevation(queryIcingTurbDataResult.data?.prob);
-      if (observationTime > maxForecastTime.getTime()) {
+      if (observationTime > maxForecastTime.getTime() + hourInMili) {
         setNoForecast(true);
         setNoDepicted(false);
         setIcingSeries(null);
@@ -109,24 +114,46 @@ const IcingChart = (props) => {
       setNoForecast(false);
       setNoDepicted(true);
       let accDistance = 0;
-      let distance = 0;
+      const distance = calcHighResolution(activeRoute);
+      const maxElevation = Math.min(routeProfileApiState.maxAltitude * 100, maxForecastElevation);
+      let arriveTime = observationTime;
+      let course = 0;
 
       queryPoints.forEach((segment, index) => {
         if (accDistance > routeLength) {
           return;
         }
-        const maxElevation = Math.min(routeProfileApiState.maxAltitude * 100, maxForecastElevation);
         if (index > 0) {
-          distance = flyjs.distanceTo(
-            queryPoints[index - 1].lat,
-            queryPoints[index - 1].lng,
-            segment.lat,
-            segment.lng,
-            6,
-          );
           accDistance += distance;
         }
-        const arriveTime = observationTime + (hourInMili * accDistance) / userSettings.true_airspeed;
+        let speed = userSettings.true_airspeed;
+        if (activeRoute.useForecastWinds) {
+          const nextPos = index < queryPoints.length - 1 ? queryPoints[index + 1] : null;
+          course =
+            index < queryPoints.length - 1
+              ? fly.trueCourse(segment.lat, segment.lng, nextPos.lat, nextPos.lng, 2)
+              : course;
+          const { value: windSpeed } = getValueFromDatasetByElevation(
+            queryDepartureAdvisorDataResult.data?.windSpeed,
+            new Date(arriveTime),
+            activeRoute.altitude,
+            index,
+          );
+          const { value: windDirection } = getValueFromDatasetByElevation(
+            queryDepartureAdvisorDataResult.data?.windDirection,
+            new Date(arriveTime),
+            activeRoute.altitude,
+            index,
+          );
+          const { groundSpeed } = fly.calculateHeadingAndGroundSpeed(
+            userSettings.true_airspeed,
+            course,
+            windSpeed,
+            windDirection,
+            2,
+          );
+          speed = groundSpeed;
+        }
         for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
           let time;
           let color = colorsByEdr.none;
@@ -134,7 +161,7 @@ const IcingChart = (props) => {
           let opacity = visibleOpacity;
           const severity = 'None';
           let hint;
-          if (arriveTime > maxForecastTime.getTime()) {
+          if (arriveTime > maxForecastTime.getTime() + hourInMili) {
             color = '#666';
             opacity = 0.8;
             hint = {
@@ -230,17 +257,36 @@ const IcingChart = (props) => {
             };
           }
           icingData.push({
-            x0: Math.round(accDistance - distance),
+            x0: accDistance - distance,
             y0: elevation - 500,
-            x: Math.round(accDistance),
+            x: accDistance,
             y: elevation + 500,
             color: color,
             opacity: opacity,
             hint,
           });
         }
+        arriveTime = arriveTime + (hourInMili * distance) / speed;
       });
       // setNoDepicted(!existTurbulence);
+      if (icingData[icingData.length - 1].color === '#666') {
+        const end = accDistance + calcEndMargin(activeRoute);
+        const hint = icingData[icingData.length - 1].hint;
+        while (end - (accDistance + distance) > -0.1 * distance) {
+          for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
+            icingData.push({
+              x0: accDistance,
+              y0: elevation - 500,
+              x: accDistance + distance,
+              y: elevation + 500,
+              color: '#666',
+              opacity: 0.8,
+              hint: hint,
+            });
+          }
+          accDistance += distance;
+        }
+      }
       setIcingSeries(icingData);
     }
   }
@@ -280,7 +326,7 @@ const IcingChart = (props) => {
           onValueClick={(value) => setIcingHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })}
         ></VerticalRectSeries>
       )}
-      {noForecast
+      {/* {noForecast
         ? [1].map((_) => {
             const routeLength = getRouteLength(activeRoute, true);
             const segmentCount = getSegmentsCount(activeRoute);
@@ -308,7 +354,7 @@ const IcingChart = (props) => {
               />
             );
           })
-        : null}
+        : null} */}
 
       {icingHint ? (
         <Hint value={icingHint} className="icing-tooltip">
