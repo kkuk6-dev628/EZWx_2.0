@@ -79,7 +79,7 @@ export const convertTimeFormat = (time: string | number | Date, useLocalTime: bo
       day: 'numeric',
       month: 'short',
       year: 'numeric',
-    })} ${dateObj.toLocaleTimeString([], {
+    })} ${dateObj.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
@@ -106,7 +106,7 @@ export const simpleTimeFormat = (time: Date, useLocalTime: boolean) => {
 
 export const simpleTimeOnlyFormat = (time: Date, useLocalTime: boolean) => {
   if (useLocalTime) {
-    return time.toLocaleTimeString([], {
+    return time.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,

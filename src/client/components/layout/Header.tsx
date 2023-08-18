@@ -367,10 +367,18 @@ export default function Header() {
 }
 
 const ResponsiveMenu = ({ activeResponsiveMenu, activeMenu, handleActiveMenu, mapMenu, workMenu, homeMenu }) => {
+  const responsiveMenu = [
+    {
+      id: 0,
+      name: 'Home',
+      link: '/home',
+    },
+    ...workMenu,
+  ];
   return (
     <div className={`responsive__menu ${activeResponsiveMenu ? 'responsive__menu__show' : ''}`}>
       {mapMenu
-        ? workMenu.map((link) => (
+        ? responsiveMenu.map((link) => (
             <div key={link.id}>
               <div
                 onClick={() => handleActiveMenu(link.id, link.children !== undefined)}

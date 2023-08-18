@@ -603,9 +603,11 @@ const RouteProfileChart = (props: {
             nbmTime = airportNbm.time.getTime();
           } else {
             nbmData = seg.segmentNbmProps;
+            nbmTime = Math.floor(seg.arriveTime / hourInMili) * hourInMili;
           }
         } else {
           nbmData = seg.segmentNbmProps;
+          nbmTime = Math.floor(seg.arriveTime / hourInMili) * hourInMili;
         }
         labelStyle.fill = getFlightCategoryColor(nbmData.vis, nbmData.ceil);
         const lowestCloud = nbmData.l_cloud;
@@ -684,7 +686,10 @@ const RouteProfileChart = (props: {
               );
         accDistance += distance;
         const speed = userSettings.true_airspeed;
-        const arriveTime = observationTime + (hourInMili * distance) / speed;
+        let arriveTime = observationTime + (hourInMili * distance) / speed;
+        if (index === routePoints.length - 1) {
+          arriveTime = segments[segments.length - 1].arriveTime;
+        }
         const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(
           getDepartureAdvisorDataResult.data?.cloudceiling,
           new Date(arriveTime),
@@ -743,7 +748,7 @@ const RouteProfileChart = (props: {
         );
         labelStyle.fill = getFlightCategoryColor(visibility, cloudceiling);
         tooltip = {
-          time: arriveTime,
+          time: forecastTime,
           clouds: makeSkyConditions(cloudbase, cloudceiling, skycover),
           ceiling: cloudceiling,
           lowestCloud: cloudbase,
@@ -965,7 +970,10 @@ const RouteProfileChart = (props: {
   }, [routeProfileApiState.maxAltitude, viewW, viewH, routeLength, startMargin, windIconScale, isMobile]);
 
   return (
-    <>
+    <div
+      className="scrollable-chart-content"
+      style={{ width: calcChartWidth(viewW, viewH), height: calcChartHeight(viewW, viewH) }}
+    >
       {segmentsCount && (
         <XYPlot
           key={viewH}
@@ -1222,7 +1230,7 @@ const RouteProfileChart = (props: {
           ) : null}
           {timeHint ? (
             <Hint value={timeHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
-              {timeHint.segment.departureTime.offset !== new Date().getTimezoneOffset() && (
+              {-timeHint.segment.departureTime.offset !== new Date().getTimezoneOffset() && (
                 <span>{timeHint.segment.departureTime.full}</span>
               )}
               <span>{convertTimeFormat(timeHint.segment.arriveTime, true)}</span>
@@ -1411,7 +1419,7 @@ const RouteProfileChart = (props: {
           ) : null}
         </XYPlot>
       )}
-    </>
+    </div>
   );
 };
 export default RouteProfileChart;

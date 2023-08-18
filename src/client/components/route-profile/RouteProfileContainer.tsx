@@ -33,6 +33,7 @@ import TurbChart from './TurbChart';
 import WindChart from './WindChart';
 import IcingChart from './IcingChart';
 import DepartureAdvisor from '../shared/DepartureAdvisor';
+import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 
 const routeProfileChartTypes: {
   wind: RouteProfileChartType;
@@ -100,6 +101,8 @@ const RouteProfileContainer = () => {
   const router = useRouter();
   const auth = useSelector(selectAuth);
   const [showRouteEditor, setShowRouteEditor] = useState(false);
+  const segments = useSelector(selectRouteSegments);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -335,24 +338,26 @@ const RouteProfileContainer = () => {
               </div>
             </div>
             <div className="label-chart">
-              <div className="fixed-label">
-                {chartLabels[routeProfileApiState.maxAltitude].map((label) => (
-                  <div>{label}</div>
-                ))}
-              </div>
-              <div className="route-profile-chart-container">
-                <div className="scrollable-chart-content">
-                  {routeProfileState.chartType === 'Wind' && <WindChart />}
-                  {routeProfileState.chartType === 'Clouds' && <CloudsChart></CloudsChart>}
-                  {routeProfileState.chartType === 'Icing' && <IcingChart></IcingChart>}
-                  {routeProfileState.chartType === 'Turb' && <TurbChart></TurbChart>}
+              {routeProfileState.chartType && (
+                <div className="fixed-label left">
+                  {chartLabels[routeProfileApiState.maxAltitude].map((label) => (
+                    <div>{label}</div>
+                  ))}
                 </div>
+              )}
+              <div className="route-profile-chart-container">
+                {routeProfileState.chartType === 'Wind' && <WindChart />}
+                {routeProfileState.chartType === 'Clouds' && <CloudsChart></CloudsChart>}
+                {routeProfileState.chartType === 'Icing' && <IcingChart></IcingChart>}
+                {routeProfileState.chartType === 'Turb' && <TurbChart></TurbChart>}
               </div>
-              <div className="fixed-label">
-                {chartLabels[routeProfileApiState.maxAltitude].map((label) => (
-                  <div>{label}</div>
-                ))}
-              </div>
+              {segments.length && (
+                <div className="fixed-label right">
+                  {chartLabels[routeProfileApiState.maxAltitude].map((label) => (
+                    <div>{label}</div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

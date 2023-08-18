@@ -39,7 +39,7 @@ export const contourMin = -100;
 
 export const contourMax = 60;
 
-export const flightCategoryDivide = 10;
+export const flightCategoryDivide = 5;
 
 export const NODATA = -9999;
 
@@ -490,7 +490,7 @@ export function interpolateLegByInterval(start: L.LatLng, end: L.LatLng, interva
 }
 
 export function calcEndMargin(route: Route) {
-  return calcHighResolution(route) * 7;
+  return calcHighResolution(route) * Math.round(0.6 * flightCategoryDivide);
 }
 
 export function calcHighResolution(route: Route) {
@@ -1023,9 +1023,9 @@ const RouteProfileDataLoader = () => {
       isRoutePoint: true,
       segmentNbmProps: readNbmProperties(new Date(observationTime), 0),
       departureTime: {
-        full: departureTime.format('MM/dd/YYYY hh:mm A z'),
+        full: departureTime.format('ddd, MMM DD, YYYY kk:mm z'),
         date: departureTime.format('MM/dd/YYYY'),
-        time: departureTime.format('HH:mm z'),
+        time: departureTime.format('kk:mm z'),
         hour: departureTime.hour(),
         minute: departureTime.minute(),
         offset: departureTime.utcOffset(),
@@ -1077,9 +1077,9 @@ const RouteProfileDataLoader = () => {
           isRoutePoint: curr.isRoutePoint,
           segmentNbmProps: readNbmProperties(new Date(newTime), index),
           departureTime: {
-            full: departureTime.format('MMM DD, YYYY HH:mm z'),
+            full: departureTime.format('ddd, MMM DD, YYYY kk:mm z'),
             date: departureTime.format('MM/DD/YYYY'),
-            time: departureTime.format('HH:mm z'),
+            time: departureTime.format('kk:mm z'),
             hour: departureTime.hour(),
             minute: departureTime.minute(),
             offset: departureTime.utcOffset(),

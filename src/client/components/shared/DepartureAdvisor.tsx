@@ -1176,7 +1176,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       const flyTimeInHour = Math.ceil(flyTime / hourInMili);
       const lastTime = (props.showPast ? 12 : 0) + forecastTime - flyTimeInHour;
       const lastTime3Hours = Math.floor(lastTime / 3) * 3;
-      const lastTimespan = (startHour + lastTime3Hours) * hourInMili;
+      const lastTimespan = ((props.showPast ? -12 : 0) + startHour + lastTime3Hours) * hourInMili;
       setLastTime(lastTimespan);
       if (settingsState.observation_time > lastTimespan) {
         handleTimeChange(new Date(lastTimespan), true);
