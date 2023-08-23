@@ -1019,7 +1019,7 @@ const RouteProfileDataLoader = () => {
         positions[1].point.lng,
         2,
       ),
-      airport: positions[0].airport,
+      airport: activeRoute.departure,
       isRoutePoint: true,
       segmentNbmProps: readNbmProperties(new Date(observationTime), 0),
       departureTime: {
@@ -1073,7 +1073,7 @@ const RouteProfileDataLoader = () => {
           accDistance: interval * index,
           arriveTime: newTime,
           course: course,
-          airport: curr.airport,
+          airport: index < positions.length - 1 ? curr.airport : activeRoute.destination,
           isRoutePoint: curr.isRoutePoint,
           segmentNbmProps: readNbmProperties(new Date(newTime), index),
           departureTime: {

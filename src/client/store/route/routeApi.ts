@@ -39,7 +39,7 @@ export const routeApi = createApi({
             dispatch(userLoggedOut());
           }
           if (result.data.length > 0) {
-            dispatch(setActiveRoute({ ...result.data[0] }));
+            // dispatch(setActiveRoute({ ...result.data[0] }));
           }
         } catch (err) {
           // toast.error('error', {

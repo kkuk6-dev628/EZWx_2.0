@@ -1,3 +1,5 @@
+import { Route } from './route';
+
 export interface authUser {
   email: string;
   id: string;
@@ -30,4 +32,5 @@ export interface UserSettings {
   ceiling_at_destination: [number, number];
   surface_visibility_at_destination: [number, number];
   crosswinds_at_destination_airport: [number, number];
+  active_route: Route;
 }

@@ -6,10 +6,10 @@ import { AiOutlineMinus } from 'react-icons/ai';
 import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
 import Switch from 'react-switch';
 import { AutoCompleteInput, Modal, MultiSelectInput, PrimaryButton, SecondaryButton } from '../common/index';
-import { selectActiveRoute } from '../../store/route/routes';
+import { selectActiveRoute, setActiveRoute } from '../../store/route/routes';
 import { useSelector } from 'react-redux';
 import { isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
-import { useCreateRouteMutation } from '../../store/route/routeApi';
+import { useCreateRouteMutation, useDeleteRouteMutation } from '../../store/route/routeApi';
 import { Route, RouteOfFlight, RoutePoint } from '../../interfaces/route';
 import { useMeteoLayersContext } from '../map/leaflet/layer-control/MeteoLayerControlContext';
 import 'leaflet-arc';
@@ -72,6 +72,7 @@ export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
 function Route({ setIsShowModal }: Props) {
   const activeRoute = useSelector(selectActiveRoute);
   const [createRoute] = useCreateRouteMutation();
+  const [deleteRoute] = useDeleteRouteMutation();
   const [routeData, setRouteData] = useState(activeRoute || emptyFormData);
   const ref = useRef();
   const meteoLayers = useMeteoLayersContext();
@@ -161,12 +162,13 @@ function Route({ setIsShowModal }: Props) {
     if (isSameRoutes(routeData, activeRoute)) {
       return;
     }
+    setActiveRoute(routeData);
     createRoute(routeData);
   };
 
   const deleteActiveRoute = () => {
     meteoLayers.routeGroupLayer.clearLayers();
-    // deleteRoute(activeRoute.id);
+    deleteRoute(activeRoute.id);
     setIsShowDeleteRouteModal(false);
     setIsShowModal(false);
     handleClickClear();

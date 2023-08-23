@@ -577,7 +577,6 @@ const RouteProfileChart = (props: {
 
   function buildAirportLabelSeries() {
     if (segments.length > 0) {
-      let tooltip = null;
       const weatherSeries = [];
       const segmentsCount = getSegmentsCount(activeRoute);
       const interval = getSegmentInterval(activeRoute, segmentsCount);
@@ -614,8 +613,9 @@ const RouteProfileChart = (props: {
         const ceiling = nbmData.ceil;
         const skyCover = nbmData.skycov;
         const skyConditionsAsc = makeSkyConditions(lowestCloud, ceiling, skyCover);
-        tooltip = {
+        const tooltip = {
           time: nbmTime,
+          isAirport: seg.airport && seg.airport.type !== 'waypoint',
           clouds: skyConditionsAsc,
           ceiling: ceiling,
           lowestCloud,
@@ -747,8 +747,9 @@ const RouteProfileChart = (props: {
           nbmDataIndex,
         );
         labelStyle.fill = getFlightCategoryColor(visibility, cloudceiling);
-        tooltip = {
+        const tooltip: any = {
           time: forecastTime,
+          isAirport: rp.type !== 'waypoint',
           clouds: makeSkyConditions(cloudbase, cloudceiling, skycover),
           ceiling: cloudceiling,
           lowestCloud: cloudbase,
@@ -818,8 +819,9 @@ const RouteProfileChart = (props: {
       );
 
       let distance = 0;
-      const step = calcHighResolution(activeRoute);
+      const step = routeLength / totalNumberOfElevations;
       let previousPos: L.LatLng = null;
+      let lastPoint = null;
       for (let j = 0; j < elevationPoints.length; j++) {
         for (let i = 0; i < elevationApiResults.length; i++) {
           if (
@@ -833,6 +835,7 @@ const RouteProfileChart = (props: {
               break;
             }
             previousPos = elevationPoints[j];
+            lastPoint = elevationApiResults[i];
             elevations.push({
               x: distance - startMargin,
               y: meterToFeet(elevationApiResults[i].elevation),
@@ -842,6 +845,10 @@ const RouteProfileChart = (props: {
         }
       }
       if (elevations.length === 0) return;
+      elevations.push({
+        x: routeLength + endMargin,
+        y: meterToFeet(lastPoint.elevation),
+      });
       setElevationSeries(elevations);
     }
   }, [queryElevationsResult.isSuccess, routeLength]);
@@ -1369,17 +1376,22 @@ const RouteProfileChart = (props: {
                   ? visibilityMileToFraction(airportHint.tooltip.visibility)
                   : visibilityMileToMeter(airportHint.tooltip.visibility)}
               </span>
-              <span>
-                <b>Wind speed:</b>&nbsp;
-                {!userSettings.default_wind_speed_unit
-                  ? Math.round(airportHint.tooltip.windspeed) +
-                    (Math.round(airportHint.tooltip.windspeed) <= 1 ? ' knot' : ' knots')
-                  : Math.round(knotsToMph(airportHint.tooltip.windspeed)) + ' mph'}
-              </span>
-              <span>
-                <b>Wind direction:</b>&nbsp;{addLeadingZeroes(Math.round(airportHint.tooltip.winddir), 3) + ' \u00B0'}
-              </span>
-              {airportHint.tooltip.windgust > 10 &&
+              {airportHint.tooltip.isAirport && (
+                <span>
+                  <b>Wind speed:</b>&nbsp;
+                  {!userSettings.default_wind_speed_unit
+                    ? Math.round(airportHint.tooltip.windspeed) +
+                      (Math.round(airportHint.tooltip.windspeed) <= 1 ? ' knot' : ' knots')
+                    : Math.round(knotsToMph(airportHint.tooltip.windspeed)) + ' mph'}
+                </span>
+              )}
+              {airportHint.tooltip.isAirport && (
+                <span>
+                  <b>Wind direction:</b>&nbsp;{addLeadingZeroes(Math.round(airportHint.tooltip.winddir), 3) + ' \u00B0'}
+                </span>
+              )}
+              {airportHint.tooltip.isAirport &&
+                airportHint.tooltip.windgust > 10 &&
                 Math.abs(airportHint.tooltip.windgust - airportHint.tooltip.windspeed) > 4 && (
                   <span>
                     <b>Wind gust:</b>&nbsp;

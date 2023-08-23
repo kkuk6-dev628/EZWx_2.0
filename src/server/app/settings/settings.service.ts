@@ -19,6 +19,15 @@ export class SettingsService {
           where: {
             user_id,
           },
+          relations: {
+            active_route: {
+              routeOfFlight: {
+                routePoint: true,
+              },
+              destination: true,
+              departure: true,
+            },
+          },
         });
         const { id, ...rest } = res;
         const modifiedData = getModifiedData(rest);

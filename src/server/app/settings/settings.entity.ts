@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { RoutePoint } from '../api/route/route-point.entity';
+import { Route } from '../api/route/route.entity';
 @Entity()
 export class UserSettings {
   @PrimaryGeneratedColumn()
@@ -90,4 +92,8 @@ export class UserSettings {
 
   @Column({ unique: true })
   user_id: number;
+
+  @OneToOne(() => Route)
+  @JoinColumn()
+  active_route: Route;
 }

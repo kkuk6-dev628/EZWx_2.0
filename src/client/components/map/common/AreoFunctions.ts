@@ -7,6 +7,7 @@ import axios from 'axios';
 import { db } from '../../caching/dexieDb';
 import { Route, RoutePoint } from '../../../interfaces/route';
 import { route as routeErrorMessages } from '../../lang/messages';
+import moment from 'moment-timezone';
 
 export function degree2radian(degree) {
   return (degree * Math.PI) / 180;
@@ -73,18 +74,9 @@ export const translateWeatherClausings = (dueto: string): string => {
 
 export const convertTimeFormat = (time: string | number | Date, useLocalTime: boolean) => {
   const dateObj = new Date(time);
+  const momentObj = moment(dateObj).tz(Intl.DateTimeFormat().resolvedOptions().timeZone);
   if (useLocalTime) {
-    return `${dateObj.toLocaleDateString('en-US', {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    })} ${dateObj.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      timeZoneName: 'short',
-    })}`;
+    return momentObj.format('ddd, MMM DD, YYYY kk:mm z');
   } else {
     return `${dateObj.toLocaleDateString('en-US', {
       weekday: 'short',

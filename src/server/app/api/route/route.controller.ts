@@ -21,7 +21,7 @@ export class RouteController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  delete(@Param('id') id: number) {
-    return this.routeService.delete(id);
+  delete(@Request() request, @Param('id') id: number) {
+    return this.routeService.delete(request.user, id);
   }
 }

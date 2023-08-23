@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../user/user.entity';
 import { RoutePoint } from './route-point.entity';
+import { UserSettings } from '../../settings/settings.entity';
 @Injectable()
 export class RouteService {
   constructor(
@@ -16,6 +17,8 @@ export class RouteService {
     private routePointRepository: Repository<RoutePoint>,
     @InjectRepository(RouteOfFlight)
     private routeFlightRepository: Repository<RouteOfFlight>,
+    @InjectRepository(UserSettings)
+    private userSettingsRepository: Repository<UserSettings>,
   ) {}
 
   async find(user: User) {
@@ -79,6 +82,9 @@ export class RouteService {
         routeOfFlights.push(saved);
       }
       updateRoute.routeOfFlight = routeOfFlights;
+      const userSettings = await this.userSettingsRepository.findOneBy({ user_id: user.id });
+      userSettings.active_route = updateRoute;
+      this.userSettingsRepository.save(userSettings);
       return await this.routeRepository.save(updateRoute);
     }
     const routeEntity = new Route();
@@ -102,12 +108,18 @@ export class RouteService {
       routeOfFlights.push(saved);
     }
     routeEntity.routeOfFlight = routeOfFlights;
+    const userSettings = await this.userSettingsRepository.findOneBy({ user_id: user.id });
+    userSettings.active_route = res;
+    this.userSettingsRepository.save(userSettings);
     return res;
   }
 
-  async delete(id: number) {
+  async delete(user: User, id: number) {
     const deleteRoute = await this.routeRepository.findOneBy({ id });
     this.routeRepository.softRemove(deleteRoute);
+    const userSettings = await this.userSettingsRepository.findOneBy({ user_id: user.id });
+    userSettings.active_route = null;
+    this.userSettingsRepository.save(userSettings);
     return deleteRoute;
   }
 }

@@ -3,6 +3,7 @@ import { toast } from 'react-hot-toast';
 import { UserSettings } from '../../interfaces/users';
 import { apiSlice } from './../api/apiSlice';
 import { initialUserSettingsState, setUserSettings } from './UserSettings';
+import { setActiveRoute } from '../route/routes';
 
 const userSettingsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -29,6 +30,7 @@ const userSettingsApi = apiSlice.injectEndpoints({
               settings.observation_interval = initialUserSettingsState.settings.observation_interval;
             }
             dispatch(setUserSettings(settings));
+            dispatch(setActiveRoute(settings.active_route));
           }
         } catch (err) {
           console.error('Error: ', err);

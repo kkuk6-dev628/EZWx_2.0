@@ -1228,6 +1228,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
       const airports = interpolateRouteByInterval(activeRoute, getSegmentsCount(activeRoute), airportsTable, true).map(
         (pt) => pt.airport?.key,
       );
+      airports.push(activeRoute.departure.key, activeRoute.destination.key);
       queryAirportNbm(airports.filter((a) => a));
     }
   }, [activeRoute, isLoadedAirports]);
