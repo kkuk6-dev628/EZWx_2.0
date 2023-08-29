@@ -100,6 +100,10 @@ export const temperatureContourColors = {
   negative: '#09FDC6',
 };
 
+export const hatchOpacity = 0.6;
+
+export const visibleOpacity = 1;
+
 export function getAirportNbmData(
   data: { time: string; data: AirportNbmData[] }[],
   time: number,
@@ -245,8 +249,8 @@ export function buildContour(
     const minPos = contour.contour.reduce((prev, curr) => (prev.x < curr.x ? prev : curr));
     const maxPos = contour.contour.reduce((prev, curr) => (prev.x > curr.x ? prev : curr));
     const label = !showInCelsius
-      ? celsiusToFahrenheit(contour.temperature) + ' \u00B0F'
-      : round(contour.temperature, 1) + ' \u00B0C';
+      ? celsiusToFahrenheit(contour.temperature) + ' \u00B0'
+      : round(contour.temperature, 1) + ' \u00B0';
     const style = {
       fill:
         contour.temperature > 0
@@ -322,7 +326,7 @@ function getFlightCategoryColor(visibility, ceiling): string {
   } else {
     indexFinalCat = -1;
   }
-  const finalCat = indexFinalCat > -1 ? categories[indexFinalCat] : 'Black';
+  const finalCat = indexFinalCat > -1 ? categories[indexFinalCat] : 'lightslategrey';
   return flightCategoryToColor(finalCat);
 }
 
@@ -330,6 +334,7 @@ const RouteProfileChart = (props: {
   children: ReactNode;
   showDayNightBackground: boolean;
   noDataMessage: string;
+  noIcingAbove30000?: string;
   setValue2PixelRate?: (
     dx: number,
     dy: number,
@@ -1029,15 +1034,17 @@ const RouteProfileChart = (props: {
               strokeWidth: 0.2,
             }}
           />
-          <HorizontalGridLines
-            tickValues={Array.from({ length: 5 - 1 }, (_value, index) =>
-              Math.round(((index + 1) * routeProfileApiState.maxAltitude * 100) / 5),
-            )}
-            style={{
-              stroke: 'grey',
-              strokeWidth: 2,
-            }}
-          />
+          {routeProfileApiState.chartType === 'Wind' && (
+            <HorizontalGridLines
+              tickValues={Array.from({ length: 5 - 1 }, (_value, index) =>
+                Math.round(((index + 1) * routeProfileApiState.maxAltitude * 100) / 5),
+              )}
+              style={{
+                stroke: 'grey',
+                strokeWidth: 2,
+              }}
+            />
+          )}
           <HorizontalGridLines
             tickValues={Array.from({ length: 5 }, (_value, index) =>
               Math.round(((index + 0.5) * routeProfileApiState.maxAltitude * 100) / 5),
@@ -1106,6 +1113,17 @@ const RouteProfileChart = (props: {
             />
           )}
           {routeProfileApiState.chartType !== 'Wind' && activeRoute ? props.children : null}
+          {routeProfileApiState.chartType !== 'Wind' && (
+            <HorizontalGridLines
+              tickValues={Array.from({ length: 5 - 1 }, (_value, index) =>
+                Math.round(((index + 1) * routeProfileApiState.maxAltitude * 100) / 5),
+              )}
+              style={{
+                stroke: 'grey',
+                strokeWidth: 2,
+              }}
+            />
+          )}
           {activeRoute ? (
             <LineSeries
               data={[
@@ -1176,9 +1194,9 @@ const RouteProfileChart = (props: {
                   return (
                     <rect
                       x="0"
-                      y={-16 * windIconScale - 2}
+                      y={-16 * windIconScale - 6}
                       width={calcChartWidth(viewW, viewH)}
-                      height={16 * windIconScale + 4}
+                      height={16 * windIconScale + 6}
                       fill="white"
                     />
                   );
@@ -1219,6 +1237,32 @@ const RouteProfileChart = (props: {
 
                         <text x="20" y="20">
                           {props.noDataMessage}
+                        </text>
+                      </switch>
+                    );
+                  },
+                  style: {
+                    textAnchor: 'middle',
+                  },
+                },
+              ]}
+            />
+          )}
+          {!props.noDataMessage && props.noIcingAbove30000 && (
+            <CustomSVGSeries
+              data={[
+                {
+                  x: getRouteLength(activeRoute, !userSettings.default_distance_unit) / 2,
+                  y: 40000,
+                  customComponent: (_row, _positionInPixels) => {
+                    return (
+                      <switch>
+                        <foreignObject x="-150" y="-60" width="300" height="200">
+                          <p className="nodata-msg">{props.noIcingAbove30000}</p>
+                        </foreignObject>
+
+                        <text x="20" y="20">
+                          {props.noIcingAbove30000}
                         </text>
                       </switch>
                     );

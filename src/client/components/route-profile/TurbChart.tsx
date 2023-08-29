@@ -305,7 +305,7 @@ const TurbChart = (props) => {
               />
             );
           }))} */}
-      {turbHint && (
+      {turbHint && turbHint.color !== colorsByEdr.na && (
         <Hint value={turbHint} className="turbulence-tooltip">
           <span>
             <b>Time:</b> {convertTimeFormat(turbHint.hint.time, userSettings.default_time_display_unit)}

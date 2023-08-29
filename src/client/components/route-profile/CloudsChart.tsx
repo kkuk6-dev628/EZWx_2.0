@@ -21,7 +21,7 @@ import {
   useQueryNbmAllMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
-import RouteProfileChart from './RouteProfileChart';
+import RouteProfileChart, { hatchOpacity, visibleOpacity } from './RouteProfileChart';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import flyjs from '../../fly-js/fly';
 import { colorsByEdr } from './TurbChart';
@@ -127,17 +127,15 @@ const CloudsChart = (props) => {
       const segmentCount = getSegmentsCount(activeRoute);
       const segmentLength = routeLength / segmentCount;
       const cloudData = [];
-      const existIcing = false;
       const maxForecastTime = getMaxForecastTime(queryNbmAllAirportResult.data?.skycover);
       segments.forEach((segment, index) => {
         const elevation = getElevationByPosition(segment.position);
         let colorFirst = cloudColor1;
         let colorSecond = cloudColor1;
         let opacity = 1;
-        const severity = 'None';
         if (segment.arriveTime > maxForecastTime.getTime()) {
           colorFirst = cloudColor1;
-          opacity = 0.5;
+          opacity = hatchOpacity;
         } else {
           const { value: skycover } = getValueFromDatasetByElevation(
             queryNbmAllAirportResult.data?.skycover,
@@ -172,12 +170,12 @@ const CloudsChart = (props) => {
           if (cloudbase > 0 && elevation + cloudbase <= routeProfileApiState.maxAltitude * 100) {
             cloudbase = Math.round(cloudbase);
             cloudData.push({
-              x0: Math.round(index * segmentLength - segmentLength / 2),
+              x0: Math.round(index * segmentLength - segmentLength / (index === 0 ? 5 : 2)),
               y0: elevation + cloudbase,
-              x: Math.round(index * segmentLength + segmentLength / 2),
+              x: Math.round(index * segmentLength + segmentLength / (index === segments.length - 1 ? 5 : 2)),
               y: elevation + cloudbase + 2000,
               color: colorFirst,
-              opacity: opacity,
+              opacity: visibleOpacity,
               hint: {
                 cloudbase,
                 skycover,
@@ -187,12 +185,12 @@ const CloudsChart = (props) => {
           if (cloudceiling > 0 && elevation + cloudceiling <= routeProfileApiState.maxAltitude * 100) {
             cloudceiling = Math.round(cloudceiling);
             cloudData.push({
-              x0: Math.round(index * segmentLength - segmentLength / 2),
+              x0: Math.round(index * segmentLength - segmentLength / (index === 0 ? 5 : 2)),
               y0: elevation + cloudceiling,
-              x: Math.round(index * segmentLength + segmentLength / 2),
+              x: Math.round(index * segmentLength + segmentLength / (index === segments.length - 1 ? 5 : 2)),
               y: elevation + cloudceiling + 2000,
               color: colorSecond,
-              opacity: opacity,
+              opacity: visibleOpacity,
               hint: { cloudceiling, skycover },
             });
           }
@@ -210,12 +208,12 @@ const CloudsChart = (props) => {
                 humidity.elevation <= routeProfileApiState.maxAltitude * 100
               ) {
                 cloudData.push({
-                  x0: Math.round(index * segmentLength - segmentLength / 2),
+                  x0: Math.round(index * segmentLength - segmentLength / (index === 0 ? 5 : 2)),
                   y0: humidity.elevation - 500,
-                  x: Math.round(index * segmentLength + segmentLength / 2),
+                  x: Math.round(index * segmentLength + segmentLength / (index === segments.length - 1 ? 5 : 2)),
                   y: humidity.elevation + 500,
                   color: colorSecond,
-                  opacity: opacity,
+                  opacity: visibleOpacity,
                   hint: { humidity: humidity.value, skycover },
                 });
               }
@@ -241,12 +239,12 @@ const CloudsChart = (props) => {
                   }
                 }
                 cloudData.push({
-                  x0: Math.round(index * segmentLength - segmentLength / 2),
+                  x0: Math.round(index * segmentLength - segmentLength / (index === 0 ? 5 : 2)),
                   y0: icingSev.elevation - 500,
-                  x: Math.round(index * segmentLength + segmentLength / 2),
+                  x: Math.round(index * segmentLength + segmentLength / (index === segments.length - 1 ? 5 : 2)),
                   y: icingSev.elevation + 500,
                   color: colorSecond,
-                  opacity: opacity,
+                  opacity: visibleOpacity,
                   hint: { severe: sevData.label, skycover },
                 });
               }

@@ -626,9 +626,11 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
             <PrimaryButton text="Cancel" onClick={() => setIsShowRestoreSettingModal(false)} isLoading={false} />
             <SecondaryButton
               text="Restore Settings"
-              onClick={() => {
+              onClick={async () => {
                 setSettings({ ...initialUserSettingsState.settings, user_id: id });
-                handleSaveSettings(true);
+                dispatch(setUserSettings({ ...initialUserSettingsState.settings, user_id: id }));
+                await updateUserSettings({ ...initialUserSettingsState.settings, user_id: id });
+                setIsShowSettingsDrawer(false);
                 setIsShowRestoreSettingModal(false);
               }}
               isLoading={false}

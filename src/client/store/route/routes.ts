@@ -18,6 +18,9 @@ export const RoutesSlice = createSlice({
       if (!isSameRoutes(state.activeRoute, action.payload)) {
         state.activeRoute = action.payload;
       }
+      if (state.activeRoute && !state.activeRoute.id && action.payload?.id) {
+        state.activeRoute.id = action.payload.id;
+      }
     },
   },
 });

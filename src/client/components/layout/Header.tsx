@@ -12,6 +12,8 @@ import { selectAuth } from '../../store/auth/authSlice';
 import ZuluClock from '../shared/ZuluClock';
 import { useCookies } from 'react-cookie';
 import { useGetUserQuery } from '../../store/auth/authApi';
+import { Dialog } from '@mui/material';
+import { PaperComponent } from '../map/leaflet/Map';
 const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
 const menusHome = [
@@ -350,9 +352,11 @@ export default function Header() {
           setIsShowSettingsDrawer={() => setIsShowSettingsDrawer(false)}
         />
         <FavoritesDrawer isOpen={favoritesDrawer} onClose={() => setFavoritesDrawer(false)} />
-        {isShowProfileModal && (
-          <ProfileModal setIsUserLoginUser={setIsUserLoginUser} handleProfileModal={handleProfileModal} />
-        )}
+        <ProfileModal
+          setIsUserLoginUser={setIsUserLoginUser}
+          isShowProfileModal={isShowProfileModal}
+          handleProfileModal={handleProfileModal}
+        />
       </div>
       <ResponsiveMenu
         activeResponsiveMenu={activeResponsiveMenu}

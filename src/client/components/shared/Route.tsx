@@ -7,7 +7,7 @@ import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
 import Switch from 'react-switch';
 import { AutoCompleteInput, Modal, MultiSelectInput, PrimaryButton, SecondaryButton } from '../common/index';
 import { selectActiveRoute, setActiveRoute } from '../../store/route/routes';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
 import { useCreateRouteMutation, useDeleteRouteMutation } from '../../store/route/routeApi';
 import { Route, RouteOfFlight, RoutePoint } from '../../interfaces/route';
@@ -83,6 +83,7 @@ function Route({ setIsShowModal }: Props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [altitudeText, setAltitudeText] = useState(routeData.altitude.toLocaleString());
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // L.DomEvent.disableClickPropagation(ref.current);
@@ -162,16 +163,19 @@ function Route({ setIsShowModal }: Props) {
     if (isSameRoutes(routeData, activeRoute)) {
       return;
     }
-    setActiveRoute(routeData);
+    dispatch(setActiveRoute(routeData));
     createRoute(routeData);
   };
 
   const deleteActiveRoute = () => {
-    meteoLayers.routeGroupLayer.clearLayers();
+    meteoLayers.routeGroupLayer?.clearLayers();
     deleteRoute(activeRoute.id);
     setIsShowDeleteRouteModal(false);
     setIsShowModal(false);
     handleClickClear();
+    if (router.pathname === '/route-profile') {
+      router.push('/map');
+    }
   };
 
   const handleSaveRoute = () => {

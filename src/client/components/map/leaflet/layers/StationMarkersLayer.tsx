@@ -214,7 +214,7 @@ export const getFlightCategoryIconUrl = (feature: GeoJSON.Feature): string => {
 export const flightCategoryToColor = (flightCategory: string): string => {
   return initialUserSettingsState.personalMinimumsState[flightCategory]
     ? initialUserSettingsState.personalMinimumsState[flightCategory].color
-    : 'black';
+    : 'lightslategrey';
 };
 
 export const getNbmFlightCategory = (feature: GeoJSON.Feature, personalMinimums: PersonalMinimums): string => {

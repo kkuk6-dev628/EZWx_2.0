@@ -34,6 +34,8 @@ import WindChart from './WindChart';
 import IcingChart from './IcingChart';
 import DepartureAdvisor from '../shared/DepartureAdvisor';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
+import { selectActiveRoute } from '../../store/route/routes';
+import { selectSettings } from '../../store/user/UserSettings';
 
 const routeProfileChartTypes: {
   wind: RouteProfileChartType;
@@ -102,6 +104,8 @@ const RouteProfileContainer = () => {
   const auth = useSelector(selectAuth);
   const [showRouteEditor, setShowRouteEditor] = useState(false);
   const segments = useSelector(selectRouteSegments);
+  const activeRoute = useSelector(selectActiveRoute);
+  const userSettings = useSelector(selectSettings);
 
   const dispatch = useDispatch();
 
@@ -227,6 +231,7 @@ const RouteProfileContainer = () => {
                           });
                         }}
                       >
+                        <i className="fas">{userSettings.default_temperature_unit ? '\u00B0F' : '\u00B0C'}</i>
                         <i className="fas fa-thermometer-half fa-2x" aria-hidden="true"></i>
                       </ToggleButton>
                     </div>
@@ -341,7 +346,7 @@ const RouteProfileContainer = () => {
               {routeProfileState.chartType && (
                 <div className="fixed-label left">
                   {chartLabels[routeProfileApiState.maxAltitude].map((label) => (
-                    <div>{label}</div>
+                    <div key={'left-' + label}>{label}</div>
                   ))}
                 </div>
               )}
@@ -354,7 +359,7 @@ const RouteProfileContainer = () => {
               {segments.length && (
                 <div className="fixed-label right">
                   {chartLabels[routeProfileApiState.maxAltitude].map((label) => (
-                    <div>{label}</div>
+                    <div key={'right-' + label}>{label}</div>
                   ))}
                 </div>
               )}

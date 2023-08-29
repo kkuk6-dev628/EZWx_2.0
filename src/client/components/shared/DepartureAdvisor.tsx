@@ -729,7 +729,10 @@ function getWheatherMinimumsAlongRoute(
           personalMinsEvaluation.departureCeiling.value = 0;
           personalMinsEvaluation.departureCeiling.color = personalMinValueToColor[0];
         }
-        if (personalMins.surface_visibility_at_departure[1] <= visibility || visibility === null) {
+        if (visibility === null) {
+          personalMinsEvaluation.departureVisibility.value = 10;
+          personalMinsEvaluation.departureVisibility.color = personalMinValueToColor[10];
+        } else if (personalMins.surface_visibility_at_departure[1] <= visibility) {
           personalMinsEvaluation.departureVisibility.value = 2;
           personalMinsEvaluation.departureVisibility.color = personalMinValueToColor[2];
         } else if (personalMins.surface_visibility_at_departure[0] < visibility) {
@@ -761,7 +764,10 @@ function getWheatherMinimumsAlongRoute(
           personalMinsEvaluation.destinationCeiling.value = 0;
           personalMinsEvaluation.destinationCeiling.color = personalMinValueToColor[0];
         }
-        if (personalMins.surface_visibility_at_destination[1] <= visibility) {
+        if (visibility === null) {
+          personalMinsEvaluation.destinationVisibility.value = 10;
+          personalMinsEvaluation.destinationVisibility.color = personalMinValueToColor[10];
+        } else if (personalMins.surface_visibility_at_destination[1] <= visibility) {
           personalMinsEvaluation.destinationVisibility.value = 2;
           personalMinsEvaluation.destinationVisibility.color = personalMinValueToColor[2];
         } else if (personalMins.surface_visibility_at_destination[0] < visibility) {
@@ -885,7 +891,10 @@ function getWheatherMinimumsAlongRoute(
     personalMinsEvaluation.alongRouteCeiling.color = personalMinValueToColor[0];
   }
 
-  if (personalMins.surface_visibility_along_route[0] <= alongVisibility) {
+  if (alongVisibility === Infinity || alongVisibility === -Infinity) {
+    personalMinsEvaluation.alongRouteVisibility.value = 10;
+    personalMinsEvaluation.alongRouteVisibility.color = personalMinValueToColor[10];
+  } else if (personalMins.surface_visibility_along_route[0] <= alongVisibility) {
     personalMinsEvaluation.alongRouteVisibility.value = 2;
     personalMinsEvaluation.alongRouteVisibility.color = personalMinValueToColor[2];
   } else if (personalMins.surface_visibility_along_route[1] < alongVisibility) {
@@ -1220,6 +1229,8 @@ function DepartureAdvisor(props: { showPast: boolean }) {
         elevations.push(Math.round(activeRoute.altitude / 1000) * 1000);
       }
       getDepartureAdvisorData({ queryPoints, elevations });
+    } else {
+      setColorByTimes(Array.from({ length: blockCount }, () => personalMinValueToColor[10]));
     }
   }, [activeRoute]);
 

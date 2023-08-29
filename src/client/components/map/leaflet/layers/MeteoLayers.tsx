@@ -56,6 +56,8 @@ const MeteoLayers = () => {
     }
     if (activeRoute) {
       addRouteToMap(activeRoute, meteoLayers.routeGroupLayer);
+    } else if (meteoLayers.routeGroupLayer) {
+      meteoLayers.routeGroupLayer.clearLayers();
     }
   }, [activeRoute]);
 

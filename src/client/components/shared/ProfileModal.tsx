@@ -7,15 +7,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectAuth, userLoggedOut } from '../../store/auth/authSlice';
 import { api } from '../../utils';
 import { useSigninMutation, useSignoutMutation } from '../../store/auth/authApi';
+import { Drawer } from '@mui/material';
+import { RxCross2 } from 'react-icons/rx';
 
 //handleProfileModal
 
 interface ProfileModalProps {
   handleProfileModal: () => void;
+  isShowProfileModal: boolean;
   setIsUserLoginUser: (value: boolean) => void;
 }
 
-function ProfileModal({ handleProfileModal, setIsUserLoginUser }: ProfileModalProps) {
+function ProfileModal({ handleProfileModal, isShowProfileModal, setIsUserLoginUser }: ProfileModalProps) {
   const router = useRouter();
   const user = useSelector(selectAuth);
   const dispatch = useDispatch();
@@ -33,8 +36,8 @@ function ProfileModal({ handleProfileModal, setIsUserLoginUser }: ProfileModalPr
   };
 
   return (
-    <div className="prom">
-      <div className="prom__header">
+    <Drawer anchor={'right'} open={isShowProfileModal} onClose={handleProfileModal} className="profile-drawer">
+      <div className="prom__header" id="draggable-dialog-title">
         <div className="prom__lft">
           <div className="prom__lft__img">
             <Image height={50} width={50} src="/images/sunny.png" alt="profile" loading="eager" />
@@ -44,6 +47,7 @@ function ProfileModal({ handleProfileModal, setIsUserLoginUser }: ProfileModalPr
           <h3 className="prom__name">{user.displayName}</h3>
           <p className="prom__email">{user.email}</p>
         </div>
+        <RxCross2 onClick={handleProfileModal} className="close__icon" />
       </div>
       <div className="prom__btm">
         <div onClick={changeRoute} className="prom__btm__itm">
@@ -55,7 +59,7 @@ function ProfileModal({ handleProfileModal, setIsUserLoginUser }: ProfileModalPr
           <span>Sign Out</span>
         </div>
       </div>
-    </div>
+    </Drawer>
   );
 }
 

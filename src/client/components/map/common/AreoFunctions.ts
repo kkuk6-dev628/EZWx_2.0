@@ -290,7 +290,7 @@ export const diffMinutes = (date1: Date, date2: Date) => {
 };
 
 export const getMetarVisibilityCategory = (visibility: number, personalMinimums: PersonalMinimums): any[] => {
-  if (visibility === null || !isFinite(visibility)) {
+  if (visibility === null || visibility < 0 || !isFinite(visibility)) {
     return [];
   }
   let visibilityMinimum = personalMinimums.VFR;

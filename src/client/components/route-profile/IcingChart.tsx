@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { VerticalRectSeries, LineSeries, Hint, LabelSeries } from 'react-vis';
+import { VerticalRectSeries, CustomSVGSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
   cacheKeys,
@@ -27,7 +27,7 @@ import {
   useQueryIcingTurbDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
-import RouteProfileChart from './RouteProfileChart';
+import RouteProfileChart, { hatchOpacity, visibleOpacity } from './RouteProfileChart';
 import { Conrec } from '../../conrec-js/conrec';
 import { celsiusToFahrenheit, convertTimeFormat, round } from '../map/common/AreoFunctions';
 import { colorsByEdr, takeoffEdrTable } from './TurbChart';
@@ -70,6 +70,8 @@ const icingSldLegend = [
   { value: 100, color: '#CD0000', label: '100' },
 ];
 
+const noIcingAbove30000Msg = 'No icing forecast available above 30,000 feet';
+
 const IcingChart = (props) => {
   const activeRoute = useSelector(selectActiveRoute);
   const userSettings = useSelector(selectSettings);
@@ -91,18 +93,15 @@ const IcingChart = (props) => {
   const [icingHint, setIcingHint] = useState(null);
 
   const segments = useSelector(selectRouteSegments);
-
   function buildIcingSeries() {
     if (segments && segments.length > 0 && queryIcingTurbDataResult.isSuccess) {
       const routeLength = getRouteLength(activeRoute, true);
       const segmentCount = getSegmentsCount(activeRoute);
-      const segmentLength = routeLength / segmentCount;
       const icingData = [];
       const queryPoints = interpolateRouteByInterval(
         activeRoute,
         getSegmentsCount(activeRoute) * flightCategoryDivide,
       ).map((pt) => pt.point);
-      const existIcing = false;
       const maxForecastTime = getMaxForecastTime(queryIcingTurbDataResult.data?.prob);
       const maxForecastElevation = getMaxForecastElevation(queryIcingTurbDataResult.data?.prob);
       if (observationTime > maxForecastTime.getTime() + hourInMili) {
@@ -157,13 +156,11 @@ const IcingChart = (props) => {
         for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
           let time;
           let color = colorsByEdr.none;
-          const visibleOpacity = 1;
           let opacity = visibleOpacity;
-          const severity = 'None';
           let hint;
           if (arriveTime > maxForecastTime.getTime() + hourInMili) {
             color = '#666';
-            opacity = 0.8;
+            opacity = hatchOpacity;
             hint = {
               time: new Date(arriveTime),
               altitude: elevation,
@@ -280,7 +277,7 @@ const IcingChart = (props) => {
               x: accDistance + distance,
               y: elevation + 500,
               color: '#666',
-              opacity: 0.8,
+              opacity: hatchOpacity,
               hint: hint,
             });
           }
@@ -312,11 +309,12 @@ const IcingChart = (props) => {
           ? 'No icing forecast available for this departure time'
           : null
       }
+      noIcingAbove30000={noForecast || routeProfileApiState.maxAltitude !== 500 ? null : noIcingAbove30000Msg}
     >
       {icingSeries && (
         <VerticalRectSeries
           colorType="literal"
-          stroke="#33333500"
+          stroke="transparent"
           data={icingSeries}
           style={{ strokeWidth: 0 }}
           onValueMouseOut={() => setIcingHint(null)}
@@ -326,37 +324,8 @@ const IcingChart = (props) => {
           onValueClick={(value) => setIcingHint({ ...value, x: (value.x + value.x0) / 2, y: (value.y + value.y0) / 2 })}
         ></VerticalRectSeries>
       )}
-      {/* {noForecast
-        ? [1].map((_) => {
-            const routeLength = getRouteLength(activeRoute, true);
-            const segmentCount = getSegmentsCount(activeRoute);
-            const segmentLength = routeLength / segmentCount;
 
-            return (
-              <VerticalRectSeries
-                key="noForecast-message"
-                colorType="literal"
-                data={[
-                  {
-                    x0: -segmentLength / 2,
-                    x: routeLength + segmentLength / 2,
-                    y0: 1000,
-                    y:
-                      routeProfileApiState.maxAltitude === 500
-                        ? 45000
-                        : routeProfileApiState.maxAltitude === 300
-                        ? 27000
-                        : 18000,
-                    color: '#333',
-                    opacity: 0.5,
-                  },
-                ]}
-              />
-            );
-          })
-        : null} */}
-
-      {icingHint ? (
+      {icingHint && icingHint.color !== '#666' ? (
         <Hint value={icingHint} className="icing-tooltip">
           <span>
             <b>Time:</b> {convertTimeFormat(icingHint.hint.time, userSettings.default_time_display_unit)}

@@ -1,3 +1,20 @@
+.profile-drawer{
+  .MuiDrawer-paper{
+    overflow: hidden;
+    .close__icon{
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin-right: 13px;
+      margin-top: 10px;
+      opacity: 0.6;
+      font-size: 20px;
+      font-weight: 800;
+      cursor: pointer;
+      color: white;
+    }
+  }
+}
 .prom{
   width: 17.5rem;
   border-radius: 8px;

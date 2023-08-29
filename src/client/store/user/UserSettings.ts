@@ -53,6 +53,7 @@ export const initialUserSettingsState: {
     ceiling_at_destination: [1000, 3000],
     surface_visibility_at_destination: [3, 7],
     crosswinds_at_destination_airport: [10, 15],
+    active_route: undefined,
   },
 };
 
