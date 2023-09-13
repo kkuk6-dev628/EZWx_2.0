@@ -78,6 +78,7 @@ export class RouteService {
         updateRouteOfFlight.routePointId = routePoint.id;
         updateRouteOfFlight.routeId = route.id;
         updateRouteOfFlight.order = i;
+        updateRouteOfFlight.routePoint = routePoint;
         const saved = await this.routeFlightRepository.save(updateRouteOfFlight);
         routeOfFlights.push(saved);
       }
@@ -85,7 +86,8 @@ export class RouteService {
       const userSettings = await this.userSettingsRepository.findOneBy({ user_id: user.id });
       userSettings.active_route = updateRoute;
       this.userSettingsRepository.save(userSettings);
-      return await this.routeRepository.save(updateRoute);
+      await this.routeRepository.save(updateRoute);
+      return updateRoute;
     }
     const routeEntity = new Route();
     routeEntity.useForecastWinds = route.useForecastWinds;
@@ -108,6 +110,7 @@ export class RouteService {
       routeOfFlights.push(saved);
     }
     routeEntity.routeOfFlight = routeOfFlights;
+    res.routeOfFlight = routeOfFlights;
     const userSettings = await this.userSettingsRepository.findOneBy({ user_id: user.id });
     userSettings.active_route = res;
     this.userSettingsRepository.save(userSettings);

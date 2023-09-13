@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SvgAir, SvgMap, SvgTemperature } from '../utils/SvgIcons';
+import { SvgAir, SvgBaseMap, SvgTemperature } from '../utils/SvgIcons';
 import ZuluClock from './ZuluClock';
 
 interface TabMenusObj {
@@ -25,7 +25,14 @@ function MapTabs({ tabMenus }: TabMenus) {
           className={`tabs__btn ${tabMenu.isHideResponsive && 'tabs__btn--hide_responsive'} ${
             tabMenu.id === 'more' && 'tabs__btn--more'
           }`}
-          onClick={tabMenu.id === 'more' ? () => setShowDropDown(!showDropDown) : () => tabMenu.handler(tabMenu.id)}
+          onClick={
+            tabMenu.id === 'more'
+              ? () => setShowDropDown(!showDropDown)
+              : () => {
+                  setShowDropDown(false);
+                  tabMenu.handler(tabMenu.id);
+                }
+          }
         >
           {tabMenu.svg && tabMenu.svg}
           <p className="btn__text">{tabMenu.name}</p>
@@ -34,36 +41,20 @@ function MapTabs({ tabMenus }: TabMenus) {
 
       {showDropDown && (
         <div className="tabs__dropdown">
-          <button
-            className=" tabs__btn--dropdown"
-            onClick={() => {
-              tabMenus[3].handler(tabMenus[3].id);
-              setShowDropDown(false);
-            }}
-          >
-            <SvgAir />
-            <p className="btn__text">Airport</p>
-          </button>
-          <button
-            className="tabs__btn--dropdown"
-            onClick={() => {
-              tabMenus[4].handler(tabMenus[4].id);
-              setShowDropDown(false);
-            }}
-          >
-            <SvgMap />
-            <p className=" btn__text">Base map</p>
-          </button>
-          <button
-            className=" tabs__btn--dropdown"
-            onClick={() => {
-              tabMenus[5].handler(tabMenus[5].id);
-              setShowDropDown(false);
-            }}
-          >
-            <SvgTemperature />
-            <p className="btn__text">7 days</p>
-          </button>
+          {tabMenus.slice(4).map((menuItem) => {
+            return (
+              <button
+                className=" tabs__btn--dropdown"
+                onClick={() => {
+                  menuItem.handler(menuItem.id);
+                  setShowDropDown(false);
+                }}
+              >
+                {menuItem.svg}
+                <p className="btn__text">{menuItem.name}</p>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

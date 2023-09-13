@@ -21,7 +21,11 @@ const qualifiersTranslation = {
 
 const IntlSigmetPopup = ({ feature, userSettings }: { feature: any; userSettings: any }) => {
   let title = hazardTranslation[feature.properties.hazard]
-    ? `${qualifiersTranslation[feature.properties.qualifier]} ${hazardTranslation[feature.properties.hazard]}`
+    ? `${
+        qualifiersTranslation[feature.properties.qualifier]
+          ? qualifiersTranslation[feature.properties.qualifier] + ' '
+          : ''
+      }${hazardTranslation[feature.properties.hazard]}`
     : 'Other';
   let base;
   if (

@@ -515,6 +515,12 @@ export const StationMarkersLayer = () => {
   };
 
   const unSimplifyFilter = (feature) => {
+    if (
+      userSettings.default_home_airport === feature.properties.station_id ||
+      userSettings.default_home_airport === feature.properties.icaoid
+    ) {
+      return true;
+    }
     if (!activeRoute) return false;
     const routePoints = [
       activeRoute.departure,
@@ -1198,10 +1204,10 @@ export const StationMarkersLayer = () => {
   ) => {
     let iconUrl = '/icons/barbs/0-kt.png';
     let transformAngle = 'rotate(0deg)';
-    if (isNaN(windSpeed)) {
-      windSpeed = 0;
+    if (isNaN(windSpeed) || windSpeed === null) {
+      return;
     }
-    if (isNaN(windDirection)) {
+    if (isNaN(windDirection) || windDirection === null) {
       windDirection = 0;
     }
     let anchor = [16, 27];
@@ -1582,6 +1588,7 @@ export const StationMarkersLayer = () => {
     <Pane name={'station-markers'} style={{ zIndex: paneOrders.station }}>
       {displayedGeojson != null && (
         <SimplifiedMarkersLayer
+          key={userSettings.default_home_airport}
           ref={geojsonLayerRef}
           data={displayedGeojson}
           visible={layerState.stationMarkersState.checked}

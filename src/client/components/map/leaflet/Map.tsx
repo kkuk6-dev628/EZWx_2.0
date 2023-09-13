@@ -6,8 +6,9 @@ import L from 'leaflet';
 import styles from './Map.module.css';
 import MapTabs from '../../shared/MapTabs';
 import {
+  SvgAir,
   SvgLayer,
-  SvgMap,
+  SvgBaseMap,
   SvgProfileCharge,
   SvgRoundMinus,
   SvgRoundPlus,
@@ -163,15 +164,22 @@ const LeafletMap = () => {
       isHideResponsive: false,
     },
     {
+      id: 'airport',
+      name: 'Airport Wx',
+      svg: <SvgAir />,
+      handler: handler,
+      isHideResponsive: true,
+    },
+    {
       id: 'basemap',
-      name: 'Base map',
-      svg: <SvgMap />,
+      name: 'Base Map',
+      svg: <SvgBaseMap />,
       handler: handler,
       isHideResponsive: true,
     },
     {
       id: '7days',
-      name: '7 days',
+      name: '7 Days',
       svg: <SvgTemperature />,
       handler: handler,
       isHideResponsive: true,

@@ -248,7 +248,7 @@ export const validateRoute = (route: Route): boolean | string => {
 };
 
 export const isSameRoutePoints = (routePoint1: RoutePoint, routePoint2: RoutePoint): boolean => {
-  return routePoint1.key === routePoint2.key && routePoint1.type === routePoint2.type;
+  return routePoint1 && routePoint2 && routePoint1.key === routePoint2.key && routePoint1.type === routePoint2.type;
 };
 
 export const isSameRoutes = (route1: Route, route2: Route): boolean => {

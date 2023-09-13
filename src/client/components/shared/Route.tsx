@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineClose, AiOutlineCloseCircle, AiOutlineHeart } from 'react-icons/ai';
 import { BsBookmarkPlus, BsFolderPlus } from 'react-icons/bs';
 import { AiOutlineMinus } from 'react-icons/ai';
-import { SvgBin, SvgLeftRight } from '../utils/SvgIcons';
+import { SvgBin, SvgLeftRight, SvgRoundClose } from '../utils/SvgIcons';
 import Switch from 'react-switch';
 import { AutoCompleteInput, Modal, MultiSelectInput, PrimaryButton, SecondaryButton } from '../common/index';
 import { selectActiveRoute, setActiveRoute } from '../../store/route/routes';
@@ -42,7 +42,7 @@ export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
   }
   const coordinateList = [
     route.departure.position.coordinates,
-    ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
+    ...route.routeOfFlight.map((item) => (item.routePoint ? item.routePoint.position.coordinates : null)),
     route.destination.position.coordinates,
   ];
   routeGroupLayer.clearLayers();
@@ -199,8 +199,8 @@ function Route({ setIsShowModal }: Props) {
           <p className="route-editor__top__text text" style={{ cursor: 'move' }} id="draggable-dialog-title">
             Enter/Edit/Delete route
           </p>
-          <button onClick={() => setIsShowModal(false)} className="route-editor__top__close" type="button">
-            <AiOutlineClose className="route-editor__icon" />
+          <button onClick={() => setIsShowModal(false)} className="dlg-close" type="button">
+            <SvgRoundClose />
           </button>
         </DialogTitle>
         <div className="route-editor__content">

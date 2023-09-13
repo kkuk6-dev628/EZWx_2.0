@@ -309,7 +309,7 @@ function SvgProfileCharge() {
     </svg>
   );
 }
-function SvgMap() {
+function SvgBaseMap() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
       <path
@@ -323,6 +323,35 @@ function SvgMap() {
       />
       <path d="M20 12.7068V20.6268" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M12 10.04V17.96" stroke="#3F0C69" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+function SvgMap() {
+  return (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M23.1027 9.57184C23.1027 5.7585 19.9227 2.6665 16 2.6665C12.0773 2.6665 8.89734 5.7585 8.89734 9.57184C8.89734 13.6025 13.1987 17.9318 15.1067 19.6545C15.6173 20.1145 16.3827 20.1145 16.8933 19.6545C18.8013 17.9318 23.1027 13.6025 23.1027 9.57184Z"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M17.6716 8.10725C18.5948 9.01847 18.5948 10.4959 17.6716 11.4071C16.7484 12.3183 15.2516 12.3183 14.3284 11.4071C13.4052 10.4958 13.4052 9.01846 14.3284 8.10725C15.2516 7.19602 16.7484 7.19602 17.6716 8.10725"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M10.0747 13.5693L4 16V26.6667L10.6667 24L16 28L21.3333 24L28 26.6667V16L21.9253 13.5693"
+        stroke="#3F0C69"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
     </svg>
   );
 }
@@ -610,6 +639,7 @@ export {
   SvgAir,
   SvgThreeDot,
   SvgTemperature,
+  SvgBaseMap,
   SvgMap,
   SvgProfileCharge,
   SvgLayer,

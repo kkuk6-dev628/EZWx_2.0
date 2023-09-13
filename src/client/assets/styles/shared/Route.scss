@@ -1,3 +1,15 @@
+.dlg-close{
+  padding: 0;
+  margin: 0;
+  border: 0;
+  height: 32px;
+  background: transparent;
+  cursor: pointer;
+  svg{
+    width: 32px;
+    height: 32px;
+  }
+}
 .route-editor {
   max-width: 480px;
   @media (max-width: 460px) {
@@ -20,7 +32,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px !important;
+    padding: 0 10px 0 20px;
   }
 
   &__top__text {

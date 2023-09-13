@@ -19,7 +19,7 @@ import {
 import { useSelector } from 'react-redux';
 import RouteProfileDataLoader from './RouteProfileDataLoader';
 import MapTabs from '../shared/MapTabs';
-import { SvgMap, SvgRoute, SvgAir, SvgRefresh } from '../utils/SvgIcons';
+import { SvgBaseMap, SvgRoute, SvgAir, SvgRefresh, SvgMap } from '../utils/SvgIcons';
 import { useRouter } from 'next/router';
 import { selectAuth } from '../../store/auth/authSlice';
 import toast from 'react-hot-toast';
@@ -155,7 +155,7 @@ const RouteProfileContainer = () => {
     },
     {
       id: 'airport',
-      name: 'Airport',
+      name: 'Airport Wx',
       svg: <SvgAir />,
       handler: handler,
       isHideResponsive: false,

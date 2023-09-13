@@ -35,8 +35,8 @@ export const simplifyPoints = (
     [
       route.departure.position,
       route.destination.position,
-      ...route.routeOfFlight.map((item) => item.routePoint.position),
-    ].forEach((position) => rbush.insert(getBoxFromGeometry(map, position)));
+      ...route.routeOfFlight.map((item) => (item.routePoint ? item.routePoint.position : null)),
+    ].forEach((position) => position && rbush.insert(getBoxFromGeometry(map, position)));
   }
   features.forEach((feature) => {
     // @ts-ignore

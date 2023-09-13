@@ -1,3 +1,6 @@
+.MuiPaper-root.MuiDialog-paper{
+  margin: 12px;
+}
 #draggable-dialog-title{
   width: 100%;
 }
@@ -271,10 +274,13 @@
 
       .bars-container{
         position: absolute;
-        margin-left: -21px;
+        margin-left: -16px;
         bottom: 80px;
         @media (max-width: 1600px) {
-          margin-left: -27px;
+          margin-left: -20px;
+        }
+        @media (max-width: 1200px) {
+          margin-left: -24px;
         }
       }
 
@@ -332,6 +338,8 @@
     }
     .move-right{
       border-radius: 0 36px 36px 0;
+      padding-left: 1px;
+      padding-right: 1px;
     }
     .disabled{
       background-color: gray;
@@ -359,12 +367,12 @@
   .evaluations-container{
     margin: 14px;
     .evaluation-item{
-      margin: 6px 20px;
+      margin: 6px 6px;
       display: flex;
       align-items: center;
       justify-content: flex-start;
       .evaluation-item-text{
-        margin-left: 20px;
+        margin-left: 8px;
       }
     }
   }
@@ -372,6 +380,7 @@
     background-color: var(--color-primary);
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 8px 4px 8px 20px;
     padding-right: 8px;
     margin-right: 0px;

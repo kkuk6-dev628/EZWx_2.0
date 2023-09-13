@@ -150,7 +150,7 @@ const menusMap = [
   },
   {
     id: 3,
-    name: 'Pilots guide',
+    name: 'Pilots Guide',
     link: '/pilots-guide',
   },
 ];
@@ -168,7 +168,7 @@ const menusMapNotAuth = [
   },
   {
     id: 3,
-    name: 'Pilots guide',
+    name: 'Pilots Guide',
     link: '/pilots-guide',
   },
 ];

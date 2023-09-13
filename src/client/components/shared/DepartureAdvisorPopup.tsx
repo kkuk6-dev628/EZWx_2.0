@@ -8,6 +8,7 @@ import { selectSettings } from '../../store/user/UserSettings';
 import DialogTitle from '@mui/material/DialogTitle';
 import { convectivePotential, icingIntensity } from './SettingsDrawer';
 import { useGetLastDepartureDataTimeQuery } from '../../store/route-profile/routeProfileApi';
+import { SvgRoundClose } from '../utils/SvgIcons';
 
 export function getEvaluationByTime(
   evaluationData: { time: number; evaluation: PersonalMinsEvaluation }[],
@@ -55,8 +56,8 @@ function DepartureAdvisorPopup({ setIsShowDateModal, evaluationsByTime, observat
         <p className="text" id="draggable-dialog-title">
           Departure Advisor
         </p>
-        <button onClick={() => setIsShowDateModal(false)} className="departure-advisor-popup-close" type="button">
-          <AiOutlineClose className="departure-advisor-popup-close-icon" />
+        <button onClick={() => setIsShowDateModal(false)} className="dlg-close" type="button">
+          <SvgRoundClose />
         </button>
       </DialogTitle>
       <div className="evaluations-container">

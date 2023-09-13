@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SvgAir, SvgMap, SvgTemperature } from '../utils/SvgIcons';
+import { SvgAir, SvgBaseMap, SvgTemperature } from '../utils/SvgIcons';
 import Image from 'next/image';
 import { AiOutlineHeart, AiOutlineHome, AiOutlineCaretDown, AiOutlineClose } from 'react-icons/ai';
 import { FiNavigation } from 'react-icons/fi';

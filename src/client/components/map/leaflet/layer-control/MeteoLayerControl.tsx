@@ -52,6 +52,7 @@ import { selectAuth } from '../../../../store/auth/authSlice';
 import { useGetUserSettingsQuery } from '../../../../store/user/userSettingsApi';
 import { useGetAirportQuery } from '../../../../store/route/airportApi';
 import { useCookies } from 'react-cookie';
+import { SvgRoundClose } from '../../../utils/SvgIcons';
 
 interface IProps {
   children?: ReactElement[];
@@ -262,16 +263,17 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
             <div className="layer-control__rgt">
               <h3>Map Layers</h3>
             </div>
+            <div
+              className="btn-close dlg-close"
+              onClick={() => {
+                updateLayerControl({ ...layerControlState, show: false });
+                disableMapInteraction(false);
+              }}
+            >
+              <SvgRoundClose />
+            </div>{' '}
           </div>
-          <div
-            className="btn-close"
-            onClick={() => {
-              updateLayerControl({ ...layerControlState, show: false });
-              disableMapInteraction(false);
-            }}
-          >
-            <i className="fa-regular fa-circle-xmark"></i>
-          </div>
+
           <div className="layer-control-contents">
             <div className="layer-control-item">
               <Accordion
@@ -1265,6 +1267,180 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
               </Accordion>
             </div>
             <div className="layer-control-item">
+              <Accordion key={`cwa-layer`} expanded={layerControlState.cwaState.expanded}>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                  IconButtonProps={{
+                    onClick: () => {
+                      const clonedLayerControlState = getLayerControlStateWithAllClosed();
+                      clonedLayerControlState.cwaState.expanded = !layerControlState.cwaState.expanded;
+                      updateLayerControl(clonedLayerControlState);
+                    },
+                  }}
+                >
+                  <FormControlLabel
+                    label={layerControlState.cwaState.name}
+                    control={
+                      <Checkbox
+                        checked={layerControlState.cwaState.checked}
+                        style={{ pointerEvents: 'none' }}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerControlState.cwaState) as CwaLayerState;
+                          cloned.checked = !layerControlState.cwaState.checked;
+                          updateLayerControl({ ...layerControlState, cwaState: cloned });
+                          cloned.checked
+                            ? showLayer(meteoLayers.cwa, layerControlState.cwaState.name)
+                            : hideLayer(meteoLayers.cwa, layerControlState.cwaState.name);
+                        }}
+                      />
+                    }
+                  />
+                </AccordionSummary>
+                <AccordionDetails style={{ display: 'flex', flexDirection: 'column' }}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerControlState.cwaState.all.checked}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerControlState.cwaState) as CwaLayerState;
+                          cloned.all.checked = true;
+                          cloned.checked = true;
+                          cloned.airframeIcing.checked = true;
+                          cloned.turbulence.checked = true;
+                          cloned.ifrConditions.checked = true;
+                          cloned.convection.checked = true;
+                          cloned.other.checked = true;
+                          showLayer(meteoLayers.cwa, cloned.name);
+                          updateLayerControl({ ...layerControlState, cwaState: cloned });
+                        }}
+                      />
+                    }
+                    label={layerControlState.cwaState.all.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerControlState.cwaState.airframeIcing.checked}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerControlState.cwaState) as CwaLayerState;
+                          cloned.airframeIcing.checked = !layerControlState.cwaState.airframeIcing.checked;
+                          cloned.all.checked = isCheckedAllCwa(cloned);
+                          if (cloned.airframeIcing.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.cwa, cloned.name);
+                          }
+                          updateLayerControl({ ...layerControlState, cwaState: cloned });
+                        }}
+                      />
+                    }
+                    label={layerControlState.cwaState.airframeIcing.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerControlState.cwaState.turbulence.checked}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerControlState.cwaState) as CwaLayerState;
+                          cloned.turbulence.checked = !layerControlState.cwaState.turbulence.checked;
+                          cloned.all.checked = isCheckedAllCwa(cloned);
+                          if (cloned.turbulence.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.cwa, cloned.name);
+                          }
+                          updateLayerControl({ ...layerControlState, cwaState: cloned });
+                        }}
+                      />
+                    }
+                    label={layerControlState.cwaState.turbulence.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerControlState.cwaState.ifrConditions.checked}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerControlState.cwaState) as CwaLayerState;
+                          cloned.ifrConditions.checked = !layerControlState.cwaState.ifrConditions.checked;
+                          cloned.all.checked = isCheckedAllCwa(cloned);
+                          if (cloned.ifrConditions.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.cwa, cloned.name);
+                          }
+                          updateLayerControl({ ...layerControlState, cwaState: cloned });
+                        }}
+                      />
+                    }
+                    label={layerControlState.cwaState.ifrConditions.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerControlState.cwaState.convection.checked}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerControlState.cwaState) as CwaLayerState;
+                          cloned.convection.checked = !layerControlState.cwaState.convection.checked;
+                          cloned.all.checked = isCheckedAllCwa(cloned);
+                          if (cloned.convection.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.cwa, cloned.name);
+                          }
+                          updateLayerControl({ ...layerControlState, cwaState: cloned });
+                        }}
+                      />
+                    }
+                    label={layerControlState.cwaState.convection.name}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={layerControlState.cwaState.other.checked}
+                        icon={<CircleUnchecked />}
+                        checkedIcon={<CircleCheckedFilled />}
+                        name="checkedB"
+                        color="primary"
+                        onClick={(_e) => {
+                          const cloned = jsonClone(layerControlState.cwaState) as CwaLayerState;
+                          cloned.other.checked = !layerControlState.cwaState.other.checked;
+                          cloned.all.checked = isCheckedAllCwa(cloned);
+                          if (cloned.other.checked) {
+                            cloned.checked = true;
+                            showLayer(meteoLayers.cwa, cloned.name);
+                          }
+                          updateLayerControl({ ...layerControlState, cwaState: cloned });
+                        }}
+                      />
+                    }
+                    label={layerControlState.cwaState.other.name}
+                  />
+                </AccordionDetails>
+              </Accordion>
+            </div>
+            <div className="layer-control-item">
               <Accordion key={`pirep-layer`} expanded={layerControlState.pirepState.expanded}>
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
@@ -1479,180 +1655,6 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
                       />
                     </div>
                   </div>
-                </AccordionDetails>
-              </Accordion>
-            </div>
-            <div className="layer-control-item">
-              <Accordion key={`cwa-layer`} expanded={layerControlState.cwaState.expanded}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
-                  IconButtonProps={{
-                    onClick: () => {
-                      const clonedLayerControlState = getLayerControlStateWithAllClosed();
-                      clonedLayerControlState.cwaState.expanded = !layerControlState.cwaState.expanded;
-                      updateLayerControl(clonedLayerControlState);
-                    },
-                  }}
-                >
-                  <FormControlLabel
-                    label={layerControlState.cwaState.name}
-                    control={
-                      <Checkbox
-                        checked={layerControlState.cwaState.checked}
-                        style={{ pointerEvents: 'none' }}
-                        icon={<CircleUnchecked />}
-                        checkedIcon={<CircleCheckedFilled />}
-                        name="checkedB"
-                        color="primary"
-                        onClick={(_e) => {
-                          const cloned = jsonClone(layerControlState.cwaState) as CwaLayerState;
-                          cloned.checked = !layerControlState.cwaState.checked;
-                          updateLayerControl({ ...layerControlState, cwaState: cloned });
-                          cloned.checked
-                            ? showLayer(meteoLayers.cwa, layerControlState.cwaState.name)
-                            : hideLayer(meteoLayers.cwa, layerControlState.cwaState.name);
-                        }}
-                      />
-                    }
-                  />
-                </AccordionSummary>
-                <AccordionDetails style={{ display: 'flex', flexDirection: 'column' }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={layerControlState.cwaState.all.checked}
-                        icon={<CircleUnchecked />}
-                        checkedIcon={<CircleCheckedFilled />}
-                        name="checkedB"
-                        color="primary"
-                        onClick={(_e) => {
-                          const cloned = jsonClone(layerControlState.cwaState) as CwaLayerState;
-                          cloned.all.checked = true;
-                          cloned.checked = true;
-                          cloned.airframeIcing.checked = true;
-                          cloned.turbulence.checked = true;
-                          cloned.ifrConditions.checked = true;
-                          cloned.convection.checked = true;
-                          cloned.other.checked = true;
-                          showLayer(meteoLayers.cwa, cloned.name);
-                          updateLayerControl({ ...layerControlState, cwaState: cloned });
-                        }}
-                      />
-                    }
-                    label={layerControlState.cwaState.all.name}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={layerControlState.cwaState.airframeIcing.checked}
-                        icon={<CircleUnchecked />}
-                        checkedIcon={<CircleCheckedFilled />}
-                        name="checkedB"
-                        color="primary"
-                        onClick={(_e) => {
-                          const cloned = jsonClone(layerControlState.cwaState) as CwaLayerState;
-                          cloned.airframeIcing.checked = !layerControlState.cwaState.airframeIcing.checked;
-                          cloned.all.checked = isCheckedAllCwa(cloned);
-                          if (cloned.airframeIcing.checked) {
-                            cloned.checked = true;
-                            showLayer(meteoLayers.cwa, cloned.name);
-                          }
-                          updateLayerControl({ ...layerControlState, cwaState: cloned });
-                        }}
-                      />
-                    }
-                    label={layerControlState.cwaState.airframeIcing.name}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={layerControlState.cwaState.turbulence.checked}
-                        icon={<CircleUnchecked />}
-                        checkedIcon={<CircleCheckedFilled />}
-                        name="checkedB"
-                        color="primary"
-                        onClick={(_e) => {
-                          const cloned = jsonClone(layerControlState.cwaState) as CwaLayerState;
-                          cloned.turbulence.checked = !layerControlState.cwaState.turbulence.checked;
-                          cloned.all.checked = isCheckedAllCwa(cloned);
-                          if (cloned.turbulence.checked) {
-                            cloned.checked = true;
-                            showLayer(meteoLayers.cwa, cloned.name);
-                          }
-                          updateLayerControl({ ...layerControlState, cwaState: cloned });
-                        }}
-                      />
-                    }
-                    label={layerControlState.cwaState.turbulence.name}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={layerControlState.cwaState.ifrConditions.checked}
-                        icon={<CircleUnchecked />}
-                        checkedIcon={<CircleCheckedFilled />}
-                        name="checkedB"
-                        color="primary"
-                        onClick={(_e) => {
-                          const cloned = jsonClone(layerControlState.cwaState) as CwaLayerState;
-                          cloned.ifrConditions.checked = !layerControlState.cwaState.ifrConditions.checked;
-                          cloned.all.checked = isCheckedAllCwa(cloned);
-                          if (cloned.ifrConditions.checked) {
-                            cloned.checked = true;
-                            showLayer(meteoLayers.cwa, cloned.name);
-                          }
-                          updateLayerControl({ ...layerControlState, cwaState: cloned });
-                        }}
-                      />
-                    }
-                    label={layerControlState.cwaState.ifrConditions.name}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={layerControlState.cwaState.convection.checked}
-                        icon={<CircleUnchecked />}
-                        checkedIcon={<CircleCheckedFilled />}
-                        name="checkedB"
-                        color="primary"
-                        onClick={(_e) => {
-                          const cloned = jsonClone(layerControlState.cwaState) as CwaLayerState;
-                          cloned.convection.checked = !layerControlState.cwaState.convection.checked;
-                          cloned.all.checked = isCheckedAllCwa(cloned);
-                          if (cloned.convection.checked) {
-                            cloned.checked = true;
-                            showLayer(meteoLayers.cwa, cloned.name);
-                          }
-                          updateLayerControl({ ...layerControlState, cwaState: cloned });
-                        }}
-                      />
-                    }
-                    label={layerControlState.cwaState.convection.name}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={layerControlState.cwaState.other.checked}
-                        icon={<CircleUnchecked />}
-                        checkedIcon={<CircleCheckedFilled />}
-                        name="checkedB"
-                        color="primary"
-                        onClick={(_e) => {
-                          const cloned = jsonClone(layerControlState.cwaState) as CwaLayerState;
-                          cloned.other.checked = !layerControlState.cwaState.other.checked;
-                          cloned.all.checked = isCheckedAllCwa(cloned);
-                          if (cloned.other.checked) {
-                            cloned.checked = true;
-                            showLayer(meteoLayers.cwa, cloned.name);
-                          }
-                          updateLayerControl({ ...layerControlState, cwaState: cloned });
-                        }}
-                      />
-                    }
-                    label={layerControlState.cwaState.other.name}
-                  />
                 </AccordionDetails>
               </Accordion>
             </div>

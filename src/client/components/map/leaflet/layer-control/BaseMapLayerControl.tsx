@@ -21,6 +21,7 @@ import {
 } from '../../../../store/layers/layerControlApi';
 import { selectAuth } from '../../../../store/auth/authSlice';
 import { useCookies } from 'react-cookie';
+import { SvgRoundClose } from '../../../utils/SvgIcons';
 
 export const InBaseLayerControl = createContext<{ value: boolean }>({
   value: false,
@@ -166,7 +167,7 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
     <div className={positionClass + ' layer-control-container'} ref={handleDisableMapInteraction}>
       {baseMapLayerStatus.show && (
         <div id="layer-control" className="leaflet-control leaflet-bar layer-control">
-          <FetchData />
+          {/* <FetchData /> */}
           <div className="layer-control__header">
             <div className="layer-control__img__area">
               <Image
@@ -181,15 +182,15 @@ const BaseMapLayerControl = ({ position, children }: { children?: ReactElement[]
             <div className="layer-control__rgt">
               <h3>Base Maps</h3>
             </div>
-          </div>
-          <div
-            className="btn-close"
-            onClick={() => {
-              setBaseLayerControlState({ ...baseMapLayerStatus, show: false });
-              disableMapInteraction(false);
-            }}
-          >
-            <i className="fa-regular fa-circle-xmark"></i>
+            <div
+              className="btn-close dlg-close"
+              onClick={() => {
+                setBaseLayerControlState({ ...baseMapLayerStatus, show: false });
+                disableMapInteraction(false);
+              }}
+            >
+              <SvgRoundClose />
+            </div>
           </div>
           <div className="layer-control-contents">
             <div className="layer-control-item" style={{ marginLeft: 12, paddingLeft: 4 }}>
