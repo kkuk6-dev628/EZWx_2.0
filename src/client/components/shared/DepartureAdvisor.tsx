@@ -1200,12 +1200,12 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     setHour(hour.getTime());
     const sliderValue = timeToValue(new Date(settingsState.observation_time));
     if (isMobile) {
+      scrollBlocks();
       setIsLeftEdges(sliderValue < scrollLeftPadding);
       setIsRightEdges(sliderValue > maxRange - scrollRightPadding);
-      scrollBlocks();
     }
     setBarPos(calcBarPos(new Date(settingsState.observation_time)));
-  }, [settingsState.observation_time]);
+  }, [settingsState.observation_time, timeRange]);
 
   useEffect(() => {
     if (isRightEdges && isMobile) {

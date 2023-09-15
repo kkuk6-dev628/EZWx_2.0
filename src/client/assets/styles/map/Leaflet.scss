@@ -178,13 +178,20 @@
   height: 16px;
   border-radius: 8px;
   &.red {
-    background-color: red;
+    width: 0 !important;
+    height: 0 !important;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 18px solid red;
+    background-color: transparent;
+    border-top: none;
   }
   &.green {
     background-color: green;
   }
   &.yellow {
     background-color: yellow;
+    border-radius: 0;
   }
   &.blue {
     background-color: blue;

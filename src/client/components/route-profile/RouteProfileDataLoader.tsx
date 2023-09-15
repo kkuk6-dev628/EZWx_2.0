@@ -115,7 +115,7 @@ function findAirportByPoint(airports: RoutePoint[], point: L.LatLng, radius: num
   for (const routePoint of airports) {
     const dist = point.distanceTo(L.latLng(routePoint.position.coordinates[1], routePoint.position.coordinates[0]));
     if (dist < radius) {
-      if (exclude.filter((ex) => ex.key == routePoint.key).length > 0) {
+      if (exclude.filter((ex) => ex.key === routePoint.key && ex.type !== 'icaoid').length > 0) {
         continue;
       }
       proxyAirports.push({ dist, airport: routePoint });

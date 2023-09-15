@@ -601,6 +601,14 @@ const RouteProfileChart = (props: {
         let nbmData: AirportNbmData = null;
         let nbmTime: number = seg.arriveTime;
         if (seg.airport) {
+          const routeofFlightAirports = activeRoute.routeOfFlight.filter((routePoint) => {
+            if (routePoint.routePoint.type === seg.airport.type && routePoint.routePoint.key === seg.airport.key) {
+              return true;
+            }
+          });
+          if (routeofFlightAirports.length > 0) {
+            return;
+          }
           const airportNbm = getAirportNbmData(queryAirportNbmResult.data, seg.arriveTime, seg.airport.key);
           if (airportNbm.data) {
             nbmData = airportNbm.data;

@@ -29,6 +29,13 @@ const userSettingsApi = apiSlice.injectEndpoints({
             if (!result.data.observation_interval) {
               settings.observation_interval = initialUserSettingsState.settings.observation_interval;
             }
+            if (settings.active_route && settings.active_route.routeOfFlight) {
+              const route = {
+                ...settings.active_route,
+                routeOfFlight: [...settings.active_route.routeOfFlight].sort((a, b) => (a.order > b.order ? 1 : -1)),
+              };
+              settings.active_route = route;
+            }
             dispatch(setUserSettings(settings));
             dispatch(setActiveRoute(settings.active_route));
           }

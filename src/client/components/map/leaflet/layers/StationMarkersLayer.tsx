@@ -359,7 +359,7 @@ export const StationMarkersLayer = () => {
   useEffect(() => {
     if (isPast) {
       layerState.stationMarkersState.markerType === StationMarkersLayerItems.surfaceWindBarbs.value
-        ? setClusterRadius(20)
+        ? setClusterRadius(10)
         : setClusterRadius(30);
       if (Object.keys(indexedData).length > 0) {
         const filteredFeatures = metarsFilter(new Date(observationTime));
