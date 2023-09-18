@@ -274,9 +274,9 @@
 
       .bars-container{
         position: absolute;
-        margin-left: -16px;
+        margin-left: -18px;
         bottom: 80px;
-        @media (max-width: 1600px) {
+        @media (max-width: 2400px) {
           margin-left: -20px;
         }
         @media (max-width: 1200px) {

@@ -1386,7 +1386,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
 
   const valueToTime = (value: number): Date => {
     const origin = getTimeRangeStart(props.showPast);
-    origin.setMinutes((value * 60) / stepsPerHour);
+    origin.setMinutes(origin.getMinutes() + (value * 60) / stepsPerHour);
     return origin;
   };
 

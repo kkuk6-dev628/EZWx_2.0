@@ -126,9 +126,10 @@ const WFSLayer = React.forwardRef(
       },
     });
     useEffect(() => {
-      if (initData.features.length == 0) {
-        fetchGeoJSON();
-      }
+      // if (initData.features.length == 0) {
+      //   fetchGeoJSON();
+      // }
+      fetchGeoJSON();
     }, [dataLoadTime]);
 
     let lastZoom: number;

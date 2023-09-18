@@ -40,13 +40,6 @@ function Imagery() {
   };
   const tabMenus = [
     {
-      id: '1040Z',
-      name: '1040Z',
-      handler: handler,
-      svg: null,
-      isHideResponsive: false,
-    },
-    {
       id: 'saved',
       name: 'Saved',
       svg: <SvgBookmark />,
