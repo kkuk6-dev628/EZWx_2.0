@@ -1,6 +1,17 @@
 .igry {
   background-color: var(--color-primary);
-
+  .menu-items-container{
+    height: calc(100vh - 600px);
+    overflow-y: auto;
+  }
+  .level1-container{
+    margin-left: 20px;
+    background-color: #EDD7FE;
+  }
+  .level2-container{
+    padding-left: 20px;
+    background-color: #c49ae4;
+  }
   &__wrp {
     display: grid;
     height: calc(100vh - 300px);
@@ -395,9 +406,9 @@ line-height: 24px;
       color: #000;
     }
 
-    &--cld {
-      display: none;
-    }
+    // &--cld {
+    //   display: none;
+    // }
   }
 
   &__menu__icon {

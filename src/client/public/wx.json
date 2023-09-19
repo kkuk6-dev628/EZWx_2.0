@@ -420,7 +420,7 @@
       {
         "TITLE": "National Forecast Chart",
         "HELPTEXT": "The National Forecast Chart is issued by a forecaster at the Weather Prediction Center (WPC) and provides an overview of expected weather\n    for up to the next three days, with emphasis on certain hazardous and significant weather. They summarize forecasts from several\n    NCEP Service Centers including the Storm Prediction Center (for severe thunderstorm and tornado outlooks as well as critical fire weather), the National Hurricane\n    Center (for tropical storm and hurricane forecasts), and the Weather Prediction Center (for information concerning heavy rainfall,\n    flooding, winter weather, and general weather). With overlaid frontal forecasts, these displays serve as a good overview of the\n    expected weather for the next three days.  Note: Fronts depicted on this forecast are valid at a single time that occurs at the\n    beginning of the valid date-time stamp.  Weather areas are valid over a 12 hour period defined by the valid range shown.\n    &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Free",
         "DELAY": 1000,
         "HOURS_TO_LIVE": 18,
@@ -441,7 +441,7 @@
       {
         "TITLE": "Prog Charts",
         "HELPTEXT": "Short and extended range forecasts are also known as \"prog\" charts.  Meteorologists at the Weather Prediction Center (WPC)\n    prepare 6 through 60 hour forecasts for the conterminous U.S., southern Canada, and northern Mexico.  These short range forecasts are\n    issued twice a day at &lt;a href=\"https://www.wpc.ncep.noaa.gov/basicwx/about_bawx.shtml\" TARGET=\"_blank\"&gt;these&lt;/a&gt; times and\n    include surface pressure patterns (isobars), circulation centers (highs and lows) and fronts for 6 through 60 hours. A depiction of the\n    types, extent (coverage) and likelihood of precipitation are a mosaic extracted from the National Digital Forecast Database (NDFD) and\n    is prepared by forecasters at the NWS Weather Forecast Offices in collaboration with the WPC.  The primary goal is to depict accurately\n    the evolution of major weather systems that will affect the conterminous U.S. during the next 6 to 60 hours. Precipitation for the short \n\trange forecasts are valid at the time depicted on the chart representing precipitation coverage. \n    For guidance on precipitation areas used in these short range forecasts, please\n    see &lt;a href=\"https://www.wpc.ncep.noaa.gov/basicwx/about_ndfd_graphics.shtml\" TARGET=\"_blank\"&gt;this&lt;/a&gt; page.\n    &lt;br&gt;&lt;br&gt;Extended range forecasts are also issued by forecasters at the WPC at &lt;a href=\"https://www.wpc.ncep.noaa.gov/medr/about_medr.shtml\" TARGET=\"_blank\"&gt;these&lt;/a&gt; times. Only surface pressure patterns, circulation centers, and fronts are depicted from 72 hours (Day 3) through 168 hours (Day 7) and are valid at the time depicted on the chart. Precipitation on the extended range forecasts are valid over a range of time from 1800Z to 0000Z. Therefore, the areal coverage will be generally larger than the short range forecast for precipitation as it is based on the 6-hour probability of precipitation (PoP). See &lt;a href=\"https://www.wpc.ncep.noaa.gov/html/fntcodes2.shtml\" TARGET=\"_blank\"&gt;this&lt;/a&gt; page for a legend of surface fronts and other symbology used in these short and extended range forecasts. \n\t&lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Free",
         "DELAY": 1000,
         "HOURS_TO_LIVE": 9,
@@ -486,7 +486,7 @@
       {
         "TITLE": "6 hour QPF",
         "HELPTEXT": "This is the Quantitative Precipitation Forecast or QPF.  The QPF is an accumulated precipitation forecast\n    valid over a specific range of time, in this case, six hours.  These forecasts depict isohyets (colored contours) of\n    accumulated precipitation of 0.01, 0.25, 0.50, 1 inch and so on expected in each six hour period. Keep in mind, this\n    precipitation forecast is the liquid equivalent expected to reach the surface and does not distinguish between precipitation\n    type (snow, rain, ice pellets, etc.) or whether the precipitation is convective or non-convective. While this is not a\n    probabilistic forecast, meteorologists will generally only include contours on this chart when there's a high confidence\n    (generally greater than 50 percent) of measurable precipitation reaching the surface. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 1000,
         "HOURS_TO_LIVE": 9,
@@ -537,7 +537,7 @@
       {
         "TITLE": "Prob of Precipitation",
         "HELPTEXT": "This is the 12-hour Probability of Precipitation (PoP) extended range forecast for Day 3 through Day 7.\n    These forecasts are issued twice a day by meteorologists at the Weather Prediction Center (WPC).  Higher\n    numbers denote high forecaster confidence that measurable precipitation will reach the surface within the valid\n    12-hour forecast period.  The 12-hour forecast periods generally coincide with a nighttime (00Z to 12Z)\n    and a daytime (12Z to 00Z) period.  Please note that the valid timestamp on the chart is the ending time\n    of the 12-hour forecast period. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Free",
         "DELAY": 1000,
         "HOURS_TO_LIVE": 18,
@@ -5192,7 +5192,7 @@
       {
         "TITLE": "Graphical AIRMETs",
         "HELPTEXT": "Graphical AIRMETs or G-AIRMETs are en route advisories issued for adverse weather conditions that are not \nexpected to meet National SIGMET criteria. This encompasses advisories for the freezing level (and multiple freezing levels),\nwidespread moderate non-convective airframe ice, widespread moderate non-convective turbulence (high and low altitude), widespread\nstrong sustained surface winds greater than 30 knots, widespread non-convective low level wind shear (LLWS) below 2,000 feet AGL\nand widespread IFR conditions and mountain obscuration. Widespread defines an area greater than 3,000 square miles. G-AIRMETs\nare routinely issued by forecasters at the Aviation Weather Center (AWC) every six hours at 0245Z, 0845Z, 1445Z and 2045Z and\namended as necessary. Every G-AIRMET issuance provides five snapshots each valid at a single time. Therefore, this is a forecast for\ncoverage of a particular adverse weather element at the valid time on the chart. This includes an initial snapshot and forecasts with a lead\ntime of 3, 6, 9 and 12 hours. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 1000,
         "SUBTAB_GROUP": {
@@ -5379,7 +5379,7 @@
       {
         "TITLE": "Cloud Top Heights",
         "HELPTEXT": "This is the MSL height forecast of the cloud tops in 5,000 ft intervals for lead times\n    of 1, 2, 3, 6, 9, 12, 15 and 18 hours.  This forecast guidance is based on numerical model forecasts\n    from the Rapid Refresh (RAP) model and is issued hourly. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 1000,
         "HOURS_TO_LIVE": 3,
@@ -5415,7 +5415,7 @@
       {
         "TITLE": "US GFA",
         "HELPTEXT": "Provides static imagery for the Graphical Forecasts for Aviation (GFA) for clouds and surface conditions over the conterminous U.S.\n    This provided forecast guidance with lead times of 3, 6, 9, 12, 15 and 18 hours. Included are graphics of surface visibility depicted in colored contours, overlays of\n    surface wind and gusts depicted with standard wind barbs, overlays of predominant weather type (i.e., haze, fog, smoke, blowing dust/sand),\n    overlays of Graphical AIRMETs to include Instrument Flight Rules (IFR) and Strong Surface Wind, and overlays of predominant precipitation type\n    (i.e., rain, snow, mix, ice, or thunderstorm) coincident with any cloud (see &lt;a href=\"https://www.aviationweather.gov/metar/symbol\" TARGET=\"_blank\"&gt;this&lt;/a&gt; page).\n    &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Free",
         "SUBTAB_GROUP": [
           {
@@ -5933,7 +5933,7 @@
       {
         "TITLE": "Canada GFA",
         "HELPTEXT": "Provides static imagery for the Graphical Area Forecast (GFA) for clouds, weather, turbulence and icing over Canada.\n    This includes a 0, 6 and 12 hour forecast. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "SUBTAB_GROUP": [
           {
@@ -6175,7 +6175,7 @@
       {
         "TITLE": "Gridded LAMP MOS",
         "HELPTEXT": "This is the graphical Model Output Statics (MOS) for the Local Aviation MOS program (LAMP) model including the convective and lightning probability forecasts.\n    &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 1000,
         "SUBTAB_GROUP": {
@@ -7029,7 +7029,7 @@
       {
         "TITLE": "HREF Model",
         "HELPTEXT": "Forecasts for the probability of a Marginal VFR (MVFR), IFR and Low IFR (LIFR) ceiling from the High Resolution Ensemble Forecast (HREF). This provides an hourly forecast\n    over the next 48 hours and is updated four times throughout the day. Also includes the probabilities of ceilings below 3,000 ft, 2,000 ft and 1,000 ft as well as a probabilistic forecast for echo tops over 30,000 ft and 35,000 ft MSL. Also included is the simulated reflectivity forecast from the HREF model that provides a simulated reflectivity forecast over the next 48 hours for the conterminous U.S. It is run twice a day at 0000 and 1200 UTC and will become available about five or six hours after this time (approximately 0500 and 1700 UTC, respectively). &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 750,
         "SUBTAB_GROUP": [
@@ -17045,7 +17045,7 @@
       {
         "TITLE": "GFS Model",
         "HELPTEXT": "Forecasts generated by the Global Forecast System (GFS) numerical weather prediction model\n    are provided for the latest execution cycles to include 0000, 0600, 1200 and 1800 UTC. In addition to the \n    analysis for the latest cycle, forecasts are provided through 120 hours (5 days).  This includes a forecast for \n    MSL pressure, 850 mb temperature (degrees Celsius) and 6-hour accumulated precipitation.  Precipitation \n    forecasts are valid during the six hours prior to the valid time shown on the chart. Additionally, a \n    constant pressure chart analysis and forecasts for 850 mb (~5,000 feet MSL), 700 mb (~10,000 feet MSL), \n    500 mb (~18,000 feet MSL), 300 mb (~30,000 feet MSL), 250 mb (~34,000 feet MSL) and 200 mb (~39,000 feet MSL) are also available. \n      Forecasts from this model are normally available between around four hours after the execution cycle times.  For example, the 1200 UTC \n    cycle ordinarily becomes available around 1600 UTC on average.  Please see \n    &lt;a href=\"http://www.nco.ncep.noaa.gov/pmb/nwprod/prodstat_new\" TARGET=\"_blank\"&gt;this&lt;/a&gt; page for \n    specific model run status. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 500,
         "SUBTAB_GROUP": {
@@ -18192,7 +18192,7 @@
       {
         "TITLE": "NAM Model",
         "HELPTEXT": "Forecasts generated by the North American Mesoscale (NAM) numerical weather prediction model\nare provided for the latest execution cycle to include 0000, 0600, 1200 and 1800 UTC. In addition to the \nanalysis for the latest cycle, forecasts are available through 84 hours (3.5 days).  This includes a forecast for \nMSL pressure that also includes the 850 mb temperature (degrees Celsius) and 6-hour accumulated precipitation.  Precipitation \nforecasts are valid during the six hours prior to the valid time shown on the chart. Additionally, a \nconstant pressure chart analysis and forecasts for 850 mb (~5,000 feet MSL), 700 mb (~10,000 feet MSL), \n500 mb (~18,000 feet MSL) and 300 mb (~30,000 feet MSL) are also available.  Forecasts from this model are \nnormally available between two and three hours after the execution cycle times.  For example, the 1200 UTC \ncycle ordinarily becomes available around 1400 to 1500 UTC.  Please see \n&lt;a href=\"http://www.nco.ncep.noaa.gov/pmb/nwprod/prodstat_new\" TARGET=\"_blank\"&gt;this&lt;/a&gt; page for \nspecific model run status.  Also included is lowest model layer simulated reflectivity from the most recent \nexecution cycle of the high resolution North American Mesoscale (NAM) model. Forecasts for convective indices from the NAM are also provided.  This includes \nforecast for surface-based convective available potential energy (SBCAPE), most unstable convective available \npotential energy (MUCAPE), mixed layer convective available potential energy (MLCAPE) and most unstable \nlifted index (MULI).  The NAM also include a 3 km model resolution for simulated reflectivity overlaid on top of an IR satellite forecast.\nThe simulated reflectivity shows the expected precipitation type reaching the surface.  Forecasts are available at hourly intervals\nthrough 60 hours. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 500,
         "SUBTAB_GROUP": [
@@ -22528,7 +22528,7 @@
       {
         "TITLE": "RAP/HRRR Model",
         "HELPTEXT": "This is the simulated reflectivity forecast from the High Resolution Rapid Refresh (HRRR) model. The HRRR is run hourly\n    and produces forecasts out to 15 hours using one hour and 15 minute forecast time steps.  Simulated reflectivity products provide forecasts at 1000 meters AGL.\n    &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 750,
         "SUBTAB_GROUP": [
@@ -26902,7 +26902,7 @@
       {
         "TITLE": "Storm Prediction Center",
         "HELPTEXT": "Storm Prediction Center (SPC) convective outlooks and forecast products.  Day 1 means today, Day 2 means tomorrow,\n    Day 3 is the following day. Severe thunderstorm or tornado watches (WW) are regions where active areas of severe thunderstorms\n    including hail to 1 inch in diameter or greater, strong winds and tornadoes are possible. Clicking on any of the Day 1, Day 2, Day 3\n    and Day 4-8 outlooks will bring up the outlook discussion in a separate window. Current mesoscale discussions (MD) represent areas\n    that are likely for the development of strong storms, heavy rain or dangerous winter weather (heavy snow or ice).\n    MDs may also contain a description of an event currently under a severe thunderstorm or tornado watch.  Enhanced resolution\n    thunderstorm outlooks are valid over a four hour period (except for the overnight forecast from 0400 to 1200 UTC) and contain a\n    probability forecast for general organized convective activity (severe or not). The thunderstorm probabilities take into account\n    both the expected areal coverage and probability for thunder to occur. Therefore, a 40% probability means that given similar\n    environmental conditions, thunder would be observed at any one location (in either a county or city) within the 40% thunder\n    probability area four times out of ten, or 40% of the time. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Free",
         "SUBTAB_GROUP": {
           "SUBTAB": [
@@ -26982,7 +26982,7 @@
       {
         "TITLE": "T-storm Probability Fcst",
         "HELPTEXT": "This is the calibrated thunderstorm probability forecast from the Short Range Ensemble Forecast (SREF) model.\n    Calibrated thunderstorm probability forecasts are available for a 1, 3 and 4 hour time period.  The date-time stamp on the\n    chart is the &lt;u&gt;ending&lt;/u&gt; time of the valid period.  For example, if the chart is valid at\n    1500 UTC on the 23rd of the month, the valid period for the 3-hour calibrated thunderstorm probability forecast is from\n    1200 UTC to 1500 UTC on that day.  &lt;br&gt;&lt;br&gt;Contours shown on the chart are roughly equivalent to the probability of a thunderstorm\n    within 10 miles of a point covering the 1, 3 or 4 hour time periods.  This product only shows the probability of convective events\n    that produce lightning and may not cover all areas of deep, moist convection (DMC).  Also, the product does &lt;u&gt;not&lt;/u&gt; forecast areas\n    of non-convective precipitation.  White locations outside of the 3 or 5 percent contoured areas simply imply there is less than a 3 or 5 percent\n    probability of thunderstorms.  In other words, it does not imply a zero percent probability. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 1000,
         "SUBTAB_GROUP": {
@@ -27408,7 +27408,7 @@
       {
         "TITLE": "Convective Forecast Guidance",
         "HELPTEXT": "This is the TFM Convective Forecast (TCF) guidance.  &lt;br&gt;&lt;br&gt;Keep in mind that this is &lt;strong&gt;NOT&lt;/strong&gt; a forecast for thunderstorms.  Moreover, the criteria used for\n    CCFP is different than the criteria used for issuing convective SIGMETs (WSTs). &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 1500,
         "SUBTAB_GROUP": {
@@ -27514,7 +27514,7 @@
       {
         "TITLE": "Lowest Freezing Level",
         "HELPTEXT": "This is an analysis and forecast of the lowest freezing level from the Rapid Refresh (RAP) model.\n    The forecast and analysis is update hourly.  The RAP model produces forecasts from 1 to 18 hours at a one hour interval.\n    The lowest freezing level is depicted at 2,000 ft. increments in hundreds of feet above mean sea level (MSL) using the\n    scale at the bottom of the chart.  Areas depicted in white consist of regions where the entire temperature profile above\n    the surface is below 0 degrees Celsius.  Hatched areas imply there are multiple freezing levels with the color presented\n    in the hatched areas as the lowest freezing level. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 500,
         "JSON_URL": "/wx/data/lowest_freezing_level/lowest_freezing_level.json",
@@ -27579,7 +27579,7 @@
       {
         "TITLE": "Icing Analyses",
         "HELPTEXT": "This represents the latest CIP severity product looped by altitude with the composite (maximum) severity shown as the\n    last image in the loop.&lt;br&gt;&lt;br&gt;Icing scenario attempts to explain the cloud's microphysical-properties,\n    especially clouds containing supercooled large water drops (SLD).  This can help to determine hazardous areas of\n    potential in-flight aircraft icing. Here's a brief overview of the various icing scenario categories.&lt;br&gt;&lt;br&gt;&lt;b&gt;BWN:&lt;/b&gt;\n    Below warm nose - Classical FZRA structure with FZRA, PE, RA, FZDZ and/or DZ observed at the surface. The subfreezing layer resides beneath the\n    melting layer (warm nose). Cloud top temperature (CTT) less than -12 degrees C.&lt;br&gt;&lt;br&gt;&lt;b&gt;AWN:&lt;/b&gt; Above warm nose - Classical\n    FZRA structure with FZRA, PE, RA, FZDZ and/or DZ observed at the surface. Cloudy area above melting layer (warm nose). Cloud top\n    temperature (CTT) less than -12 degrees C.&lt;br&gt;&lt;br&gt;&lt;b&gt;AS:&lt;/b&gt; All snow - All sounding levels less than 0 degrees C.  Snow\n    is the only precipitation observed at the surface.&lt;br&gt;&lt;br&gt;&lt;b&gt;CR:&lt;/b&gt; Cold rain - RA is observed at surface and\n    Cloud Top Temp (CTT) less than or equal to -12 degrees C.&lt;br&gt;&lt;br&gt;&lt;b&gt;WMPCP:&lt;/b&gt; Warm precipitation: Any non-snow\n    precipitation observed at surface with a CTT greater than -12 degrees C.&lt;br&gt;&lt;br&gt;&lt;b&gt;CPCP:&lt;/b&gt; Cold non-snow,\n    non-rain - FZRA, PE, FZDZ and/or DZ observed at the surface with CTT greater than or equal to -12 degrees C.&lt;br&gt;&lt;br&gt;&lt;b&gt;CONV:&lt;/b&gt;\n    Convective - Lightning strikes within 25 km and 15 minutes. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 750,
         "SUBTAB_GROUP": [
@@ -28383,7 +28383,7 @@
       {
         "TITLE": "Icing Forecast by Altitude",
         "HELPTEXT": "This is the Forecast Icing Product (FIP) that provides guidance for the probability of airframe icing and icing severity\n    with a 1, 2, 3, 6, 9, 12, 15 and 18 hour lead time from the Rapid Refresh (RAP) forecast model. Each forecast hour provides a loop at 1,000 ft\n    intervals altitude. Also included are forecast from the legacy Forecast Icing Product found on the Aviation Weather Center's website. This\n    includes the Supercooled Large Drop (SLD) icing potential with an overlay in red on the icing severity forecast. See the EZWxBrief Pilots\n    Guide for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 1000,
         "SUBTAB_GROUP": [
@@ -30740,7 +30740,7 @@
       {
         "TITLE": "Icing Forecast by Hour",
         "HELPTEXT": "This is the Current Icing Product (CIP) and Forecast Icing Product (FIP) looped for the selected altitude for the CIP analysis and\n    subsequent FIP forecasts through 18 hours. The first image is the CIP analysis followed by the FIP forecast for 1, 2, 3, 6, 9, 12, 15 and 18 hours. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 1000,
         "SUBTAB_GROUP": [
@@ -31694,7 +31694,7 @@
       {
         "TITLE": "Icing Masked Severity",
         "HELPTEXT": "This is the Current Icing Product (CIP) and Forecast Icing Product (FIP) 25-percent and 50-percent masked severity looped over an\n    altitude for the CIP analysis and subsequent FIP forecasts through 18 hours.  Masked severity combines the probability product with the severity product.\n    Areas with less than a 25-percent or 50-percent probability will be grayed out or masked to leave only the icing severity with the greatest\n    probabilities. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 1000,
         "SUBTAB_GROUP": [
@@ -32643,7 +32643,7 @@
       {
         "TITLE": "Turbulence by Altitude",
         "HELPTEXT": "This is the Graphical Turbulence Guidance (GTG-3) product looped over an altitude.  Included are forecasts from the 13 km resolution\n    RAP model for Clear Air Turbulence, Mountain Wave Turbulence and the combination of the two. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
-        "LOOP": "Yes",
+        "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 1000,
         "SUBTAB_GROUP": [

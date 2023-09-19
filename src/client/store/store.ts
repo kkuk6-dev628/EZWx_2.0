@@ -14,6 +14,7 @@ import DataLoadTimeSlice from './layers/DataLoadTimeSlice';
 import { routeProfileApi } from './route-profile/routeProfileApi';
 import { elevationApi } from './route-profile/elevationApi';
 import RouteProfileSlice from './route-profile/RouteProfile';
+import { imageryApi } from './imagery/imageryApi';
 
 const makeStore = () =>
   configureStore({
@@ -25,6 +26,7 @@ const makeStore = () =>
       [layerControlApi.reducerPath]: layerControlApi.reducer,
       [routeProfileApi.reducerPath]: routeProfileApi.reducer,
       [elevationApi.reducerPath]: elevationApi.reducer,
+      [imageryApi.reducerPath]: imageryApi.reducer,
       [RoutesSlice.name]: RoutesSlice.reducer,
       [apiSlice.reducerPath]: apiSlice.reducer,
       [authSlice.name]: authSlice.reducer,
@@ -45,6 +47,7 @@ const makeStore = () =>
         layerControlApi.middleware,
         routeProfileApi.middleware,
         elevationApi.middleware,
+        imageryApi.middleware,
       );
       return middleWares;
     },
