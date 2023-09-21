@@ -7,6 +7,16 @@ const settings = {
   serverRuntimeConfig: {
     PROJECT_ROOT: __dirname,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'imagery.ezwxbrief.com',
+        port: '',
+        pathname: '/wx/**',
+      },
+    ],
+  },
   eslint: {
     dirs: ['src/client'], // https://github.com/thisismydesign/nestjs-starter/issues/82
   },

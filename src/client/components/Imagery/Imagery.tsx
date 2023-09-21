@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useState } from 'react';
 import { IoMdArrowDropdown } from 'react-icons/io';
 import { AiOutlineSearch } from 'react-icons/ai';
@@ -14,7 +15,7 @@ import axios from 'axios';
 import ImageryDropDown from './ImageryDropDown';
 import moment from 'moment';
 import { Slider } from '@mui/material';
-import { convertTimeFormat } from '../map/common/AreoFunctions';
+import { convertTimeFormat, simpleTimeFormat } from '../map/common/AreoFunctions';
 
 function Imagery() {
   const { isSuccess: isLoadedImageryCollections, data: imageryData } = useGetWxJsonQuery('');
@@ -27,20 +28,23 @@ function Imagery() {
   const [sliderValue, setSliderValue] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [timerHandle, setTimerHandle] = useState(null);
+  const [selectedTime, setSelectedTime] = useState([]);
 
   useEffect(() => {
     if (selectedImages.length > sliderValue) {
       setSelectedImageUrl(selectedImages[sliderValue]);
-    } else {
+      setSelectedTime(dataTimes[sliderValue]);
+    } else if (selectedImages.length > 0) {
       setSelectedImageUrl(selectedImages[0]);
+      setSelectedTime(dataTimes[0]);
     }
-  }, [selectedImages, sliderValue]);
+  }, [selectedImages, dataTimes, sliderValue]);
 
   useEffect(() => {
-    const sliderMarks = dataTimes.map((time, index) => {
+    const sliderMarks = dataTimes.map((item, index) => {
       return {
         value: index,
-        label: convertTimeFormat(time, false),
+        label: simpleTimeFormat(item[0], false),
       };
     });
     setSliderLabels(sliderMarks);
@@ -55,8 +59,7 @@ function Imagery() {
         if (!data.data) {
           return;
         }
-        const timestamps = data.data.map((timestr) => moment.utc(timestr, 'YYYYMMDDHHmm').toDate());
-        console.log(timestamps);
+        const timestamps = data.data.map((item) => item.map((strTime) => moment.utc(strTime, 'YYYYMMDDHHmm').toDate()));
         setDataTimes(timestamps);
       });
     }
@@ -72,11 +75,13 @@ function Imagery() {
     } else {
       setIsPlaying(true);
       const handle = setInterval(() => {
-        if (sliderValue >= selectedImages.length) {
-          setSliderValue(0);
-        } else {
-          setSliderValue((prevValue) => prevValue + 1);
-        }
+        setSliderValue((prevValue) => {
+          if (prevValue >= selectedImages.length - 1) {
+            return 0;
+          } else {
+            return prevValue + 1;
+          }
+        });
       }, 500);
       setTimerHandle(handle);
     }
@@ -138,7 +143,16 @@ function Imagery() {
         </div>
         <div className="igry__mid">
           <div className="igry__img__area">
-            <img className="igry__img" src={imageryServerUrl + selectedImageUrl} alt={''} loading="eager" />
+            {selectedImageUrl && (
+              <Image
+                className="igry__img"
+                src={imageryServerUrl + selectedImageUrl}
+                width={1024}
+                height={720}
+                alt={''}
+                loading="eager"
+              />
+            )}
           </div>
         </div>
         <div className="igry__rgt igry__blu">
@@ -150,7 +164,11 @@ function Imagery() {
       </div>
       <div className="igry__range">
         <div className="container">
-          <h2 className="igry__range__title">Valid 0000Z Feb 27 to 1200Z Feb 27</h2>
+          {selectedTime && selectedTime.length > 0 && (
+            <h2 className="igry__range__title">{`Valid ${simpleTimeFormat(selectedTime[0], false)} ${
+              selectedTime.length > 1 ? 'To ' + simpleTimeFormat(selectedTime[1], false) : ''
+            }`}</h2>
+          )}
           <div className=" container">
             <div className="igry__range__wrp">
               <div className="igry__btn__area">
@@ -163,8 +181,10 @@ function Imagery() {
                 <Slider
                   min={20}
                   defaultValue={0}
+                  value={sliderValue}
                   marks={sliderLabels}
                   step={1}
+                  // @ts-ignore
                   min={0}
                   max={dataTimes.length > 0 ? dataTimes.length - 1 : 3}
                   className="igry__range__slider"
