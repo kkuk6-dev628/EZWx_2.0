@@ -10,6 +10,7 @@ import {
   useUpdateImageryStateMutation,
 } from '../../store/imagery/imageryApi';
 import { useDispatch } from 'react-redux';
+import { convertTimeFormat } from '../map/common/AreoFunctions';
 
 // IoMdArrowDropdown
 interface ImageryDropDownProps {
@@ -74,13 +75,15 @@ const ImageryDropDown = ({
           ? selectedLvl1Data.SUBTAB_GROUP
           : selectedLvl1Data.SUBTAB_GROUP.SUBTAB;
         const selectedLvl2Data = childrenLvl1[imagerySt.selectedLvl2];
-        if (selectedLvl2Data.IMAGE) {
+        if (selectedLvl2Data && selectedLvl2Data.IMAGE) {
           setSelectedImage(selectedLvl2Data as any);
-        } else {
+        } else if (selectedLvl2Data) {
           const childrenLvl2 = (selectedLvl2Data as SubtabGroupItem).SUBTAB;
           const selectedLvl3Data = Array.isArray(childrenLvl2) ? childrenLvl2[imagerySt.selectedLvl3] : childrenLvl2;
-          if (selectedLvl3Data.IMAGE) {
+          if (selectedLvl3Data && selectedLvl3Data.IMAGE) {
             setSelectedImage(selectedLvl3Data as any);
+          } else {
+            setSelectedImage(childrenLvl2[0] as any);
           }
         }
       }
@@ -118,7 +121,7 @@ const ImageryDropDown = ({
               </form>
             </div>
             <div className="menu-items-container">
-              <div className="igryDrop__menu">
+              <div className="igryDrop__menu" key={'children-' + Date.now()}>
                 {imageryCollections.map((item, index1) => {
                   const children = item.SUBTAB_GROUP
                     ? Array.isArray(item.SUBTAB_GROUP)
@@ -130,8 +133,14 @@ const ImageryDropDown = ({
                   return (
                     <>
                       <div
-                        onClick={() => {
+                        onClick={(e) => {
+                          if (selectedLevel1 === index1) {
+                            setSelectedLevel1(-1);
+                            return;
+                          }
                           setSelectedLevel1(index1);
+                          setSelectedLevel2(-1);
+                          setSelectedLevel3(-1);
                           if (item.IMAGE) {
                             selectImage(item);
                           }
@@ -140,7 +149,7 @@ const ImageryDropDown = ({
                         key={item.TITLE}
                         {...itemProps}
                       >
-                        <p className="igryDrop__menu__text">{item.TITLE}</p>
+                        <p className="igryDrop__menu__text">{item.TITLE.replace(/&amp;/g, '&')}</p>
                         {children && (
                           <div
                             className={`igryDrop__menu__icon ${
@@ -155,7 +164,10 @@ const ImageryDropDown = ({
                         <div className="level1-container">
                           {Array.isArray(children) &&
                             children.map((child, index2) => {
-                              const children2 = Array.isArray(child.SUBTAB) ? child.SUBTAB : [child.SUBTAB];
+                              const children2 =
+                                child.SUBTAB === undefined || Array.isArray(child.SUBTAB)
+                                  ? child.SUBTAB
+                                  : [child.SUBTAB];
                               const itemProps =
                                 index2 == selectedLevel2 && child.IMAGE !== undefined
                                   ? { ref: selectedComponentRef }
@@ -163,23 +175,30 @@ const ImageryDropDown = ({
                               return (
                                 <>
                                   <div
-                                    onClick={() => {
-                                      setSelectedLevel2(index2);
-                                      if (child.IMAGE) {
-                                        selectImage(child);
+                                    onClick={(e) => {
+                                      if (selectedLevel2 === index2) {
+                                        setSelectedLevel2(-1);
+                                      } else {
+                                        setSelectedLevel2(index2);
+                                        setSelectedLevel3(-1);
+                                        if (child.IMAGE) {
+                                          selectImage(child);
+                                        }
                                       }
                                     }}
-                                    className={`igryDrop__menu__item igryDrop__menu__item--cld ${
-                                      selectedLevel2 === index2 && 'igryDrop__menu__item--cld--show'
-                                    }`}
+                                    className={`igryDrop__menu__item igryDrop__menu__item--cld`}
                                     key={child.SUBTABLABEL || child.GROUP_NAME}
                                     {...itemProps}
                                   >
-                                    <p className="igryDrop__menu__text">{child.SUBTABLABEL || child.GROUP_NAME}</p>
+                                    <p className="igryDrop__menu__text">
+                                      {child.SUBTABLABEL
+                                        ? child.SUBTABLABEL.replace(/&amp;/g, '&')
+                                        : child.GROUP_NAME.replace(/&amp;/g, '&')}
+                                    </p>
                                     {children2 && (
                                       <div
                                         className={`igryDrop__menu__icon ${
-                                          selectedLevel1 === index2 && 'igryDrop__menu__icon--rotate'
+                                          selectedLevel2 === index2 && 'igryDrop__menu__icon--rotate'
                                         }`}
                                       >
                                         <SvgDropDown />
@@ -187,7 +206,7 @@ const ImageryDropDown = ({
                                     )}
                                   </div>
                                   {children2 && selectedLevel2 == index2 && (
-                                    <div className="level2-container">
+                                    <div className="level2-container" key={'children2-' + index2}>
                                       {children2.map((child3, index3) => {
                                         const itemProps =
                                           index3 == selectedLevel3 && child3.IMAGE !== undefined
@@ -208,7 +227,9 @@ const ImageryDropDown = ({
                                             {...itemProps}
                                           >
                                             <p className="igryDrop__menu__text">
-                                              {child3.SUBTABLABEL || child3.GROUP_NAME}
+                                              {child3.SUBTABLABEL
+                                                ? child3.SUBTABLABEL.replace(/&amp;/g, '&')
+                                                : child3.GROUP_NAME.replace(/&amp;/g, '&')}
                                             </p>
                                           </div>
                                         );

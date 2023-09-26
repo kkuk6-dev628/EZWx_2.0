@@ -16,6 +16,8 @@ import ImageryDropDown from './ImageryDropDown';
 import moment from 'moment';
 import { Slider } from '@mui/material';
 import { convertTimeFormat, simpleTimeFormat } from '../map/common/AreoFunctions';
+import { selectSettings } from '../../store/user/UserSettings';
+import { useSelector } from 'react-redux';
 
 function Imagery() {
   const { isSuccess: isLoadedImageryCollections, data: imageryData } = useGetWxJsonQuery('');
@@ -29,32 +31,44 @@ function Imagery() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [timerHandle, setTimerHandle] = useState(null);
   const [selectedTime, setSelectedTime] = useState([]);
+  const userSettings = useSelector(selectSettings);
 
   useEffect(() => {
     if (selectedImages.length > sliderValue) {
       setSelectedImageUrl(selectedImages[sliderValue]);
-      setSelectedTime(dataTimes[sliderValue]);
+      dataTimes && setSelectedTime(dataTimes[sliderValue]);
     } else if (selectedImages.length > 0) {
       setSelectedImageUrl(selectedImages[0]);
-      setSelectedTime(dataTimes[0]);
+      dataTimes && setSelectedTime(dataTimes[0]);
     }
   }, [selectedImages, dataTimes, sliderValue]);
 
   useEffect(() => {
-    const sliderMarks = dataTimes.map((item, index) => {
-      return {
-        value: index,
-        label: simpleTimeFormat(item[0], false),
-      };
-    });
-    setSliderLabels(sliderMarks);
+    if (dataTimes) {
+      const sliderMarks = dataTimes.map((item, index) => {
+        return {
+          value: index,
+          label: toTimeString(item[0], userSettings.default_time_display_unit),
+        };
+      });
+      setSliderLabels(sliderMarks);
+    }
   }, [dataTimes]);
 
+  function toTimeString(date: Date, useLocalTime: boolean) {
+    const momentObj = moment(date).tz(Intl.DateTimeFormat().resolvedOptions().timeZone);
+    if (useLocalTime) return momentObj.format('ddd, kk:mm MMM DD');
+    else {
+      const timeStr = momentObj.utc().format('ddd, kkmm MMM DD');
+      return `${timeStr.slice(0, 9)}Z${timeStr.slice(9)}`;
+    }
+  }
+
   function handleSelectImageCollection(item: SubtabItem | ImageryCollectionItem) {
+    setSelectedImages(item.IMAGE.map((img) => img.URL));
     if (item.JSON_URL) {
       const jsonUrl = imageryServerUrl + item.JSON_URL;
       const requestUrl = '/api/imagery/timestamps?url=' + jsonUrl;
-      setSelectedImages(item.IMAGE.map((img) => img.URL));
       axios.get(requestUrl).then((data) => {
         if (!data.data) {
           return;
@@ -62,6 +76,16 @@ function Imagery() {
         const timestamps = data.data.map((item) => item.map((strTime) => moment.utc(strTime, 'YYYYMMDDHHmm').toDate()));
         setDataTimes(timestamps);
       });
+    } else {
+      const sliderMarks = item.IMAGE.map((item, index) => {
+        return {
+          value: index,
+          label: index,
+        };
+      });
+      setSliderLabels(sliderMarks);
+      setSelectedTime(null);
+      setDataTimes(null);
     }
   }
 
@@ -165,10 +189,16 @@ function Imagery() {
       <div className="igry__range">
         <div className="container">
           {selectedTime && selectedTime.length > 0 && (
-            <h2 className="igry__range__title">{`Valid ${simpleTimeFormat(selectedTime[0], false)} ${
-              selectedTime.length > 1 ? 'To ' + simpleTimeFormat(selectedTime[1], false) : ''
+            <h2 className="igry__range__title">{`Valid ${toTimeString(
+              selectedTime[0],
+              userSettings.default_time_display_unit,
+            )} ${
+              selectedTime.length > 1
+                ? 'To ' + toTimeString(selectedTime[0], userSettings.default_time_display_unit)
+                : ''
             }`}</h2>
           )}
+          {!selectedTime && <h2 className="igry__range__title">Please reference time stamps on image</h2>}
           <div className=" container">
             <div className="igry__range__wrp">
               <div className="igry__btn__area">
@@ -186,7 +216,7 @@ function Imagery() {
                   step={1}
                   // @ts-ignore
                   min={0}
-                  max={dataTimes.length > 0 ? dataTimes.length - 1 : 3}
+                  max={selectedImages.length > 0 ? selectedImages.length - 1 : 3}
                   className="igry__range__slider"
                   onChange={(event, newValue: number) => {
                     setSliderValue(newValue);

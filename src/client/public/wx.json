@@ -1272,7 +1272,7 @@
         "SUBTAB_GROUP": [
           {
             "GROUP_NAME": "National",
-            "SUBTAB": {
+            "SUBTAB": [{
               "SUBTABLABEL": "U.S. Vis Satellite",
               "JSON_URL": "/wx/data/satellite/US/satellite.json",
               "FAVORITE_ID": "VIS_SAT_NAT",
@@ -1368,7 +1368,7 @@
                   "URL": "/wx/data/satellite/US/vis_1.jpg"
                 }
               ]
-            }
+            }]
           },
           {
             "GROUP_NAME": "Northeast",
@@ -3167,7 +3167,7 @@
         "SUBTAB_GROUP": [
           {
             "GROUP_NAME": "National",
-            "SUBTAB": {
+            "SUBTAB": [{
               "SUBTABLABEL": "U.S. IR Satellite",
               "JSON_URL": "/wx/data/satellite/US/satellite.json",
               "FAVORITE_ID": "IR_SAT_NAT",
@@ -3263,7 +3263,7 @@
                   "URL": "/wx/data/satellite/US/ir_1.jpg"
                 }
               ]
-            }
+            }]
           },
           {
             "GROUP_NAME": "Northeast",
@@ -28300,81 +28300,81 @@
                 "SUBTABLABEL": "Base of icing layer",
                 "JSON_URL": "/wx/data/cip/cip_base_ice.json",
                 "FAVORITE_ID": "CIP_ICE_BASE",
-                "IMAGE": {
+                "IMAGE": [{
                   "URL": "/wx/data/cip/icebase.png"
-                }
+                }]
               },
               {
                 "SUBTABLABEL": "Base of SLD layer",
                 "JSON_URL": "/wx/data/cip/cip_base_sld.json",
                 "FAVORITE_ID": "CIP_SLD_BASE",
-                "IMAGE": {
+                "IMAGE": [{
                   "URL": "/wx/data/cip/sldbase.png"
-                }
+                }]
               },
               {
                 "SUBTABLABEL": "Cloud base height",
                 "JSON_URL": "/wx/data/cip/cip_cbz.json",
                 "FAVORITE_ID": "CIP_CLD_BASE",
-                "IMAGE": {
+                "IMAGE": [{
                   "URL": "/wx/data/cip/cbz.png"
-                }
+                }]
               },
               {
                 "SUBTABLABEL": "Top of icing layer",
                 "JSON_URL": "/wx/data/cip/cip_top_ice.json",
                 "FAVORITE_ID": "CIP_ICE_TOP",
-                "IMAGE": {
+                "IMAGE": [{
                   "URL": "/wx/data/cip/icetop.png"
-                }
+                }]
               },
               {
                 "SUBTABLABEL": "Top of SLD layer",
                 "JSON_URL": "/wx/data/cip/cip_top_sld.json",
                 "FAVORITE_ID": "CIP_SLD_TOP",
-                "IMAGE": {
+                "IMAGE": [{
                   "URL": "/wx/data/cip/sldtop.png"
-                }
+                }]
               },
               {
                 "SUBTABLABEL": "Cloud top temperature",
                 "JSON_URL": "/wx/data/cip/cip_ctt.json",
                 "FAVORITE_ID": "CIP_CTT",
-                "IMAGE": {
+                "IMAGE": [{
                   "URL": "/wx/data/cip/ctt.png"
-                }
+                }]
               },
               {
                 "SUBTABLABEL": "Cloud top height",
                 "JSON_URL": "/wx/data/cip/cip_ctz.json",
                 "FAVORITE_ID": "CIP_CTZ",
-                "IMAGE": {
+                "IMAGE": [{
                   "URL": "/wx/data/cip/ctz.png"
-                }
+                }]
               },
               {
                 "SUBTABLABEL": "Freezing precipitation",
                 "JSON_URL": "/wx/data/cip/cip_precip_freezing.json",
                 "FAVORITE_ID": "CIP_FRZ_PRECIP",
-                "IMAGE": {
+                "IMAGE": [{
                   "URL": "/wx/data/cip/pcpfz.png"
-                }
+                }]
               },
               {
                 "SUBTABLABEL": "All snow",
                 "JSON_URL": "/wx/data/cip/cip_snow.json",
                 "FAVORITE_ID": "CIP_ALL_SNOW",
-                "IMAGE": {
+                "IMAGE": [{
                   "URL": "/wx/data/cip/pcpsn.png"
-                }
+                }]
               },
               {
                 "SUBTABLABEL": "Distance to lightning",
                 "JSON_URL": "/wx/data/cip/cip_lightning.json",
                 "FAVORITE_ID": "CIP_DIST_LIGHTNING",
-                "IMAGE": {
+                "IMAGE": [{
                   "URL": "/wx/data/cip/ltg.png"
-                }
+                }]
               }
             ]
           }

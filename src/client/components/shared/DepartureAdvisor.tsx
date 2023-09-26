@@ -13,8 +13,14 @@ import {
 } from '../map/common/AreoFunctions';
 import { useDispatch, useSelector } from 'react-redux';
 import { Dialog, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import { PersonalMinimums, selectSettings, setObservationTime, setUserSettings } from '../../store/user/UserSettings';
-import { useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
+import {
+  PersonalMinimums,
+  initialUserSettingsState,
+  selectSettings,
+  setObservationTime,
+  setUserSettings,
+} from '../../store/user/UserSettings';
+import { useGetUserSettingsQuery, useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
 import { selectAuth } from '../../store/auth/authSlice';
 import {
   useGetLastDepartureDataTimeQuery,
@@ -47,6 +53,22 @@ import { useGetAirportQuery } from '../../store/route/airportApi';
 type personalMinValue = 0 | 1 | 2 | 10;
 type personalMinColor = 'red' | 'yellow' | 'green' | 'grey';
 type personalMinShape = 'rect' | 'circle' | 'triangle';
+
+export const FetchUserSettings = () => {
+  const { id } = useSelector(selectAuth);
+  if (id !== null) {
+    const { data, isSuccess } = useGetUserSettingsQuery(id, { refetchOnMountOrArgChange: true });
+    const [updateUserSettings, { isLoading: isUpdating, isSuccess: isSuccessUpdate }] = useUpdateUserSettingsMutation({
+      fixedCacheKey: 'user-settings',
+    });
+    useEffect(() => {
+      if (isSuccess && (!data || !data.user_id)) {
+        if (!isUpdating && !isSuccessUpdate) updateUserSettings({ ...initialUserSettingsState.settings, user_id: id });
+      }
+    }, [data, isSuccess]);
+  }
+  return <></>;
+};
 
 export interface PersonalMinsEvaluation {
   departureCeiling: { value: personalMinValue; color: personalMinColor };
@@ -1015,7 +1037,9 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const settingsState = useSelector(selectSettings);
   const activeRoute = useSelector(selectActiveRoute);
   let currentTime: Date;
-  const [updateUserSettingsAPI] = useUpdateUserSettingsMutation();
+  const [updateUserSettingsAPI] = useUpdateUserSettingsMutation({
+    fixedCacheKey: 'user-settings',
+  });
   const auth = useSelector(selectAuth);
   const [isLeftEdges, setIsLeftEdges] = useState(false);
   const [isRightEdges, setIsRightEdges] = useState(false);
@@ -1459,6 +1483,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
 
   return (
     <div className="departure-advisor">
+      <FetchUserSettings />
       <Dialog
         PaperComponent={PaperComponent}
         hideBackdrop

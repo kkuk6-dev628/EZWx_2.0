@@ -163,6 +163,7 @@
 
   &__range {
     background-color: var(--color-white);
+    padding-top: 12px;
     @media (max-width: 1024px) {
       padding-bottom: 0;
     }

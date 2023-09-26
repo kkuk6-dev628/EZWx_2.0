@@ -65,6 +65,7 @@ export const cacheKeys = {
   nbm: 'nbm-all',
   elevation: 'elevation-api',
   departureAdvisor: 'departure-advisor',
+  userSettings: 'update-usersettings',
 };
 
 /**

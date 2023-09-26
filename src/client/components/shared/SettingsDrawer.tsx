@@ -19,12 +19,6 @@ import { ColoredRangeSlider, formatForDecimal, formatForInteger } from '../commo
 import { toast } from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 
-export const FetchUserSettings = () => {
-  const { id } = useSelector(selectAuth);
-  if (id !== null) useGetUserSettingsQuery(id, { refetchOnMountOrArgChange: true });
-  return <></>;
-};
-
 export const icingIntensity = ['None', 'Trc', 'Lgt', 'Mod', 'Hvy'];
 
 export const convectivePotential = ['None', 'Very Lo', 'Lo', 'Mod', 'Hi', 'Very Hi'];
@@ -46,7 +40,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const dispatch = useDispatch();
 
   const [updateUserSettings, { isLoading: isUpdating, isSuccess: isSuccessUpdate, error: updateError }] =
-    useUpdateUserSettingsMutation();
+    useUpdateUserSettingsMutation({
+      fixedCacheKey: 'user-settings',
+    });
 
   useEffect(() => {
     if (settingsState) setSettings(settingsState);
@@ -107,7 +103,6 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
 
   return (
     <Drawer anchor={'right'} open={isShowSettingsDrawer} onClose={handleCloseDrawer}>
-      <FetchUserSettings />
       <div className="drawer__container">
         <div className="drawer__sticky__header">
           <div className="drawer__header">
