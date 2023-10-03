@@ -225,6 +225,20 @@ function SvgRefresh() {
     </svg>
   );
 }
+function SvgCollapse() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24">
+      <path
+        fill="none"
+        stroke="#3f0c69"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="m20 20l-5-5m0 0v4m0-4h4M4 20l5-5m0 0v4m0-4H5M20 4l-5 5m0 0V5m0 4h4M4 4l5 5m0 0V5m0 4H5"
+      />
+    </svg>
+  );
+}
 function SvgLayer() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -647,6 +661,7 @@ export {
   SvgRefresh,
   SvgProfile,
   SvgSetting,
+  SvgCollapse,
   SvgSave,
   SvgWarn,
   SvgDropDown,

@@ -3,6 +3,8 @@ export interface SubtabItem {
   HOURS_TO_LIVE: number;
   JSON_URL: string;
   FAVORITE_ID: string;
+  LOOP?: string;
+  DELAY?: number;
   IMAGE: { URL: string }[];
 }
 

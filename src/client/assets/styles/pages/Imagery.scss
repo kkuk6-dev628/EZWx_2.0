@@ -1,7 +1,7 @@
 .igry {
   background-color: var(--color-primary);
   .menu-items-container{
-    height: calc(100vh - 600px);
+    height: calc(100vh - 440px);
     overflow-y: auto;
   }
   .level1-container{
@@ -28,30 +28,66 @@
     background-color: #3F0C69;
     border: none;
   }
+  .blue-dot {
+    background: #0685f6;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    margin-left: -16px;
+    margin-right: 6px;   
+  }
+  .last-item {
+    justify-content: left;
+  }
+  .igryDrop__menu {
+    margin-left: 20px;
+  }
+  .react-transform-wrapper{
+    margin: auto;
+    width: auto;
+    // display: flex;
+  }
+  .image-wraper{
+    width: auto;
+    height: calc(100vh - 200px);
+  }
+  .date-container {
+    display: flex;
+    .date {
+      background-color: aliceblue;
+      height: 20px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 4px;
+      margin: 0 1px;
+      text-overflow: clip;
+      text-align: center;
+      white-space: nowrap;
+    }
+  }
+
   &__wrp {
-    display: grid;
-    height: calc(100vh - 300px);
-    grid-template-columns: 1fr 3fr 1fr;
+    position: relative;
+    height: calc(100vh - 200px);
 
     @media (max-width: 1530px) {
-      grid-template-columns: .8fr 3fr 1.8fr;
+      // grid-template-columns: .4fr 3fr 1fr;
     }
 
     @media (max-width: 1024px) {
-      grid-template-columns: 1fr;
+      // grid-template-columns: 1fr;
       height: auto;
     }
   }
 
   &__lft {
-    position: relative;
     @media (max-width: 1024px) {
-      display: none;
+      // display: none;
     }
   }
 
   &__mid {
-    background-color: var(--color-white);
+    background-color: var(--color-primary);
     
     @media (max-width: 1024px) {
       order: 2;
@@ -76,15 +112,17 @@
     }
 
     img{
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      position: absolute;
+      object-fit: cover;
+      width: auto;
+      height: calc(100vh - 200px);
     }
   }
 
   &__rgt {
-    padding: 20px;
+    padding: 4px;
+    position: absolute;
+    right: 8px;
+    top: 0;
     @media (max-width: 1024px) {
       order: 1;
       background-color: var(--color-white);
@@ -264,7 +302,7 @@ line-height: 24px;
 
 .igryDrop {
   background-color: var(--color-white);
-  max-width: 300px;
+  width: 300px;
   border: 1px solid #C4C4C4;
   padding: 0px 12px 0px 12px;
   border-radius: 4px;

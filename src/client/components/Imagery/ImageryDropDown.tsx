@@ -76,14 +76,14 @@ const ImageryDropDown = ({
           : selectedLvl1Data.SUBTAB_GROUP.SUBTAB;
         const selectedLvl2Data = childrenLvl1[imagerySt.selectedLvl2];
         if (selectedLvl2Data && selectedLvl2Data.IMAGE) {
-          setSelectedImage(selectedLvl2Data as any);
+          setSelectedImage({ ...(selectedLvl2Data as any), DELAY: selectedLvl1Data.DELAY });
         } else if (selectedLvl2Data) {
           const childrenLvl2 = (selectedLvl2Data as SubtabGroupItem).SUBTAB;
           const selectedLvl3Data = Array.isArray(childrenLvl2) ? childrenLvl2[imagerySt.selectedLvl3] : childrenLvl2;
           if (selectedLvl3Data && selectedLvl3Data.IMAGE) {
-            setSelectedImage(selectedLvl3Data as any);
+            setSelectedImage({ ...(selectedLvl3Data as any), DELAY: selectedLvl1Data.DELAY });
           } else {
-            setSelectedImage(childrenLvl2[0] as any);
+            setSelectedImage({ ...(childrenLvl2[0] as any), DELAY: selectedLvl1Data.DELAY });
           }
         }
       }
@@ -96,12 +96,14 @@ const ImageryDropDown = ({
     }
   }, [isShowDropDown]);
 
+  const title = selectedImage ? selectedImage.TITLE || selectedImage.SUBTABLABEL : '';
+  const newTitle = title.replace(/&amp;/g, '&');
   return (
     <div className="igryDrop">
       <div className="igryDrop__wrp">
         <div onClick={() => setIsShowDropDown(!isShowDropDown)} className="igryDrop__header">
           <div className="igryDrop__header__lft">
-            <h3 className="igryDrop__title">{selectedImage ? selectedImage.TITLE || selectedImage.SUBTABLABEL : ''}</h3>
+            <h3 className="igryDrop__title">{newTitle}</h3>
           </div>
           <div className={`igryDrop__header__rgt ${isShowDropDown && 'igryDrop__header__rgt--rotate'}`}>
             <IoMdArrowDropdown className="igryDrop__icon" />
@@ -145,10 +147,11 @@ const ImageryDropDown = ({
                             selectImage(item);
                           }
                         }}
-                        className="igryDrop__menu__item"
+                        className={`igryDrop__menu__item ${item.IMAGE && 'last-item'}`}
                         key={item.TITLE}
                         {...itemProps}
                       >
+                        {item.IMAGE && selectedLevel1 === index1 && <span className="blue-dot"></span>}
                         <p className="igryDrop__menu__text">{item.TITLE.replace(/&amp;/g, '&')}</p>
                         {children && (
                           <div
@@ -182,14 +185,17 @@ const ImageryDropDown = ({
                                         setSelectedLevel2(index2);
                                         setSelectedLevel3(-1);
                                         if (child.IMAGE) {
-                                          selectImage(child);
+                                          selectImage({ ...child, LOOP: item.LOOP, DELAY: item.DELAY });
                                         }
                                       }
                                     }}
-                                    className={`igryDrop__menu__item igryDrop__menu__item--cld`}
+                                    className={`igryDrop__menu__item igryDrop__menu__item--cld ${
+                                      child.IMAGE && 'last-item'
+                                    }`}
                                     key={child.SUBTABLABEL || child.GROUP_NAME}
                                     {...itemProps}
                                   >
+                                    {child.IMAGE && selectedLevel2 === index2 && <span className="blue-dot"></span>}
                                     <p className="igryDrop__menu__text">
                                       {child.SUBTABLABEL
                                         ? child.SUBTABLABEL.replace(/&amp;/g, '&')
@@ -217,15 +223,18 @@ const ImageryDropDown = ({
                                             onClick={() => {
                                               setSelectedLevel3(index3);
                                               if (child3.IMAGE) {
-                                                selectImage(child3);
+                                                selectImage({ ...child3, LOOP: item.LOOP, DELAY: item.DELAY });
                                               }
                                             }}
                                             className={`igryDrop__menu__item igryDrop__menu__item--cld ${
                                               selectedLevel2 === index2 && 'igryDrop__menu__item--cld--show'
-                                            }`}
+                                            } ${child3.IMAGE && 'last-item'}`}
                                             key={child3.SUBTABLABEL || child3.GROUP_NAME}
                                             {...itemProps}
                                           >
+                                            {child3.IMAGE && selectedLevel3 === index3 && (
+                                              <span className="blue-dot"></span>
+                                            )}
                                             <p className="igryDrop__menu__text">
                                               {child3.SUBTABLABEL
                                                 ? child3.SUBTABLABEL.replace(/&amp;/g, '&')

@@ -8,6 +8,7 @@
   background-color: var(--color-white);
   max-width: 70px;
   width: 100%;
+  border: solid 1px var(--color-primary);
   .zulu-clock{
     display: block;
     @media screen and (max-width: 1024px) {
