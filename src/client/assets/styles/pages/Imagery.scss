@@ -54,7 +54,8 @@
   .date-container {
     display: flex;
     .date {
-      background-color: aliceblue;
+      background-color: var(--color-primary);
+      color: var(--color-white);
       height: 20px;
       font-size: 15px;
       font-weight: 600;

@@ -6,6 +6,7 @@ export interface SubtabItem {
   LOOP?: string;
   DELAY?: number;
   IMAGE: { URL: string }[];
+  TITLE?: string;
 }
 
 export interface SubtabGroupItem {

@@ -30,8 +30,10 @@ import { selectSettings } from '../../store/user/UserSettings';
 import { useSelector } from 'react-redux';
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef, useTransformInit } from 'react-zoom-pan-pinch';
 
+const sliderStep = 60 * 1000;
+
 function Imagery() {
-  const { isSuccess: isLoadedImageryCollections, data: imageryData } = useGetWxJsonQuery('');
+  const { isSuccess: isLoadedImageryCollections, data: imageryData, refetch: refetchWxJson } = useGetWxJsonQuery('');
   const imageryServerUrl = imageryData?.ROOTURL;
   const imageryCollections = imageryData?.TAB;
   const [dataTimes, setDataTimes] = useState([]);
@@ -51,34 +53,45 @@ function Imagery() {
   const [delay, setDelay] = useState(500);
   const [loopCount, setLoopCount] = useState(0);
   const [loopStart, setLoopStart] = useState('First');
+  const [lastTimeoutHandle, setLastTimeoutHandle] = useState(null);
+  const [refreshTime, setRefreshTime] = useState(Date.now());
+  const [imageTitle, setImageTitle] = useState('');
 
   useEffect(() => {
     const timeImage = getImageBySliderValue(sliderValue);
     if (timeImage) {
       setSelectedImageUrl(timeImage.image);
       setSelectedTime(timeImage.time);
-      setSliderValue(timeImage.sliderValue);
+      // setSliderValue(timeImage.sliderValue);
     } else if (selectedImages.length > 0) {
       setSelectedImageUrl(selectedImages[0]);
       dataTimes && setSelectedTime(dataTimes[0]);
     }
     if (timerHandle !== null && sliderValue === sliderMaxValue) {
-      setLoopCount((prevState) => prevState + 1);
+      clearInterval(timerHandle);
+      setTimerHandle(null);
+      const timer = setTimeout(() => startTimer(), (delay ? delay : 1000) * 3);
+      setLastTimeoutHandle(timer);
     }
   }, [selectedImages, dataTimes, sliderValue]);
 
   useEffect(() => {
     if (dataTimes && dataTimes.length > 0) {
-      const startHour = Math.floor(dataTimes[0][0].getTime() / (3600 * 1000));
+      const startHour = Math.floor(dataTimes[0][0].getTime() / sliderStep);
       const sliderMarks = dataTimes.map((item, index) => {
         return {
-          value: Math.floor(item[0].getTime() / (3600 * 1000)) - startHour,
+          value: Math.floor(item[0].getTime() / sliderStep) - startHour,
           label: '',
         };
       });
       setSliderLabels(sliderMarks);
-      const { dateBlocks, hoursCount } = calcBlockDays(dataTimes.map((item) => item[0]));
-      setSliderMaxValue(hoursCount);
+      const { dateBlocks, hoursCount } = calcBlockDays(dataTimes.map((item) => (item.length > 1 ? item[1] : item[0])));
+      if (hoursCount === 0) {
+        setSliderMaxValue(selectedImages.length - 1);
+        setSliderLabels(selectedImages.map((img, index) => ({ value: index })));
+      } else {
+        setSliderMaxValue(hoursCount);
+      }
       setDateBlocks(dateBlocks);
       let sliderVal = 0;
       if (loopStart === 'Last') {
@@ -90,25 +103,23 @@ function Imagery() {
     }
   }, [dataTimes]);
 
-  useEffect(() => {
-    if (loopCount >= 3) {
-      stopTimer();
-    }
-  }, [loopCount]);
-
   function getImageBySliderValue(value) {
-    if (dataTimes && dataTimes.length > 0) {
-      const startHour = Math.floor(dataTimes[0][0].getTime() / (3600 * 1000));
+    if (
+      dataTimes &&
+      dataTimes.length > 0 &&
+      dataTimes[0][0].getTime() != dataTimes[dataTimes.length - 1][0].getTime()
+    ) {
+      const startHour = Math.floor(dataTimes[0][0].getTime() / sliderStep);
       const closest = dataTimes.reduce(
         (acc, curr, index) => {
-          const imgTime2SliderValue = Math.floor(curr[0].getTime() / (3600 * 1000)) - startHour;
+          const imgTime2SliderValue = Math.floor(curr[0].getTime() / sliderStep) - startHour;
           const difference = Math.abs(value - imgTime2SliderValue);
           if (difference < acc.diff) {
             return { id: index, diff: difference, sliderValue: imgTime2SliderValue };
           }
           return acc;
         },
-        { id: 0, diff: 240, sliderValue: 0 },
+        { id: 0, diff: 240 * 60, sliderValue: 0 },
       );
       return {
         id: closest.id,
@@ -116,11 +127,18 @@ function Imagery() {
         image: selectedImages[closest.id],
         sliderValue: closest.sliderValue,
       };
+    } else {
+      return {
+        id: value,
+        time: dataTimes && dataTimes.length > 0 ? dataTimes[0] : null,
+        image: selectedImages[value],
+        sliderValue: value,
+      };
     }
   }
 
   function calcBlockDays(times: Date[]) {
-    const hoursCount = Math.ceil((times[times.length - 1].getTime() - times[0].getTime()) / (3600 * 1000));
+    const hoursCount = Math.ceil((times[times.length - 1].getTime() - times[0].getTime()) / sliderStep);
     const firstDateTime = times[0];
     const lastDateTime = times[times.length - 1];
     const firstDate = Math.floor(firstDateTime.getTime() / (3600 * 24 * 1000));
@@ -133,15 +151,15 @@ function Imagery() {
         hoursCount,
       };
     }
-    const dateBlocks = [{ date: firstDateTime, width: ((24 - firstTime) * 100) / hoursCount }];
+    const dateBlocks = [{ date: firstDateTime, width: ((24 - firstTime) * 60 * 100) / hoursCount }];
     for (let i = 1; i < lastDate - firstDate; i++) {
       const dateTime = new Date(firstDateTime);
       userSettings.default_time_display_unit
         ? dateTime.setDate(firstDateTime.getDate() + i)
         : dateTime.setUTCDate(firstDateTime.getUTCDate() + i);
-      dateBlocks.push({ date: dateTime, width: (24 * 100) / hoursCount });
+      dateBlocks.push({ date: dateTime, width: (24 * 60 * 100) / hoursCount });
     }
-    dateBlocks.push({ date: lastDateTime, width: (lastTime * 100) / hoursCount });
+    dateBlocks.push({ date: lastDateTime, width: (lastTime * 60 * 100) / hoursCount });
     return { dateBlocks, hoursCount };
   }
 
@@ -159,6 +177,7 @@ function Imagery() {
     setSelectedImages(item.IMAGE.map((img) => img.URL));
     setDelay(item.DELAY);
     setLoopStart(item.LOOP);
+    setImageTitle(item.TITLE || item.SUBTABLABEL);
     if (item.JSON_URL) {
       const jsonUrl = imageryServerUrl + item.JSON_URL;
       const requestUrl = '/api/imagery/timestamps?url=' + jsonUrl;
@@ -173,23 +192,27 @@ function Imagery() {
       const sliderMarks = item.IMAGE.map((item, index) => {
         return {
           value: index,
-          label: index,
+          label: '',
         };
       });
       setSliderLabels(sliderMarks);
+      setSliderMaxValue(item.IMAGE.length - 1);
       setSelectedTime(null);
       setDataTimes(null);
     }
   }
 
   function dataIndex2SliderValue(index) {
-    if (dataTimes && dataTimes.length > 0) {
+    if (
+      dataTimes &&
+      dataTimes.length > 0 &&
+      (dataTimes.length === 1 || dataTimes[0][0].getTime() != dataTimes[dataTimes.length - 1][0].getTime())
+    ) {
       return (
-        Math.floor(dataTimes[index][0].getTime() / (3600 * 1000)) -
-        Math.floor(dataTimes[0][0].getTime() / (3600 * 1000))
+        Math.floor(dataTimes[index][0].getTime() / sliderStep) - Math.floor(dataTimes[0][0].getTime() / sliderStep)
       );
     } else {
-      return 0;
+      return index;
     }
   }
 
@@ -198,16 +221,17 @@ function Imagery() {
     if (timerHandle) {
       clearInterval(timerHandle);
       setTimerHandle(null);
-      setLoopCount(0);
+    }
+    if (lastTimeoutHandle) {
+      clearTimeout(lastTimeoutHandle);
+      setLastTimeoutHandle(null);
     }
   }
 
-  function play() {
-    if (isPlaying) {
-      stopTimer();
-    } else {
-      setIsPlaying(true);
-      const handle = setInterval(() => {
+  function startTimer() {
+    setIsPlaying(true);
+    const handle = setInterval(
+      () => {
         setSliderValue((prevValue) => {
           if (prevValue >= sliderMaxValue) {
             return 0;
@@ -220,12 +244,21 @@ function Imagery() {
             return prevValue;
           }
         });
-      }, delay);
-      setTimerHandle(handle);
+      },
+      delay ? delay : 1000,
+    );
+    setTimerHandle(handle);
+  }
+
+  function clickPlay() {
+    if (isPlaying) {
+      stopTimer();
+    } else {
+      startTimer();
     }
   }
 
-  function handler(id: string) {
+  async function handler(id: string) {
     console.log(id);
     switch (id) {
       case 'collapse':
@@ -234,6 +267,26 @@ function Imagery() {
           resetTransform();
           setImageExpanded(false);
         }
+        break;
+      case 'refresh':
+        refetchWxJson();
+        setRefreshTime(Date.now());
+        break;
+      case 'export':
+        const imageResponse = await fetch(imageryServerUrl + selectedImageUrl);
+        const imageBlob = await imageResponse.blob();
+        const ext = selectedImageUrl.split('.').pop();
+        const href = URL.createObjectURL(imageBlob);
+
+        const anchorElement = document.createElement('a');
+        anchorElement.href = href;
+        anchorElement.download = imageTitle + '.' + ext;
+
+        document.body.appendChild(anchorElement);
+        anchorElement.click();
+
+        document.body.removeChild(anchorElement);
+        window.URL.revokeObjectURL(href);
         break;
     }
   }
@@ -269,7 +322,7 @@ function Imagery() {
     },
   ];
   return (
-    <div className="igry">
+    <div className="igry" key={refreshTime}>
       <div className="igry__wrp">
         <div className="igry__lft igry__blu">
           <MapTabs tabMenus={tabMenus} />
@@ -338,8 +391,8 @@ function Imagery() {
           <div className=" container">
             <div className="igry__range__wrp">
               <div className="igry__btn__area">
-                {selectedTime && (
-                  <button className="igry__range__play__btn" onClick={play}>
+                {selectedImages.length > 1 && (
+                  <button className="igry__range__play__btn" onClick={clickPlay}>
                     {!isPlaying && <FaPlayCircle className="igry__range__play--icon" />}
                     {isPlaying && <FaPauseCircle className="igry__range__play--icon" />}
                   </button>
@@ -360,7 +413,7 @@ function Imagery() {
                     </div>
                   ))}
                 </div>
-                {selectedTime && (
+                {selectedImages.length > 1 && (
                   <Slider
                     min={20}
                     defaultValue={0}
@@ -375,6 +428,14 @@ function Imagery() {
                       setSliderValue(newValue);
                     }}
                     onClick={() => stopTimer()}
+                    onChangeCommitted={(_e, newValue) => {
+                      const timeImage = getImageBySliderValue(newValue);
+                      if (timeImage) {
+                        setSelectedImageUrl(timeImage.image);
+                        setSelectedTime(timeImage.time);
+                        setSliderValue(timeImage.sliderValue);
+                      }
+                    }}
                   />
                 )}
               </div>
