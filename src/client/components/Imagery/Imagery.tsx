@@ -1,39 +1,37 @@
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useRef, useState } from 'react';
-import { IoMdArrowDropdown } from 'react-icons/io';
-import { AiOutlineSearch } from 'react-icons/ai';
-import { GrFormClose } from 'react-icons/gr';
 import { FaPauseCircle, FaPlayCircle } from 'react-icons/fa';
 import { BsBookmarkPlus, BsShare } from 'react-icons/bs';
 import { MdOutlineSaveAlt } from 'react-icons/md';
 import MapTabs from '../shared/MapTabs';
-import {
-  SvgBookmark,
-  SvgCollapse,
-  SvgDownload,
-  SvgDropDown,
-  SvgRefresh,
-  SvgShare,
-  SvgTabs,
-  SvgZoom,
-} from '../utils/SvgIcons';
-import Image from 'next/image';
+import { SvgBookmark, SvgCollapse, SvgDownload, SvgRefresh, SvgRoundClose, SvgTabs, SvgZoom } from '../utils/SvgIcons';
 import { useGetWxJsonQuery } from '../../store/imagery/imageryApi';
-import { ImageryCollectionItem, SubtabItem } from '../../interfaces/imagery';
+import { ImageryCollectionItem } from '../../interfaces/imagery';
 import axios from 'axios';
 import ImageryDropDown from './ImageryDropDown';
 import moment from 'moment';
-import { Slider } from '@mui/material';
-import { convertTimeFormat, simpleTimeFormat } from '../map/common/AreoFunctions';
+import { Dialog, DialogTitle, Slider } from '@mui/material';
 import { selectSettings } from '../../store/user/UserSettings';
 import { useSelector } from 'react-redux';
-import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef, useTransformInit } from 'react-zoom-pan-pinch';
+import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
+import { selectShowInformation, setShowInformation } from '../../store/imagery/imagery';
+import { PaperComponent } from '../map/leaflet/Map';
+import { useDispatch } from 'react-redux';
 
 const sliderStep = 60 * 1000;
 
+function unEscape(htmlStr) {
+  htmlStr = htmlStr.replace(/&lt;/g, '<');
+  htmlStr = htmlStr.replace(/&gt;/g, '>');
+  htmlStr = htmlStr.replace(/&quot;/g, '"');
+  htmlStr = htmlStr.replace(/&#39;/g, "'");
+  htmlStr = htmlStr.replace(/&amp;/g, '&');
+  return htmlStr;
+}
+
 function Imagery() {
-  const { isSuccess: isLoadedImageryCollections, data: imageryData, refetch: refetchWxJson } = useGetWxJsonQuery('');
+  const { data: imageryData, refetch: refetchWxJson } = useGetWxJsonQuery('');
   const imageryServerUrl = imageryData?.ROOTURL;
   const imageryCollections = imageryData?.TAB;
   const [dataTimes, setDataTimes] = useState([]);
@@ -46,16 +44,14 @@ function Imagery() {
   const [selectedTime, setSelectedTime] = useState([]);
   const userSettings = useSelector(selectSettings);
   const transformComponentRef = useRef<ReactZoomPanPinchRef | null>(null);
-  const [imageExpanded, setImageExpanded] = useState(false);
   const [needMoveCenter, setNeedMoveCenter] = useState(false);
   const [sliderMaxValue, setSliderMaxValue] = useState(3);
   const [dateBlocks, setDateBlocks] = useState([{ width: 100, date: new Date() }]);
-  const [delay, setDelay] = useState(500);
-  const [loopCount, setLoopCount] = useState(0);
-  const [loopStart, setLoopStart] = useState('First');
   const [lastTimeoutHandle, setLastTimeoutHandle] = useState(null);
   const [refreshTime, setRefreshTime] = useState(Date.now());
-  const [imageTitle, setImageTitle] = useState('');
+  const [selectedImagesData, setSelectedImagesData] = useState<ImageryCollectionItem>(null);
+  const showInformation = useSelector(selectShowInformation);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const timeImage = getImageBySliderValue(sliderValue);
@@ -70,7 +66,10 @@ function Imagery() {
     if (timerHandle !== null && sliderValue === sliderMaxValue) {
       clearInterval(timerHandle);
       setTimerHandle(null);
-      const timer = setTimeout(() => startTimer(), (delay ? delay : 1000) * 3);
+      const timer = setTimeout(
+        () => startTimer(),
+        (selectedImagesData && selectedImagesData.DELAY ? selectedImagesData.DELAY : 1000) * 3,
+      );
       setLastTimeoutHandle(timer);
     }
   }, [selectedImages, dataTimes, sliderValue]);
@@ -94,7 +93,7 @@ function Imagery() {
       }
       setDateBlocks(dateBlocks);
       let sliderVal = 0;
-      if (loopStart === 'Last') {
+      if (selectedImagesData && selectedImagesData.LOOP === 'Last') {
         sliderVal = dataTimes.length - 1;
       }
       setSliderValue(dataIndex2SliderValue(sliderVal));
@@ -172,12 +171,10 @@ function Imagery() {
     }
   }
 
-  function handleSelectImageCollection(item: SubtabItem | ImageryCollectionItem) {
+  function handleSelectImageCollection(item: ImageryCollectionItem) {
     stopTimer();
     setSelectedImages(item.IMAGE.map((img) => img.URL));
-    setDelay(item.DELAY);
-    setLoopStart(item.LOOP);
-    setImageTitle(item.TITLE || item.SUBTABLABEL);
+    setSelectedImagesData(item);
     if (item.JSON_URL) {
       const jsonUrl = imageryServerUrl + item.JSON_URL;
       const requestUrl = '/api/imagery/timestamps?url=' + jsonUrl;
@@ -245,7 +242,7 @@ function Imagery() {
           }
         });
       },
-      delay ? delay : 1000,
+      selectedImagesData && selectedImagesData.DELAY ? selectedImagesData.DELAY : 1000,
     );
     setTimerHandle(handle);
   }
@@ -265,7 +262,6 @@ function Imagery() {
         if (transformComponentRef.current) {
           const { resetTransform } = transformComponentRef.current;
           resetTransform();
-          setImageExpanded(false);
         }
         break;
       case 'refresh':
@@ -280,7 +276,8 @@ function Imagery() {
 
         const anchorElement = document.createElement('a');
         anchorElement.href = href;
-        anchorElement.download = imageTitle + '.' + ext;
+        anchorElement.download =
+          (selectedImagesData && (selectedImagesData.TITLE || selectedImagesData.SUBTABLABEL)) + '.' + ext;
 
         document.body.appendChild(anchorElement);
         anchorElement.click();
@@ -323,6 +320,32 @@ function Imagery() {
   ];
   return (
     <div className="igry" key={refreshTime}>
+      <Dialog
+        PaperComponent={PaperComponent}
+        hideBackdrop
+        disableEnforceFocus
+        style={{ position: 'absolute' }}
+        open={showInformation}
+        onClose={() => dispatch(setShowInformation())}
+      >
+        <DialogTitle className="departure-advisor-popup-title">
+          <p className="text" id="draggable-dialog-title">
+            Info: {selectedImagesData && (selectedImagesData.TITLE || selectedImagesData.SUBTABLABEL)}
+          </p>
+          <button onClick={() => dispatch(setShowInformation())} className="dlg-close" type="button">
+            <SvgRoundClose />
+          </button>
+        </DialogTitle>
+        <div className="imagery-info-body">
+          {selectedImagesData && selectedImagesData.HELPTEXT && (
+            <div
+              dangerouslySetInnerHTML={{
+                __html: unEscape(selectedImagesData.HELPTEXT),
+              }}
+            />
+          )}
+        </div>
+      </Dialog>
       <div className="igry__wrp">
         <div className="igry__lft igry__blu">
           <MapTabs tabMenus={tabMenus} />

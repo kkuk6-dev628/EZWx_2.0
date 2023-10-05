@@ -1,3 +1,12 @@
+.imagery-info-body {
+  max-width: 480px;
+  padding: 10px;
+  a {
+    color: var(--color-secondary);
+    font-size: 13px;
+  }
+}
+
 .igry {
   background-color: var(--color-primary);
   .menu-items-container{
@@ -51,6 +60,7 @@
     width: auto;
     height: calc(100vh - 200px);
   }
+
   .date-container {
     display: flex;
     .date {

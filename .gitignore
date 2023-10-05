@@ -411,3 +411,4 @@ src/client/public/workbox-*.js
 src/client/public/workbox-*.js.map
 src/client/public/worker-*.js
 src/client/public/worker-*.js.map
+src/client/public/wx.json.bak

@@ -15,6 +15,7 @@ import { routeProfileApi } from './route-profile/routeProfileApi';
 import { elevationApi } from './route-profile/elevationApi';
 import RouteProfileSlice from './route-profile/RouteProfile';
 import { imageryApi } from './imagery/imageryApi';
+import ImagerySlice from './imagery/imagery';
 
 const makeStore = () =>
   configureStore({
@@ -28,6 +29,7 @@ const makeStore = () =>
       [elevationApi.reducerPath]: elevationApi.reducer,
       [imageryApi.reducerPath]: imageryApi.reducer,
       [RoutesSlice.name]: RoutesSlice.reducer,
+      [ImagerySlice.name]: ImagerySlice.reducer,
       [apiSlice.reducerPath]: apiSlice.reducer,
       [authSlice.name]: authSlice.reducer,
       [LayerControlSlidersSlice.name]: LayerControlSlidersSlice.reducer,

@@ -14,6 +14,8 @@ import { useCookies } from 'react-cookie';
 import { useGetUserQuery } from '../../store/auth/authApi';
 import { Dialog } from '@mui/material';
 import { PaperComponent } from '../map/leaflet/Map';
+import { useDispatch } from 'react-redux';
+import { setShowInformation } from '../../store/imagery/imagery';
 const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
 const menusHome = [
@@ -185,6 +187,7 @@ export default function Header() {
   const auth = useSelector(selectAuth);
   const [cookies] = useCookies(['logged_in']);
   useGetUserQuery(null, { refetchOnMountOrArgChange: true });
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (pathname === '/map' || pathname === '/imagery' || pathname === '/route-profile') {
@@ -307,7 +310,13 @@ export default function Header() {
               </Link>
               {isUserLoginUser ? (
                 <div className="header__icon__area">
-                  <button className="header__rgt__btn header__rgt__btn--icon btn">
+                  <button
+                    className="header__rgt__btn header__rgt__btn--icon btn"
+                    onClick={() => {
+                      closeAllModals();
+                      dispatch(setShowInformation());
+                    }}
+                  >
                     <SvgWarn />
                   </button>
                   <button
