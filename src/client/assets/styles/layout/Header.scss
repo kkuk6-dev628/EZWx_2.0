@@ -1,6 +1,8 @@
 .header {
   background-color: var(--color-primary);
   width: 100%;
+  z-index: 10;
+  position: relative;
 
   &--fixed{
     position: fixed;
@@ -19,8 +21,8 @@
 
   &__tab__text{
     font-weight: 600;
-font-size: 16px;
-line-height: 20px;
+    font-size: 16px;
+    line-height: 20px;
     margin-left: 10px;
     color: var(--color-white);
     background-color: transparent;

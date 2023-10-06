@@ -77,6 +77,20 @@
     }
   }
 
+  .prisma {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+  }
+  .image-div {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+  }
+
   &__wrp {
     position: relative;
     height: calc(100vh - 200px);
@@ -213,6 +227,8 @@
   &__range {
     background-color: var(--color-white);
     padding-top: 12px;
+    position: relative;
+    z-index: 9;
     @media (max-width: 1024px) {
       padding-bottom: 0;
     }

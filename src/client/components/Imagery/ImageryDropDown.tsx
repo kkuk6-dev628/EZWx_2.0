@@ -133,7 +133,7 @@ const ImageryDropDown = ({
                   const itemProps =
                     index1 == selectedLevel1 && item.IMAGE !== undefined ? { ref: selectedComponentRef } : null;
                   return (
-                    <>
+                    <div key={index1}>
                       <div
                         onClick={(e) => {
                           if (selectedLevel1 === index1) {
@@ -148,7 +148,6 @@ const ImageryDropDown = ({
                           }
                         }}
                         className={`igryDrop__menu__item ${item.IMAGE && 'last-item'}`}
-                        key={item.TITLE}
                         {...itemProps}
                       >
                         {item.IMAGE && selectedLevel1 === index1 && <span className="blue-dot"></span>}
@@ -176,7 +175,7 @@ const ImageryDropDown = ({
                                   ? { ref: selectedComponentRef }
                                   : null;
                               return (
-                                <>
+                                <div key={index2}>
                                   <div
                                     onClick={(e) => {
                                       if (selectedLevel2 === index2) {
@@ -195,7 +194,6 @@ const ImageryDropDown = ({
                                     className={`igryDrop__menu__item igryDrop__menu__item--cld ${
                                       child.IMAGE && 'last-item'
                                     }`}
-                                    key={child.SUBTABLABEL || child.GROUP_NAME}
                                     {...itemProps}
                                   >
                                     {child.IMAGE && selectedLevel2 === index2 && <span className="blue-dot"></span>}
@@ -215,7 +213,7 @@ const ImageryDropDown = ({
                                     )}
                                   </div>
                                   {children2 && selectedLevel2 == index2 && (
-                                    <div className="level2-container" key={'children2-' + index2}>
+                                    <div className="level2-container">
                                       {children2.map((child3, index3) => {
                                         const itemProps =
                                           index3 == selectedLevel3 && child3.IMAGE !== undefined
@@ -251,12 +249,12 @@ const ImageryDropDown = ({
                                       })}
                                     </div>
                                   )}
-                                </>
+                                </div>
                               );
                             })}
                         </div>
                       )}
-                    </>
+                    </div>
                   );
                 })}
               </div>

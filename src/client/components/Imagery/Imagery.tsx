@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { ComponentRef, useCallback, useEffect, useRef, useState } from 'react';
 import { FaPauseCircle, FaPlayCircle } from 'react-icons/fa';
 import { BsBookmarkPlus, BsShare } from 'react-icons/bs';
 import { MdOutlineSaveAlt } from 'react-icons/md';
@@ -14,10 +14,10 @@ import moment from 'moment';
 import { Dialog, DialogTitle, Slider } from '@mui/material';
 import { selectSettings } from '../../store/user/UserSettings';
 import { useSelector } from 'react-redux';
-import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { selectShowInformation, setShowInformation } from '../../store/imagery/imagery';
 import { PaperComponent } from '../map/leaflet/Map';
 import { useDispatch } from 'react-redux';
+import PrismaZoom from 'react-prismazoom';
 
 const sliderStep = 60 * 1000;
 
@@ -43,7 +43,7 @@ function Imagery() {
   const [timerHandle, setTimerHandle] = useState(null);
   const [selectedTime, setSelectedTime] = useState([]);
   const userSettings = useSelector(selectSettings);
-  const transformComponentRef = useRef<ReactZoomPanPinchRef | null>(null);
+  const prismaRef = useRef<ComponentRef<typeof PrismaZoom>>(null);
   const [needMoveCenter, setNeedMoveCenter] = useState(false);
   const [sliderMaxValue, setSliderMaxValue] = useState(3);
   const [dateBlocks, setDateBlocks] = useState([{ width: 100, date: new Date() }]);
@@ -259,10 +259,7 @@ function Imagery() {
     console.log(id);
     switch (id) {
       case 'collapse':
-        if (transformComponentRef.current) {
-          const { resetTransform } = transformComponentRef.current;
-          resetTransform();
-        }
+        prismaRef.current?.reset();
         break;
       case 'refresh':
         refetchWxJson();
@@ -318,6 +315,7 @@ function Imagery() {
       isHideResponsive: false,
     },
   ];
+
   return (
     <div className="igry" key={refreshTime}>
       <Dialog
@@ -353,41 +351,59 @@ function Imagery() {
         <div className="igry__mid">
           <div className="igry__img__area">
             {selectedImageUrl && (
-              <TransformWrapper
-                ref={transformComponentRef}
-                initialPositionX={0}
-                initialPositionY={0}
-                centerOnInit={true}
-                alignmentAnimation={{ disabled: true, sizeX: 0, sizeY: 0 }}
-                zoomAnimation={{ disabled: true }}
-                velocityAnimation={{ disabled: true }}
-                key={JSON.stringify(selectedImages)}
-                onInit={() => {
-                  setNeedMoveCenter(true);
-                }}
-              >
-                <TransformComponent>
-                  <div className="image-wraper">
-                    <img
-                      className="igry__img"
-                      src={imageryServerUrl + selectedImageUrl}
-                      width={1024}
-                      height={720}
-                      alt={''}
-                      onLoad={() => {
-                        if (transformComponentRef.current && needMoveCenter) {
-                          console.log('Image onLoad move center');
-                          setNeedMoveCenter(false);
-                          const { resetTransform, centerView, setTransform } = transformComponentRef.current;
-                          setTransform(0, 0, 1, 0);
-                          resetTransform();
-                          centerView();
-                        }
-                      }}
-                    />
-                  </div>
-                </TransformComponent>
-              </TransformWrapper>
+              // <TransformWrapper
+              //   ref={transformComponentRef}
+              //   initialPositionX={0}
+              //   initialPositionY={0}
+              //   centerOnInit={true}
+              //   alignmentAnimation={{ disabled: true, sizeX: 0, sizeY: 0 }}
+              //   zoomAnimation={{ disabled: true }}
+              //   velocityAnimation={{ disabled: true }}
+              //   key={JSON.stringify(selectedImages)}
+              //   onInit={() => {
+              //     setNeedMoveCenter(true);
+              //   }}
+              // >
+              //   <TransformComponent>
+              //     <div className="image-wraper">
+              //       <img
+              //         className="igry__img"
+              //         src={imageryServerUrl + selectedImageUrl}
+              //         width={1024}
+              //         height={720}
+              //         alt={''}
+              //         onLoad={() => {
+              //           if (transformComponentRef.current && needMoveCenter) {
+              //             setNeedMoveCenter(false);
+              //             const { resetTransform, centerView, setTransform } = transformComponentRef.current;
+              //             setTransform(0, 0, 1, 0);
+              //             resetTransform();
+              //             centerView();
+              //           }
+              //         }}
+              //         // onError={(e) => {
+              //         //   e.currentTarget.src = '/images/404.jpg';
+              //         //   if (transformComponentRef.current) {
+              //         //     setTimeout(() => {
+              //         //       setNeedMoveCenter(true);
+              //         //       const { resetTransform, centerView, setTransform } = transformComponentRef.current;
+              //         //       setTransform(0, 0, 1, 0);
+              //         //       resetTransform();
+              //         //       centerView();
+              //         //     }, 500);
+              //         //   }
+              //         // }}
+              //       />
+              //     </div>
+              //   </TransformComponent>
+              // </TransformWrapper>
+
+              <PrismaZoom className="prisma" allowTouchEvents={true} ref={prismaRef}>
+                <img
+                  src={imageryServerUrl + selectedImageUrl}
+                  onError={(e) => (e.currentTarget.src = '/images/404.jpg')}
+                />
+              </PrismaZoom>
             )}
           </div>
         </div>
