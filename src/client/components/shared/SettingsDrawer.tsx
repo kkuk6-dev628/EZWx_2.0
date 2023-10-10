@@ -38,6 +38,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
   const [isShowSaveSettingModal, setIsShowSaveSettingModal] = useState(false);
   const [settings, setSettings] = useState(settingsState);
   const dispatch = useDispatch();
+  const [showUpdateResultToast, setShowUpdateResultToast] = useState(false);
 
   const [updateUserSettings, { isLoading: isUpdating, isSuccess: isSuccessUpdate, error: updateError }] =
     useUpdateUserSettingsMutation({
@@ -50,13 +51,16 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
 
   useEffect(() => {
     if (isSuccessUpdate) {
-      toast.success('Settings saved!');
+      if (showUpdateResultToast) {
+        toast.success('Settings saved!');
+      }
     } else if (updateError && 'data' in updateError) {
       console.log('Error in save settings', updateError.data);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       //@ts-ignore
       toast.error(updateError.data.message);
     }
+    setShowUpdateResultToast(false);
   }, [isSuccessUpdate]);
 
   useEffect(() => {
@@ -622,6 +626,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
             <SecondaryButton
               text="Restore Settings"
               onClick={async () => {
+                setShowUpdateResultToast(true);
                 setSettings({ ...initialUserSettingsState.settings, user_id: id });
                 dispatch(setUserSettings({ ...initialUserSettingsState.settings, user_id: id }));
                 await updateUserSettings({ ...initialUserSettingsState.settings, user_id: id });
@@ -641,7 +646,14 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
         footer={
           <>
             <SecondaryButton onClick={closeDrawer} text="Abandon and close" isLoading={false} />
-            <PrimaryButton text="Save and close" onClick={() => handleSaveSettings(true)} isLoading={isUpdating} />
+            <PrimaryButton
+              text="Save and close"
+              onClick={() => {
+                setShowUpdateResultToast(true);
+                handleSaveSettings(true);
+              }}
+              isLoading={isUpdating}
+            />
           </>
         }
       />

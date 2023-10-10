@@ -153,8 +153,8 @@ const RouteProfileContainer = () => {
       isHideResponsive: false,
     },
     {
-      id: 'airport',
-      name: 'Airport Wx',
+      id: 'save',
+      name: 'Add to saved',
       svg: <SvgAir />,
       handler: handler,
       isHideResponsive: false,

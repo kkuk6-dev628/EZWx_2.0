@@ -147,11 +147,21 @@ const menusMap = [
   },
   {
     id: 2,
+    name: 'Map',
+    link: '/map',
+  },
+  {
+    id: 3,
+    name: 'Airport Wx',
+    link: '/airport',
+  },
+  {
+    id: 4,
     name: 'Imagery',
     link: '/imagery',
   },
   {
-    id: 3,
+    id: 5,
     name: 'Pilots Guide',
     link: '/pilots-guide',
   },

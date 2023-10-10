@@ -287,8 +287,8 @@ function Imagery() {
 
   const tabMenus = [
     {
-      id: 'saved',
-      name: 'Saved',
+      id: 'save',
+      name: 'Add to saved',
       svg: <SvgBookmark />,
       handler: handler,
       isHideResponsive: false,

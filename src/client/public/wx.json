@@ -480,6 +480,9 @@
           },
           {
             "URL": "/wx/data/prog/progN_11.gif"
+          },
+          {
+            "URL": "/wx/data/prog/progN_12.gif"
           }
         ]
       },
@@ -30303,2071 +30306,869 @@
         ]
       },
       {
-        "TITLE": "Turbulence by Altitude",
-        "HELPTEXT": "This is the Graphical Turbulence Guidance (GTG-3) product looped over an altitude.  Included are forecasts from the 13 km resolution RAP model for Clear Air Turbulence, Mountain Wave Turbulence and the combination of the two. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
+        "TITLE": "Combined Turbulence",
+        "HELPTEXT": "This is the Graphical Turbulence Guidance (GTG-3) product that combines both the clear air and mountain wave forecasts looped for the selected altitude for the GTG analysis and subsequent GTG forecasts through 18 hours. The first image is the GTG analysis followed by the GTG forecast for 1, 2, 3, 6, 9, 12, 15 and 18 hours. &lt;br&gt;&lt;br&gt;See the &lt;a href=\"https://s3-static.ezwxbrief.com/PG/EZWxBrief-Pilots-Guide.pdf\" TARGET=\"_blank\"&gt;EZWxBrief Pilots Guide&lt;/a&gt; for more information.",
         "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 750,
         "SUBTAB_GROUP": [
           {
-            "GROUP_NAME": "Clear Air Turbulence",
+            "GROUP_NAME": "1,000 ft to 15,000 ft",
             "SUBTAB": [
               {
-                "SUBTABLABEL": "GTG CAT 0-hr",
-                "JSON_URL": "/wx/data/turbulence/f00/gtg_0hr.json",
-                "FAVORITE_ID": "GTG_CAT_0HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/cat_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG CAT 1-hr",
-                "JSON_URL": "/wx/data/turbulence/f01/gtg_1hr.json",
-                "FAVORITE_ID": "GTG_CAT_1HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/cat_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG CAT 2-hr",
-                "JSON_URL": "/wx/data/turbulence/f02/gtg_2hr.json",
-                "FAVORITE_ID": "GTG_CAT_2HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/cat_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG CAT 3-hr",
-                "JSON_URL": "/wx/data/turbulence/f03/gtg_3hr.json",
-                "FAVORITE_ID": "GTG_CAT_3HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/cat_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG CAT 6-hr",
-                "JSON_URL": "/wx/data/turbulence/f06/gtg_6hr.json",
-                "FAVORITE_ID": "GTG_CAT_6HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/cat_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG CAT 9-hr",
-                "JSON_URL": "/wx/data/turbulence/f09/gtg_9hr.json",
-                "FAVORITE_ID": "GTG_CAT_9HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/cat_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG CAT 12-hr",
-                "JSON_URL": "/wx/data/turbulence/f12/gtg_12hr.json",
-                "FAVORITE_ID": "GTG_CAT_12HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/cat_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG CAT 15-hr",
-                "JSON_URL": "/wx/data/turbulence/f15/gtg_15hr.json",
-                "FAVORITE_ID": "GTG_CAT_15HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/cat_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG CAT 18-hr",
-                "JSON_URL": "/wx/data/turbulence/f18/gtg_18hr.json",
-                "FAVORITE_ID": "GTG_CAT_18HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/cat_lgt_23.gif"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "GROUP_NAME": "Mountain Wave Turbulence",
-            "SUBTAB": [
-              {
-                "SUBTABLABEL": "GTG MWT 0-hr",
-                "JSON_URL": "/wx/data/turbulence/f00/gtg_0hr.json",
-                "FAVORITE_ID": "GTG_MWT_0HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/mtw_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG MWT 1-hr",
-                "JSON_URL": "/wx/data/turbulence/f01/gtg_1hr.json",
-                "FAVORITE_ID": "GTG_MWT_1HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/mtw_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG MWT 2-hr",
-                "JSON_URL": "/wx/data/turbulence/f02/gtg_2hr.json",
-                "FAVORITE_ID": "GTG_MWT_2HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/mtw_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG MWT 3-hr",
-                "JSON_URL": "/wx/data/turbulence/f03/gtg_3hr.json",
-                "FAVORITE_ID": "GTG_MWT_3HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/mtw_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG MWT 6-hr",
-                "JSON_URL": "/wx/data/turbulence/f06/gtg_6hr.json",
-                "FAVORITE_ID": "GTG_MWT_6HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/mtw_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG MWT 9-hr",
-                "JSON_URL": "/wx/data/turbulence/f09/gtg_9hr.json",
-                "FAVORITE_ID": "GTG_MWT_9HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/mtw_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG MWT 12-hr",
-                "JSON_URL": "/wx/data/turbulence/f12/gtg_12hr.json",
-                "FAVORITE_ID": "GTG_MWT_12HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/mtw_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG MWT 15-hr",
-                "JSON_URL": "/wx/data/turbulence/f15/gtg_15hr.json",
-                "FAVORITE_ID": "GTG_MWT_15HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f15/mtw_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG MWT 18-hr",
-                "JSON_URL": "/wx/data/turbulence/f18/gtg_18hr.json",
-                "FAVORITE_ID": "GTG_MWT_18HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_1.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/mtw_lgt_23.gif"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "GROUP_NAME": "Combined Turbulence",
-            "SUBTAB": [
-              {
-                "SUBTABLABEL": "GTG Combined 0-hr",
-                "JSON_URL": "/wx/data/turbulence/f00/gtg_0hr.json",
-                "FAVORITE_ID": "GTG_COMB_0HR",
+                "SUBTABLABEL": "Combined Turbulence at 1,000 ft",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_1K",
                 "IMAGE": [
                   {
                     "URL": "/wx/data/turbulence/f00/total_lgt_1.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_2.gif"
+                    "URL": "/wx/data/turbulence/f01/total_lgt_1.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_3.gif"
+                    "URL": "/wx/data/turbulence/f02/total_lgt_1.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_4.gif"
+                    "URL": "/wx/data/turbulence/f03/total_lgt_1.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_5.gif"
+                    "URL": "/wx/data/turbulence/f06/total_lgt_1.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_6.gif"
+                    "URL": "/wx/data/turbulence/f09/total_lgt_1.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_7.gif"
+                    "URL": "/wx/data/turbulence/f12/total_lgt_1.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_8.gif"
+                    "URL": "/wx/data/turbulence/f15/total_lgt_1.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f00/total_lgt_23.gif"
+                    "URL": "/wx/data/turbulence/f18/total_lgt_1.gif"
                   }
                 ]
               },
               {
-                "SUBTABLABEL": "GTG Combined 1-hr",
-                "JSON_URL": "/wx/data/turbulence/f01/gtg_1hr.json",
-                "FAVORITE_ID": "GTG_COMB_1HR",
+                "SUBTABLABEL": "Combined Turbulence at 3,000 ft",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_3K",
                 "IMAGE": [
                   {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_1.gif"
+                    "URL": "/wx/data/turbulence/f00/total_lgt_2.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f01/total_lgt_2.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f01/total_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG Combined 2-hr",
-                "JSON_URL": "/wx/data/turbulence/f02/gtg_2hr.json",
-                "FAVORITE_ID": "GTG_COMB_2HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_1.gif"
-                  },
-                  {
                     "URL": "/wx/data/turbulence/f02/total_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f02/total_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG Combined 3-hr",
-                "JSON_URL": "/wx/data/turbulence/f03/gtg_3hr.json",
-                "FAVORITE_ID": "GTG_COMB_3HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_1.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f03/total_lgt_2.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f03/total_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG Combined 6-hr",
-                "JSON_URL": "/wx/data/turbulence/f06/gtg_6hr.json",
-                "FAVORITE_ID": "GTG_COMB_6HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_1.gif"
-                  },
-                  {
                     "URL": "/wx/data/turbulence/f06/total_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f06/total_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG Combined 9-hr",
-                "JSON_URL": "/wx/data/turbulence/f09/gtg_9hr.json",
-                "FAVORITE_ID": "GTG_COMB_9HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_1.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f09/total_lgt_2.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f09/total_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG Combined 12-hr",
-                "JSON_URL": "/wx/data/turbulence/f12/gtg_12hr.json",
-                "FAVORITE_ID": "GTG_COMB_12HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_1.gif"
-                  },
-                  {
                     "URL": "/wx/data/turbulence/f12/total_lgt_2.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_3.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_4.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_5.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_6.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_7.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_22.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f12/total_lgt_23.gif"
-                  }
-                ]
-              },
-              {
-                "SUBTABLABEL": "GTG Combined 15-hr",
-                "JSON_URL": "/wx/data/turbulence/f15/gtg_15hr.json",
-                "FAVORITE_ID": "GTG_COMB_15HR",
-                "IMAGE": [
-                  {
-                    "URL": "/wx/data/turbulence/f15/total_lgt_1.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f15/total_lgt_2.gif"
                   },
                   {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_2.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at 5,000 ft",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_5K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_3.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_3.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_3.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_3.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_3.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_3.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_3.gif"
+                  },
+                  {
                     "URL": "/wx/data/turbulence/f15/total_lgt_3.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_3.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at 7,000 ft",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_7K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_4.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_4.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_4.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_4.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_4.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_4.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_4.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f15/total_lgt_4.gif"
                   },
                   {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_4.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at 9,000 ft",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_9K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_5.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_5.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_5.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_5.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_5.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_5.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_5.gif"
+                  },
+                  {
                     "URL": "/wx/data/turbulence/f15/total_lgt_5.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_5.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at 11,000 ft",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_11K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_6.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_6.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_6.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_6.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_6.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_6.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_6.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f15/total_lgt_6.gif"
                   },
                   {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_6.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at 13,000 ft",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_13K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_7.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_7.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_7.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_7.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_7.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_7.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_7.gif"
+                  },
+                  {
                     "URL": "/wx/data/turbulence/f15/total_lgt_7.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_7.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at 15,000 ft",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_15K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_8.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_8.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_8.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_8.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_8.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_8.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_8.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f15/total_lgt_8.gif"
                   },
                   {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_8.gif"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "GROUP_NAME": "17,000 ft to FL290",
+            "SUBTAB": [
+              {
+                "SUBTABLABEL": "Combined Turbulence at 17,000 ft",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_17K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_9.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_9.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_9.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_9.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_9.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_9.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_9.gif"
+                  },
+                  {
                     "URL": "/wx/data/turbulence/f15/total_lgt_9.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_9.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL190",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_19K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_10.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_10.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_10.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_10.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_10.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_10.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_10.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f15/total_lgt_10.gif"
                   },
                   {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_10.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL210",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_21K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_11.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_11.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_11.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_11.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_11.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_11.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_11.gif"
+                  },
+                  {
                     "URL": "/wx/data/turbulence/f15/total_lgt_11.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_11.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL230",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_23K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_12.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_12.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_12.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_12.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_12.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_12.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_12.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f15/total_lgt_12.gif"
                   },
                   {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_12.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL250",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_25K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_13.gif"
+                  },
+                  {
                     "URL": "/wx/data/turbulence/f15/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_13.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL270",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_27K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_14.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_14.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_14.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_14.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_14.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_14.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_14.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f15/total_lgt_14.gif"
                   },
                   {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_14.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL250",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_25K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f15/total_lgt_13.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_13.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL270",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_27K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_14.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_14.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_14.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_14.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_14.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_14.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_14.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f15/total_lgt_14.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_14.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL290",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_29K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_15.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_15.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_15.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_15.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_15.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_15.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_15.gif"
+                  },
+                  {
                     "URL": "/wx/data/turbulence/f15/total_lgt_15.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_15.gif"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "GROUP_NAME": "FL310 to FL450",
+            "SUBTAB": [
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL310",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_31K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_16.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_16.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_16.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_16.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_16.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_16.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_16.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f15/total_lgt_16.gif"
                   },
                   {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_16.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL330",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_33K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_17.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_17.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_17.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_17.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_17.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_17.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_17.gif"
+                  },
+                  {
                     "URL": "/wx/data/turbulence/f15/total_lgt_17.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_17.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL350",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_35K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_18.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_18.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_18.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_18.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_18.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_18.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_18.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f15/total_lgt_18.gif"
                   },
                   {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_18.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL370",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_37K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_19.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_19.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_19.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_19.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_19.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_19.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_19.gif"
+                  },
+                  {
                     "URL": "/wx/data/turbulence/f15/total_lgt_19.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_19.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL390",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_39K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_20.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_20.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_20.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_20.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_20.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_20.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_20.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f15/total_lgt_20.gif"
                   },
                   {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_20.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL410",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_41K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_21.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_21.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_21.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_21.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_21.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_21.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_21.gif"
+                  },
+                  {
                     "URL": "/wx/data/turbulence/f15/total_lgt_21.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f18/total_lgt_21.gif"
+                  }
+                ]
+              },
+              {
+                "SUBTABLABEL": "Combined Turbulence at FL430",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_43K",
+                "IMAGE": [
+                  {
+                    "URL": "/wx/data/turbulence/f00/total_lgt_22.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f01/total_lgt_22.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f02/total_lgt_22.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f03/total_lgt_22.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f06/total_lgt_22.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f09/total_lgt_22.gif"
+                  },
+                  {
+                    "URL": "/wx/data/turbulence/f12/total_lgt_22.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f15/total_lgt_22.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f15/total_lgt_23.gif"
+                    "URL": "/wx/data/turbulence/f18/total_lgt_22.gif"
                   }
                 ]
               },
               {
-                "SUBTABLABEL": "GTG Combined 18-hr",
-                "JSON_URL": "/wx/data/turbulence/f18/gtg_18hr.json",
-                "FAVORITE_ID": "GTG_COMB_18HR",
+                "SUBTABLABEL": "Combined Turbulence at FL450",
+                "JSON_URL": "/wx/data/turbulence/gtg.json",
+                "FAVORITE_ID": "GTG_TOT_HR_45K",
                 "IMAGE": [
                   {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_1.gif"
+                    "URL": "/wx/data/turbulence/f00/total_lgt_23.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_2.gif"
+                    "URL": "/wx/data/turbulence/f01/total_lgt_23.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_3.gif"
+                    "URL": "/wx/data/turbulence/f02/total_lgt_23.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_4.gif"
+                    "URL": "/wx/data/turbulence/f03/total_lgt_23.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_5.gif"
+                    "URL": "/wx/data/turbulence/f06/total_lgt_23.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_6.gif"
+                    "URL": "/wx/data/turbulence/f09/total_lgt_23.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_7.gif"
+                    "URL": "/wx/data/turbulence/f12/total_lgt_23.gif"
                   },
                   {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_8.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_9.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_10.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_11.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_12.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_13.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_14.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_15.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_16.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_17.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_18.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_19.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_20.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_21.gif"
-                  },
-                  {
-                    "URL": "/wx/data/turbulence/f18/total_lgt_22.gif"
+                    "URL": "/wx/data/turbulence/f15/total_lgt_23.gif"
                   },
                   {
                     "URL": "/wx/data/turbulence/f18/total_lgt_23.gif"

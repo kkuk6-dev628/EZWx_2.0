@@ -9,10 +9,7 @@ import {
   useGetImageryStateQuery,
   useUpdateImageryStateMutation,
 } from '../../store/imagery/imageryApi';
-import { useDispatch } from 'react-redux';
-import { convertTimeFormat } from '../map/common/AreoFunctions';
 
-// IoMdArrowDropdown
 interface ImageryDropDownProps {
   imageryCollectionData: ImageryCollectionItem[];
   handleSelectImageCollection: (item: SubtabItem | ImageryCollectionItem) => void;
@@ -27,6 +24,8 @@ const ImageryDropDown = ({
   const [selectedLevel2, setSelectedLevel2] = useState(0);
   const [selectedLevel3, setSelectedLevel3] = useState(0);
   const [selectedImage, setSelectedImage] = useState<ImageryCollectionItem>(null);
+  const [filterInput, setFilterInput] = useState('');
+  const [imageData, setImageData] = useState([]);
   const {
     data: imageryState,
     isSuccess: isImageryStateLoaded,
@@ -57,6 +56,7 @@ const ImageryDropDown = ({
 
   useEffect(() => {
     if ((imageryCollections && isImageryStateLoaded) || isImageryStateError) {
+      setImageData(imageryCollections);
       let imagerySt = null;
       if (isImageryStateLoaded) {
         imagerySt = imageryState;
@@ -96,7 +96,55 @@ const ImageryDropDown = ({
     }
   }, [isShowDropDown]);
 
-  const title = selectedImage ? selectedImage.TITLE || selectedImage.SUBTABLABEL : '';
+  function filterImageData(filter: string) {
+    setFilterInput(filter);
+    const lowerFilter = filter.toLowerCase();
+    const filteredResult = [];
+    imageryCollections.forEach((topItem) => {
+      if (topItem.TITLE.toLowerCase().includes(lowerFilter)) {
+        filteredResult.push(topItem);
+      } else {
+        if (topItem.SUBTAB_GROUP && Array.isArray(topItem.SUBTAB_GROUP)) {
+          const topItemClone = { ...topItem };
+          const children = [];
+          topItem.SUBTAB_GROUP.forEach((secondItem) => {
+            if (secondItem.GROUP_NAME.toLowerCase().includes(lowerFilter)) {
+              children.push(secondItem);
+            } else {
+              const secondItemClone = { ...secondItem };
+              const lastChildren = [];
+              if (secondItem.SUBTAB && Array.isArray(secondItem.SUBTAB)) {
+                secondItem.SUBTAB.forEach((lastItem) => {
+                  if (lastItem.SUBTABLABEL.toLowerCase().includes(lowerFilter)) {
+                    lastChildren.push(lastItem);
+                  }
+                });
+                if (lastChildren.length > 0) {
+                  secondItemClone.SUBTAB = lastChildren;
+                  children.push(secondItemClone);
+                }
+              }
+            }
+          });
+          if (children.length > 0) {
+            topItemClone.SUBTAB_GROUP = children;
+            filteredResult.push(topItemClone);
+          }
+        }
+      }
+    });
+    setImageData(filteredResult);
+  }
+
+  useEffect(() => {
+    if (filterInput) {
+      filterImageData(filterInput);
+    } else {
+      setImageData(imageryCollections);
+    }
+  }, [filterInput]);
+
+  const title = selectedImage ? selectedImage.SUBTABLABEL || selectedImage.TITLE : '';
   const newTitle = title.replace(/&amp;/g, '&');
   return (
     <div className="igryDrop">
@@ -112,19 +160,27 @@ const ImageryDropDown = ({
         {isShowDropDown && (
           <div className="igryDrop__body">
             <div className="igryDrop__search__area">
-              <form action="" className="igryDrop__frm">
+              <div className="igryDrop__frm">
                 <button className="igryDrop__submit">
                   <AiOutlineSearch className="igryDrop__search__icon" />
                 </button>
-                <input type="text" name="data" id="data" className="igryDrop__input" placeholder="Filter menu" />
-                <button className="igryDrop__close">
+                <input
+                  type="text"
+                  name="data"
+                  id="data"
+                  className="igryDrop__input"
+                  placeholder="Filter menu"
+                  value={filterInput}
+                  onChange={(e) => setFilterInput(e.currentTarget.value)}
+                />
+                <button className="igryDrop__close" onClick={() => setFilterInput('')}>
                   <GrFormClose className="igryDrop__icon__close" />
                 </button>
-              </form>
+              </div>
             </div>
             <div className="menu-items-container">
               <div className="igryDrop__menu" key={'children-' + Date.now()}>
-                {imageryCollections.map((item, index1) => {
+                {imageData.map((item, index1) => {
                   const children = item.SUBTAB_GROUP
                     ? Array.isArray(item.SUBTAB_GROUP)
                       ? item.SUBTAB_GROUP
