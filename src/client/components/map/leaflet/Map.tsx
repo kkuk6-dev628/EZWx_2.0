@@ -164,13 +164,6 @@ const LeafletMap = () => {
       isHideResponsive: false,
     },
     {
-      id: 'airport',
-      name: 'Airport Wx',
-      svg: <SvgAir />,
-      handler: handler,
-      isHideResponsive: true,
-    },
-    {
       id: 'basemap',
       name: 'Base Map',
       svg: <SvgBaseMap />,

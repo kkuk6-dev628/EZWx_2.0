@@ -49,6 +49,8 @@ import { PaperComponent } from '../map/leaflet/Map';
 import DepartureAdvisorTimeBlockComponent from './DepartureAdvisorTimeBlockComponent';
 import DepartureAdvisor3Bars from './DepartureAdvisor3Bars';
 import { useGetAirportQuery } from '../../store/route/airportApi';
+import { iOS } from '../Imagery/Imagery';
+import toast from 'react-hot-toast';
 
 type personalMinValue = 0 | 1 | 2 | 10;
 type personalMinColor = 'red' | 'yellow' | 'green' | 'grey';
@@ -1084,6 +1086,8 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const [barTimeoutHandle, setBarTimeoutHandle] = useState(0);
   const [flyTime, setFlyTime] = useState(0);
   const [lastTime, setLastTime] = useState(Date.now());
+  const isIOS = iOS();
+  const [ignoreChange, setIgnoreChange] = useState(false);
 
   function calcBlockTimes() {
     return Array.from({ length: blockCount }, (_v, index) => {
@@ -1574,11 +1578,19 @@ function DepartureAdvisor(props: { showPast: boolean }) {
               valueLabelFormat={valuetext}
               step={1}
               valueLabelDisplay="on"
-              onChange={(_e, newValue: number) => {
+              onChange={(e, newValue: number) => {
+                if (isIOS && (e.type === 'mousedown' || e.type == 'mouseup')) {
+                  setIgnoreChange(true);
+                  return;
+                }
                 handleTimeChange(valueToTime(newValue), false);
                 setShowBarComponent(true);
               }}
-              onChangeCommitted={(_e, newValue: number) => {
+              onChangeCommitted={(e, newValue: number) => {
+                if (ignoreChange) {
+                  setIgnoreChange(false);
+                  return;
+                }
                 handleTimeChange(valueToTime(newValue));
                 setShowBarComponent(true);
                 setBarTimeout();

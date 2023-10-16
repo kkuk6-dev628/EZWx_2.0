@@ -53,15 +53,16 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
     if (isSuccessUpdate) {
       if (showUpdateResultToast) {
         toast.success('Settings saved!');
+        setShowUpdateResultToast(false);
       }
     } else if (updateError && 'data' in updateError) {
       console.log('Error in save settings', updateError.data);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       //@ts-ignore
       toast.error(updateError.data.message);
+      setShowUpdateResultToast(false);
     }
-    setShowUpdateResultToast(false);
-  }, [isSuccessUpdate]);
+  }, [isSuccessUpdate, showUpdateResultToast]);
 
   useEffect(() => {
     if (isUpdating) {

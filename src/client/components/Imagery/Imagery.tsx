@@ -18,6 +18,8 @@ import { selectShowInformation, setShowInformation } from '../../store/imagery/i
 import { PaperComponent } from '../map/leaflet/Map';
 import { useDispatch } from 'react-redux';
 import PrismaZoom from 'react-prismazoom';
+import toast from 'react-hot-toast';
+import Nouislider from 'nouislider-react';
 
 const sliderStep = 60 * 1000;
 
@@ -30,6 +32,17 @@ function unEscape(htmlStr) {
   return htmlStr;
 }
 
+export function iOS() {
+  // @ts-ignore
+  const platform = navigator.userAgentData?.platform || navigator.platform;
+
+  return (
+    ['iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'].includes(platform) ||
+    // iPad on iOS 13 detection
+    (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
+  );
+}
+
 function Imagery() {
   const { data: imageryData, refetch: refetchWxJson } = useGetWxJsonQuery('');
   const imageryServerUrl = imageryData?.ROOTURL;
@@ -40,25 +53,48 @@ function Imagery() {
   const [selectedImageUrl, setSelectedImageUrl] = useState('');
   const [sliderValue, setSliderValue] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [timerHandle, setTimerHandle] = useState(null);
+  const [timerHandle, _setTimerHandle] = useState(null);
+  const timerHandleRef = useRef(timerHandle);
+  const setTimerHandle = (data) => {
+    timerHandleRef.current = data;
+    _setTimerHandle(data);
+  };
   const [selectedTime, setSelectedTime] = useState([]);
   const userSettings = useSelector(selectSettings);
   const prismaRef = useRef<ComponentRef<typeof PrismaZoom>>(null);
-  const [needMoveCenter, setNeedMoveCenter] = useState(false);
+  const noUISliderRef = useRef(null);
   const [sliderMaxValue, setSliderMaxValue] = useState(3);
   const [dateBlocks, setDateBlocks] = useState([{ width: 100, date: new Date() }]);
-  const [lastTimeoutHandle, setLastTimeoutHandle] = useState(null);
+  const [lastTimeoutHandle, _setLastTimeoutHandle] = useState(null);
+  const lastTimeoutHandleRef = useRef(lastTimeoutHandle);
+  const setLastTimeoutHandle = (data) => {
+    lastTimeoutHandleRef.current = data;
+    _setLastTimeoutHandle(data);
+  };
   const [refreshTime, setRefreshTime] = useState(Date.now());
   const [selectedImagesData, setSelectedImagesData] = useState<ImageryCollectionItem>(null);
+  const [hideWeekDay, setHideWeekDay] = useState(true);
   const showInformation = useSelector(selectShowInformation);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    window.addEventListener('resize', handleWindowSizeChange);
+    return () => {
+      window.removeEventListener('resize', handleWindowSizeChange);
+    };
+  }, []);
+
+  function handleWindowSizeChange() {
+    setHideWeekDay(document.documentElement.clientWidth < 1024);
+  }
+
+  useEffect(() => {
     const timeImage = getImageBySliderValue(sliderValue);
     if (timeImage) {
-      setSelectedImageUrl(timeImage.image);
-      setSelectedTime(timeImage.time);
-      // setSliderValue(timeImage.sliderValue);
+      if (timeImage.image != selectedImageUrl) {
+        setSelectedImageUrl(timeImage.image);
+        setSelectedTime(timeImage.time);
+      }
     } else if (selectedImages.length > 0) {
       setSelectedImageUrl(selectedImages[0]);
       dataTimes && setSelectedTime(dataTimes[0]);
@@ -78,10 +114,7 @@ function Imagery() {
     if (dataTimes && dataTimes.length > 0) {
       const startHour = Math.floor(dataTimes[0][0].getTime() / sliderStep);
       const sliderMarks = dataTimes.map((item, index) => {
-        return {
-          value: Math.floor(item[0].getTime() / sliderStep) - startHour,
-          label: '',
-        };
+        return Math.floor(item[0].getTime() / sliderStep) - startHour;
       });
       setSliderLabels(sliderMarks);
       const { dateBlocks, hoursCount } = calcBlockDays(dataTimes.map((item) => (item.length > 1 ? item[1] : item[0])));
@@ -96,7 +129,9 @@ function Imagery() {
       if (selectedImagesData && selectedImagesData.LOOP === 'Last') {
         sliderVal = dataTimes.length - 1;
       }
-      setSliderValue(dataIndex2SliderValue(sliderVal));
+      const val = dataIndex2SliderValue(sliderVal);
+      setSliderValue(val);
+      updateSliderValue(val);
     } else {
       setDateBlocks([{ date: null, width: 100 }]);
     }
@@ -175,6 +210,7 @@ function Imagery() {
     stopTimer();
     setSelectedImages(item.IMAGE.map((img) => img.URL));
     setSelectedImagesData(item);
+    prismaRef.current?.reset();
     if (item.JSON_URL) {
       const jsonUrl = imageryServerUrl + item.JSON_URL;
       const requestUrl = '/api/imagery/timestamps?url=' + jsonUrl;
@@ -186,12 +222,7 @@ function Imagery() {
         setDataTimes(timestamps);
       });
     } else {
-      const sliderMarks = item.IMAGE.map((item, index) => {
-        return {
-          value: index,
-          label: '',
-        };
-      });
+      const sliderMarks = item.IMAGE.map((item, index) => index);
       setSliderLabels(sliderMarks);
       setSliderMaxValue(item.IMAGE.length - 1);
       setSelectedTime(null);
@@ -213,14 +244,27 @@ function Imagery() {
     }
   }
 
+  function readSliderValue() {
+    if (noUISliderRef.current) {
+      return noUISliderRef.current.noUiSlider?.get();
+    }
+    return 0;
+  }
+
+  function updateSliderValue(value) {
+    if (noUISliderRef.current) {
+      noUISliderRef.current.noUiSlider?.set(value);
+    }
+  }
+
   function stopTimer() {
     setIsPlaying(false);
-    if (timerHandle) {
-      clearInterval(timerHandle);
+    if (timerHandleRef.current) {
+      clearInterval(timerHandleRef.current);
       setTimerHandle(null);
     }
-    if (lastTimeoutHandle) {
-      clearTimeout(lastTimeoutHandle);
+    if (lastTimeoutHandleRef.current) {
+      clearTimeout(lastTimeoutHandleRef.current);
       setLastTimeoutHandle(null);
     }
   }
@@ -229,18 +273,21 @@ function Imagery() {
     setIsPlaying(true);
     const handle = setInterval(
       () => {
-        setSliderValue((prevValue) => {
-          if (prevValue >= sliderMaxValue) {
-            return 0;
+        const prevValue = readSliderValue();
+        if (prevValue >= sliderMaxValue) {
+          setSliderValue(0);
+          updateSliderValue(0);
+        } else {
+          const prevImageId = getImageBySliderValue(prevValue);
+          if (prevImageId) {
+            const newValue = dataIndex2SliderValue(prevImageId.id + 1);
+            setSliderValue(newValue);
+            updateSliderValue(newValue);
           } else {
-            const prevImageId = getImageBySliderValue(prevValue);
-            if (prevImageId) {
-              const newValue = dataIndex2SliderValue(prevImageId.id + 1);
-              return newValue;
-            }
-            return prevValue;
+            setSliderValue(prevValue);
+            updateSliderValue(prevValue);
           }
-        });
+        }
       },
       selectedImagesData && selectedImagesData.DELAY ? selectedImagesData.DELAY : 1000,
     );
@@ -266,21 +313,25 @@ function Imagery() {
         setRefreshTime(Date.now());
         break;
       case 'export':
-        const imageResponse = await fetch(imageryServerUrl + selectedImageUrl);
-        const imageBlob = await imageResponse.blob();
-        const ext = selectedImageUrl.split('.').pop();
-        const href = URL.createObjectURL(imageBlob);
+        try {
+          const imageResponse = await fetch(imageryServerUrl + selectedImageUrl);
+          const imageBlob = await imageResponse.blob();
+          const ext = selectedImageUrl.split('.').pop();
+          const href = URL.createObjectURL(imageBlob);
 
-        const anchorElement = document.createElement('a');
-        anchorElement.href = href;
-        anchorElement.download =
-          (selectedImagesData && (selectedImagesData.TITLE || selectedImagesData.SUBTABLABEL)) + '.' + ext;
+          const anchorElement = document.createElement('a');
+          anchorElement.href = href;
+          anchorElement.download =
+            (selectedImagesData && (selectedImagesData.TITLE || selectedImagesData.SUBTABLABEL)) + '.' + ext;
 
-        document.body.appendChild(anchorElement);
-        anchorElement.click();
+          document.body.appendChild(anchorElement);
+          anchorElement.click();
 
-        document.body.removeChild(anchorElement);
-        window.URL.revokeObjectURL(href);
+          document.body.removeChild(anchorElement);
+          window.URL.revokeObjectURL(href);
+        } catch (ex) {
+          toast.error('No image to export');
+        }
         break;
     }
   }
@@ -288,7 +339,7 @@ function Imagery() {
   const tabMenus = [
     {
       id: 'save',
-      name: 'Add to saved',
+      name: 'Save',
       svg: <SvgBookmark />,
       handler: handler,
       isHideResponsive: false,
@@ -351,53 +402,6 @@ function Imagery() {
         <div className="igry__mid">
           <div className="igry__img__area">
             {selectedImageUrl && (
-              // <TransformWrapper
-              //   ref={transformComponentRef}
-              //   initialPositionX={0}
-              //   initialPositionY={0}
-              //   centerOnInit={true}
-              //   alignmentAnimation={{ disabled: true, sizeX: 0, sizeY: 0 }}
-              //   zoomAnimation={{ disabled: true }}
-              //   velocityAnimation={{ disabled: true }}
-              //   key={JSON.stringify(selectedImages)}
-              //   onInit={() => {
-              //     setNeedMoveCenter(true);
-              //   }}
-              // >
-              //   <TransformComponent>
-              //     <div className="image-wraper">
-              //       <img
-              //         className="igry__img"
-              //         src={imageryServerUrl + selectedImageUrl}
-              //         width={1024}
-              //         height={720}
-              //         alt={''}
-              //         onLoad={() => {
-              //           if (transformComponentRef.current && needMoveCenter) {
-              //             setNeedMoveCenter(false);
-              //             const { resetTransform, centerView, setTransform } = transformComponentRef.current;
-              //             setTransform(0, 0, 1, 0);
-              //             resetTransform();
-              //             centerView();
-              //           }
-              //         }}
-              //         // onError={(e) => {
-              //         //   e.currentTarget.src = '/images/404.jpg';
-              //         //   if (transformComponentRef.current) {
-              //         //     setTimeout(() => {
-              //         //       setNeedMoveCenter(true);
-              //         //       const { resetTransform, centerView, setTransform } = transformComponentRef.current;
-              //         //       setTransform(0, 0, 1, 0);
-              //         //       resetTransform();
-              //         //       centerView();
-              //         //     }, 500);
-              //         //   }
-              //         // }}
-              //       />
-              //     </div>
-              //   </TransformComponent>
-              // </TransformWrapper>
-
               <PrismaZoom className="prisma" allowTouchEvents={true} ref={prismaRef}>
                 <img
                   src={imageryServerUrl + selectedImageUrl}
@@ -442,84 +446,84 @@ function Imagery() {
                   {dateBlocks.map((item, index) => (
                     <div key={'date' + index} className="date" style={{ width: item.width + '%' }}>
                       {item.date && item.width > 5
-                        ? item.date.toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            day: 'numeric',
-                            month: 'numeric',
-                            timeZone: userSettings.default_time_display_unit ? undefined : 'UTC',
-                          })
+                        ? item.date.toLocaleDateString(
+                            'en-US',
+                            hideWeekDay
+                              ? {
+                                  day: 'numeric',
+                                  month: 'numeric',
+                                  timeZone: userSettings.default_time_display_unit ? undefined : 'UTC',
+                                }
+                              : {
+                                  weekday: 'short',
+                                  day: 'numeric',
+                                  month: 'numeric',
+                                  timeZone: userSettings.default_time_display_unit ? undefined : 'UTC',
+                                },
+                          )
                         : ''}
                     </div>
                   ))}
                 </div>
                 {selectedImages.length > 1 && (
-                  <Slider
-                    min={20}
-                    defaultValue={0}
-                    value={sliderValue}
-                    marks={sliderLabels}
-                    step={1}
-                    // @ts-ignore
-                    min={0}
-                    max={sliderMaxValue ? sliderMaxValue : 3}
-                    className="igry__range__slider"
-                    onChange={(event, newValue: number) => {
-                      setSliderValue(newValue);
+                  <Nouislider
+                    instanceRef={(instance) => {
+                      if (instance && !noUISliderRef.current) {
+                        noUISliderRef.current = instance;
+                      }
                     }}
-                    onClick={() => stopTimer()}
-                    onChangeCommitted={(_e, newValue) => {
+                    range={{ min: 0, max: sliderMaxValue ? sliderMaxValue : 3 }}
+                    start={0}
+                    connect={[true, false]}
+                    pips={{
+                      mode: 'values',
+                      values: sliderLabels,
+                    }}
+                    onSlide={(value) => {
+                      setSliderValue(value[0]);
+                    }}
+                    onChange={(value) => {
+                      const newValue = value[0];
                       const timeImage = getImageBySliderValue(newValue);
                       if (timeImage) {
                         setSelectedImageUrl(timeImage.image);
                         setSelectedTime(timeImage.time);
                         setSliderValue(timeImage.sliderValue);
+                        updateSliderValue(timeImage.sliderValue);
                       }
+                      stopTimer();
                     }}
-                  />
+                  ></Nouislider>
+                  // <Slider
+                  //   min={20}
+                  //   defaultValue={0}
+                  //   value={sliderValue}
+                  //   marks={sliderLabels}
+                  //   step={1}
+                  //   // @ts-ignore
+                  //   min={0}
+                  //   max={sliderMaxValue ? sliderMaxValue : 3}
+                  //   className="igry__range__slider"
+                  //   onChange={(event, newValue: number) => {
+                  //     if (isIOS && event.type === 'mousedown') {
+                  //       return;
+                  //     }
+                  //     setSliderValue(newValue);
+                  //   }}
+                  //   onClick={() => stopTimer()}
+                  //   onChangeCommitted={(e, newValue) => {
+                  //     if (isIOS && e.type === 'mousedown') {
+                  //       return;
+                  //     }
+                  //     const timeImage = getImageBySliderValue(newValue);
+                  //     if (timeImage) {
+                  //       setSelectedImageUrl(timeImage.image);
+                  //       setSelectedTime(timeImage.time);
+                  //       setSliderValue(timeImage.sliderValue);
+                  //     }
+                  //   }}
+                  // />
                 )}
-              </div>
-            </div>
-            <div className="igry__tbs">
-              <div className="igry__tbs__btn__area">
-                <button className="igry__tbs__btn">
-                  <BsBookmarkPlus className="igry__tbs__btn--icon" />
-                  <p className="igry__tbs__txt">Save</p>
-                </button>
-              </div>
-              <div className="igry__tbs__btn__area">
-                <button className="igry__tbs__btn">
-                  <MdOutlineSaveAlt className="igry__tbs__btn--icon" />
-                  <p className="igry__tbs__txt">Export</p>
-                </button>
-              </div>
-              <div className="igry__tbs__btn__area">
-                <button className="igry__tbs__btn">
-                  <BsShare className="igry__tbs__btn--icon" />
-                  <p className="igry__tbs__txt">Share</p>
-                </button>
-              </div>
-              <div className="igry__tbs__btn__area">
-                <button className="igry__range__play__btn">
-                  <FaPlayCircle className="igry__range__play--icon" />
-                </button>
-              </div>
-              <div className="igry__tbs__btn__area">
-                <button className="igry__tbs__btn">
-                  <SvgTabs />
-                  <p className="igry__tbs__txt">Future</p>
-                </button>
-              </div>
-              <div className="igry__tbs__btn__area">
-                <button className="igry__tbs__btn">
-                  <SvgZoom />
-                  <p className="igry__tbs__txt">Expand</p>
-                </button>
-              </div>
-              <div className="igry__tbs__btn__area">
-                <button className="igry__tbs__btn">
-                  <SvgRefresh />
-                  <p className="igry__tbs__txt">Expand</p>
-                </button>
               </div>
             </div>
           </div>

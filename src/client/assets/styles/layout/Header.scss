@@ -289,8 +289,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 28px;
     cursor: pointer;
+    a {
+      padding: 14px 28px;
+      width: -webkit-fill-available;
+    }
   }
 
   &__link{

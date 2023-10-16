@@ -15,9 +15,6 @@
       display: none;
     }
   }
-  p {
-    font-size: rem($fs-xl);
-  }
   @media screen and (orientation: portrait) {
     position: relative;
     flex-direction: row;
@@ -26,48 +23,56 @@
     width: 100%;
     padding: 10px 0;
   }
+  @media screen and (orientation: landscape) {
+    width: auto;
+  }
   &__btn {
     background-color: transparent;
     border: 0;
     border-bottom: 1px solid #C4C4C4;
     font-weight: 400;
-    font-size: 20px;
-    line-height: 24px;
+    font-size: rem($fs-xl);
+    line-height: rem($fs-xl);
     padding: 10px 0;
     min-height: 80px;
     cursor: pointer;
 
-    @media screen and (orientation: portrait) {
-      min-height: 50px;
 
-      svg{
-        width: 18px;
-        height: 18px;
+    @media screen and (orientation: landscape) {
+      min-height: 40px;
+      line-height: 20px;
+      font-size: rem($fs-sm);
+      padding: 8px 0;
+      @media (max-width: 960px) {
+        svg{
+          width: 24px;
+          height: 24px;
+        }
       }
     }
     @media screen and (orientation: portrait) {
-    font-size: 16px;
+      min-height: 50px;
+      font-size: 16px;
+      border: 0;
+      padding: 0;
+      border-right: 1px solid #C4C4C4;
+      height: auto;
+      width: 100%;
+      @media (max-width: 720px) {
+        svg{
+          width: 24px;
+          height: 24px;
+        }
+      }
     }
-
-    
-
     &:first-child {
       font-weight: 800;
       font-size: 20px;
       line-height: 24px;
       color: var(--color-primary);
     }
-
     &:last-child {
       border-bottom: 0;
-    }
-
-    @media screen and (orientation: portrait) {
-      border: 0;
-      padding: 0;
-      border-right: 1px solid #C4C4C4;
-      height: auto;
-      width: 100%;
     }
     &--more{
       display: none;

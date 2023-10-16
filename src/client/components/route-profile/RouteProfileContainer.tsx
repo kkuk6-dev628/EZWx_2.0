@@ -19,7 +19,7 @@ import {
 import { useSelector } from 'react-redux';
 import RouteProfileDataLoader from './RouteProfileDataLoader';
 import MapTabs from '../shared/MapTabs';
-import { SvgBaseMap, SvgRoute, SvgAir, SvgRefresh, SvgMap } from '../utils/SvgIcons';
+import { SvgBaseMap, SvgRoute, SvgAir, SvgRefresh, SvgMap, SvgBookmark } from '../utils/SvgIcons';
 import { useRouter } from 'next/router';
 import { selectAuth } from '../../store/auth/authSlice';
 import toast from 'react-hot-toast';
@@ -154,8 +154,8 @@ const RouteProfileContainer = () => {
     },
     {
       id: 'save',
-      name: 'Add to saved',
-      svg: <SvgAir />,
+      name: 'Save',
+      svg: <SvgBookmark />,
       handler: handler,
       isHideResponsive: false,
     },

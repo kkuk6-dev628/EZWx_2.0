@@ -26926,7 +26926,6 @@
             },
             {
               "SUBTABLABEL": "SPC Convective Outlooks",
-              "JSON_URL": "/wx/data/spc/spc.json",
               "FAVORITE_ID": "SPC_CONV_OUTLOOKS",
               "IMAGE": [
                 {
