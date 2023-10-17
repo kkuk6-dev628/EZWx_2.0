@@ -119,8 +119,7 @@
   }
   .noUi-horizontal {
     height: 12px;
-    margin-top: 6px;
-    margin-bottom: 12px;
+    margin: 6px 12px 12px 12px;
   }
   .noUi-connect {
     background-color: transparent;
@@ -167,7 +166,7 @@
     @media (max-width: 1024px) {
       order: 2;
       background: var(--color-primary);
-      padding: 6rem 0;
+      height: calc(100% - 72px);
     }
     @media (max-width: 550px) {
       padding: 0;
@@ -190,8 +189,8 @@
     }
 
     img{
-      object-fit: cover;
-      width: auto;
+      object-fit: contain;
+      width: 100%;
       height: calc(100vh - 200px);
       @media screen and (orientation: portrait) {
         width: 100vw;

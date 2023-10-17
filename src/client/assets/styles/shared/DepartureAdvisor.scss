@@ -37,6 +37,7 @@
     }
   }
   .label{
+    margin-left: -8px;
     margin-top: 2px;
     align-self: center;
     font-size: 11px;
@@ -44,6 +45,7 @@
     background-color: white;
     color: black;
     padding: 1px 2px;
+    position: absolute;
   }
 
   .MuiSlider-rail{
@@ -216,20 +218,34 @@
     // overflow-x: scroll;
   }
   .time-slider{
-    margin: 0 auto;
+    margin: 6px;
     color: white;
     width: 100%;
-    padding: 8px 0;
+    padding: 00;
+    height: 8px;
+    .noUi-connect {
+      background-color: var(--color-white);
+    }
+    .noUi-handle {
+      width: 18px;
+      height: 18px;
+      right: -14px;
+      top: -6px;
+      border-radius: 9px;
+      &:before{
+        display: none;
+      }
+      &:after{
+        display: none;
+      }
+
+    }
   }
   .interval-select{
     color:white;
   }
   .slider-label-container{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin-bottom: 42px;
-    align-items: center;
+    margin-bottom: 18px;
     .fade-out{
       opacity: 0;
       transition: all 250ms linear 3s;  

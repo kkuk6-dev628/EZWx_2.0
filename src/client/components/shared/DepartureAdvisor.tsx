@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import Slider from '@mui/material/Slider';
-import React, { SyntheticEvent, useEffect, useRef, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   absoluteDateToTime,
   addLeadingZeroes,
@@ -51,6 +51,7 @@ import DepartureAdvisor3Bars from './DepartureAdvisor3Bars';
 import { useGetAirportQuery } from '../../store/route/airportApi';
 import { iOS } from '../Imagery/Imagery';
 import toast from 'react-hot-toast';
+import Nouislider from 'nouislider-react';
 
 type personalMinValue = 0 | 1 | 2 | 10;
 type personalMinColor = 'red' | 'yellow' | 'green' | 'grey';
@@ -1080,14 +1081,12 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const [blockDays, setBlockDays] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [evaluationsByTime, setEvaluationsByTime] = useState<any[]>();
-  const dotElementRef = useRef(null);
+  const sliderRef = useRef(null);
   const [showBarComponent, setShowBarComponent] = useState(false);
   const [barPos, setBarPos] = useState(0);
   const [barTimeoutHandle, setBarTimeoutHandle] = useState(0);
   const [flyTime, setFlyTime] = useState(0);
   const [lastTime, setLastTime] = useState(Date.now());
-  const isIOS = iOS();
-  const [ignoreChange, setIgnoreChange] = useState(false);
 
   function calcBlockTimes() {
     return Array.from({ length: blockCount }, (_v, index) => {
@@ -1244,7 +1243,6 @@ function DepartureAdvisor(props: { showPast: boolean }) {
 
   useEffect(() => {
     if (activeRoute) {
-      // getDepartureAdvisorDataResult.reset();
       const queryPoints = interpolateRouteByInterval(
         activeRoute,
         getSegmentsCount(activeRoute) * flightCategoryDivide,
@@ -1274,10 +1272,6 @@ function DepartureAdvisor(props: { showPast: boolean }) {
 
   useEffect(() => {
     if (activeRoute && getDepartureAdvisorDataResult.isSuccess && evaluationsByTime) {
-      // const queryPoints = interpolateRouteByInterval(
-      //   activeRoute,
-      //   getSegmentsCount(activeRoute) * flightCategoryDivide,
-      // ).map((pt) => pt.point);
       const currentTime = new Date();
       currentTime.setMinutes(0, 0, 0);
       const currentTimeMili = currentTime.getTime();
@@ -1424,12 +1418,11 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     return Math.floor(diff / (60 / stepsPerHour));
   };
 
-  function valuetext(value: number) {
-    return (
-      <div className="slider-label-container">
-        <div className="label">{simpleTimeOnlyFormat(valueToTime(value), settingsState.default_time_display_unit)}</div>
-      </div>
-    );
+  function moveSlider(time: number | Date) {
+    if (sliderRef.current && sliderRef.current.noUiSlider) {
+      const value = timeToValue(new Date(time));
+      sliderRef.current.noUiSlider.set(value);
+    }
   }
 
   function calcBarPos(time: Date) {
@@ -1470,6 +1463,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
     e.currentTarget.disabled = true;
     const newTime = settingsState.observation_time + (isForward ? 1 : -1) * 3 * 3600 * 1000;
     handleTimeChange(new Date(newTime), true);
+    moveSlider(newTime);
   }
 
   function setBarTimeout() {
@@ -1484,6 +1478,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   }
 
   const isPast = settingsState.observation_time < new Date().getTime();
+  const startSlider = timeToValue(new Date(settingsState.observation_time));
 
   return (
     <div className="departure-advisor">
@@ -1534,6 +1529,14 @@ function DepartureAdvisor(props: { showPast: boolean }) {
                 setShowPopup={setShowPopup}
               ></DepartureAdvisor3Bars>
             )}
+            <div className="slider-label-container">
+              <div className="label" style={{ left: `${barPos}%` }}>
+                {simpleTimeOnlyFormat(
+                  new Date(settingsState.observation_time),
+                  settingsState.default_time_display_unit,
+                )}
+              </div>
+            </div>
             <div className="horizental-blocks">
               {true &&
                 blockTimes.map((time, index) => (
@@ -1548,6 +1551,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
                     setShowPopup={setShowPopup}
                     handleTimeChange={(newValue: Date) => {
                       handleTimeChange(newValue);
+                      moveSlider(newValue);
                       setShowBarComponent(true);
                       setBarTimeout();
                     }}
@@ -1568,30 +1572,23 @@ function DepartureAdvisor(props: { showPast: boolean }) {
                 </div>
               ))}
             </div>
-            <Slider
+            <Nouislider
               className="time-slider"
-              key={`time-range-slider`}
-              aria-label="Time Slider"
-              // defaultValue={timeToValue(defaultTime)}
-              value={timeToValue(currentTime)}
-              max={maxRange}
-              valueLabelFormat={valuetext}
+              start={startSlider}
               step={1}
-              valueLabelDisplay="on"
-              onChange={(e, newValue: number) => {
-                if (isIOS && (e.type === 'mousedown' || e.type == 'mouseup')) {
-                  setIgnoreChange(true);
-                  return;
+              connect={[true, false]}
+              range={{ min: 0, max: maxRange }}
+              instanceRef={(instance) => {
+                if (instance && !sliderRef.current) {
+                  sliderRef.current = instance;
                 }
-                handleTimeChange(valueToTime(newValue), false);
+              }}
+              onSlide={(newValue) => {
+                handleTimeChange(valueToTime(newValue[0]), false);
                 setShowBarComponent(true);
               }}
-              onChangeCommitted={(e, newValue: number) => {
-                if (ignoreChange) {
-                  setIgnoreChange(false);
-                  return;
-                }
-                handleTimeChange(valueToTime(newValue));
+              onChange={(newValue) => {
+                handleTimeChange(valueToTime(newValue[0]));
                 setShowBarComponent(true);
                 setBarTimeout();
               }}

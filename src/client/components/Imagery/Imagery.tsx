@@ -78,6 +78,7 @@ function Imagery() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    handleWindowSizeChange();
     window.addEventListener('resize', handleWindowSizeChange);
     return () => {
       window.removeEventListener('resize', handleWindowSizeChange);
@@ -134,6 +135,12 @@ function Imagery() {
       updateSliderValue(val);
     } else {
       setDateBlocks([{ date: null, width: 100 }]);
+      let sliderVal = 0;
+      if (selectedImagesData && selectedImagesData.LOOP === 'Last') {
+        sliderVal = selectedImages.length - 1;
+      }
+      setSliderValue(sliderVal);
+      updateSliderValue(sliderVal);
     }
   }, [dataTimes]);
 
@@ -214,13 +221,18 @@ function Imagery() {
     if (item.JSON_URL) {
       const jsonUrl = imageryServerUrl + item.JSON_URL;
       const requestUrl = '/api/imagery/timestamps?url=' + jsonUrl;
-      axios.get(requestUrl).then((data) => {
-        if (!data.data || !Array.isArray(data.data)) {
-          return;
-        }
-        const timestamps = data.data.map((item) => item.map((strTime) => moment.utc(strTime, 'YYYYMMDDHHmm').toDate()));
-        setDataTimes(timestamps);
-      });
+      axios
+        .get(requestUrl)
+        .then((data) => {
+          if (!data.data || !Array.isArray(data.data)) {
+            return;
+          }
+          const timestamps = data.data.map((item) =>
+            item.map((strTime) => moment.utc(strTime, 'YYYYMMDDHHmm').toDate()),
+          );
+          setDataTimes(timestamps);
+        })
+        .catch((err) => console.error(err));
     } else {
       const sliderMarks = item.IMAGE.map((item, index) => index);
       setSliderLabels(sliderMarks);
@@ -246,7 +258,8 @@ function Imagery() {
 
   function readSliderValue() {
     if (noUISliderRef.current) {
-      return noUISliderRef.current.noUiSlider?.get();
+      const str = noUISliderRef.current.noUiSlider?.get();
+      return parseInt(str);
     }
     return 0;
   }
@@ -445,7 +458,7 @@ function Imagery() {
                 <div className="date-container">
                   {dateBlocks.map((item, index) => (
                     <div key={'date' + index} className="date" style={{ width: item.width + '%' }}>
-                      {item.date && item.width > 5
+                      {item.date && item.width > 10
                         ? item.date.toLocaleDateString(
                             'en-US',
                             hideWeekDay
@@ -473,17 +486,18 @@ function Imagery() {
                       }
                     }}
                     range={{ min: 0, max: sliderMaxValue ? sliderMaxValue : 3 }}
-                    start={0}
+                    start={selectedImagesData.LOOP === 'Last' ? sliderMaxValue : 0}
+                    step={1}
                     connect={[true, false]}
                     pips={{
                       mode: 'values',
                       values: sliderLabels,
                     }}
                     onSlide={(value) => {
-                      setSliderValue(value[0]);
+                      setSliderValue(parseInt(value[0]));
                     }}
                     onChange={(value) => {
-                      const newValue = value[0];
+                      const newValue = parseInt(value[0]);
                       const timeImage = getImageBySliderValue(newValue);
                       if (timeImage) {
                         setSelectedImageUrl(timeImage.image);
