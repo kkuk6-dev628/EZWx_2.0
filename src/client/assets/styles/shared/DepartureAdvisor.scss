@@ -1,5 +1,6 @@
 .MuiPaper-root.MuiDialog-paper{
   margin: 12px;
+  overflow-y: visible;
 }
 #draggable-dialog-title{
   width: 100%;
@@ -218,7 +219,7 @@
     // overflow-x: scroll;
   }
   .time-slider{
-    margin: 6px;
+    margin: 6px 0;
     color: white;
     width: 100%;
     padding: 00;

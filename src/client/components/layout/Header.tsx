@@ -13,9 +13,10 @@ import ZuluClock from '../shared/ZuluClock';
 import { useCookies } from 'react-cookie';
 import { useGetUserQuery } from '../../store/auth/authApi';
 import { Dialog } from '@mui/material';
-import { PaperComponent } from '../map/leaflet/Map';
 import { useDispatch } from 'react-redux';
 import { setShowInformation } from '../../store/imagery/imagery';
+import AirportSelectModal from '../airportwx/AirportSelectModal';
+import { PaperComponent } from '../common/PaperComponent';
 const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
 const menusHome = [
@@ -194,6 +195,7 @@ export default function Header() {
   const [isUserLoginUser, setIsUserLoginUser] = useState(false);
   const [userSettingDrawer, setIsShowSettingsDrawer] = useState(false);
   const [favoritesDrawer, setFavoritesDrawer] = useState(false);
+  const [showAirportSelect, setShowAirportSelect] = useState(false);
   const auth = useSelector(selectAuth);
   const [cookies] = useCookies(['logged_in']);
   useGetUserQuery(null, { refetchOnMountOrArgChange: true });
@@ -245,6 +247,15 @@ export default function Header() {
     if (isShowProfileModal) closeAllModals();
     setIsShowProfileModal(!isShowProfileModal);
   };
+
+  function handleClickMenu(e, link) {
+    switch (link) {
+      case '/airport':
+        e.preventDefault();
+        setShowAirportSelect(true);
+        break;
+    }
+  }
   return (
     <div className={`header ${sticky && 'header--fixed'}`}>
       <div className="container">
@@ -281,7 +292,11 @@ export default function Header() {
               {mapMenu
                 ? workMenu.map((link) => (
                     <li key={link.id} className="header__nav__item">
-                      <Link className="header__nav__anc" href={link.link}>
+                      <Link
+                        className="header__nav__anc"
+                        href={link.link}
+                        onClick={(e) => handleClickMenu(e, link.link)}
+                      >
                         <span className="header__nav__link">{link.name}</span>
                       </Link>
                     </li>
@@ -376,6 +391,16 @@ export default function Header() {
           isShowProfileModal={isShowProfileModal}
           handleProfileModal={handleProfileModal}
         />
+        <Dialog
+          PaperComponent={PaperComponent}
+          hideBackdrop
+          disableEnforceFocus
+          style={{ position: 'absolute' }}
+          open={showAirportSelect}
+          onClose={() => setShowAirportSelect(false)}
+        >
+          <AirportSelectModal setIsShowModal={setShowAirportSelect} />
+        </Dialog>
       </div>
       <ResponsiveMenu
         activeResponsiveMenu={activeResponsiveMenu}

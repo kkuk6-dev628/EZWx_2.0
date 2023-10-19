@@ -47,14 +47,7 @@ import { BaseMapLayerControlState, LayerControlState } from '../../../interfaces
 import { selectLayerControlState, setLayerControlState } from '../../../store/layers/LayerControl';
 import { selectActiveRoute } from '../../../store/route/routes';
 import { useCookies } from 'react-cookie';
-
-export const PaperComponent = (props) => {
-  return (
-    <Draggable handle="#draggable-dialog-title" cancel={'[class*="MuiDialogContent-root"]'}>
-      <Paper {...props} />
-    </Draggable>
-  );
-};
+import { PaperComponent } from '../../common/PaperComponent';
 
 const maxScreenDimension = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
 const minZoom = maxScreenDimension > 1024 ? 4 : 3;

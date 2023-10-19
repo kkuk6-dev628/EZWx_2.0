@@ -15,7 +15,7 @@ import { Dialog, DialogTitle, Slider } from '@mui/material';
 import { selectSettings } from '../../store/user/UserSettings';
 import { useSelector } from 'react-redux';
 import { selectShowInformation, setShowInformation } from '../../store/imagery/imagery';
-import { PaperComponent } from '../map/leaflet/Map';
+import { PaperComponent } from '../common/PaperComponent';
 import { useDispatch } from 'react-redux';
 import PrismaZoom from 'react-prismazoom';
 import toast from 'react-hot-toast';

@@ -45,7 +45,7 @@ import { jsonClone } from '../utils/ObjectUtil';
 import { DateObject } from 'react-multi-date-picker';
 import DepartureAdvisorPopup, { getEvaluationByTime } from './DepartureAdvisorPopup';
 import { getMaxForecastTime } from '../route-profile/RouteProfileDataLoader';
-import { PaperComponent } from '../map/leaflet/Map';
+import { PaperComponent } from '../common/PaperComponent';
 import DepartureAdvisorTimeBlockComponent from './DepartureAdvisorTimeBlockComponent';
 import DepartureAdvisor3Bars from './DepartureAdvisor3Bars';
 import { useGetAirportQuery } from '../../store/route/airportApi';

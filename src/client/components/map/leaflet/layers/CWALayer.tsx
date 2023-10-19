@@ -100,7 +100,7 @@ const CWALayer = () => {
       typeName="EZWxBrief:cwa"
       propertyNames={[
         'wkb_geometry',
-        'id',
+        // 'id',
         'data',
         'cwsu',
         'name',

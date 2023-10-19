@@ -323,7 +323,7 @@ const RouteProfileContainer = () => {
                       });
                     }}
                   >
-                    -
+                    &darr;
                   </button>
                   <div className="label-altitude">{routeProfileState.maxAltitude}</div>
                   <button
@@ -336,7 +336,7 @@ const RouteProfileContainer = () => {
                       });
                     }}
                   >
-                    +
+                    &uarr;
                   </button>
                 </div>
               </div>

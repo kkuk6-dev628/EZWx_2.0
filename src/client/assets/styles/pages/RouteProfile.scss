@@ -57,7 +57,7 @@ body>div{
       width: calc(100vw);
     }
     @media screen and (orientation: landscape) {
-      width: calc(100vw - 76px);
+      width: calc(100vw - 80px);
     }
 
     .route-profile-header{
@@ -114,7 +114,7 @@ body>div{
             background-color: var(--color-yellow);
             color: var(--color-dark);
             height: 100%;
-            width: 14px;
+            width: 18px;
             border: none;
             padding: 0;
             font-size: 14px;

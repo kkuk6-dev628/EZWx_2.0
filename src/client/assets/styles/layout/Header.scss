@@ -366,3 +366,56 @@ visibility: visible;
   }
 
 }
+.dlg-title {
+    background-color: var(--color-primary);
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px 0 20px;
+    overflow: hidden;
+    .text {
+      color: var(--color-white);
+    }
+}
+.airport-selector {
+  width: 340px;
+  height: 256px;
+  overflow-y: visible;
+  &-wrap {
+    height: 100%;
+  }
+  &-content {
+    height: calc(100% - 40px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    .button-area {
+      width: 100%;
+      button {
+        width: 50%;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        svg, p{
+          color: var(--color-primary);
+        }
+      }
+      .home-airport {
+        border-right: solid #00000066 2px;
+      }
+    }
+    .selector-area {
+      width: 90%;
+    }
+    .btn-apply {
+      width: 144px;
+      height: 40px;
+      background-color: var(--color-primary);
+      border-radius: 20px;
+      color: var(--color-white);
+      cursor: pointer;
+    }
+  }
+}

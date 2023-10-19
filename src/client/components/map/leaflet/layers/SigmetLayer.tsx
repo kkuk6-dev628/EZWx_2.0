@@ -102,7 +102,7 @@ const SigmetLayer = () => {
       initData={jsonData}
       propertyNames={[
         'wkb_geometry',
-        'id',
+        // 'id',
         'altitudelow',
         'altitudehi',
         'validtimeto',

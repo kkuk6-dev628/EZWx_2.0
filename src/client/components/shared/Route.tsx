@@ -220,7 +220,7 @@ function Route({ setIsShowModal }: Props) {
               </button>
               <button className="route-editor__tab" type="button" onClick={handleSaveRoute}>
                 <BsBookmarkPlus className="route-editor__icon" />
-                <p className="route-editor__tab__text text">Add to saved</p>
+                <p className="route-editor__tab__text text">Save</p>
               </button>
             </div>
             <form action="" className="route-editor__form">
