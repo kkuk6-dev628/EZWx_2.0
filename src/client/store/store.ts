@@ -16,6 +16,8 @@ import { elevationApi } from './route-profile/elevationApi';
 import RouteProfileSlice from './route-profile/RouteProfile';
 import { imageryApi } from './imagery/imageryApi';
 import ImagerySlice from './imagery/imagery';
+import airportwxSlice from './airportwx/airportwx';
+import { airportwxApi } from './airportwx/airportwxApi';
 
 const makeStore = () =>
   configureStore({
@@ -28,8 +30,10 @@ const makeStore = () =>
       [routeProfileApi.reducerPath]: routeProfileApi.reducer,
       [elevationApi.reducerPath]: elevationApi.reducer,
       [imageryApi.reducerPath]: imageryApi.reducer,
+      [airportwxApi.reducerPath]: airportwxApi.reducer,
       [RoutesSlice.name]: RoutesSlice.reducer,
       [ImagerySlice.name]: ImagerySlice.reducer,
+      [airportwxSlice.name]: airportwxSlice.reducer,
       [apiSlice.reducerPath]: apiSlice.reducer,
       [authSlice.name]: authSlice.reducer,
       [LayerControlSlidersSlice.name]: LayerControlSlidersSlice.reducer,
@@ -50,6 +54,7 @@ const makeStore = () =>
         routeProfileApi.middleware,
         elevationApi.middleware,
         imageryApi.middleware,
+        airportwxApi.middleware as any,
       );
       return middleWares;
     },

@@ -24,7 +24,7 @@ import { useRouter } from 'next/router';
 import { selectAuth } from '../../store/auth/authSlice';
 import toast from 'react-hot-toast';
 import Route from '../shared/Route';
-import { PaperComponent } from '../map/leaflet/Map';
+import { PaperComponent } from '../common/PaperComponent';
 import { selectDataLoadTime, setDataLoadTime } from '../../store/layers/DataLoadTimeSlice';
 import { useDispatch } from 'react-redux';
 import CloudsChart from './CloudsChart';

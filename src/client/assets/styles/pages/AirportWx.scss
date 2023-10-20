@@ -1,0 +1,14 @@
+.airportwx-page {
+  display: flex;
+  height: calc(100vh - 72px);
+  .tabs {
+    position: relative;
+  }
+  .main-container {
+    width: calc(100vw - 82px);
+  }
+  .primary-bar {
+    display: flex;
+    flex-direction: row;
+  }
+}

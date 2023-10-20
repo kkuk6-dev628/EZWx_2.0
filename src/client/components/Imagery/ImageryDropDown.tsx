@@ -48,6 +48,7 @@ const ImageryDropDown = ({
         selectedLvl2: selectedLevel2,
         selectedLvl3: selectedLevel3,
         selectedImageryName: selectedImage.TITLE ? selectedImage.TITLE : selectedImage.SUBTABLABEL,
+        selectedImageryId: selectedImage.FAVORITE_ID,
       };
       updateImageryState(imageryState);
       handleSelectImageCollection(selectedImage);
@@ -74,13 +75,34 @@ const ImageryDropDown = ({
         const childrenLvl1 = Array.isArray(selectedLvl1Data.SUBTAB_GROUP)
           ? selectedLvl1Data.SUBTAB_GROUP
           : selectedLvl1Data.SUBTAB_GROUP.SUBTAB;
+        if (!Array.isArray(childrenLvl1)) {
+          console.log('Invalid data structure in wx.json');
+          setSelectedLevel1(0);
+          setSelectedLevel2(0);
+          setSelectedLevel3(0);
+          return;
+        }
+        if (childrenLvl1.length <= imagerySt.selectedLvl2 || !childrenLvl1[imagerySt.selectedLvl2]) {
+          console.log('Imagery collection has been changed! lvl 2', imagerySt.selectedLvl2);
+          setSelectedLevel1(0);
+          setSelectedLevel2(0);
+          setSelectedLevel3(0);
+          return;
+        }
         const selectedLvl2Data = childrenLvl1[imagerySt.selectedLvl2];
-        if (selectedLvl2Data && selectedLvl2Data.IMAGE) {
+        if (selectedLvl2Data.IMAGE) {
           setSelectedImage({ ...selectedLvl1Data, ...selectedLvl2Data });
-        } else if (selectedLvl2Data) {
+        } else {
           const childrenLvl2 = (selectedLvl2Data as SubtabGroupItem).SUBTAB;
           const selectedLvl3Data = Array.isArray(childrenLvl2) ? childrenLvl2[imagerySt.selectedLvl3] : childrenLvl2;
-          if (selectedLvl3Data && selectedLvl3Data.IMAGE) {
+          if (!selectedLvl3Data) {
+            console.log('Imagery collection has been changed! lvl 3', imagerySt.selectedLvl2);
+            setSelectedLevel1(0);
+            setSelectedLevel2(0);
+            setSelectedLevel3(0);
+            return;
+          }
+          if (selectedLvl3Data.IMAGE) {
             setSelectedImage({ ...selectedLvl1Data, ...selectedLvl3Data });
           } else {
             setSelectedImage({ ...selectedLvl1Data, ...childrenLvl2[0] });

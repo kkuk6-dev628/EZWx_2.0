@@ -36,6 +36,7 @@ export interface ImageryState {
   selectedLvl3?: number;
   selectedLvl4?: number;
   selectedImageryName: string;
+  selectedImageryId: string;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string;

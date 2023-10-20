@@ -39,6 +39,8 @@ docker-compose exec web yarn nest -- --help
 TypeORM CLI:
 ```
 docker-compose exec web yarn typeorm -- --help
+
+yarn migration:generate src/server/migration/createRecentAirportTable
 ```
 
 ## Resources

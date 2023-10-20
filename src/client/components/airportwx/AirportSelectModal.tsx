@@ -3,12 +3,42 @@ import { SvgBookmark, SvgHomeAirport, SvgRoundClose, SvgSave } from '../utils/Sv
 import { AutoCompleteInput } from '../common/AutoCompleteInput';
 import { useSelector } from 'react-redux';
 import { selectSettings } from '../../store/user/UserSettings';
+import { useDispatch } from 'react-redux';
+import { selectCurrentAirport, setCurrentAirport } from '../../store/airportwx/airportwx';
+import { useRouter } from 'next/router';
+import { useAddRecentAirportMutation, useGetRecentAirportQuery } from '../../store/airportwx/airportwxApi';
+import { useEffect, useState } from 'react';
 
 function AirportSelectModal({ setIsShowModal }) {
   const settingsState = useSelector(selectSettings);
+  const currentAirport = useSelector(selectCurrentAirport);
+  const [selectedAirport, setSelectedAirport] = useState<any>(currentAirport);
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const { data: recentAirports, isSuccess: isSuccessRecentAirports } = useGetRecentAirportQuery(null);
+  const [addRecentAirport] = useAddRecentAirportMutation();
+
+  useEffect(() => {
+    if (isSuccessRecentAirports && recentAirports.length > 0) {
+      dispatch(setCurrentAirport(recentAirports[0].airportId));
+      setSelectedAirport(recentAirports[0].airportId);
+    } else {
+      dispatch(setCurrentAirport(settingsState.default_home_airport));
+      setSelectedAirport(settingsState.default_home_airport);
+    }
+  }, [isSuccessRecentAirports]);
+
   function clickHomeAirport() {
-    settingsState.default_home_airport;
+    setSelectedAirport(settingsState.default_home_airport);
   }
+
+  function clickApply() {
+    dispatch(setCurrentAirport(selectedAirport.key || selectedAirport));
+    addRecentAirport({ airportId: selectedAirport.key || selectedAirport });
+    setIsShowModal(false);
+    router.push('/airportwx');
+  }
+
   return (
     <div className="airport-selector">
       <div className="airport-selector-wrap">
@@ -22,7 +52,7 @@ function AirportSelectModal({ setIsShowModal }) {
         </DialogTitle>
         <div className="airport-selector-content">
           <div className="button-area">
-            <button className="home-airport">
+            <button className="home-airport" onClick={clickHomeAirport}>
               <SvgHomeAirport />
               <p className="btn-text">Home airport</p>
             </button>
@@ -34,9 +64,9 @@ function AirportSelectModal({ setIsShowModal }) {
           <div className="selector-area">
             <AutoCompleteInput
               name="default_home_airport"
-              selectedValue={settingsState.default_home_airport as any}
+              selectedValue={selectedAirport}
               handleAutoComplete={(name, value) => {
-                console.log(name, value);
+                setSelectedAirport(value);
               }}
               exceptions={[]}
               key={'home-airport'}
@@ -44,7 +74,7 @@ function AirportSelectModal({ setIsShowModal }) {
               // showSuggestion={formData[DESTINATION_SUGGESTION]}
             />
           </div>
-          <div className="apply-area">
+          <div className="apply-area" onClick={clickApply}>
             <button className="btn-apply">Apply</button>
           </div>
         </div>

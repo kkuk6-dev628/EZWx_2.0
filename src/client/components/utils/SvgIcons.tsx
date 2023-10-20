@@ -117,8 +117,8 @@ function SvgHomeAirport() {
   return (
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M17.6567 5.40197V5.40197C20.7809 8.52617 20.7809 13.5915 17.6567 16.7157L13.3329 21.0395C12.5967 21.7757 11.4031 21.7757 10.6668 21.0395L6.34302 16.7157C3.21883 13.5915 3.21883 8.52617 6.34302 5.40197V5.40197C9.46722 2.27778 14.5325 2.27778 17.6567 5.40197Z"
         stroke="#3F0C69"
         strokeWidth="1.5"
@@ -126,8 +126,8 @@ function SvgHomeAirport() {
         strokeLinejoin="round"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M10.75 15.2501V13.0001C10.75 12.3096 11.3095 11.7501 12 11.7501V11.7501C12.6905 11.7501 13.25 12.3096 13.25 13.0001V15.2501H16V10.9571C16 10.6921 15.8945 10.4376 15.707 10.2501L12.3535 6.89662C12.158 6.70112 11.8415 6.70112 11.6465 6.89662L8.293 10.2501C8.1055 10.4376 8 10.6921 8 10.9571V15.2501H10.75Z"
         stroke="#3F0C69"
         strokeWidth="1.5"
@@ -320,6 +320,26 @@ function SvgRoute() {
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+function SvgForward() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 256 256">
+      <path
+        fill="#3F0C69"
+        d="M208 40v176a8 8 0 0 1-16 0v-69.23L72.43 221.55A15.95 15.95 0 0 1 48 208.12V47.88a15.95 15.95 0 0 1 24.43-13.43L192 109.23V40a8 8 0 0 1 16 0Z"
+      />
+    </svg>
+  );
+}
+function SvgBackward() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 512 512">
+      <path
+        fill="#3F0C69"
+        d="M112 64a16 16 0 0 1 16 16v136.43L360.77 77.11a35.13 35.13 0 0 1 35.77-.44c12 6.8 19.46 20 19.46 34.33v290c0 14.37-7.46 27.53-19.46 34.33a35.14 35.14 0 0 1-35.77-.45L128 295.57V432a16 16 0 0 1-32 0V80a16 16 0 0 1 16-16Z"
       />
     </svg>
   );
@@ -696,4 +716,6 @@ export {
   SvgBulbDollar,
   SvgRoundMinus,
   SvgRoundPlus,
+  SvgForward,
+  SvgBackward,
 };

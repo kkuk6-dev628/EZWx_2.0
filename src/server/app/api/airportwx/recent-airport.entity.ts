@@ -8,8 +8,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('imagery')
-export class Imagery {
+@Entity('recent_airport')
+export class RecentAirport {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -18,22 +18,7 @@ export class Imagery {
   userId: number;
 
   @Column()
-  selectedLvl1: number;
-
-  @Column({ nullable: true })
-  selectedLvl2: number;
-
-  @Column({ nullable: true })
-  selectedLvl3: number;
-
-  @Column({ nullable: true })
-  selectedLvl4: number;
-
-  @Column()
-  selectedImageryName: string;
-
-  @Column()
-  selectedImageryId: string;
+  airportId: string;
 
   @Column()
   @CreateDateColumn()

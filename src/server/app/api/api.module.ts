@@ -6,10 +6,11 @@ import { ApiController } from './api.controller';
 import { Module } from '@nestjs/common';
 import { RouteProfileModule } from './route-profile/route-profile.module';
 import { ImageryModule } from './imagery/imagery.module';
+import { AirportwxModule } from './airportwx/airportwx.module';
 
 @Module({
   controllers: [ApiController],
-  imports: [StationTimeModule, RouteModule, LayerControlModule, RouteProfileModule, ImageryModule],
+  imports: [StationTimeModule, RouteModule, LayerControlModule, RouteProfileModule, ImageryModule, AirportwxModule],
   providers: [ApiService],
 })
 export class ApiModule {}

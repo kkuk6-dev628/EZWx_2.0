@@ -8,6 +8,7 @@ export const initialImageryState: ImageryState = {
   selectedLvl2: 0,
   selectedLvl3: 0,
   selectedImageryName: 'U.S. Sfc Analysis',
+  selectedImageryId: 'SFC_ANL_WITH_MODELS',
 };
 
 export const imageryApi = createApi({

@@ -37,8 +37,8 @@ const menusHome = [
   },
   {
     id: 4,
-    name: 'Airport',
-    link: '/airport',
+    name: 'Airport Wx',
+    link: '/airportwx',
   },
   {
     id: 5,
@@ -154,7 +154,7 @@ const menusMap = [
   {
     id: 3,
     name: 'Airport Wx',
-    link: '/airport',
+    link: '/airportwx',
   },
   {
     id: 4,
@@ -250,7 +250,7 @@ export default function Header() {
 
   function handleClickMenu(e, link) {
     switch (link) {
-      case '/airport':
+      case '/airportwx':
         e.preventDefault();
         setShowAirportSelect(true);
         break;
