@@ -6,7 +6,7 @@ import { selectLayerControlState } from '../../../../store/layers/LayerControl';
 import { selectSettings } from '../../../../store/user/UserSettings';
 import { addLeadingZeroes } from '../../common/AreoFunctions';
 import WMS from '../plugins/leaflet.wms';
-import { hourInMili } from '../../../shared/DepartureAdvisor';
+import { hourInMili } from '../../../../utils/constants';
 
 interface Radar {
   valid_timespan: number;

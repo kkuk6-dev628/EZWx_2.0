@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { AirportNbmData, RouteProfileDataset, RouteProfileState } from '../../interfaces/route-profile';
 
-const initialRouteProfileState: RouteProfileState = {
+export const initialRouteProfileState: RouteProfileState = {
   chartType: 'Wind',
   windLayer: 'SPEED',
   icingLayers: ['Prob'],
@@ -35,7 +35,7 @@ const transformElevationBands = (response: any[]): RouteProfileDataset[] => {
   return results;
 };
 
-const transformTimeBands = (response: any[]): RouteProfileDataset[] => {
+export const transformTimeBands = (response: any[]): RouteProfileDataset[] => {
   const results: RouteProfileDataset[] = response.map((row) => {
     return {
       time: row.time,

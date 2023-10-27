@@ -262,14 +262,6 @@ const MeteoLayers = () => {
         <IntlSigmetLayer></IntlSigmetLayer>
       </GroupedLayer>
       <GroupedLayer
-        checked={layerControlState.cwaState.checked}
-        addLayerToStore={(layer) => {
-          meteoLayers.cwa = layer;
-        }}
-      >
-        <CWALayer></CWALayer>
-      </GroupedLayer>
-      <GroupedLayer
         checked={layerControlState.sigmetState.checked && layerControlState.sigmetState.outlooks.checked}
         addLayerToStore={(layer) => {
           meteoLayers.convectiveOutlooks = layer;
@@ -284,6 +276,14 @@ const MeteoLayers = () => {
         }}
       >
         {true && <GairmetLayer />}
+      </GroupedLayer>
+      <GroupedLayer
+        checked={layerControlState.cwaState.checked}
+        addLayerToStore={(layer) => {
+          meteoLayers.cwa = layer;
+        }}
+      >
+        <CWALayer></CWALayer>
       </GroupedLayer>
       <GroupedLayer
         checked={layerControlState.pirepState.checked}

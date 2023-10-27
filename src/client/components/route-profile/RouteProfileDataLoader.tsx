@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import { selectActiveRoute } from '../../store/route/routes';
 import L from 'leaflet';
 import * as fly from '../../fly-js/fly';
-import * as d3 from 'd3-scale';
 import { getFuzzyLocalTimeFromPoint } from '@mapbox/timespace';
 import { Route, RoutePoint } from '../../interfaces/route';
 import { useEffect, useState } from 'react';
@@ -19,54 +18,19 @@ import {
   useQueryIcingTurbDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { CircularProgress } from '@mui/material';
-import { QueryStatus, skipToken } from '@reduxjs/toolkit/query';
 import { useDispatch } from 'react-redux';
-import { AirportNbmData, NbmProperties, RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
+import { AirportNbmData, NbmProperties, RouteSegment } from '../../interfaces/route-profile';
 import { selectSettings } from '../../store/user/UserSettings';
 import { selectFetchedDate, setFetchedDate, setRouteSegments } from '../../store/route-profile/RouteProfile';
-import { windQueryElevations } from './WindChart';
+import { windQueryElevations } from '../../utils/constants';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { useGetAirportQuery } from '../../store/route/airportApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import Point from '../../fly-js/src/Point';
 import Latitude from '../../fly-js/src/Latitude';
 import Longitude from '../../fly-js/src/Longitude';
-import { nauticalMilesToMeters } from '../../fly-js/src/helpers/converters/DistanceConverter';
-
-export const totalNumberOfElevations = 200;
-
-export const contourMin = -100;
-
-export const contourMax = 60;
-
-export const flightCategoryDivide = 5;
-
-export const NODATA = -9999;
-
-export const SUNSET_SUNRISE = {
-  night: {
-    start: 20,
-    end: 4,
-  },
-  day: {
-    start: 7,
-    end: 17,
-  },
-};
-
-export const NIGHT_GRADIENT_COLOR = 'rgb(24, 33, 48)';
-export const DAY_GRADIENT_COLOR = 'rgb(109, 154, 229)';
-
-export const cacheKeys = {
-  airportProperties: 'airport-properties',
-  gData: 'g-windspeed',
-  icingTurb: 'icing-turb',
-  nbmAllAirport: 'nbm-airport',
-  nbm: 'nbm-all',
-  elevation: 'elevation-api',
-  departureAdvisor: 'departure-advisor',
-  userSettings: 'update-usersettings',
-};
+import { flightCategoryDivide, totalNumberOfElevations, cacheKeys } from '../../utils/constants';
+import { getValueFromDatasetByElevation } from '../../utils/utils';
 
 /**
  * calculate length of polyline.
@@ -86,21 +50,36 @@ export function getLineLength(coordinateList: GeoJSON.Position[], inMile = false
   return inMile ? routeLength / 1852 : routeLength / 1000;
 }
 
-function getLineLengthAndAccDistances(
-  coordinateList: GeoJSON.Position[],
-  inMile = false,
-): { length: number; segments: any[] } {
-  let routeLength = 0;
-  const latlngs: L.LatLng[] = L.GeoJSON.coordsToLatLngs(coordinateList);
-  const points = [{ point: latlngs[0], accDistance: 0 }];
-  latlngs.reduce((a, b) => {
-    if (a.lat !== b.lat || a.lng !== b.lng) {
-      routeLength += a.distanceTo(b);
-    }
-    points.push({ point: b, accDistance: inMile ? routeLength / 1852 : routeLength / 1000 });
-    return b;
-  });
-  return { length: inMile ? routeLength / 1852 : routeLength / 1000, segments: points };
+export function getSegmentInterval(route: Route, segmentsCount: number) {
+  return getRouteLength(route, true) / segmentsCount;
+}
+
+export function getRouteLength(route: Route, inMile = false): number {
+  const coordinateList = [
+    route.departure.position.coordinates,
+    ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
+    route.destination.position.coordinates,
+  ];
+  const routeLengthNm = getLineLength(coordinateList, inMile);
+  return routeLengthNm;
+}
+
+export function getSegmentsCount(route: Route): number {
+  const coordinateList = [
+    route.departure.position.coordinates,
+    ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
+    route.destination.position.coordinates,
+  ];
+  const routeLengthNm = getLineLength(coordinateList, true);
+  if (routeLengthNm <= 250) {
+    return 7;
+  } else if (routeLengthNm <= 500) {
+    return 9;
+  } else if (routeLengthNm <= 800) {
+    return 11;
+  } else {
+    return 13;
+  }
 }
 
 /**
@@ -141,335 +120,11 @@ function findAirportByPoint(airports: RoutePoint[], point: L.LatLng, radius: num
   }
 }
 
-export function getMaxForecastTime(dataset: RouteProfileDataset[]): Date {
-  let maxForecast = new Date();
-  for (const item of dataset) {
-    for (const timeString of item.time) {
-      const time = new Date(timeString);
-      if (time > maxForecast) {
-        maxForecast = time;
-      }
-    }
-  }
-  return maxForecast;
-}
-
-export function getMaxForecastElevation(dataset: RouteProfileDataset[]): number {
-  let maxElevation = 0;
-  for (const item of dataset) {
-    for (const elevation of item.elevations) {
-      const el = typeof elevation === 'number' ? elevation : parseInt(elevation, 10);
-      if (el > maxElevation) {
-        maxElevation = el;
-      }
-    }
-  }
-  return maxElevation;
-}
-
-export function getMinMaxValueByElevation(
-  dataset: RouteProfileDataset[],
-  elevation: number,
-): { min: number; max: number } {
-  let maxValue = Number.NEGATIVE_INFINITY;
-  let minValue = Number.POSITIVE_INFINITY;
-  for (const item of dataset) {
-    for (const subitem of item.data) {
-      for (const value of subitem.data) {
-        if (value.elevation <= elevation) {
-          if (value.value > maxValue) {
-            maxValue = value.value;
-          }
-          if (value.value < minValue) {
-            minValue = value.value;
-          }
-        }
-      }
-    }
-  }
-  return { max: maxValue, min: minValue };
-}
-
-export function getValueFromDataset(
-  datasetAll: RouteProfileDataset[],
-  time: Date,
-  elevation: number,
-  segmentIndex,
-): { value: number; time: Date } {
-  try {
-    const filteredByTime = datasetAll.reduce((prev, curr) => {
-      if (prev.time && prev.time.length === 1) {
-        const diff = time.getTime() - new Date(curr.time[0]).getTime();
-        const diffPrev = time.getTime() - new Date(prev.time[0]).getTime();
-        return diff >= 0 && diff < diffPrev ? curr : prev;
-      }
-      return prev;
-    });
-
-    const forecastTime = new Date(filteredByTime.time[0]);
-    if (time.getTime() - forecastTime.getTime() < 3600 * 3 * 1000) {
-      const filteredByElevation = filteredByTime.data[segmentIndex].data.filter((dataset) => {
-        return Math.abs(dataset.elevation - elevation) < 1000;
-      });
-      if (filteredByElevation.length === 1) {
-        return {
-          value: filteredByElevation[0].value === NODATA ? null : filteredByElevation[0].value,
-          time: new Date(filteredByTime.time[0]),
-        };
-      } else if (filteredByElevation.length === 2) {
-        return {
-          value:
-            filteredByElevation[0].value === NODATA
-              ? null
-              : (filteredByElevation[0].value + filteredByElevation[0].value) / 2,
-          time: new Date(filteredByTime.time[0]),
-        };
-      }
-    }
-    return { value: null, time: null };
-  } catch (e) {
-    // console.warn(e);
-    // console.log(datasetAll, time, elevation, segmentIndex);
-    return { value: null, time: null };
-  }
-}
-export function getValuesFromDatasetAllElevationByTime(
-  datasetAll: RouteProfileDataset[],
-  time: Date,
-  segmentIndex,
-): { elevation: number; value: number }[] {
-  try {
-    if (!datasetAll) {
-      return [];
-    }
-    const filteredByTime = datasetAll.reduce((prev, curr) => {
-      if (prev.time && prev.time.length === 1) {
-        const diff = time.getTime() - new Date(curr.time[0]).getTime();
-        const diffPrev = time.getTime() - new Date(prev.time[0]).getTime();
-        return diff >= 0 && diff < diffPrev ? curr : prev;
-      }
-      return prev;
-    });
-
-    const forecastTime = new Date(filteredByTime.time[0]);
-    if (time.getTime() - forecastTime.getTime() < 3600 * 3 * 1000) {
-      return filteredByTime.data[segmentIndex].data;
-    }
-    return [];
-  } catch (e) {
-    return [];
-  }
-}
-
-export function getValuesFromDatasetAllElevationByElevation(
-  datasetAll: RouteProfileDataset[],
-  time: Date,
-  segmentIndex,
-): { elevation: number; value: number }[] {
-  try {
-    if (!datasetAll) {
-      return [];
-    }
-    const result = [];
-    datasetAll.forEach((dataset) => {
-      const filteredByTime = dataset.data[segmentIndex].data.reduce((prev, curr) => {
-        if (prev.time) {
-          const diff = time.getTime() - new Date(curr.time).getTime();
-          const diffPrev = time.getTime() - new Date(prev.time).getTime();
-          return diff >= 0 && diff < diffPrev ? curr : prev;
-        }
-        return prev;
-      });
-
-      const forecastTime = new Date(filteredByTime.time);
-      if (time.getTime() - forecastTime.getTime() < 3600 * 3 * 1000) {
-        result.push({
-          elevation: dataset.elevations[0],
-          value: filteredByTime.value === NODATA ? null : filteredByTime.value,
-        });
-      }
-    });
-    return result;
-  } catch (e) {
-    return [];
-  }
-}
-export function getValueFromDatasetByElevation(
-  datasetAll: RouteProfileDataset[],
-  time: Date,
-  elevation: number,
-  segmentIndex,
-): { value: number; time: Date } {
-  try {
-    if (!datasetAll) {
-      return { value: null, time: null };
-    }
-    const filteredByElevations = datasetAll.filter((dataset) => {
-      if (dataset.elevations && dataset.elevations.length === 1) {
-        return Math.abs(dataset.elevations[0] - elevation) < 1000;
-      }
-      return false;
-    });
-
-    if (datasetAll.length === 1 && filteredByElevations.length === 0) {
-      filteredByElevations.push(datasetAll[0]);
-    }
-
-    if (filteredByElevations.length === 1) {
-      const filteredByTime = filteredByElevations[0].data[segmentIndex].data.reduce((prev, curr) => {
-        if (prev.time) {
-          const diff = time.getTime() - new Date(curr.time).getTime();
-          const diffPrev = time.getTime() - new Date(prev.time).getTime();
-          return diff >= 0 && diff < diffPrev ? curr : prev;
-        }
-        return prev;
-      });
-      const forecastTime = new Date(filteredByTime.time);
-      if (time.getTime() - forecastTime.getTime() < 3600 * 3 * 1000) {
-        return {
-          value: filteredByTime.value === NODATA ? null : filteredByTime.value,
-          time: new Date(filteredByTime.time),
-        };
-      }
-    } else if (filteredByElevations.length === 2) {
-      const filteredByTime_0 = filteredByElevations[0].data[segmentIndex].data.reduce((prev, curr) => {
-        if (prev.time) {
-          const diff = time.getTime() - new Date(curr.time).getTime();
-          const diffPrev = time.getTime() - new Date(prev.time).getTime();
-          return diff >= 0 && diff < diffPrev ? curr : prev;
-        }
-        return prev;
-      });
-      const forecastTime_0 = new Date(filteredByTime_0.time);
-      const filteredByTime_1 = filteredByElevations[1].data[segmentIndex].data.reduce((prev, curr) => {
-        if (prev.time && prev.time.length === 1) {
-          const diff = time.getTime() - new Date(curr.time).getTime();
-          const diffPrev = time.getTime() - new Date(prev.time).getTime();
-          return diff >= 0 && diff < diffPrev ? curr : prev;
-        }
-        return prev;
-      });
-      const forecastTime_1 = new Date(filteredByTime_1.time);
-      if (
-        time.getTime() - forecastTime_0.getTime() < 3600 * 3 * 1000 &&
-        time.getTime() - forecastTime_1.getTime() < 3600 * 3 * 1000
-      ) {
-        return {
-          value: filteredByTime_0.value === NODATA ? null : (filteredByTime_0.value + filteredByTime_1.value) / 2,
-          time: new Date(filteredByTime_0.time),
-        };
-      }
-    }
-    return { value: null, time: null };
-  } catch (e) {
-    return { value: null, time: null };
-  }
-}
-
-export function getIndexByElevation(datasetAll: RouteProfileDataset[], position: GeoJSON.Position): number {
-  if (!datasetAll || datasetAll.length === 0) {
-    return -1;
-  }
-  let closestIndex = 0;
-  let closestDistance = Infinity;
-  datasetAll[0].data.forEach((dataset, index) => {
-    const distance = fly.distanceTo(position[1], position[0], dataset.position[1], dataset.position[0], 6);
-    if (distance < closestDistance) {
-      closestDistance = distance;
-      closestIndex = index;
-    }
-  });
-  return closestIndex;
-}
-
-export function getRouteLength(route: Route, inMile = false): number {
-  const coordinateList = [
-    route.departure.position.coordinates,
-    ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
-    route.destination.position.coordinates,
-  ];
-  const routeLengthNm = getLineLength(coordinateList, inMile);
-  return routeLengthNm;
-}
-
-export function getSegmentInterval(route: Route, segmentsCount: number) {
-  return getRouteLength(route, true) / segmentsCount;
-}
-
 export interface SegmentPoint {
   point: L.LatLng;
   isRoutePoint: boolean;
   airport?: RoutePoint;
 }
-
-// export function interpolateRouteWithStation(route: Route, divideNumber, airports: RoutePoint[]): SegmentPoint[] {
-//   const coordinateList = [
-//     route.departure.position.coordinates,
-//     ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
-//     route.destination.position.coordinates,
-//   ];
-//   const totalLength = getLineLength(coordinateList);
-//   const interpolatedLatlngs = new Array<SegmentPoint>();
-//   const latlngs: L.LatLng[] = L.GeoJSON.coordsToLatLngs(coordinateList);
-//   latlngs.map((latlng, index) => {
-//     if (index < latlngs.length - 1) {
-//       const nextLatlng = latlngs[index + 1];
-//       const segmentLength = latlng.distanceTo(nextLatlng);
-//       const vertices = Math.round((segmentLength * divideNumber) / (totalLength * 1000)) + 1;
-//       const segmentInterval = (totalLength * 1000) / divideNumber;
-//       //@ts-ignore
-//       const polyline = L.Polyline.Arc(latlng, nextLatlng, { color: '#f0fa', weight: 6, pane: 'route-line', vertices });
-//       const points: SegmentPoint[] = polyline.getLatLngs().map((latlng) => ({ point: latlng }));
-//       if (index === 0) {
-//         points[0].airport = route.departure;
-//         points[0].isRoutePoint = true;
-//         let routePoint = route.destination;
-//         if (route.routeOfFlight && route.routeOfFlight.length > 0) {
-//           routePoint = route.routeOfFlight[0].routePoint;
-//         }
-//         points[points.length - 1].airport = routePoint;
-//         points[points.length - 1].isRoutePoint = true;
-//         for (let i = 1; i < points.length - 1; i++) {
-//           const airport = findAirportByPoint(
-//             airports,
-//             points[i].point,
-//             segmentInterval / 2,
-//             route.routeOfFlight.map((routeOfFlight) => routeOfFlight.routePoint),
-//           );
-//           points[i].airport = airport;
-//           points[i].isRoutePoint = false;
-//         }
-//         interpolatedLatlngs.push(...points);
-//       } else {
-//         if (index > 0 && index < latlngs.length - 2) {
-//           /////////////////////
-//           // departure, rf[0], rf[1], rf[2], dest
-//           //  0,           1,     2,     3,    4
-//           //    index === 0, index=1, index=2, index=3
-//           points[points.length - 1].airport = route.routeOfFlight[index].routePoint;
-//           points[points.length - 1].isRoutePoint = true;
-//         } else if (index === latlngs.length - 2) {
-//           points[points.length - 1].airport = route.destination;
-//           points[points.length - 1].isRoutePoint = true;
-//         }
-//         for (let i = 0; i < points.length - 1; i++) {
-//           const airport = findAirportByPoint(
-//             airports,
-//             points[i].point,
-//             segmentInterval / 2,
-//             route.routeOfFlight.map((routeOfFlight) => routeOfFlight.routePoint),
-//           );
-//           points[i].airport = airport;
-//           points[i].isRoutePoint = false;
-//         }
-
-//         interpolatedLatlngs.push(...points.slice(1));
-//       }
-//       //@ts-ignore
-//     }
-//   });
-//   return interpolatedLatlngs;
-// }
 
 export function interpolateLegByInterval(start: L.LatLng, end: L.LatLng, interval: number, offset: number) {
   const latlngs: Point[] = [];
@@ -645,133 +300,6 @@ export function interpolateRoute(route: Route, divideNumber, returnAsLeaflet = f
     }
   });
   return returnAsLeaflet ? interpolatedLatlngs : L.GeoJSON.latLngsToCoords(interpolatedLatlngs);
-}
-
-export function getSegmentsCount(route: Route): number {
-  const coordinateList = [
-    route.departure.position.coordinates,
-    ...route.routeOfFlight.map((item) => item.routePoint.position.coordinates),
-    route.destination.position.coordinates,
-  ];
-  const routeLengthNm = getLineLength(coordinateList, true);
-  if (routeLengthNm <= 250) {
-    return 7;
-  } else if (routeLengthNm <= 500) {
-    return 9;
-  } else if (routeLengthNm <= 800) {
-    return 11;
-  } else {
-    return 13;
-  }
-}
-
-export function getTimeGradientStops(times: { time: Date; hour: number; minute: number }[]) {
-  const sortingTime = [...times];
-
-  const lastTime = sortingTime[sortingTime.length - 1];
-  const startStop = {
-    level: 0,
-    stopColor: getGradientStopColor(sortingTime[0].hour, sortingTime[0].minute),
-  };
-  const finishStop = {
-    level: 100,
-    stopColor: getGradientStopColor(lastTime.hour, lastTime.minute),
-  };
-
-  const stops = [];
-  const { day, night } = SUNSET_SUNRISE;
-
-  const startHour = sortingTime[0].hour;
-  const pHours = lastTime.hour - startHour;
-
-  for (let i = startHour; i <= lastTime.hour; i++) {
-    const hour = i % 24;
-
-    const level = Math.round(((i - startHour) / pHours) * 100);
-
-    if (hour === day.start || hour === day.end) {
-      stops.push({
-        level,
-        stopColor: DAY_GRADIENT_COLOR,
-      });
-    }
-
-    if (hour === night.start || hour === night.end) {
-      stops.push({
-        level,
-        stopColor: NIGHT_GRADIENT_COLOR,
-      });
-    }
-  }
-
-  return [startStop, ...stops, finishStop];
-}
-
-function getGradientStopColor(hour: number, minutes: number) {
-  const { isDay, isNight, isEvening } = getDayStatus(hour, minutes);
-
-  if (isDay) {
-    return DAY_GRADIENT_COLOR;
-  }
-  if (isNight) {
-    return NIGHT_GRADIENT_COLOR;
-  }
-
-  const hourMinutes = hour + minutes / 60;
-
-  const { night, day } = SUNSET_SUNRISE,
-    twilightWhile = night.start - day.end;
-
-  //@ts-ignore
-  const colorTwilight = d3.scaleLinear().domain([0, twilightWhile]).range([NIGHT_GRADIENT_COLOR, DAY_GRADIENT_COLOR]);
-
-  if (isEvening) {
-    return colorTwilight(twilightWhile - (hourMinutes - day.end));
-  }
-
-  return colorTwilight(hourMinutes - night.end);
-}
-
-function getDayStatus(hour, minutes) {
-  const isDay = checkHourIsDay(hour, minutes);
-  if (isDay) {
-    return {
-      isDay: true,
-    };
-  }
-
-  const isNight = checkHourIsNight(hour, minutes);
-  if (isNight) {
-    return {
-      isNight: true,
-    };
-  }
-
-  const isEvening = checkHourIsEvening(hour, minutes);
-  if (isEvening) {
-    return {
-      isEvening: true,
-    };
-  }
-
-  return {
-    isMorning: true,
-  };
-}
-
-function checkHourIsDay(hour, minutes) {
-  const { day } = SUNSET_SUNRISE;
-  return hour >= day.start && hour < day.end;
-}
-
-function checkHourIsNight(hour, minutes) {
-  const { night, day } = SUNSET_SUNRISE;
-  return hour >= night.start || hour < night.end;
-}
-
-function checkHourIsEvening(hour, minutes) {
-  const { night, day } = SUNSET_SUNRISE;
-  return hour >= day.end && hour < night.start;
 }
 
 const RouteProfileDataLoader = () => {

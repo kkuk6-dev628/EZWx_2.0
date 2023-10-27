@@ -2,19 +2,12 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { VerticalRectSeries, LineSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
-import {
-  cacheKeys,
-  calcEndMargin,
-  calcHighResolution,
-  flightCategoryDivide,
-  getIndexByElevation,
-  getMaxForecastTime,
-  getRouteLength,
-  getSegmentInterval,
-  getSegmentsCount,
-  getValueFromDatasetByElevation,
-  interpolateRouteByInterval,
-} from './RouteProfileDataLoader';
+import { calcEndMargin, calcHighResolution, interpolateRouteByInterval } from './RouteProfileDataLoader';
+import { getSegmentsCount } from './RouteProfileDataLoader';
+import { getIndexByElevation, getMaxForecastTime, getValueFromDatasetByElevation } from '../../utils/utils';
+import { getSegmentInterval } from './RouteProfileDataLoader';
+import { getRouteLength } from './RouteProfileDataLoader';
+import { cacheKeys, flightCategoryDivide } from '../../utils/constants';
 import { selectSettings } from '../../store/user/UserSettings';
 import {
   useGetRouteProfileStateQuery,
@@ -25,7 +18,7 @@ import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import RouteProfileChart from './RouteProfileChart';
 import { convertTimeFormat } from '../map/common/AreoFunctions';
 import flyjs from '../../fly-js/fly';
-import { hourInMili } from '../shared/DepartureAdvisor';
+import { hourInMili } from '../../utils/constants';
 import fly from '../../fly-js/fly';
 
 export const takeoffEdrTable = {

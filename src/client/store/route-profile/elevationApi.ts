@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { ElevationApiResult } from '../../interfaces/route-profile';
 
-const baseUrl = 'https://api.elevationapi.com/api/Elevation/points';
+const baseUrl = 'https://api.elevationapi.com/api/Elevation';
 
 export const elevationApi = createApi({
   reducerPath: 'elevationApi',
@@ -9,9 +9,12 @@ export const elevationApi = createApi({
     baseUrl,
   }),
   endpoints: (builder) => ({
+    getSingleElevation: builder.query<ElevationApiResult, any>({
+      query: (params) => ({ url: '', method: 'Get', params: { lat: params.lat, lon: params.lng } }),
+    }),
     queryElevationApi: builder.mutation({
       query: (data) => ({
-        url: '',
+        url: '/points',
         method: 'Post',
         body: {
           points: { type: 1, coordinates: data.queryPoints },
@@ -24,4 +27,4 @@ export const elevationApi = createApi({
   }),
 });
 
-export const { useQueryElevationApiMutation } = elevationApi;
+export const { useQueryElevationApiMutation, useGetSingleElevationQuery } = elevationApi;

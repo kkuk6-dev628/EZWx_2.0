@@ -7,9 +7,7 @@ import 'react-vis/dist/style.css';
 import {
   RouteProfileChartType,
   RouteProfileIcingDataType,
-  RouteProfileMaxAltitudes,
   RouteProfileState,
-  RouteProfileTurbDataType,
   RouteProfileWindDataType,
 } from '../../interfaces/route-profile';
 import {
@@ -31,66 +29,19 @@ import CloudsChart from './CloudsChart';
 import TurbChart from './TurbChart';
 import WindChart from './WindChart';
 import IcingChart from './IcingChart';
-import DepartureAdvisor, { FetchUserSettings } from '../shared/DepartureAdvisor';
+import DepartureAdvisor from '../shared/DepartureAdvisor';
+import { FetchUserSettings } from '../shared/FetchUserSettings';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import { selectActiveRoute } from '../../store/route/routes';
 import { selectSettings } from '../../store/user/UserSettings';
-
-const routeProfileChartTypes: {
-  wind: RouteProfileChartType;
-  clouds: RouteProfileChartType;
-  icing: RouteProfileChartType;
-  turb: RouteProfileChartType;
-} = {
-  wind: 'Wind',
-  clouds: 'Clouds',
-  icing: 'Icing',
-  turb: 'Turb',
-};
-const routeProfileChartTypeLabels: {
-  wind: string;
-  clouds: string;
-  icing: string;
-  turb: string;
-} = {
-  wind: 'WIND',
-  clouds: 'CLDS',
-  icing: 'ICE',
-  turb: 'TURB',
-};
-
-const routeProfileWindDataTypes: {
-  windspeed: RouteProfileWindDataType;
-  headtail: RouteProfileWindDataType;
-} = {
-  windspeed: 'SPEED',
-  headtail: 'HEAD/TAIL',
-};
-
-const routeProfileIcingDataTypes: {
-  prob: RouteProfileIcingDataType;
-  sev: RouteProfileIcingDataType;
-  sld: RouteProfileIcingDataType;
-} = {
-  prob: 'Prob',
-  sev: 'Sev',
-  sld: 'SLD',
-};
-
-const routeProfileTurbDataTypes: {
-  cat: RouteProfileTurbDataType;
-  mtw: RouteProfileTurbDataType;
-} = {
-  cat: 'CAT',
-  mtw: 'MWT',
-};
-
-const routeProfileMaxAltitudes: RouteProfileMaxAltitudes[] = [500, 300, 200];
-const chartLabels = {
-  200: [200, 160, 120, 80, 40, 0],
-  300: [300, 240, 180, 120, 60, 0],
-  500: [500, 400, 300, 200, 100, 0],
-};
+import {
+  routeProfileChartTypes,
+  routeProfileChartTypeLabels,
+  routeProfileWindDataTypes,
+  routeProfileIcingDataTypes,
+  routeProfileTurbDataTypes,
+  chartLabels,
+} from '../../utils/constants';
 
 const RouteProfileContainer = () => {
   const { data: routeProfileApiState, isSuccess: isRouteProfileStateLoaded } = useGetRouteProfileStateQuery(null, {
@@ -365,7 +316,6 @@ const RouteProfileContainer = () => {
             </div>
           </div>
         </div>
-        {/* <div className="departure-advisor-background"></div> */}
         <DepartureAdvisor showPast={false} />
       </>
     )

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import DateSlider from './DateSlider';
-import { PersonalMinsEvaluation, hourInMili, initialEvaluation, personalMinValueToShape } from './DepartureAdvisor';
+import { PersonalMinsEvaluation, initialEvaluation, personalMinValueToShape } from './DepartureAdvisor';
+import { hourInMili } from '../../utils/constants';
 import { convertTimeFormat, simpleTimeFormat } from '../map/common/AreoFunctions';
 import { useSelector } from 'react-redux';
 import { selectSettings } from '../../store/user/UserSettings';

@@ -2,8 +2,26 @@ import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@m
 import MapTabs from '../components/shared/MapTabs';
 import { SvgBackward, SvgBookmark, SvgForward, SvgRefresh, SvgRoute } from '../components/utils/SvgIcons';
 import { AutoCompleteInput } from '../components/common';
+import Meteogram from '../components/airportwx/Meteogram';
+import { useGetRecentAirportQuery } from '../store/airportwx/airportwxApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { setCurrentAirport } from '../store/airportwx/airportwx';
+import { selectSettings } from '../store/user/UserSettings';
 
 function AirportWxPage() {
+  const { data: recentAirports, isSuccess: isSuccessRecentAirports } = useGetRecentAirportQuery(null);
+  const settingsState = useSelector(selectSettings);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (isSuccessRecentAirports && recentAirports.length > 0) {
+      dispatch(setCurrentAirport(recentAirports[0].airportId));
+    } else {
+      dispatch(setCurrentAirport(settingsState.default_home_airport));
+    }
+  }, [isSuccessRecentAirports]);
+
   function handler(id: string) {
     console.log(id);
   }
@@ -57,7 +75,7 @@ function AirportWxPage() {
       <div className="main-container">
         <div className="primary-bar">
           <FormControl className="select-view">
-            <Select value={'meteogram'} label="Age" onChange={changeViews}>
+            <Select value={'meteogram'} onChange={changeViews}>
               <MenuItem value={'meteogram'}>Meteogram</MenuItem>
               <MenuItem value={'metars'}>METARs</MenuItem>
               <MenuItem value={'terminal-forecasts'}>Terminal Forecasts</MenuItem>
@@ -65,15 +83,20 @@ function AirportWxPage() {
               <MenuItem value={'skew-t'}>Skew-T</MenuItem>
             </Select>
           </FormControl>
-          <AutoCompleteInput
-            name="default_home_airport"
-            selectedValue={null}
-            handleAutoComplete={(name, value) => {
-              console.log(value);
-            }}
-            exceptions={[]}
-            key={'home-airport'}
-          />
+          <div className="select-airport">
+            <AutoCompleteInput
+              name="default_home_airport"
+              selectedValue={null}
+              handleAutoComplete={(name, value) => {
+                console.log(value);
+              }}
+              exceptions={[]}
+              key={'home-airport'}
+            />
+          </div>
+        </div>
+        <div className="view-container">
+          <Meteogram />
         </div>
       </div>
     </div>

@@ -173,6 +173,46 @@ export class RouteProfileQueryDataService {
     return results;
   }
 
+  async queryMeteogramData(query: RouteProfileQueryDto) {
+    console.log(query);
+    const gfsHumidity = await this.queryRasterDataset(query.queryPoints, this.humidityRepository);
+    const gfsTemperature = await this.queryRasterDataset(query.queryPoints, this.temperaturRepository);
+    const gfsWindDirection = await this.queryRasterDataset(query.queryPoints, this.gfsWindDirectionRepository);
+    const gfsWindSpeed = await this.queryRasterDataset(query.queryPoints, this.gfsWindSpeedRepository);
+    const sld = await this.queryRasterDataset(query.queryPoints, this.icingSldRepository);
+    const sev = await this.queryRasterDataset(query.queryPoints, this.icingSevRepository);
+    const prob = await this.queryRasterDataset(query.queryPoints, this.icingProbRepository);
+    const cat = await this.queryRasterDataset(query.queryPoints, this.clearAirTubRepository);
+    const mwt = await this.queryRasterDataset(query.queryPoints, this.mwturbRepository);
+    const cloudceiling = await this.queryRasterDataset(query.queryPoints, this.nbmCloudCeilingRepository);
+    const visibility = await this.queryRasterDataset(query.queryPoints, this.nbmVisRepository);
+    const wx_1 = await this.queryRasterDataset(query.queryPoints, this.nbmWx1Repository);
+    const wx_2 = await this.queryRasterDataset(query.queryPoints, this.nbmWx2Repository);
+    const wxInten1 = await this.queryRasterDataset(query.queryPoints, this.nbmWxInten1Repository);
+    const wxInten2 = await this.queryRasterDataset(query.queryPoints, this.nbmWxInten2Repository);
+    const wxProbCov1 = await this.queryRasterDataset(query.queryPoints, this.nbmWxProbCov1Repository);
+    const wxProbCov2 = await this.queryRasterDataset(query.queryPoints, this.nbmWxProbCov2Repository);
+    return {
+      humidity: gfsHumidity,
+      temperature: gfsTemperature,
+      windDirection: gfsWindDirection,
+      windSpeed: gfsWindSpeed,
+      sld,
+      sev,
+      prob,
+      cat,
+      mwt,
+      cloudceiling,
+      visibility,
+      wx_1,
+      wx_2,
+      wxInten1,
+      wxInten2,
+      wxProbCov1,
+      wxProbCov2,
+    };
+  }
+
   async queryGfsData(query: RouteProfileQueryDto) {
     const gfsHumidity = await this.queryRasterDataset(query.queryPoints, this.humidityRepository);
     const gfsTemperature = await this.queryRasterDataset(query.queryPoints, this.temperaturRepository);

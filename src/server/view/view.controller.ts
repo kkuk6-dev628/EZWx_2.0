@@ -93,7 +93,13 @@ export class ViewController {
 
   @UseGuards(JwtAuthGuard)
   @Get('route-profile')
-  public async indexOrders(@Req() req: Request, @Res() res: Response) {
+  public async RouteProfile(@Req() req: Request, @Res() res: Response) {
+    await this.handler(req, res);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('airportwx')
+  public async AirportWx(@Req() req: Request, @Res() res: Response) {
     await this.handler(req, res);
   }
 

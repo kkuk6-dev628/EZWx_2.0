@@ -10,5 +10,23 @@
   .primary-bar {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
+    background-color: var(--color-white);
+    align-items: center;
+    padding: 4px 8px;
+
+    .select-view {
+      width: 260px;
+      >div {
+        height: 40px;
+      }
+    }
+    .select-airport {
+      width: 260px;
+      .auto_complete__input__container {
+        height: 40px;
+        padding: 0;
+      }
+    }
   }
 }

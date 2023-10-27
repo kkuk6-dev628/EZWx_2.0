@@ -21,4 +21,20 @@ export class AirportwxController {
     recentAirport.created_at = undefined;
     return this.airportwxService.addRecentAirport(recentAirport);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/get-airportwx-state')
+  getAirportwxState(@Request() request) {
+    return this.airportwxService.getAirportwxState(request.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/update-airportwx-state')
+  updateAirportwxState(@Request() request, @Body() airportwxState) {
+    airportwxState.userId = request.user.id;
+    airportwxState.id = undefined;
+    airportwxState.updated_at = undefined;
+    airportwxState.created_at = undefined;
+    return this.airportwxService.updateAirportwxState(airportwxState);
+  }
 }

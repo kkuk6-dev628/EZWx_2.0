@@ -2,16 +2,15 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { VerticalRectSeries, LineSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
+import { getSegmentsCount } from './RouteProfileDataLoader';
 import {
-  cacheKeys,
   getMaxForecastTime,
-  getRouteLength,
-  getSegmentsCount,
   getValueFromDatasetByElevation,
   getValuesFromDatasetAllElevationByElevation,
-  flightCategoryDivide,
   getIndexByElevation,
-} from './RouteProfileDataLoader';
+} from '../../utils/utils';
+import { getRouteLength } from './RouteProfileDataLoader';
+import { cacheKeys, flightCategoryDivide } from '../../utils/constants';
 import { selectSettings } from '../../store/user/UserSettings';
 import {
   useGetRouteProfileStateQuery,
@@ -21,7 +20,8 @@ import {
   useQueryNbmAllMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
-import RouteProfileChart, { hatchOpacity, visibleOpacity } from './RouteProfileChart';
+import RouteProfileChart from './RouteProfileChart';
+import { hatchOpacity, visibleOpacity } from '../../utils/constants';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import flyjs from '../../fly-js/fly';
 import { colorsByEdr } from './TurbChart';

@@ -4,12 +4,15 @@ import { RecentAirport } from './recent-airport.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../user/user.entity';
+import { AirportwxState } from './airportwx-state.entity';
 @Injectable()
 export class AirportwxService {
   constructor(
     private readonly httpService: HttpService,
     @InjectRepository(RecentAirport)
     private recentAirportRepository: Repository<RecentAirport>,
+    @InjectRepository(AirportwxState)
+    private airportwxStateRepository: Repository<AirportwxState>,
   ) {}
 
   async getRecentAirport(user: User) {
@@ -22,6 +25,18 @@ export class AirportwxService {
   }
 
   async addRecentAirport(recentAirport) {
-    return (await this.recentAirportRepository.upsert(recentAirport, ['userId'])).generatedMaps[0].id;
+    return (await this.recentAirportRepository.upsert(recentAirport, ['userId', 'airportId'])).generatedMaps[0].id;
+  }
+
+  async getAirportwxState(user: User) {
+    const res = await this.airportwxStateRepository.findOne({
+      where: {
+        userId: user.id,
+      },
+    });
+    return res;
+  }
+  async updateAirportwxState(airportwxState) {
+    return (await this.airportwxStateRepository.upsert(airportwxState, ['userId'])).generatedMaps[0].id;
   }
 }

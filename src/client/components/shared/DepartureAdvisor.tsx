@@ -13,14 +13,8 @@ import {
 } from '../map/common/AreoFunctions';
 import { useDispatch, useSelector } from 'react-redux';
 import { Dialog, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import {
-  PersonalMinimums,
-  initialUserSettingsState,
-  selectSettings,
-  setObservationTime,
-  setUserSettings,
-} from '../../store/user/UserSettings';
-import { useGetUserSettingsQuery, useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
+import { PersonalMinimums, selectSettings, setObservationTime, setUserSettings } from '../../store/user/UserSettings';
+import { useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
 import { selectAuth } from '../../store/auth/authSlice';
 import {
   useGetLastDepartureDataTimeQuery,
@@ -28,23 +22,20 @@ import {
   useQueryDepartureAdvisorDataMutation,
   useQueryGfsDataMutation,
 } from '../../store/route-profile/routeProfileApi';
-import {
-  cacheKeys,
-  flightCategoryDivide,
-  getRouteLength,
-  getSegmentsCount,
-  getValueFromDatasetByElevation,
-  interpolateRouteByInterval,
-} from '../route-profile/RouteProfileDataLoader';
+import { interpolateRouteByInterval } from '../route-profile/RouteProfileDataLoader';
+import { getSegmentsCount } from '../route-profile/RouteProfileDataLoader';
+import { getValueFromDatasetByElevation } from '../../utils/utils';
+import { getRouteLength } from '../route-profile/RouteProfileDataLoader';
+import { cacheKeys, flightCategoryDivide } from '../../utils/constants';
 import { selectActiveRoute } from '../../store/route/routes';
 import { LatLng } from 'leaflet';
 import fly from '../../fly-js/fly';
-import { getAirportNbmData } from '../route-profile/RouteProfileChart';
+import { getAirportNbmData } from '../../utils/utils';
 import { UserSettings } from '../../interfaces/users';
 import { jsonClone } from '../utils/ObjectUtil';
 import { DateObject } from 'react-multi-date-picker';
 import DepartureAdvisorPopup, { getEvaluationByTime } from './DepartureAdvisorPopup';
-import { getMaxForecastTime } from '../route-profile/RouteProfileDataLoader';
+import { getMaxForecastTime } from '../../utils/utils';
 import { PaperComponent } from '../common/PaperComponent';
 import DepartureAdvisorTimeBlockComponent from './DepartureAdvisorTimeBlockComponent';
 import DepartureAdvisor3Bars from './DepartureAdvisor3Bars';
@@ -52,26 +43,12 @@ import { useGetAirportQuery } from '../../store/route/airportApi';
 import { iOS } from '../Imagery/Imagery';
 import toast from 'react-hot-toast';
 import Nouislider from 'nouislider-react';
+import { hourInMili } from '../../utils/constants';
+import { FetchUserSettings } from './FetchUserSettings';
 
 type personalMinValue = 0 | 1 | 2 | 10;
 type personalMinColor = 'red' | 'yellow' | 'green' | 'grey';
 type personalMinShape = 'rect' | 'circle' | 'triangle';
-
-export const FetchUserSettings = () => {
-  const { id } = useSelector(selectAuth);
-  if (id !== null) {
-    const { data, isSuccess } = useGetUserSettingsQuery(id, { refetchOnMountOrArgChange: true });
-    const [updateUserSettings, { isLoading: isUpdating, isSuccess: isSuccessUpdate }] = useUpdateUserSettingsMutation({
-      fixedCacheKey: 'user-settings',
-    });
-    useEffect(() => {
-      if (isSuccess && (!data || !data.user_id)) {
-        if (!isUpdating && !isSuccessUpdate) updateUserSettings({ ...initialUserSettingsState.settings, user_id: id });
-      }
-    }, [data, isSuccess]);
-  }
-  return <></>;
-};
 
 export interface PersonalMinsEvaluation {
   departureCeiling: { value: personalMinValue; color: personalMinColor };
@@ -119,8 +96,6 @@ export const personalMinValueToShape: {
   2: 'circle',
   10: 'rect',
 };
-export const hourInMili = 3600 * 1000;
-
 export const initialEvaluation: PersonalMinsEvaluation = {
   departureCeiling: {
     value: 10,

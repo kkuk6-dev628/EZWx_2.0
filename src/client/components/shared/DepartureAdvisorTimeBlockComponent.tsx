@@ -1,6 +1,7 @@
 import { useState, SyntheticEvent } from 'react';
 import { addLeadingZeroes, simpleTimeOnlyFormat } from '../map/common/AreoFunctions';
-import { PersonalMinsEvaluation, hourInMili, personalMinValueToShape } from './DepartureAdvisor';
+import { PersonalMinsEvaluation, personalMinValueToShape } from './DepartureAdvisor';
+import { hourInMili } from '../../utils/constants';
 import { useSelector } from 'react-redux';
 import { selectSettings } from '../../store/user/UserSettings';
 import { getEvaluationByTime } from './DepartureAdvisorPopup';

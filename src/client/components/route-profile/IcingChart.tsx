@@ -2,24 +2,20 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { VerticalRectSeries, CustomSVGSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
+import { calcEndMargin, calcHighResolution, interpolateRouteByInterval } from './RouteProfileDataLoader';
+import { getSegmentsCount } from './RouteProfileDataLoader';
+import { getTimeGradientStops } from '../../utils/utils';
 import {
-  cacheKeys,
-  calcEndMargin,
-  calcHighResolution,
-  flightCategoryDivide,
   getIndexByElevation,
   getMaxForecastElevation,
   getMaxForecastTime,
   getMinMaxValueByElevation,
-  getRouteLength,
-  getSegmentInterval,
-  getSegmentsCount,
-  getTimeGradientStops,
   getValueFromDataset,
   getValueFromDatasetByElevation,
-  interpolateRouteByInterval,
-  totalNumberOfElevations,
-} from './RouteProfileDataLoader';
+} from '../../utils/utils';
+import { getSegmentInterval } from './RouteProfileDataLoader';
+import { getRouteLength } from './RouteProfileDataLoader';
+import { cacheKeys, flightCategoryDivide, totalNumberOfElevations } from '../../utils/constants';
 import { selectSettings } from '../../store/user/UserSettings';
 import {
   useGetRouteProfileStateQuery,
@@ -27,14 +23,15 @@ import {
   useQueryIcingTurbDataMutation,
 } from '../../store/route-profile/routeProfileApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
-import RouteProfileChart, { hatchOpacity, visibleOpacity } from './RouteProfileChart';
+import RouteProfileChart from './RouteProfileChart';
+import { hatchOpacity, visibleOpacity } from '../../utils/constants';
 import { Conrec } from '../../conrec-js/conrec';
 import { celsiusToFahrenheit, convertTimeFormat, round } from '../map/common/AreoFunctions';
 import { colorsByEdr, takeoffEdrTable } from './TurbChart';
 import { Route } from '../../interfaces/route';
 import { RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
 import flyjs from '../../fly-js/fly';
-import { hourInMili } from '../shared/DepartureAdvisor';
+import { hourInMili } from '../../utils/constants';
 import fly from '../../fly-js/fly';
 
 export const icingSevLegend = [

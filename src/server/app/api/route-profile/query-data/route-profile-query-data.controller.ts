@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Request, Get, Post, UseGuards, Query } from '@nestjs/common';
 import { RouteProfileQueryDataService } from './route-profile-query-data.service';
 import { RouteProfileQueryDto } from './route-profile-query.dto';
 import { JwtAuthGuard } from 'src/server/app/auth/jwt/jwt-auth.guard';
@@ -32,5 +32,13 @@ export class RouteProfileQueryDataController {
   @Get('last-dep-time')
   queryLastDepartureDataTime() {
     return this.routeProfileQueryDataService.queryLastDepartureDataTime();
+  }
+  @Get('mgram')
+  queryMeteogramData(@Query() { lat, lng }: { lat: number; lng: number }) {
+    const queryPoints = [[lng, lat]];
+    return this.routeProfileQueryDataService.queryMeteogramData({
+      queryPoints,
+      elevations: [],
+    });
   }
 }

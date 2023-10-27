@@ -18,22 +18,18 @@ import {
 import { selectActiveRoute } from '../../store/route/routes';
 import {
   SegmentPoint,
-  cacheKeys,
   calcEndMargin,
   calcHighResolution,
   extendLine,
-  flightCategoryDivide,
-  getIndexByElevation,
   getLineLength,
-  getMinMaxValueByElevation,
-  getRouteLength,
-  getSegmentInterval,
-  getSegmentsCount,
-  getTimeGradientStops,
-  getValueFromDatasetByElevation,
   interpolateRouteByInterval,
-  totalNumberOfElevations,
 } from './RouteProfileDataLoader';
+import { getSegmentsCount } from './RouteProfileDataLoader';
+import { getTimeGradientStops, weatherFontContents } from '../../utils/utils';
+import { getIndexByElevation, getMinMaxValueByElevation, getValueFromDatasetByElevation } from '../../utils/utils';
+import { getSegmentInterval } from './RouteProfileDataLoader';
+import { getRouteLength } from './RouteProfileDataLoader';
+import { cacheKeys, flightCategoryDivide, totalNumberOfElevations } from '../../utils/constants';
 import { initialUserSettingsState, selectSettings } from '../../store/user/UserSettings';
 import {
   useQueryAirportNbmMutation,
@@ -60,27 +56,27 @@ import {
   visibilityMileToMeter,
 } from '../map/common/AreoFunctions';
 import fly, * as flyjs from '../../fly-js/fly';
-import {
-  flightCategoryToColor,
-  getNbmFlightCategory,
-  getNbmWeatherMarkerIcon,
-} from '../map/leaflet/layers/StationMarkersLayer';
+import { getNbmFlightCategory } from '../map/leaflet/layers/StationMarkersLayer';
+import { getNbmWeatherMarkerIcon } from '../../utils/utils';
+import { flightCategoryToColor } from '../../utils/utils';
 import { MetarSkyValuesToString } from '../map/common/AreoConstants';
 import { Conrec } from '../../conrec-js/conrec';
 import { AirportNbmData, RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
 import Route from '../shared/Route';
 import { LatLng } from 'leaflet';
-import { makeWeatherString } from '../map/leaflet/popups/StationForecastPopup';
-import { hourInMili } from '../shared/DepartureAdvisor';
+import { makeWeatherString } from '../../utils/utils';
+import { hourInMili } from '../../utils/constants';
+import { iPadPortraitWidth, mobileLandscapeHeight, temperatureContourColors } from '../../utils/constants';
+import { makeSkyConditions, getAirportNbmData } from '../../utils/utils';
 
-export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
+const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
   if (viewWidth < iPadPortraitWidth) {
     return 900;
   } else {
     return viewWidth - 140;
   }
 };
-export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
+const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
   if (viewHeight < mobileLandscapeHeight) {
     return viewHeight - 200;
   } else {
@@ -91,92 +87,6 @@ export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
   }
 };
 
-export const mobileLandscapeHeight = 680;
-
-export const iPadPortraitWidth = 840;
-
-export const temperatureContourColors = {
-  positive: '#FBF209',
-  negative: '#09FDC6',
-};
-
-export const hatchOpacity = 0.6;
-
-export const visibleOpacity = 1;
-
-export function getAirportNbmData(
-  data: { time: string; data: AirportNbmData[] }[],
-  time: number,
-  airportid: string,
-): { time: Date; data: AirportNbmData } {
-  const nullResult = { time: null, data: null };
-  const hours3 = 3 * 3600 * 1000;
-  if (!airportid) {
-    return nullResult;
-  }
-  const timeData = data.reduce((prev, curr) => {
-    const prevDiff = time - new Date(prev.time).getTime();
-    const currDiff = time - new Date(curr.time).getTime();
-    if (currDiff >= 0 && currDiff <= hours3 && currDiff < prevDiff) {
-      return curr;
-    }
-    return prev;
-  });
-  const resultDiff = time - new Date(timeData.time).getTime();
-  if (resultDiff < 0 || resultDiff > hours3) {
-    return nullResult;
-  }
-  const airportData = timeData.data.filter((timeD) => {
-    return timeD.icaoid === airportid || timeD.faaid === airportid;
-  });
-  if (airportData.length > 0) {
-    return { time: new Date(timeData.time), data: airportData[0] };
-  }
-  return nullResult;
-}
-
-export function makeSkyConditions(
-  lowestCloud: number,
-  ceiling: number,
-  skyCover: number,
-): { skyCover: string; cloudBase: number }[] {
-  const skyConditions = [];
-  if (ceiling > 0) {
-    skyConditions.push({
-      skyCover: skyCover >= 88 ? 'OVC' : 'BKN',
-      cloudBase: ceiling,
-    });
-    if (lowestCloud > 0 && roundCloudHeight(lowestCloud) !== roundCloudHeight(ceiling)) {
-      skyConditions.push({
-        skyCover: 'SCT',
-        cloudBase: lowestCloud,
-      });
-    }
-  } else if (lowestCloud > 0) {
-    let skyCondition: string;
-    if (skyCover < 6) {
-      skyCondition = 'SKC';
-    } else if (skyCover < 31) {
-      skyCondition = 'FEW';
-    } else {
-      skyCondition = 'SCT';
-    }
-    skyConditions.push({
-      skyCover: skyCondition,
-      cloudBase: lowestCloud,
-    });
-  } else {
-    skyConditions.push({
-      skyCover: 'SKC',
-      cloudBase: 0,
-    });
-  }
-
-  const skyConditionsAsc = skyConditions.sort((a, b) => {
-    return a.cloudBase > b.cloudBase ? 1 : -1;
-  });
-  return skyConditionsAsc;
-}
 export function buildContour(
   activeRoute: Route,
   routeProfileDataset: RouteProfileDataset[],
@@ -284,31 +194,6 @@ export function buildContour(
   });
   return { contours: newContours, contourLabels };
 }
-
-const weatherFontContents = {
-  'fas fa-question-square': '\uf2fd',
-  'fa-solid fa-wind': '\uf72e',
-  'fa-solid fa-sun': '\uf185',
-  'fa-solid fa-moon': '\uf186',
-  'fas fa-sun-cloud': '\uf763',
-  'fas fa-moon-cloud': '\uf754',
-  'fa-solid fa-cloud-sun': '\uf6c4',
-  'fa-solid fa-cloud-moon': '\uf6c3',
-  'fas fa-clouds-sun': '\uf746',
-  'fas fa-clouds-moon': '\uf745',
-  'fa-solid fa-cloud': '\uf0c2',
-  'fa-solid fa-cloud-rain': '\uf73d',
-  'fa-solid fa-icicles': '\uf7ad',
-  'fas fa-cloud-snow': '\uf742',
-  'fas fa-cloud-bolt-sun': '\uf76e',
-  'fas fa-cloud-bolt-moon': '\uf76d',
-  'fa-solid fa-cloud-bolt': '\uf76c',
-  'fa-solid fa-cloud-sun-rain': '\uf743',
-  'fas fa-cloud-moon-rain': '\uf73c',
-  'fa-solid fa-cloud-showers-heavy': '\uf740',
-  'fas fa-cloud-sleet': '\uf741',
-  'fas fa-fog': '\uf74e',
-};
 
 function getFlightCategoryColor(visibility, ceiling): string {
   const [catVis] = getMetarVisibilityCategory(visibility, initialUserSettingsState.personalMinimumsState);
