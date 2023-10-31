@@ -232,12 +232,11 @@ const MeteogramChart = (props: {
     skip: currentAirportPos === null,
   });
   const userSettings = useSelector(selectSettings);
-  const observationTime = userSettings.observation_time;
   const { data: airportwxState, isSuccess: isAirportwxStateLoaded } = useGetAirportwxStateQuery(null, {
     refetchOnMountOrArgChange: true,
   });
   const fetchedDate = useSelector(selectFetchedDate);
-  const [chartWidth, setChartWidth] = useState(24);
+  const chartWidth = 24 * airportwxState.chartDays;
   const [interval, setInterval] = useState(1);
   const activeRoute = useSelector(selectActiveRoute);
 
@@ -287,20 +286,13 @@ const MeteogramChart = (props: {
 
   useEffect(() => {
     if (currentAirportPos) {
-      queryNbmAll({ queryPoints: [[currentAirportPos.lat, currentAirportPos.lng]] });
+      queryNbmAll({ queryPoints: [[currentAirportPos.lng, currentAirportPos.lat]] });
     }
   }, [currentAirportPos]);
 
   useEffect(() => {
     buildTemperatureContourSeries();
   }, [isLoadedMGramData, userSettings.default_temperature_unit, airportwxState]);
-
-  useEffect(() => {
-    if (isAirportwxStateLoaded) {
-      const chartWidth = airportwxState.chartDays === 1 ? 24 : 72;
-      setChartWidth(chartWidth);
-    }
-  }, [isAirportwxStateLoaded, airportwxState]);
 
   useEffect(() => {
     const times = getXAxisValues(chartWidth, interval);
@@ -544,7 +536,7 @@ const MeteogramChart = (props: {
   return (
     <div
       className="scrollable-chart-content"
-      style={{ width: calcChartWidth(viewW, viewH), height: calcChartHeight(viewW, viewH) }}
+      style={{ width: calcChartWidth(viewW, viewH), height: calcChartHeight(viewW, viewH), position: 'relative' }}
     >
       {airportwxState && (
         <XYPlot
@@ -765,7 +757,7 @@ const MeteogramChart = (props: {
               ]}
             />
           )}
-          {!props.noDataMessage && props.noIcingAbove30000 && (
+          {/* {!props.noDataMessage && props.noIcingAbove30000 && (
             <CustomSVGSeries
               data={[
                 {
@@ -790,7 +782,7 @@ const MeteogramChart = (props: {
                 },
               ]}
             />
-          )}
+          )} */}
           {showElevationHint && elevationHint ? (
             <Hint value={elevationHint}>
               <div style={{ background: 'white', color: 'black', padding: 4, borderRadius: 4 }}>{elevationHint.y}</div>

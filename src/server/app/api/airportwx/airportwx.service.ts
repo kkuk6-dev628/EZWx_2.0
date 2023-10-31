@@ -25,7 +25,7 @@ export class AirportwxService {
   }
 
   async addRecentAirport(recentAirport) {
-    return (await this.recentAirportRepository.upsert(recentAirport, ['userId', 'airportId'])).generatedMaps[0].id;
+    return (await this.recentAirportRepository.insert(recentAirport)).generatedMaps[0].id;
   }
 
   async getAirportwxState(user: User) {

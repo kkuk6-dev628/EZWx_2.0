@@ -49,19 +49,12 @@ const MTurbChart = (props) => {
   const { data: airportwxState, isSuccess: isAirportwxStateLoaded } = useGetAirportwxStateQuery(null, {
     refetchOnMountOrArgChange: true,
   });
-  const [chartWidth, setChartWidth] = useState(24);
-  const [interval, setInterval] = useState(1);
+  const chartWidth = 24 * airportwxState.chartDays;
+  const interval = 1;
   const [turbSeries, setTurbSeries] = useState([]);
   const [turbHint, setTurbHint] = useState(null);
   const [noForecast, setNoForecast] = useState(false);
   const [noDepicted, setNoDepicted] = useState(false);
-
-  useEffect(() => {
-    if (isAirportwxStateLoaded) {
-      const chartWidth = airportwxState.chartDays === 1 ? 24 : 72;
-      setChartWidth(chartWidth);
-    }
-  }, [isAirportwxStateLoaded, airportwxState]);
 
   function buildTurbSeries() {
     if (isLoadedMGramData && meteogramData.cat) {
@@ -144,10 +137,10 @@ const MTurbChart = (props) => {
             }
           }
           turbData.push({
-            x0: index,
-            y0: elevation - 500,
-            x: index + interval,
-            y: elevation + 500,
+            x0: index - interval / 2,
+            y0: elevation - 502,
+            x: index + interval / 2,
+            y: elevation + 502,
             color: color,
             opacity: opacity,
             hint: {
@@ -171,16 +164,7 @@ const MTurbChart = (props) => {
   }, [isLoadedMGramData, airportwxState, userSettings.max_takeoff_weight_category]);
 
   return (
-    <MeteogramChart
-      showDayNightBackground={true}
-      noDataMessage={
-        noDepicted
-          ? 'No turbulence forecast depicted for this departure time'
-          : noForecast
-          ? 'No turbulence forecast available for this departure time'
-          : null
-      }
-    >
+    <MeteogramChart showDayNightBackground={true} noDataMessage={null}>
       {turbSeries && (
         <VerticalRectSeries
           colorType="literal"

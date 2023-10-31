@@ -202,7 +202,7 @@ export default function Header() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (pathname === '/map' || pathname === '/imagery' || pathname === '/route-profile') {
+    if (pathname === '/map' || pathname === '/imagery' || pathname === '/route-profile' || pathname === '/airportwx') {
       setMapMenu(true);
     } else {
       setMapMenu(false);

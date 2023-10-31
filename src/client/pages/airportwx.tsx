@@ -6,11 +6,12 @@ import Meteogram from '../components/airportwx/Meteogram';
 import { useGetRecentAirportQuery } from '../store/airportwx/airportwxApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { setCurrentAirport } from '../store/airportwx/airportwx';
+import { selectCurrentAirport, setCurrentAirport } from '../store/airportwx/airportwx';
 import { selectSettings } from '../store/user/UserSettings';
 
 function AirportWxPage() {
   const { data: recentAirports, isSuccess: isSuccessRecentAirports } = useGetRecentAirportQuery(null);
+  const currentAirport = useSelector(selectCurrentAirport);
   const settingsState = useSelector(selectSettings);
   const dispatch = useDispatch();
 
@@ -86,7 +87,7 @@ function AirportWxPage() {
           <div className="select-airport">
             <AutoCompleteInput
               name="default_home_airport"
-              selectedValue={null}
+              selectedValue={currentAirport as any}
               handleAutoComplete={(name, value) => {
                 console.log(value);
               }}
