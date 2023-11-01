@@ -48,7 +48,7 @@ const ConvectiveOutlookLayer = () => {
       url={wfsUrl1}
       maxFeatures={256}
       typeName="EZWxBrief:conv_outlook"
-      propertyNames={['wkb_geometry', 'ogc_fid', 'valid_time_from', 'valid_time_to', 'raw_text']}
+      propertyNames={['geometry', 'valid_time_from', 'valid_time_to', 'raw_text']}
       style={style}
       getLabel={getLabel}
       clientFilter={clientFilter}

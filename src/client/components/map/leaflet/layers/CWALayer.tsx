@@ -99,8 +99,7 @@ const CWALayer = () => {
       maxFeatures={256}
       typeName="EZWxBrief:cwa"
       propertyNames={[
-        'wkb_geometry',
-        // 'id',
+        'geometry',
         'data',
         'cwsu',
         'name',

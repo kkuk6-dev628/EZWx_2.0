@@ -12,8 +12,7 @@ import { selectLayerControlState } from '../../../../store/layers/LayerControl';
 import { selectSettings } from '../../../../store/user/UserSettings';
 
 const properties = [
-  'wkb_geometry',
-  'ogc_fid',
+  'geometry',
   'icaoid',
   'aireptype',
   'obstime',

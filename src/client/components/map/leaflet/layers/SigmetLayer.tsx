@@ -101,7 +101,7 @@ const SigmetLayer = () => {
       typeName="EZWxBrief:sigmet"
       initData={jsonData}
       propertyNames={[
-        'wkb_geometry',
+        'geometry',
         // 'id',
         'altitudelow',
         'altitudehi',

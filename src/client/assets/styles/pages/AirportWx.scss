@@ -29,4 +29,33 @@
       }
     }
   }
+  .days{
+    display: flex;
+    flex-direction: row;
+    .select-chart-width-days {
+      width: 110px;
+      margin-left: -114px;
+      margin-right: 4px;
+      label {
+        padding: 6px;
+      }
+    }
+    .input_radio_container {
+      margin: 0;
+    }
+    .date-block-container {
+      width: calc(100% - 110px);
+      display: flex;
+      flex-direction: row;
+      .date {
+        background-color: var(--color-white);
+        margin: 0 2px;
+        border-radius: 4px;
+        text-align: center;
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 30px;
+      }
+    }
+  }
 }

@@ -41,7 +41,7 @@ export const airportwxApi = createApi({
         console.error(response);
         return initialAirportWxState;
       },
-      providesTags: [{ type: 'airportwxState', id: 'LIST' }],
+      providesTags: ['airportwxState'],
     }),
     updateAirportwxState: builder.mutation({
       query: (data) => ({ url: '/api/airportwx/update-airportwx-state', method: 'Post', body: data }),

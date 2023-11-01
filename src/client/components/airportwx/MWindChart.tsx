@@ -19,7 +19,7 @@ const MWindChart = () => {
   const { data: airportwxState, isSuccess: isAirportwxStateLoaded } = useGetAirportwxStateQuery(null, {
     refetchOnMountOrArgChange: true,
   });
-  const [chartWidth, setChartWidth] = useState(24);
+  const chartWidth = 24 * airportwxState.chartDays;
   const [interval, setInterval] = useState(1);
 
   const [value2PixelRate, setValue2PixelRate] = useState({ dx: 1, dy: 1 });
@@ -28,13 +28,6 @@ const MWindChart = () => {
 
   const [windSpeedSeries, setWindSpeedSeries] = useState(null);
   const [windHintValue, setWindHintValue] = useState(null);
-
-  useEffect(() => {
-    if (isAirportwxStateLoaded) {
-      const chartWidth = airportwxState.chartDays === 1 ? 24 : 72;
-      setChartWidth(chartWidth);
-    }
-  }, [isAirportwxStateLoaded, airportwxState]);
 
   function buildWindSeries() {
     if (isLoadedMGramData && meteogramData.windSpeed.length > 0) {

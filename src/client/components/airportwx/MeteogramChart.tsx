@@ -19,6 +19,7 @@ import { useQueryNbmAllMutation } from '../../store/route-profile/routeProfileAp
 import { useGetSingleElevationQuery, useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectFetchedDate, selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import {
+  addLeadingZeroes,
   celsiusToFahrenheit,
   convertTimeFormat,
   getMetarCeilingCategory,
@@ -31,7 +32,7 @@ import {
 } from '../map/common/AreoFunctions';
 import { MetarSkyValuesToString } from '../map/common/AreoConstants';
 import { Conrec } from '../../conrec-js/conrec';
-import { AirportNbmData, RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
+import { RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
 import {
   getForecastTimes,
   getMinMaxValueByElevation,
@@ -46,32 +47,14 @@ import {
   cacheKeys,
   flightCategoryDivide,
   hourInMili,
-  iPadPortraitWidth,
   mobileLandscapeHeight,
   temperatureContourColors,
 } from '../../utils/constants';
-import { selectCurrentAirportPos } from '../../store/airportwx/airportwx';
+import { selectCurrentAirportPos, selectViewHeight, selectViewWidth } from '../../store/airportwx/airportwx';
 import { useGetAirportwxStateQuery, useGetMeteogramDataQuery } from '../../store/airportwx/airportwxApi';
 import { getCurrentHour } from '../../utils/utils';
 import { weatherFontContents } from '../../utils/utils';
-
-const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
-  if (viewWidth < iPadPortraitWidth) {
-    return 900;
-  } else {
-    return viewWidth - 140;
-  }
-};
-const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
-  if (viewHeight < mobileLandscapeHeight) {
-    return viewHeight - 200;
-  } else {
-    if (_viewWidth < iPadPortraitWidth) {
-      return viewHeight - 270;
-    }
-    return viewHeight - 220;
-  }
-};
+import { calcChartWidth, calcChartHeight } from '../../utils/utils';
 
 export function getXAxisValues(chartWidth, interval): { index: number; hour: number; time: Date }[] {
   const currentHour = Math.floor(Date.now() / hourInMili);
@@ -247,8 +230,8 @@ const MeteogramChart = (props: {
   const [elevationSeries, setElevationSeries] = useState([]);
   const [startMargin, setStartMargin] = useState(1);
   const [endMargin, setEndMargin] = useState(1);
-  const [viewW, setViewW] = useState<number>(0);
-  const [viewH, setViewH] = useState<number>(0);
+  const viewW = useSelector(selectViewWidth);
+  const viewH = useSelector(selectViewHeight);
 
   const [elevationHint, setElevationHint] = useState(null);
   const [showElevationHint, setShowElevationHint] = useState(false);
@@ -305,21 +288,6 @@ const MeteogramChart = (props: {
     );
     setGradientStops(stops);
   }, [isLoadedMGramData, airportwxState]);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      handleWindowSizeChange();
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-        window.removeEventListener('resize', handleWindowSizeChange);
-      };
-    }
-  }, []);
-
-  const handleWindowSizeChange = () => {
-    setViewW(document.documentElement.clientWidth);
-    setViewH(document.documentElement.clientHeight);
-  };
 
   function buildWeatherSeries(segment: RouteSegment, segmentIndex: number, segmentInterval: number) {
     if (segment) {
@@ -614,7 +582,9 @@ const MeteogramChart = (props: {
               const offset = isMobile ? '1em' : '1.2em';
               return (
                 <tspan dy={offset} className="chart-label">
-                  <tspan className="chart-label-dist">{hour}</tspan>
+                  <tspan className="chart-label-dist">
+                    {addLeadingZeroes(hour, 2) + (userSettings.default_time_display_unit ? '' : 'Z')}
+                  </tspan>
                 </tspan>
               );
             }}
@@ -636,25 +606,6 @@ const MeteogramChart = (props: {
               }}
             />
           )}
-          {activeRoute ? (
-            <LineSeries
-              data={[
-                { x: 0, y: activeRoute.altitude },
-                { x: chartWidth, y: activeRoute.altitude },
-              ]}
-              color="white"
-              strokeWidth={4}
-            />
-          ) : null}
-          {activeRoute ? (
-            <LineSeries
-              data={[
-                { x: 0, y: activeRoute.altitude },
-                { x: chartWidth, y: activeRoute.altitude },
-              ]}
-              color="magenta"
-            />
-          ) : null}
           {airportwxState.chartType !== 'Turb' &&
             airportwxState.showTemperature &&
             temperatureContures &&
@@ -757,32 +708,6 @@ const MeteogramChart = (props: {
               ]}
             />
           )}
-          {/* {!props.noDataMessage && props.noIcingAbove30000 && (
-            <CustomSVGSeries
-              data={[
-                {
-                  x: chartWidth / 2,
-                  y: 40000,
-                  customComponent: (_row, _positionInPixels) => {
-                    return (
-                      <switch>
-                        <foreignObject x="-150" y="-60" width="300" height="200">
-                          <p className="nodata-msg">{props.noIcingAbove30000}</p>
-                        </foreignObject>
-
-                        <text x="20" y="20">
-                          {props.noIcingAbove30000}
-                        </text>
-                      </switch>
-                    );
-                  },
-                  style: {
-                    textAnchor: 'middle',
-                  },
-                },
-              ]}
-            />
-          )} */}
           {showElevationHint && elevationHint ? (
             <Hint value={elevationHint}>
               <div style={{ background: 'white', color: 'black', padding: 4, borderRadius: 4 }}>{elevationHint.y}</div>

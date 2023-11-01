@@ -17,6 +17,7 @@ import { useDispatch } from 'react-redux';
 import { setShowInformation } from '../../store/imagery/imagery';
 import AirportSelectModal from '../airportwx/AirportSelectModal';
 import { PaperComponent } from '../common/PaperComponent';
+import { setViewHeight, setViewWidth } from '../../store/airportwx/airportwx';
 const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
 const menusHome = [
@@ -230,12 +231,23 @@ export default function Header() {
       setSticky(false);
     }
   };
+
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    if (typeof window !== 'undefined') {
+      handleWindowSizeChange();
+      window.addEventListener('resize', handleWindowSizeChange);
+      window.addEventListener('scroll', handleScroll);
+      return () => {
+        window.removeEventListener('resize', handleWindowSizeChange);
+        window.removeEventListener('scroll', handleScroll);
+      };
+    }
   }, []);
+
+  const handleWindowSizeChange = () => {
+    dispatch(setViewWidth(document.documentElement.clientWidth));
+    dispatch(setViewHeight(document.documentElement.clientHeight));
+  };
 
   const closeAllModals = () => {
     setIsShowProfileModal(false);

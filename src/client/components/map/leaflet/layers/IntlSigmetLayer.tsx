@@ -31,8 +31,7 @@ const IntlSigmetLayer = () => {
       maxFeatures={256}
       typeName="EZWxBrief:intl_sigmet"
       propertyNames={[
-        'wkb_geometry',
-        'ogc_fid',
+        'geometry',
         'icaoid',
         'firid',
         'firname',
@@ -40,7 +39,6 @@ const IntlSigmetLayer = () => {
         'validtimefrom',
         'validtimeto',
         'qualifier',
-        'geom',
         'base',
         'top',
         'rawsigmet',

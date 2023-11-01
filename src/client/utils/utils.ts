@@ -11,6 +11,8 @@ import {
   probStrings,
   wxStrings,
   intenStrings,
+  iPadPortraitWidth,
+  mobileLandscapeHeight,
 } from './constants';
 import * as d3 from 'd3-scale';
 import { roundCloudHeight } from '../components/map/common/AreoFunctions';
@@ -608,4 +610,21 @@ export const weatherFontContents = {
   'fa-solid fa-cloud-showers-heavy': '\uf740',
   'fas fa-cloud-sleet': '\uf741',
   'fas fa-fog': '\uf74e',
+};
+export const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
+  if (viewWidth < iPadPortraitWidth) {
+    return 900;
+  } else {
+    return viewWidth - 140;
+  }
+};
+export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
+  if (viewHeight < mobileLandscapeHeight) {
+    return viewHeight - 200;
+  } else {
+    if (_viewWidth < iPadPortraitWidth) {
+      return viewHeight - 270;
+    }
+    return viewHeight - 220;
+  }
 };

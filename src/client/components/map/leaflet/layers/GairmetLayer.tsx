@@ -163,8 +163,7 @@ const GairmetLayer = () => {
       maxFeatures={256}
       typeName="EZWxBrief:gairmet"
       propertyNames={[
-        'wkb_geometry',
-        'id',
+        'geometry',
         'top',
         'base',
         'fzlbase',

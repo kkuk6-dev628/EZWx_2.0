@@ -3,7 +3,7 @@ import MapTabs from '../components/shared/MapTabs';
 import { SvgBackward, SvgBookmark, SvgForward, SvgRefresh, SvgRoute } from '../components/utils/SvgIcons';
 import { AutoCompleteInput } from '../components/common';
 import Meteogram from '../components/airportwx/Meteogram';
-import { useGetRecentAirportQuery } from '../store/airportwx/airportwxApi';
+import { useAddRecentAirportMutation, useGetRecentAirportQuery } from '../store/airportwx/airportwxApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { selectCurrentAirport, setCurrentAirport } from '../store/airportwx/airportwx';
@@ -14,6 +14,7 @@ function AirportWxPage() {
   const currentAirport = useSelector(selectCurrentAirport);
   const settingsState = useSelector(selectSettings);
   const dispatch = useDispatch();
+  const [addRecentAirport] = useAddRecentAirportMutation();
 
   useEffect(() => {
     if (isSuccessRecentAirports && recentAirports.length > 0) {
@@ -89,7 +90,12 @@ function AirportWxPage() {
               name="default_home_airport"
               selectedValue={currentAirport as any}
               handleAutoComplete={(name, value) => {
-                console.log(value);
+                if (value) {
+                  dispatch(setCurrentAirport(value.key || value));
+                  addRecentAirport({ airportId: value.key || value });
+                } else {
+                  dispatch(setCurrentAirport(null));
+                }
               }}
               exceptions={[]}
               key={'home-airport'}
