@@ -1,11 +1,41 @@
 .airportwx-page {
   display: flex;
   height: calc(100vh - 72px);
+  @media screen and (orientation: portrait){
+    width: calc(100vw);
+    flex-direction: column;
+  }
+
   .tabs {
     position: relative;
   }
   .main-container {
     width: calc(100vw - 82px);
+    @media screen and (orientation: portrait){
+      width: calc(100vw);
+      .label-chart .fixed-label.right {
+        margin: 2px;
+      }
+    }
+    .label-chart .fixed-label {
+      padding-bottom: 80px;
+    }
+    .scrollable-chart-content {
+      .date-block-container {
+        width: calc(100% - 110px);
+        display: flex;
+        flex-direction: row;
+        .date {
+          background-color: var(--color-white);
+          margin: 0 2px;
+          border-radius: 4px;
+          text-align: center;
+          font-size: 15px;
+          font-weight: 600;
+          line-height: 30px;
+        }
+      }
+    }
   }
   .primary-bar {
     display: flex;
@@ -34,28 +64,20 @@
     flex-direction: row;
     .select-chart-width-days {
       width: 110px;
-      margin-left: -114px;
+      margin-left: -32px;
       margin-right: 4px;
+      margin-top: -44px;
+      z-index: 5;
       label {
         padding: 6px;
+      }
+      @media screen and (orientation: portrait){
+        margin-left: 32px;
+        margin-top: 0;
       }
     }
     .input_radio_container {
       margin: 0;
-    }
-    .date-block-container {
-      width: calc(100% - 110px);
-      display: flex;
-      flex-direction: row;
-      .date {
-        background-color: var(--color-white);
-        margin: 0 2px;
-        border-radius: 4px;
-        text-align: center;
-        font-size: 15px;
-        font-weight: 600;
-        line-height: 30px;
-      }
     }
   }
 }

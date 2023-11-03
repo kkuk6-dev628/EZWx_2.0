@@ -12,6 +12,7 @@ import { isSameRoutes, validateRoute } from '../map/common/AreoFunctions';
 import { useCreateRouteMutation, useDeleteRouteMutation } from '../../store/route/routeApi';
 import { Route, RouteOfFlight, RoutePoint } from '../../interfaces/route';
 import { useMeteoLayersContext } from '../map/leaflet/layer-control/MeteoLayerControlContext';
+import L from 'leaflet';
 import 'leaflet-arc';
 import { Button } from '@mui/material';
 import MultipleSelect from './MultipleSelect';

@@ -97,14 +97,16 @@
   }
 
   &__nav__item {
-    padding: 24px 32px;
     transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
-
-    @media screen and (max-width: 1650px) {
-      padding: 24px 16px;
+    &>a {
+      padding: 24px 32px;
+      @media screen and (max-width: 1650px) {
+        padding: 24px 16px;
+      }
     }
+
 
     &:hover {
       background-color: var(--color-white);

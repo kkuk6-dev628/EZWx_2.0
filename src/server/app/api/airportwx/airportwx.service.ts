@@ -20,6 +20,9 @@ export class AirportwxService {
       where: {
         userId: user.id,
       },
+      order: {
+        created_at: 'DESC',
+      },
     });
     return res;
   }

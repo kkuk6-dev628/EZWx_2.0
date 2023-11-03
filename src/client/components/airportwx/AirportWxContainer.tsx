@@ -1,27 +1,20 @@
 import { Dialog, FormControl, MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import MapTabs from '../components/shared/MapTabs';
-import { SvgBackward, SvgBookmark, SvgForward, SvgRefresh, SvgRoute } from '../components/utils/SvgIcons';
-import { AutoCompleteInput } from '../components/common';
-import Meteogram from '../components/airportwx/Meteogram';
-import { useAddRecentAirportMutation, useGetRecentAirportQuery } from '../store/airportwx/airportwxApi';
+import MapTabs from '../shared/MapTabs';
+import { SvgBackward, SvgBookmark, SvgForward, SvgRefresh, SvgRoute } from '../utils/SvgIcons';
+import { AutoCompleteInput } from '../common';
+import Meteogram from '../airportwx/Meteogram';
+import { useAddRecentAirportMutation, useGetRecentAirportQuery } from '../../store/airportwx/airportwxApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { selectCurrentAirport, setCurrentAirport } from '../store/airportwx/airportwx';
-import { selectSettings } from '../store/user/UserSettings';
-import { PaperComponent } from '../components/common/PaperComponent';
-import dynamic from 'next/dynamic';
-import { setDataLoadTime } from '../store/layers/DataLoadTimeSlice';
-import { selectActiveRoute } from '../store/route/routes';
-import { RoutePoint } from '../interfaces/route';
-const Route = dynamic(() => import('../components/shared/Route'), {
-  ssr: false,
-});
+import { selectCurrentAirport, setCurrentAirport } from '../../store/airportwx/airportwx';
+import { selectSettings } from '../../store/user/UserSettings';
+import { PaperComponent } from '../common/PaperComponent';
+import Route from '../shared/Route';
 
-function AirportWxPage() {
+function AirportWxContainer() {
   const { data: recentAirports, isSuccess: isSuccessRecentAirports } = useGetRecentAirportQuery(null);
   const currentAirport = useSelector(selectCurrentAirport);
   const settingsState = useSelector(selectSettings);
-  const activeRoute = useSelector(selectActiveRoute);
   const dispatch = useDispatch();
   const [addRecentAirport] = useAddRecentAirportMutation();
   const [showRouteEditor, setShowRouteEditor] = useState(false);
@@ -34,44 +27,18 @@ function AirportWxPage() {
     }
   }, [isSuccessRecentAirports]);
 
-  function changeCurrentAirport(airport) {
-    dispatch(setCurrentAirport(airport.key || airport));
-    addRecentAirport({ airportId: airport.key || airport });
-  }
   function handler(id: string) {
     switch (id) {
       case 'route':
         setShowRouteEditor(true);
         break;
       case 'next':
+        break;
       case 'previous':
-        if (activeRoute) {
-          let airports = [
-            activeRoute.departure,
-            ...activeRoute.routeOfFlight.filter((x) => x.routePoint.type === 'icaoid').map((x) => x.routePoint),
-            activeRoute.destination,
-          ];
-          if (id === 'previous') {
-            airports = airports.reverse();
-          }
-          for (let i = 0; i < airports.length; i++) {
-            const airport = airports[i];
-            if (airport.key === currentAirport) {
-              let j = i + 1;
-              if (i === airports.length - 1) {
-                j = 0;
-              }
-              changeCurrentAirport(airports[j]);
-              return;
-            }
-          }
-          changeCurrentAirport(airports[0]);
-        }
         break;
       case 'save':
         break;
       case 'refresh':
-        dispatch(setDataLoadTime(Date.now()));
         break;
     }
   }
@@ -149,7 +116,8 @@ function AirportWxPage() {
               selectedValue={currentAirport as any}
               handleAutoComplete={(name, value) => {
                 if (value) {
-                  changeCurrentAirport(value);
+                  dispatch(setCurrentAirport(value.key || value));
+                  addRecentAirport({ airportId: value.key || value });
                 } else {
                   dispatch(setCurrentAirport(null));
                 }
@@ -167,4 +135,4 @@ function AirportWxPage() {
   );
 }
 
-export default AirportWxPage;
+export default AirportWxContainer;

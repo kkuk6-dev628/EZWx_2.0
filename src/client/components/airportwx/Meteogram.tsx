@@ -55,20 +55,8 @@ function Meteogram() {
   const viewW = useSelector(selectViewWidth);
   const viewH = useSelector(selectViewHeight);
   const [airportwxState, setAirportwxState] = useState(initialAirportWxState);
-  const [blockDates, setBlockDates] = useState([]);
   const [updateAirportwxState] = useUpdateAirportwxStateMutation();
-  const [dateBlocksWidth, setDateBlocksWidth] = useState(viewW);
-  const [dateBlocksMargin, setDateBlockMargin] = useState(0);
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    const chartWidth = calcChartWidth(viewW, viewH);
-    const chartAxisCount = airportwxState.chartDays * 24 + 2;
-    const dx = chartWidth / chartAxisCount;
-    const w = chartWidth - 2 * dx + 8;
-    setDateBlocksWidth(w);
-    setDateBlockMargin(dx + 23);
-  }, [viewW, airportwxState]);
 
   useEffect(() => {
     if (airportwxDbState) {
@@ -92,40 +80,9 @@ function Meteogram() {
     }
   }, [isSuccess, currentAirport]);
 
-  useEffect(() => {
-    const blockDays = calcBlockDays();
-    setBlockDates(blockDays);
-  }, [airportwxState, userSettings.default_time_display_unit]);
-
   function handleUpdateState(state: AirportWxState) {
     setAirportwxState(state);
     updateAirportwxState(state);
-  }
-
-  function calcBlockDays() {
-    const times = getXAxisValues(airportwxState.chartDays * 24, interval).map((x) => x.time);
-    const blockCount = 24 * airportwxState.chartDays;
-    let date = times[0];
-    let width = 0;
-    let blockCountInDate = 0;
-    const dateBlocks = [];
-    for (const blockTime of times) {
-      if (
-        userSettings.default_time_display_unit
-          ? date.getDate() === blockTime.getDate()
-          : date.getUTCDate() === blockTime.getUTCDate()
-      ) {
-        blockCountInDate++;
-      } else {
-        width = blockCountInDate / blockCount;
-        dateBlocks.push({ date: date, width: width * 100 });
-        blockCountInDate = 1;
-        date = blockTime;
-      }
-    }
-    width = (blockCountInDate - 1) / blockCount;
-    dateBlocks.push({ date: date, width: width * 100 });
-    return dateBlocks;
   }
 
   return (
@@ -278,7 +235,7 @@ function Meteogram() {
               ))}
             </div>
           </div>
-          <div className="days" style={{ width: dateBlocksWidth, marginLeft: dateBlocksMargin }}>
+          <div className="days">
             <div className="select-chart-width-days">
               <InputFieldWrapper>
                 <div className="input_radio_container">
@@ -306,20 +263,6 @@ function Meteogram() {
                   />
                 </div>
               </InputFieldWrapper>
-            </div>
-            <div className="date-block-container" style={{ width: dateBlocksWidth }}>
-              {blockDates.map((item, index) => (
-                <div key={'date' + index} className="date" style={{ width: item.width + '%' }}>
-                  {item.width > 5
-                    ? item.date.toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        day: 'numeric',
-                        month: 'numeric',
-                        timeZone: userSettings.default_time_display_unit ? undefined : 'UTC',
-                      })
-                    : ''}
-                </div>
-              ))}
             </div>
           </div>
         </div>

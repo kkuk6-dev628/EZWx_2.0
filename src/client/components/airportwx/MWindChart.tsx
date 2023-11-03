@@ -20,7 +20,7 @@ const MWindChart = () => {
     refetchOnMountOrArgChange: true,
   });
   const chartWidth = 24 * airportwxState.chartDays;
-  const [interval, setInterval] = useState(1);
+  const interval = airportwxState.chartDays;
 
   const [value2PixelRate, setValue2PixelRate] = useState({ dx: 1, dy: 1 });
   const [chartMargin, setChartMargin] = useState({ x: 0, y: 0 });
@@ -34,7 +34,7 @@ const MWindChart = () => {
       const windSpeedData = [];
       const times = getXAxisValues(chartWidth, interval);
       times.forEach(({ index, time }) => {
-        const x = index * interval;
+        const x = index;
         const elevations = windDataElevations[airportwxState.maxAltitude];
         if (!elevations) {
           return;
