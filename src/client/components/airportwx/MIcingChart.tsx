@@ -65,7 +65,7 @@ const icingSldLegend = [
   { value: 100, color: '#CD0000', label: '100' },
 ];
 
-const noIcingAbove30000Msg = 'No icing forecast available above 30,000 feet';
+const noIcingAbove30000Msg = 'No icing forecast above 30,000 feet';
 
 const MIcingChart = (props) => {
   const currentAirportPos = useSelector(selectCurrentAirportPos);
@@ -101,7 +101,7 @@ const MIcingChart = (props) => {
       const maxElevation = Math.min(airportwxState.maxAltitude * 100, maxForecastElevation);
       const times = getXAxisValues(chartWidth, interval);
       times.forEach(({ time, index }) => {
-        for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
+        for (let elevation = 1000; elevation <= airportwxState.maxAltitude * 100; elevation += 1000) {
           let color = colorsByEdr.none;
           let opacity = visibleOpacity;
           let hint;
@@ -115,7 +115,16 @@ const MIcingChart = (props) => {
               sev: 'None',
               sld: 'None',
             };
-          } else {
+            icingData.push({
+              x0: index - interval / 2,
+              y0: elevation - 500,
+              x: index + interval / 2,
+              y: elevation + 500,
+              color: color,
+              opacity: opacity,
+              hint,
+            });
+          } else if (elevation <= maxForecastElevation) {
             let { value: prob, time: provTime } = getValueFromDatasetByElevation(
               meteogramData.prob,
               time,
@@ -189,16 +198,16 @@ const MIcingChart = (props) => {
               sev: sevData.label,
               sld: sld ? sld + ' %' : 'None',
             };
+            icingData.push({
+              x0: index - interval / 2,
+              y0: elevation - 500,
+              x: index + interval / 2,
+              y: elevation + 500,
+              color: color,
+              opacity: opacity,
+              hint,
+            });
           }
-          icingData.push({
-            x0: index - interval / 2,
-            y0: elevation - 500,
-            x: index + interval / 2,
-            y: elevation + 500,
-            color: color,
-            opacity: opacity,
-            hint,
-          });
         }
       });
       setIcingSeries(icingData);
@@ -207,18 +216,28 @@ const MIcingChart = (props) => {
 
   useEffect(() => {
     buildIcingSeries();
-  }, [isLoadedMGramData, airportwxState]);
+  }, [isLoadedMGramData, airportwxState, meteogramData]);
 
+  let noDataMessage = 'No icing forecast depicted for this airport';
+  if (airportwxState && airportwxState.icingLayers) {
+    if (airportwxState.icingLayers.includes('Prob')) {
+      noDataMessage = 'No icing probability depicted for this airport';
+    } else {
+      if (airportwxState.icingLayers.includes('SLD') && airportwxState.icingLayers.includes('Sev')) {
+        noDataMessage = 'No icing forecast depicted for this airport';
+      } else {
+        if (airportwxState.icingLayers.includes('SLD')) {
+          noDataMessage = 'No SLD forecast depicted for this airport';
+        } else if (airportwxState.icingLayers.includes('Sev')) {
+          noDataMessage = 'No icing severity depicted for this airport';
+        }
+      }
+    }
+  }
   return (
     <MeteogramChart
       showDayNightBackground={true}
-      noDataMessage={
-        noDepicted
-          ? 'No icing forecast depicted for this departure time'
-          : noForecast
-          ? 'No icing forecast available for this departure time'
-          : null
-      }
+      noDataMessage={noDepicted ? noDataMessage : noForecast ? 'No icing forecast available for this airport' : null}
       noIcingAbove30000={noForecast || airportwxState.maxAltitude !== 500 ? null : noIcingAbove30000Msg}
     >
       {icingSeries && (

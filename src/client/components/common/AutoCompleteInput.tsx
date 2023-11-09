@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
-import React, { KeyboardEvent, useRef, useState } from 'react';
+import React, { FocusEventHandler, KeyboardEvent, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { RoutePoint } from '../../interfaces/route';
 import { useGetAirportQuery } from '../../store/route/airportApi';
@@ -9,10 +9,11 @@ interface Props {
   selectedValue: RoutePoint;
   name: string;
   handleAutoComplete: (name: string, value: RoutePoint) => void;
+  onBlur?: FocusEventHandler<HTMLDivElement>;
   exceptions: string[];
 }
 
-const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete, exceptions }: Props) => {
+const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete, onBlur, exceptions }: Props) => {
   const [currentFocus, setCurrentFocus] = useState(0);
   const [value, setValue] = useState('');
   const [showSuggestion, setShowSuggestion] = useState(false);
@@ -129,13 +130,14 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete, exceptions
   }
   return (
     <>
-      <div className="auto_complete__input__container">
+      <div className="auto_complete__input__container" onBlur={onBlur}>
         {selectedValue ? (
           <span className="auto__complete__label">{displayText}</span>
         ) : (
           <input
             type="text"
             name={name}
+            autoFocus
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}

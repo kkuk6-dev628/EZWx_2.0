@@ -84,9 +84,9 @@ const MCloudsChart = (props) => {
           if (cloudbase > 0 && elevation + cloudbase <= airportwxState.maxAltitude * 100) {
             cloudbase = Math.round(cloudbase);
             cloudData.push({
-              x0: index,
+              x0: index - interval / 2,
               y0: elevation + cloudbase,
-              x: index + interval,
+              x: index + interval / 2,
               y: elevation + cloudbase + 2000,
               color: colorFirst,
               opacity: visibleOpacity,
@@ -118,9 +118,9 @@ const MCloudsChart = (props) => {
                 humidity.elevation <= airportwxState.maxAltitude * 100
               ) {
                 cloudData.push({
-                  x0: index,
+                  x0: index - interval / 2,
                   y0: humidity.elevation - 500,
-                  x: index + interval,
+                  x: index + interval / 2,
                   y: humidity.elevation + 500,
                   color: colorSecond,
                   opacity: visibleOpacity,
@@ -141,9 +141,9 @@ const MCloudsChart = (props) => {
                   }
                 }
                 cloudData.push({
-                  x0: index,
+                  x0: index - interval / 2,
                   y0: icingSev.elevation - 500,
-                  x: interval,
+                  x: index + interval / 2,
                   y: icingSev.elevation + 500,
                   color: colorSecond,
                   opacity: visibleOpacity,
@@ -160,7 +160,7 @@ const MCloudsChart = (props) => {
 
   useEffect(() => {
     buildCloudSeries();
-  }, [isLoadedMGramData, queryNbmAllAirportResult.isSuccess, airportwxState]);
+  }, [isLoadedMGramData, meteogramData, queryNbmAllAirportResult.isSuccess, airportwxState]);
   return (
     <MeteogramChart showDayNightBackground={true} noDataMessage={null}>
       {cloudSeries && (

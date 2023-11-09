@@ -48,7 +48,9 @@ function AirportWxPage() {
         if (activeRoute) {
           let airports = [
             activeRoute.departure,
-            ...activeRoute.routeOfFlight.filter((x) => x.routePoint.type === 'icaoid').map((x) => x.routePoint),
+            ...activeRoute.routeOfFlight
+              .filter((x) => x.routePoint.type === 'icaoid' || x.routePoint.type === 'faaid')
+              .map((x) => x.routePoint),
             activeRoute.destination,
           ];
           if (id === 'previous') {
@@ -91,16 +93,16 @@ function AirportWxPage() {
       isHideResponsive: false,
     },
     {
-      id: 'next',
-      name: 'Next Airport',
-      svg: <SvgForward />,
+      id: 'previous',
+      name: 'Prev Airport',
+      svg: <SvgBackward />,
       handler: handler,
       isHideResponsive: false,
     },
     {
-      id: 'previous',
-      name: 'Previous Airport',
-      svg: <SvgBackward />,
+      id: 'next',
+      name: 'Next Airport',
+      svg: <SvgForward />,
       handler: handler,
       isHideResponsive: false,
     },
@@ -138,8 +140,8 @@ function AirportWxPage() {
             <Select value={'meteogram'} onChange={changeViews}>
               <MenuItem value={'meteogram'}>Meteogram</MenuItem>
               <MenuItem value={'metars'}>METARs</MenuItem>
-              <MenuItem value={'terminal-forecasts'}>Terminal Forecasts</MenuItem>
-              <MenuItem value={'forecast-discussion'}>Forecast Discussion</MenuItem>
+              <MenuItem value={'tafs'}>TAFs</MenuItem>
+              <MenuItem value={'discussion'}>Discussion</MenuItem>
               <MenuItem value={'skew-t'}>Skew-T</MenuItem>
             </Select>
           </FormControl>
@@ -153,6 +155,10 @@ function AirportWxPage() {
                 } else {
                   dispatch(setCurrentAirport(null));
                 }
+              }}
+              onBlur={() => {
+                if (recentAirports && recentAirports.length > 0)
+                  dispatch(setCurrentAirport(recentAirports[0].airportId));
               }}
               exceptions={[]}
               key={'home-airport'}

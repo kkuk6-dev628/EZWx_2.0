@@ -38,7 +38,7 @@ import MTurbChart from './MTurbChart';
 import MIcingChart from './MIcingChart';
 import MCloudsChart from './MCloudsChart';
 import { getXAxisValues } from './MeteogramChart';
-import { calcChartWidth } from '../../utils/utils';
+import { calcChartWidth, isTouchScreenDevice } from '../../utils/utils';
 
 function Meteogram() {
   const userSettings = useSelector(selectSettings);
@@ -57,12 +57,13 @@ function Meteogram() {
   const [airportwxState, setAirportwxState] = useState(initialAirportWxState);
   const [updateAirportwxState] = useUpdateAirportwxStateMutation();
   const dispatch = useDispatch();
+  const isTouchScreen = isTouchScreenDevice();
 
   useEffect(() => {
     if (airportwxDbState) {
       setAirportwxState({ ...airportwxDbState });
     }
-  }, [isAirportwxStateLoaded]);
+  }, [airportwxDbState]);
 
   useEffect(() => {
     if (isSuccess && airports.length > 0) {
@@ -89,7 +90,7 @@ function Meteogram() {
     isAirportwxStateLoaded && (
       <div className="route-profile">
         <FetchUserSettings />
-        <div className="route-profile-container">
+        <div className={'route-profile-container' + (isTouchScreen ? ' touch' : '')}>
           <div className="route-profile-header">
             <div className="header-left">
               <InputFieldWrapper>
@@ -222,7 +223,7 @@ function Meteogram() {
                 ))}
               </div>
             )}
-            <div className="route-profile-chart-container">
+            <div className={'route-profile-chart-container'}>
               {airportwxState.chartType === 'Wind' && <MWindChart />}
               {airportwxState.chartType === 'Turb' && <MTurbChart />}
               {airportwxState.chartType === 'Icing' && <MIcingChart />}
@@ -233,36 +234,6 @@ function Meteogram() {
               {chartLabels[airportwxState.maxAltitude].map((label) => (
                 <div key={'right-' + label}>{label}</div>
               ))}
-            </div>
-          </div>
-          <div className="days">
-            <div className="select-chart-width-days">
-              <InputFieldWrapper>
-                <div className="input_radio_container">
-                  <RadioButton
-                    id="1-day"
-                    key="1-day"
-                    value={1}
-                    title="1-Day"
-                    selectedValue={airportwxState.chartDays}
-                    description=""
-                    onChange={() => {
-                      handleUpdateState({ ...airportwxState, chartDays: 1 });
-                    }}
-                  />
-                  <RadioButton
-                    id="3-day"
-                    key="3-day"
-                    value={3}
-                    title="3-Day"
-                    selectedValue={airportwxState.chartDays}
-                    description=""
-                    onChange={() => {
-                      handleUpdateState({ ...airportwxState, chartDays: 3 });
-                    }}
-                  />
-                </div>
-              </InputFieldWrapper>
             </div>
           </div>
         </div>

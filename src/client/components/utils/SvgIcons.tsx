@@ -389,8 +389,8 @@ function SvgMap() {
   return (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M23.1027 9.57184C23.1027 5.7585 19.9227 2.6665 16 2.6665C12.0773 2.6665 8.89734 5.7585 8.89734 9.57184C8.89734 13.6025 13.1987 17.9318 15.1067 19.6545C15.6173 20.1145 16.3827 20.1145 16.8933 19.6545C18.8013 17.9318 23.1027 13.6025 23.1027 9.57184Z"
         stroke="#3F0C69"
         strokeWidth="1.5"

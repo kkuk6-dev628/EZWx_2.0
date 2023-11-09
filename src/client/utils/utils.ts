@@ -628,3 +628,11 @@ export const calcChartHeight = (_viewWidth: number, viewHeight: number) => {
     return viewHeight - 220;
   }
 };
+export const isTouchScreenDevice = () => {
+  try {
+    document.createEvent('TouchEvent');
+    return true;
+  } catch (e) {
+    return false;
+  }
+};

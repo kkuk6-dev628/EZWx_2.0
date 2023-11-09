@@ -161,10 +161,22 @@ const MTurbChart = (props) => {
 
   useEffect(() => {
     buildTurbSeries();
-  }, [isLoadedMGramData, airportwxState, userSettings.max_takeoff_weight_category]);
+  }, [isLoadedMGramData, meteogramData, airportwxState, userSettings.max_takeoff_weight_category]);
 
+  let noDataMessage = 'No turbulence depicted for this airport';
+  if (airportwxState && airportwxState.icingLayers) {
+    if (airportwxState.turbLayers.includes('CAT') && airportwxState.turbLayers.includes('MWT')) {
+      noDataMessage = 'No turbulence depicted for this airport';
+    } else {
+      if (airportwxState.turbLayers.includes('CAT')) {
+        noDataMessage = 'No clear air turbulence depicted for this airport';
+      } else if (airportwxState.turbLayers.includes('MWT')) {
+        noDataMessage = 'No mountain wave turbulence depicted for this airport';
+      }
+    }
+  }
   return (
-    <MeteogramChart showDayNightBackground={true} noDataMessage={null}>
+    <MeteogramChart showDayNightBackground={true} noDataMessage={noDepicted ? noDataMessage : null}>
       {turbSeries && (
         <VerticalRectSeries
           colorType="literal"

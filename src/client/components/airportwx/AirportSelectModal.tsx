@@ -8,6 +8,8 @@ import { selectCurrentAirport, setCurrentAirport } from '../../store/airportwx/a
 import { useRouter } from 'next/router';
 import { useAddRecentAirportMutation, useGetRecentAirportQuery } from '../../store/airportwx/airportwxApi';
 import { useEffect, useState } from 'react';
+import { Modal } from '../common/Modal';
+import { PrimaryButton } from '../common/Buttons';
 
 function AirportSelectModal({ setIsShowModal }) {
   const settingsState = useSelector(selectSettings);
@@ -17,6 +19,7 @@ function AirportSelectModal({ setIsShowModal }) {
   const dispatch = useDispatch();
   const { data: recentAirports, isSuccess: isSuccessRecentAirports } = useGetRecentAirportQuery(null);
   const [addRecentAirport] = useAddRecentAirportMutation();
+  const [showError, setShowError] = useState(false);
 
   useEffect(() => {
     if (isSuccessRecentAirports && recentAirports.length > 0) {
@@ -33,10 +36,14 @@ function AirportSelectModal({ setIsShowModal }) {
   }
 
   function clickApply() {
-    dispatch(setCurrentAirport(selectedAirport.key || selectedAirport));
-    addRecentAirport({ airportId: selectedAirport.key || selectedAirport });
-    setIsShowModal(false);
-    router.push('/airportwx');
+    if (selectedAirport) {
+      dispatch(setCurrentAirport(selectedAirport.key || selectedAirport));
+      addRecentAirport({ airportId: selectedAirport.key || selectedAirport });
+      setIsShowModal(false);
+      router.push('/airportwx');
+    } else {
+      setShowError(true);
+    }
   }
 
   return (
@@ -79,6 +86,17 @@ function AirportSelectModal({ setIsShowModal }) {
           </div>
         </div>
       </div>
+      <Modal
+        open={showError}
+        handleClose={() => setShowError(false)}
+        title="Airport Error"
+        description="No valid airport entered"
+        footer={
+          <>
+            <PrimaryButton text="Close" onClick={() => setShowError(false)} isLoading={false} />
+          </>
+        }
+      />
     </div>
   );
 }

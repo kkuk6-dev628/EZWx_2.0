@@ -98,6 +98,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
 
   const handleSaveSettings = async (isCloseDrawer = false) => {
     if (id) {
+      setShowUpdateResultToast(true);
       dispatch(setUserSettings({ ...settings, user_id: id }));
       await updateUserSettings({ ...settings, user_id: id });
       if (isCloseDrawer) {
@@ -650,7 +651,6 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
             <PrimaryButton
               text="Save and close"
               onClick={() => {
-                setShowUpdateResultToast(true);
                 handleSaveSettings(true);
               }}
               isLoading={isUpdating}

@@ -20,7 +20,7 @@ const App = ({ Component, ...rest }: AppProps) => {
   }, []);
 
   useEffect(() => {
-    if (['/map', '/imagery', '/route-profile'].includes(pathname)) {
+    if (['/map', '/imagery', '/route-profile', '/airportwx'].includes(pathname)) {
       setShowFooter(false);
     } else {
       setShowFooter(true);

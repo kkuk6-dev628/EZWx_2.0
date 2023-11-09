@@ -18,7 +18,7 @@
     }
   }
   .auto__complete__label {
-    padding: 10px 12px;
+    padding: 10px 28px 10px 12px;
     flex-grow: 1;
     text-overflow: ellipsis;
     background-color: var(--color-secondary-highlight);
@@ -31,7 +31,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     @media (max-width: 460px) {
-      padding: 10px 8px;
+      padding: 10px 24px 10px 8px;
       font-size: 14px;
     }
   }

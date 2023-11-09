@@ -182,9 +182,14 @@ body>div{
         }
       }
     }
+    &.touch{
+      ::-webkit-scrollbar{
+        width: 0px;
+        height: 0px;
+      }
+    }
     ::-webkit-scrollbar{
-      width: 0px;
-      height: 0px;
+      height: 8px;
       color: var(--color-primary);
     }
     ::-webkit-scrollbar-thumb {
@@ -193,6 +198,11 @@ body>div{
     .route-profile-chart-container{
       overflow-x: auto;
       margin: 4px;
+      &>no-touch{
+        ::-webkit-scrollbar{
+          height: 4px;
+        }
+      }
       @media screen and (max-width: 500px) {
         margin: 0;
       }

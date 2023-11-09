@@ -52,9 +52,15 @@ import {
   temperatureContourColors,
 } from '../../utils/constants';
 import { selectCurrentAirportPos, selectViewHeight, selectViewWidth } from '../../store/airportwx/airportwx';
-import { useGetAirportwxStateQuery, useGetMeteogramDataQuery } from '../../store/airportwx/airportwxApi';
+import {
+  initialAirportWxState,
+  useGetAirportwxStateQuery,
+  useGetMeteogramDataQuery,
+  useUpdateAirportwxStateMutation,
+} from '../../store/airportwx/airportwxApi';
 import { getCurrentHour } from '../../utils/utils';
 import { weatherFontContents } from '../../utils/utils';
+import { ToggleButton } from '@mui/material';
 
 export function getXAxisValues(chartWidth, interval): { index: number; hour: number; time: Date }[] {
   const currentHour = Math.floor(Date.now() / hourInMili);
@@ -197,8 +203,8 @@ function getFlightCategoryColor(visibility, ceiling): string {
 }
 
 function calcChartWidth(viewWidth: number, _viewHeight: number) {
-  if (viewWidth < iPadPortraitWidth) {
-    return 1400;
+  if (viewWidth < 1500) {
+    return 1500;
   } else {
     return viewWidth - 140;
   }
@@ -234,24 +240,24 @@ const MeteogramChart = (props: {
     skip: currentAirportPos === null,
   });
   const userSettings = useSelector(selectSettings);
-  const { data: airportwxState, isSuccess: isAirportwxStateLoaded } = useGetAirportwxStateQuery(null, {
+  const { data: airportwxDbState, isSuccess: isAirportwxStateLoaded } = useGetAirportwxStateQuery(null, {
     refetchOnMountOrArgChange: true,
   });
   const fetchedDate = useSelector(selectFetchedDate);
-  const chartWidth = 24 * airportwxState.chartDays;
-  const interval = airportwxState.chartDays;
-  const activeRoute = useSelector(selectActiveRoute);
+  const chartWidth = 24 * airportwxDbState.chartDays;
+  const interval = airportwxDbState.chartDays;
 
   const { data: airportElevation, isSuccess: isElevationLoaded } = useGetSingleElevationQuery(currentAirportPos, {
     skip: currentAirportPos === null,
   });
   const [elevationSeries, setElevationSeries] = useState([]);
-  const startMargin = airportwxState.chartDays === 1 ? 1 : 3;
-  const endMargin = airportwxState.chartDays === 1 ? 1 : 3;
+  const startMargin = airportwxDbState.chartDays === 1 ? 1 : 3;
+  const endMargin = airportwxDbState.chartDays === 1 ? 1 : 3;
   const viewW = useSelector(selectViewWidth);
   const viewH = useSelector(selectViewHeight);
 
   const [elevationHint, setElevationHint] = useState(null);
+  const [elevationHintX, setElevationHintX] = useState(0);
   const [showElevationHint, setShowElevationHint] = useState(false);
 
   const [gradientStops, setGradientStops] = useState([]);
@@ -267,27 +273,29 @@ const MeteogramChart = (props: {
   const [dateBlocksWidth, setDateBlocksWidth] = useState(viewW);
   const [dateBlocksMargin, setDateBlockMargin] = useState(0);
   const [blockDates, setBlockDates] = useState([]);
+  const [airportwxState, setAirportwxState] = useState(initialAirportWxState);
+  const [updateAirportwxState] = useUpdateAirportwxStateMutation();
 
   const isMobile = viewH < mobileLandscapeHeight || viewW < mobileLandscapeHeight;
   const windIconScale = isMobile ? 1 : 2;
 
   useEffect(() => {
     const chartWidth = calcChartWidth(viewW, viewH);
-    const chartAxisCount = airportwxState.chartDays * 24 + 2;
+    const chartAxisCount = airportwxDbState.chartDays * 24 + 2;
     const dx = chartWidth / chartAxisCount;
     const w = chartWidth - startMargin * dx - endMargin * dx;
     setDateBlocksWidth(w);
-    setDateBlockMargin(startMargin * dx);
-  }, [viewW, airportwxState]);
+    setDateBlockMargin(startMargin * dx - 44);
+  }, [viewW, airportwxDbState]);
 
   useEffect(() => {
     const blockDays = calcBlockDays();
     setBlockDates(blockDays);
-  }, [airportwxState, userSettings.default_time_display_unit]);
+  }, [airportwxDbState, userSettings.default_time_display_unit]);
 
   function calcBlockDays() {
-    const times = getXAxisValues(airportwxState.chartDays * 24, 1).map((x) => x.time);
-    const blockCount = 24 * airportwxState.chartDays;
+    const times = getXAxisValues(airportwxDbState.chartDays * 24, 1).map((x) => x.time);
+    const blockCount = 24 * airportwxDbState.chartDays;
     let date = times[0];
     let width = 0;
     let blockCountInDate = 0;
@@ -313,12 +321,12 @@ const MeteogramChart = (props: {
 
   function buildTemperatureContourSeries() {
     if (isLoadedMGramData) {
-      if (airportwxState.showTemperature) {
+      if (airportwxDbState.showTemperature) {
         const times = getXAxisValues(chartWidth, 1);
         const { contours, contourLabels } = buildContour(
           meteogramData.temperature,
           times,
-          airportwxState.maxAltitude,
+          airportwxDbState.maxAltitude,
           !userSettings.default_temperature_unit,
         );
         setContourLabelData(contourLabels);
@@ -338,7 +346,7 @@ const MeteogramChart = (props: {
 
   useEffect(() => {
     buildTemperatureContourSeries();
-  }, [isLoadedMGramData, userSettings.default_temperature_unit, airportwxState]);
+  }, [isLoadedMGramData, userSettings.default_temperature_unit, airportwxDbState]);
 
   useEffect(() => {
     const times = getXAxisValues(chartWidth, interval);
@@ -350,7 +358,7 @@ const MeteogramChart = (props: {
       })),
     );
     setGradientStops(stops);
-  }, [isLoadedMGramData, airportwxState]);
+  }, [isLoadedMGramData, airportwxDbState]);
 
   function buildWeatherSeries(time: Date, index) {
     const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(
@@ -380,7 +388,7 @@ const MeteogramChart = (props: {
     const icon = getNbmWeatherMarkerIcon(wx_1, w_speed, w_gust, skycover, currentAirportPos, time.getTime());
     return {
       x: index,
-      y: airportwxState.maxAltitude * 100,
+      y: airportwxDbState.maxAltitude * 100,
       tooltip: {
         time: forecastTime,
         clouds: makeSkyConditions(cloudbase, cloudceiling, skycover),
@@ -424,7 +432,7 @@ const MeteogramChart = (props: {
       ];
       setElevationSeries(elevations);
     }
-  }, [isElevationLoaded, airportElevation, airportwxState]);
+  }, [isElevationLoaded, airportElevation, airportwxDbState]);
 
   function buildFlightCategorySeries() {
     if (queryNbmAllResult.isSuccess && isLoadedMGramData) {
@@ -457,8 +465,8 @@ const MeteogramChart = (props: {
           flightCategoryData.push({
             x0: curr.index - interval / 2,
             x: curr.index + interval / 2,
-            y0: (-airportwxState.maxAltitude * 100) / 50,
-            y: -airportwxState.maxAltitude / 5,
+            y0: (-airportwxDbState.maxAltitude * 100) / 50,
+            y: -airportwxDbState.maxAltitude / 5,
             color: flightCategoryColor,
             tooltip: {
               time: forecastTime,
@@ -480,14 +488,14 @@ const MeteogramChart = (props: {
 
   useEffect(() => {
     buildFlightCategorySeries();
-  }, [queryNbmAllResult.isSuccess, isLoadedMGramData, airportwxState]);
+  }, [queryNbmAllResult.isSuccess, isLoadedMGramData, airportwxDbState]);
 
   useEffect(() => {
-    if (airportwxState) {
+    if (airportwxDbState) {
       const dx = (calcChartWidth(viewW, viewH) - 40) / (chartWidth + startMargin + endMargin);
       const dy =
         (calcChartHeight(viewW, viewH) - (isMobile ? 64 : 72) - (16 * windIconScale + 4)) /
-        (airportwxState.maxAltitude * 100);
+        (airportwxDbState.maxAltitude * 100);
       if (props.setValue2PixelRate)
         props.setValue2PixelRate(
           dx,
@@ -498,20 +506,20 @@ const MeteogramChart = (props: {
           calcChartHeight(viewW, viewH),
         );
     }
-  }, [airportwxState, viewW, viewH, startMargin, windIconScale, isMobile]);
+  }, [airportwxDbState, viewW, viewH, startMargin, windIconScale, isMobile]);
 
   return (
     <div
       className="scrollable-chart-content"
       style={{ width: calcChartWidth(viewW, viewH), height: calcChartHeight(viewW, viewH) + 40, position: 'relative' }}
     >
-      {airportwxState && (
+      {airportwxDbState && (
         <XYPlot
           key={viewH}
           height={calcChartHeight(viewW, viewH)}
           width={calcChartWidth(viewW, viewH)}
           color="white"
-          yDomain={[0, airportwxState.maxAltitude * 100]}
+          yDomain={[0, airportwxDbState.maxAltitude * 100]}
           xDomain={[-startMargin, chartWidth + endMargin]}
           margin={{ left: 0, right: 0, bottom: isMobile ? 32 : 42, top: 16 * windIconScale + 4 }}
           style={{ position: 'relative' }}
@@ -530,8 +538,8 @@ const MeteogramChart = (props: {
           {props.showDayNightBackground && (
             <AreaSeries
               data={[
-                { x: -startMargin, y: airportwxState.maxAltitude * 100 },
-                { x: chartWidth + endMargin, y: airportwxState.maxAltitude * 100 },
+                { x: -startMargin, y: airportwxDbState.maxAltitude * 100 },
+                { x: chartWidth + endMargin, y: airportwxDbState.maxAltitude * 100 },
               ]}
               color={'url(#linear-gradient)'}
             />
@@ -539,8 +547,8 @@ const MeteogramChart = (props: {
           {!props.showDayNightBackground && (
             <AreaSeries
               data={[
-                { x: -startMargin, y: airportwxState.maxAltitude * 100 },
-                { x: chartWidth + endMargin, y: airportwxState.maxAltitude * 100 },
+                { x: -startMargin, y: airportwxDbState.maxAltitude * 100 },
+                { x: chartWidth + endMargin, y: airportwxDbState.maxAltitude * 100 },
               ]}
               color="#F2F0F0"
             />
@@ -552,10 +560,10 @@ const MeteogramChart = (props: {
               strokeWidth: 0.2,
             }}
           />
-          {airportwxState.chartType === 'Wind' && (
+          {airportwxDbState.chartType === 'Wind' && (
             <HorizontalGridLines
               tickValues={Array.from({ length: 5 - 1 }, (_value, index) =>
-                Math.round(((index + 1) * airportwxState.maxAltitude * 100) / 5),
+                Math.round(((index + 1) * airportwxDbState.maxAltitude * 100) / 5),
               )}
               style={{
                 stroke: 'grey',
@@ -565,7 +573,7 @@ const MeteogramChart = (props: {
           )}
           <HorizontalGridLines
             tickValues={Array.from({ length: 5 }, (_value, index) =>
-              Math.round(((index + 0.5) * airportwxState.maxAltitude * 100) / 5),
+              Math.round(((index + 0.5) * airportwxDbState.maxAltitude * 100) / 5),
             )}
             style={{
               stroke: 'grey',
@@ -593,11 +601,11 @@ const MeteogramChart = (props: {
               text: { stroke: 'none', fill: 'white', fontWeight: 600, marginTop: 36 },
             }}
           />
-          {airportwxState.chartType !== 'Wind' && activeRoute ? props.children : null}
-          {airportwxState.chartType !== 'Wind' && (
+          {airportwxDbState.chartType !== 'Wind' ? props.children : null}
+          {airportwxDbState.chartType !== 'Wind' && (
             <HorizontalGridLines
               tickValues={Array.from({ length: 5 - 1 }, (_value, index) =>
-                Math.round(((index + 1) * airportwxState.maxAltitude * 100) / 5),
+                Math.round(((index + 1) * airportwxDbState.maxAltitude * 100) / 5),
               )}
               style={{
                 stroke: 'grey',
@@ -605,8 +613,8 @@ const MeteogramChart = (props: {
               }}
             />
           )}
-          {airportwxState.chartType !== 'Turb' &&
-            airportwxState.showTemperature &&
+          {airportwxDbState.chartType !== 'Turb' &&
+            airportwxDbState.showTemperature &&
             temperatureContures &&
             temperatureContures.map((contourLine, index) => {
               const color =
@@ -627,10 +635,10 @@ const MeteogramChart = (props: {
                 />
               );
             })}
-          {airportwxState.chartType !== 'Turb' && airportwxState.showTemperature && contourLabelData && (
+          {airportwxDbState.chartType !== 'Turb' && airportwxDbState.showTemperature && contourLabelData && (
             <LabelSeries animation allowOffsetToBeReversed data={contourLabelData}></LabelSeries>
           )}
-          {airportwxState.chartType === 'Wind' && activeRoute ? props.children : null}
+          {airportwxDbState.chartType === 'Wind' ? props.children : null}
           {elevationSeries.length > 0 && (
             <AreaSeries
               data={elevationSeries}
@@ -640,7 +648,10 @@ const MeteogramChart = (props: {
               stroke="#443322"
               onNearestXY={(datapoint) => setElevationHint(datapoint)}
               onSeriesMouseOut={() => setShowElevationHint(false)}
-              onSeriesMouseOver={() => setShowElevationHint(true)}
+              onSeriesMouseOver={(event) => {
+                setElevationHintX(event.event.clientX);
+                setShowElevationHint(true);
+              }}
             />
           )}
           <CustomSVGSeries
@@ -648,7 +659,7 @@ const MeteogramChart = (props: {
             data={[
               {
                 x: -startMargin,
-                y: airportwxState.maxAltitude * 100,
+                y: airportwxDbState.maxAltitude * 100,
                 customComponent: () => {
                   return (
                     <rect
@@ -686,7 +697,7 @@ const MeteogramChart = (props: {
               data={[
                 {
                   x: chartWidth / 2,
-                  y: (airportwxState.maxAltitude * 100) / 2,
+                  y: (airportwxDbState.maxAltitude * 100) / 2,
                   customComponent: (_row, _positionInPixels) => {
                     return (
                       <switch>
@@ -712,11 +723,11 @@ const MeteogramChart = (props: {
               data={[
                 {
                   x: chartWidth / 2,
-                  y: 40000,
+                  y: 35000,
                   customComponent: (_row, _positionInPixels) => {
                     return (
                       <switch>
-                        <foreignObject x="-150" y="-60" width="300" height="200">
+                        <foreignObject x="-150" y="-10" width="300" height="200">
                           <p className="nodata-msg">{props.noIcingAbove30000}</p>
                         </foreignObject>
 
@@ -734,7 +745,7 @@ const MeteogramChart = (props: {
             />
           )}
           {showElevationHint && elevationHint ? (
-            <Hint value={elevationHint}>
+            <Hint value={elevationHint} className="elevation-tooltip">
               <div style={{ background: 'white', color: 'black', padding: 4, borderRadius: 4 }}>{elevationHint.y}</div>
             </Hint>
           ) : null}
@@ -832,19 +843,31 @@ const MeteogramChart = (props: {
           )}
         </XYPlot>
       )}
-      <div className="date-block-container" style={{ width: dateBlocksWidth, marginLeft: dateBlocksMargin }}>
-        {blockDates.map((item, index) => (
-          <div key={'date' + index} className="date" style={{ width: item.width + '%' }}>
-            {item.width > 5
-              ? item.date.toLocaleDateString('en-US', {
-                  weekday: 'short',
-                  day: 'numeric',
-                  month: 'numeric',
-                  timeZone: userSettings.default_time_display_unit ? undefined : 'UTC',
-                })
-              : ''}
-          </div>
-        ))}
+      <div className="days">
+        <div
+          className="select-chart-width-days"
+          onClick={() => {
+            const newState = { ...airportwxDbState, chartDays: airportwxDbState.chartDays === 1 ? 3 : 1 };
+            setAirportwxState(newState);
+            updateAirportwxState(newState);
+          }}
+        >
+          {airportwxState.chartDays === 1 ? 3 : 1}-Day
+        </div>
+        <div className="date-block-container" style={{ width: dateBlocksWidth, marginLeft: dateBlocksMargin }}>
+          {blockDates.map((item, index) => (
+            <div key={'date' + index} className="date" style={{ width: item.width + '%' }}>
+              {item.width > 5
+                ? item.date.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'numeric',
+                    timeZone: userSettings.default_time_display_unit ? undefined : 'UTC',
+                  })
+                : ''}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

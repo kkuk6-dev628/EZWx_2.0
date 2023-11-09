@@ -421,12 +421,21 @@ export default function Header() {
         mapMenu={mapMenu}
         workMenu={workMenu}
         homeMenu={homeMenu}
+        handleClickMenu={handleClickMenu}
       />
     </div>
   );
 }
 
-const ResponsiveMenu = ({ activeResponsiveMenu, activeMenu, handleActiveMenu, mapMenu, workMenu, homeMenu }) => {
+const ResponsiveMenu = ({
+  activeResponsiveMenu,
+  activeMenu,
+  handleActiveMenu,
+  mapMenu,
+  workMenu,
+  homeMenu,
+  handleClickMenu,
+}) => {
   const responsiveMenu = [
     {
       id: 0,
@@ -447,7 +456,7 @@ const ResponsiveMenu = ({ activeResponsiveMenu, activeMenu, handleActiveMenu, ma
                   activeMenu && activeMenu === link.id ? 'responsive__menu__active' : ''
                 }`}
               >
-                <Link href={link.link}>
+                <Link href={link.link} onClick={(e) => handleClickMenu(e, link.link)}>
                   <span className="responsive__menu__link">{link.name}</span>
                 </Link>
               </div>
