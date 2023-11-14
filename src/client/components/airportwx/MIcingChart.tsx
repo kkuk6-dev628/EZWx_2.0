@@ -210,6 +210,15 @@ const MIcingChart = (props) => {
           }
         }
       });
+      icingData.push({
+        x0: chartWidth + 0.5,
+        y0: 0,
+        x: chartWidth + (airportwxState.chartDays === 1 ? 1 : 3),
+        y: airportwxState.maxAltitude * 100,
+        color: '#666',
+        opacity: hatchOpacity,
+      });
+
       setIcingSeries(icingData);
     }
   }

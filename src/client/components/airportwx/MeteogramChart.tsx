@@ -13,9 +13,9 @@ import {
   VerticalRectSeries,
   CustomSVGSeries,
 } from 'react-vis';
-import { selectActiveRoute } from '../../store/route/routes';
+import { getFuzzyLocalTimeFromPoint } from '@mapbox/timespace';
 import { initialUserSettingsState, selectSettings } from '../../store/user/UserSettings';
-import { useQueryNbmAllMutation } from '../../store/route-profile/routeProfileApi';
+import { useQueryAirportNbmMutation, useQueryNbmAllMutation } from '../../store/route-profile/routeProfileApi';
 import { useGetSingleElevationQuery, useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
 import { selectFetchedDate, selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import {
@@ -24,6 +24,7 @@ import {
   convertTimeFormat,
   getMetarCeilingCategory,
   getMetarVisibilityCategory,
+  knotsToMph,
   meterToFeet,
   round,
   roundCloudHeight,
@@ -42,6 +43,7 @@ import {
   getNbmWeatherMarkerIcon,
   flightCategoryToColor,
   makeSkyConditions,
+  getAirportNbmData,
 } from '../../utils/utils';
 import {
   cacheKeys,
@@ -51,7 +53,12 @@ import {
   mobileLandscapeHeight,
   temperatureContourColors,
 } from '../../utils/constants';
-import { selectCurrentAirportPos, selectViewHeight, selectViewWidth } from '../../store/airportwx/airportwx';
+import {
+  selectCurrentAirport,
+  selectCurrentAirportPos,
+  selectViewHeight,
+  selectViewWidth,
+} from '../../store/airportwx/airportwx';
 import {
   initialAirportWxState,
   useGetAirportwxStateQuery,
@@ -235,6 +242,7 @@ const MeteogramChart = (props: {
     height: number,
   ) => void;
 }) => {
+  const currentAirport = useSelector(selectCurrentAirport);
   const currentAirportPos = useSelector(selectCurrentAirportPos);
   const { isSuccess: isLoadedMGramData, data: meteogramData } = useGetMeteogramDataQuery(currentAirportPos, {
     skip: currentAirportPos === null,
@@ -267,9 +275,12 @@ const MeteogramChart = (props: {
   const [weatherHint, setWeatherHint] = useState(null);
   const [flightCategorySeries, setFlightCategorySeries] = useState(null);
   const [flightCatHint, setFlightCatHint] = useState(null);
+  const [timeHint, setTimeHint] = useState(null);
+
   const [queryNbmAll, queryNbmAllResult] = useQueryNbmAllMutation({
     fixedCacheKey: cacheKeys.nbm,
   });
+  const [queryAirportNbm, queryAirportNbmResult] = useQueryAirportNbmMutation();
   const [dateBlocksWidth, setDateBlocksWidth] = useState(viewW);
   const [dateBlocksMargin, setDateBlockMargin] = useState(0);
   const [blockDates, setBlockDates] = useState([]);
@@ -339,10 +350,16 @@ const MeteogramChart = (props: {
   }
 
   useEffect(() => {
-    if (currentAirportPos) {
+    if (currentAirport) {
+      queryAirportNbm([currentAirport]);
+    }
+  }, [currentAirport]);
+
+  useEffect(() => {
+    if (currentAirportPos && !queryAirportNbmResult.isLoading) {
       queryNbmAll({ queryPoints: [[currentAirportPos.lng, currentAirportPos.lat]] });
     }
-  }, [currentAirportPos]);
+  }, [currentAirportPos, queryAirportNbmResult.isLoading]);
 
   useEffect(() => {
     buildTemperatureContourSeries();
@@ -360,7 +377,7 @@ const MeteogramChart = (props: {
     setGradientStops(stops);
   }, [isLoadedMGramData, airportwxDbState]);
 
-  function buildWeatherSeries(time: Date, index) {
+  function getWeatherMarker(time: Date, index) {
     const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(
       meteogramData.cloudceiling,
       time,
@@ -422,11 +439,11 @@ const MeteogramChart = (props: {
       const elevationApiResults = airportElevation.geoPoints;
       const elevations = [
         {
-          x: -1,
+          x: -startMargin,
           y: meterToFeet(elevationApiResults[0].elevation),
         },
         {
-          x: chartWidth + 1,
+          x: chartWidth + endMargin,
           y: meterToFeet(elevationApiResults[0].elevation),
         },
       ];
@@ -435,8 +452,8 @@ const MeteogramChart = (props: {
   }, [isElevationLoaded, airportElevation, airportwxDbState]);
 
   function buildFlightCategorySeries() {
-    if (queryNbmAllResult.isSuccess && isLoadedMGramData) {
-      const timesToShow = getXAxisValues(chartWidth, interval);
+    if (queryNbmAllResult.isSuccess && queryAirportNbmResult.data && isLoadedMGramData) {
+      const timesToShow = getXAxisValues(chartWidth, 1);
       const flightCategoryData = [];
       const weatherSeries = [];
       timesToShow.forEach((curr) => {
@@ -462,20 +479,65 @@ const MeteogramChart = (props: {
           );
           const skyConditions = makeSkyConditions(cloudbase, cloudceiling, skycover);
           const flightCategoryColor = getFlightCategoryColor(visibility, cloudceiling);
+          const { value: w_speed } = getValueFromDatasetByElevation(
+            queryNbmAllResult.data?.windspeed,
+            curr.time,
+            null,
+            0,
+          );
+          const { value: w_gust } = getValueFromDatasetByElevation(queryNbmAllResult.data?.gust, curr.time, null, 0);
+          const { value: w_direction } = getValueFromDatasetByElevation(
+            queryNbmAllResult.data?.winddir,
+            curr.time,
+            null,
+            0,
+          );
+          const { value: temperature } = getValueFromDatasetByElevation(
+            queryNbmAllResult.data?.temperature,
+            curr.time,
+            null,
+            0,
+          );
+          const { value: dewpoint } = getValueFromDatasetByElevation(
+            queryNbmAllResult.data?.dewpoint,
+            curr.time,
+            null,
+            0,
+          );
+
+          const { data: forCrosswind } = getAirportNbmData(
+            queryAirportNbmResult.data,
+            curr.time.getTime(),
+            currentAirport,
+          );
+          const crosscom = forCrosswind?.cross_com;
+          const crossRunwayId = forCrosswind?.cross_r_id;
+
           flightCategoryData.push({
-            x0: curr.index - interval / 2,
-            x: curr.index + interval / 2,
-            y0: (-airportwxDbState.maxAltitude * 100) / 50,
+            x0: curr.index - 0.5,
+            x: curr.index + 0.5,
+            y0:
+              (-airportwxDbState.maxAltitude * 100) / 50 -
+              (viewH < mobileLandscapeHeight ? airportwxDbState.maxAltitude * 2 : 0),
             y: -airportwxDbState.maxAltitude / 5,
             color: flightCategoryColor,
             tooltip: {
               time: forecastTime,
               clouds: skyConditions,
+              cloudbase,
+              cloudceiling,
               visibility: visibility,
+              windspeed: w_speed,
+              winddirection: w_direction,
+              windgust: w_gust,
+              temperature,
+              dewpoint,
+              crosscom,
+              crossrunway: crossRunwayId,
               position: currentAirportPos,
             },
           });
-          const weatherData = buildWeatherSeries(curr.time, curr.index);
+          const weatherData = getWeatherMarker(curr.time, curr.index);
           weatherSeries.push(weatherData);
         } catch (err) {
           console.warn(err);
@@ -486,9 +548,25 @@ const MeteogramChart = (props: {
     }
   }
 
+  function buildWeatherSeries() {
+    if (queryNbmAllResult.isSuccess && isLoadedMGramData) {
+      const timesToShow = getXAxisValues(chartWidth, interval);
+      const weatherSeries = [];
+      timesToShow.forEach((curr) => {
+        try {
+          const weatherData = getWeatherMarker(curr.time, curr.index);
+          weatherSeries.push(weatherData);
+        } catch (err) {
+          console.warn(err);
+        }
+      });
+      setWeatherIconData(weatherSeries);
+    }
+  }
   useEffect(() => {
     buildFlightCategorySeries();
-  }, [queryNbmAllResult.isSuccess, isLoadedMGramData, airportwxDbState]);
+    buildWeatherSeries();
+  }, [queryNbmAllResult.isSuccess, queryAirportNbmResult.data, isLoadedMGramData, airportwxDbState, viewH]);
 
   useEffect(() => {
     if (airportwxDbState) {
@@ -513,7 +591,7 @@ const MeteogramChart = (props: {
       className="scrollable-chart-content"
       style={{ width: calcChartWidth(viewW, viewH), height: calcChartHeight(viewW, viewH) + 40, position: 'relative' }}
     >
-      {airportwxDbState && (
+      {airportwxDbState && currentAirportPos && (
         <XYPlot
           key={viewH}
           height={calcChartHeight(viewW, viewH)}
@@ -580,26 +658,32 @@ const MeteogramChart = (props: {
               strokeWidth: 0.2,
             }}
           />
-          <XAxis
-            tickValues={getXAxisValues(chartWidth, interval).map((x) => x.index)}
-            tickFormat={(v, index) => {
-              const currentHour = getCurrentHour();
-              const time = new Date((currentHour + v) * hourInMili);
-              const hour = userSettings.default_time_display_unit ? time.getHours() : time.getUTCHours();
-              const offset = isMobile ? '1em' : '1.2em';
-              return (
-                <tspan dy={offset} className="chart-label">
-                  <tspan className="chart-label-dist">
-                    {addLeadingZeroes(hour, 2) + (userSettings.default_time_display_unit ? '' : 'Z')}
-                  </tspan>
-                </tspan>
-              );
+          <LabelSeries
+            onValueMouseOver={(value) => {
+              setTimeHint(value);
             }}
-            style={{
-              line: { stroke: '#ADDDE100' },
-              ticks: { stroke: '#ADDDE100' },
-              text: { stroke: 'none', fill: 'white', fontWeight: 600, marginTop: 36 },
-            }}
+            onValueClick={(value) => setTimeHint(value)}
+            onValueMouseOut={() => setTimeHint(null)}
+            data={getXAxisValues(chartWidth, interval).map((x) => {
+              const localTime = getFuzzyLocalTimeFromPoint(x.time, [currentAirportPos.lng, currentAirportPos.lat]);
+              return {
+                x: x.index,
+                y: 0,
+                yOffset: isMobile ? 32 : 36,
+                label: userSettings.default_time_display_unit
+                  ? addLeadingZeroes(x.time.getHours(), 2)
+                  : addLeadingZeroes(x.time.getUTCHours(), 2) + 'Z',
+                time: x.time,
+                localtime: localTime,
+                style: {
+                  fill: 'white',
+                  dominantBaseline: 'text-after-edge',
+                  textAnchor: 'start',
+                  fontSize: 12,
+                  fontWeight: 500,
+                },
+              };
+            })}
           />
           {airportwxDbState.chartType !== 'Wind' ? props.children : null}
           {airportwxDbState.chartType !== 'Wind' && (
@@ -647,7 +731,7 @@ const MeteogramChart = (props: {
               strokeWidth={1}
               stroke="#443322"
               onNearestXY={(datapoint) => setElevationHint(datapoint)}
-              onSeriesMouseOut={() => setShowElevationHint(false)}
+              // onSeriesMouseOut={() => setShowElevationHint(false)}
               onSeriesMouseOver={(event) => {
                 setElevationHintX(event.event.clientX);
                 setShowElevationHint(true);
@@ -749,6 +833,15 @@ const MeteogramChart = (props: {
               <div style={{ background: 'white', color: 'black', padding: 4, borderRadius: 4 }}>{elevationHint.y}</div>
             </Hint>
           ) : null}
+          {timeHint ? (
+            <Hint value={timeHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
+              {-timeHint.localtime.utcOffset() !== new Date().getTimezoneOffset() && (
+                <span>{timeHint.localtime.format('ddd, MMM DD, YYYY kk:mm z')}</span>
+              )}
+              <span>{convertTimeFormat(timeHint.time, true)}</span>
+              <span>{convertTimeFormat(timeHint.time, false)}</span>
+            </Hint>
+          ) : null}
           {weatherHint && (
             <Hint value={weatherHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'bottom' }}>
               <span>
@@ -791,12 +884,6 @@ const MeteogramChart = (props: {
                   })}
                 </div>
               </div>
-              <span>
-                <b>Latitude:</b>&nbsp;{weatherHint.tooltip.position.lat}
-              </span>
-              <span>
-                <b>Longitude:</b>&nbsp;{weatherHint.tooltip.position.lng}
-              </span>
             </Hint>
           )}
           {flightCatHint && (
@@ -826,6 +913,12 @@ const MeteogramChart = (props: {
                   })}
                 </div>
               </div>
+              <span>
+                <b>Lowest Cloud:</b>&nbsp;{Math.round(flightCatHint.tooltip.cloudbase)}
+              </span>
+              <span>
+                <b>Ceiling:</b>&nbsp;{Math.round(flightCatHint.tooltip.cloudceiling)}
+              </span>
 
               <span>
                 <b>Visibility:</b>&nbsp;
@@ -834,10 +927,51 @@ const MeteogramChart = (props: {
                   : visibilityMileToMeter(flightCatHint.tooltip.visibility)}
               </span>
               <span>
-                <b>Latitude:</b>&nbsp;{flightCatHint.tooltip.position.lat}
+                <b>Wind speed:</b>&nbsp;
+                {!userSettings.default_wind_speed_unit
+                  ? Math.round(flightCatHint.tooltip.windspeed) +
+                    (Math.round(flightCatHint.tooltip.windspeed) <= 1 ? ' knot' : ' knots')
+                  : Math.round(knotsToMph(flightCatHint.tooltip.windspeed)) + ' mph'}
               </span>
               <span>
-                <b>Longitude:</b>&nbsp;{flightCatHint.tooltip.position.lng}
+                <b>Wind direction:</b>&nbsp;
+                {addLeadingZeroes(Math.round(flightCatHint.tooltip.winddirection), 3) + ' \u00B0'}
+              </span>
+              {flightCatHint.tooltip.windgust > 10 &&
+                Math.abs(flightCatHint.tooltip.windgust - flightCatHint.tooltip.windspeed) > 4 && (
+                  <span>
+                    <b>Wind gust:</b>&nbsp;
+                    {!userSettings.default_wind_speed_unit
+                      ? Math.round(flightCatHint.tooltip.windgust) +
+                        (Math.round(flightCatHint.tooltip.windgust) <= 1 ? ' knot' : ' knots')
+                      : Math.round(knotsToMph(flightCatHint.tooltip.windgust)) + ' mph'}
+                  </span>
+                )}
+              {flightCatHint.tooltip.crosscom > 0 && (
+                <span>
+                  <b>Crosswind component:</b>&nbsp;
+                  {!userSettings.default_wind_speed_unit
+                    ? Math.round(flightCatHint.tooltip.crosscom) +
+                      (Math.round(flightCatHint.tooltip.crosscom) <= 1 ? ' knot' : ' knots')
+                    : Math.round(knotsToMph(flightCatHint.tooltip.crosscom)) + ' mph'}
+                </span>
+              )}
+              {flightCatHint.tooltip.crossrunway && (
+                <span>
+                  <b>Crosswind runway:</b>&nbsp;{flightCatHint.tooltip.crossrunway}
+                </span>
+              )}
+              <span>
+                <b>Temperature:</b>&nbsp;
+                {!userSettings.default_temperature_unit
+                  ? Math.round(flightCatHint.tooltip.temperature) + ' \u00B0C'
+                  : celsiusToFahrenheit(flightCatHint.tooltip.temperature, 0) + ' \u00B0F'}
+              </span>
+              <span>
+                <b>Dewpoint:</b>&nbsp;{' '}
+                {!userSettings.default_temperature_unit
+                  ? Math.round(flightCatHint.tooltip.dewpoint) + ' \u00B0C'
+                  : celsiusToFahrenheit(flightCatHint.tooltip.dewpoint, 0) + ' \u00B0F'}
               </span>
             </Hint>
           )}

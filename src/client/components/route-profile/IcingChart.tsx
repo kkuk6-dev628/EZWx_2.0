@@ -150,7 +150,7 @@ const IcingChart = (props) => {
           );
           speed = groundSpeed;
         }
-        for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
+        for (let elevation = 1000; elevation <= routeProfileApiState.maxAltitude * 100; elevation += 1000) {
           let time;
           let color = colorsByEdr.none;
           let opacity = visibleOpacity;
@@ -165,7 +165,16 @@ const IcingChart = (props) => {
               sev: 'None',
               sld: 'None',
             };
-          } else {
+            icingData.push({
+              x0: accDistance - distance,
+              y0: elevation - 500,
+              x: accDistance,
+              y: elevation + 500,
+              color: color,
+              opacity: opacity,
+              hint,
+            });
+          } else if (elevation <= maxForecastElevation) {
             let { value: prob, time: provTime } = getValueFromDatasetByElevation(
               queryIcingTurbDataResult.data?.prob,
               new Date(arriveTime),
@@ -249,16 +258,16 @@ const IcingChart = (props) => {
               sev: sevData.label,
               sld: sld ? sld + ' %' : 'None',
             };
+            icingData.push({
+              x0: accDistance - distance,
+              y0: elevation - 500,
+              x: accDistance,
+              y: elevation + 500,
+              color: color,
+              opacity: opacity,
+              hint,
+            });
           }
-          icingData.push({
-            x0: accDistance - distance,
-            y0: elevation - 500,
-            x: accDistance,
-            y: elevation + 500,
-            color: color,
-            opacity: opacity,
-            hint,
-          });
         }
         arriveTime = arriveTime + (hourInMili * distance) / speed;
       });
@@ -267,7 +276,7 @@ const IcingChart = (props) => {
         const end = accDistance + calcEndMargin(activeRoute);
         const hint = icingData[icingData.length - 1].hint;
         while (end - (accDistance + distance) > -0.1 * distance) {
-          for (let elevation = 1000; elevation <= maxElevation; elevation += 1000) {
+          for (let elevation = 1000; elevation <= routeProfileApiState.maxAltitude * 100; elevation += 1000) {
             icingData.push({
               x0: accDistance,
               y0: elevation - 500,

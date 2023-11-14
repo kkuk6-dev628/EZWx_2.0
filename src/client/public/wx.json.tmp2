@@ -23018,10 +23018,12 @@
         "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 750,
-        "SUBTAB_GROUP": {
-          "SUBTAB": [
+        "SUBTAB_GROUP": [
+          {
+            "GROUP_NAME": "1,000 ft to 9,000 ft",
+            "SUBTAB": [
               {
-                "SUBTABLABEL": "Icing Prob at 1,000'",
+                "SUBTABLABEL": "Icing Probability at 1,000'",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_1K",
                 "IMAGE": [
@@ -23052,7 +23054,7 @@
                 ]
               },
               {
-                "SUBTABLABEL": "Icing Prob at 3,000'",
+                "SUBTABLABEL": "Icing Probability at 3,000'",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_3K",
                 "IMAGE": [
@@ -23083,7 +23085,7 @@
                 ]
               },
               {
-                "SUBTABLABEL": "Icing Prob at 5,000'",
+                "SUBTABLABEL": "Icing Probability at 5,000'",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_5K",
                 "IMAGE": [
@@ -23114,7 +23116,7 @@
                 ]
               },
               {
-                "SUBTABLABEL": "Icing Prob at 7,000'",
+                "SUBTABLABEL": "Icing Probability at 7,000'",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_7K",
                 "IMAGE": [
@@ -23145,7 +23147,7 @@
                 ]
               },
               {
-                "SUBTABLABEL": "Icing Prob at 9,000'",
+                "SUBTABLABEL": "Icing Probability at 9,000'",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_9K",
                 "IMAGE": [
@@ -23174,9 +23176,14 @@
                     "URL": "/wx/data/fip/f18/adds_prob_5.gif"
                   }
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "GROUP_NAME": "11,000 ft to FL190",
+            "SUBTAB": [
               {
-                "SUBTABLABEL": "Icing Prob at 11,000'",
+                "SUBTABLABEL": "Icing Probability at 11,000'",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_11K",
                 "IMAGE": [
@@ -23207,7 +23214,7 @@
                 ]
               },
               {
-                "SUBTABLABEL": "Icing Prob at 13,000'",
+                "SUBTABLABEL": "Icing Probability at 13,000'",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_13K",
                 "IMAGE": [
@@ -23238,7 +23245,7 @@
                 ]
               },
               {
-                "SUBTABLABEL": "Icing Prob at 15,000'",
+                "SUBTABLABEL": "Icing Probability at 15,000'",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_15K",
                 "IMAGE": [
@@ -23269,7 +23276,7 @@
                 ]
               },
               {
-                "SUBTABLABEL": "Icing Prob at 17,000'",
+                "SUBTABLABEL": "Icing Probability at 17,000'",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_17K",
                 "IMAGE": [
@@ -23300,7 +23307,7 @@
                 ]
               },
               {
-                "SUBTABLABEL": "Icing Prob at FL190",
+                "SUBTABLABEL": "Icing Probability at FL190",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_19K",
                 "IMAGE": [
@@ -23329,9 +23336,14 @@
                     "URL": "/wx/data/fip/f18/adds_prob_10.gif"
                   }
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "GROUP_NAME": "FL210 to FL290",
+            "SUBTAB": [
               {
-                "SUBTABLABEL": "Icing Prob at FL210",
+                "SUBTABLABEL": "Icing Probability at FL210",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_21K",
                 "IMAGE": [
@@ -23362,7 +23374,7 @@
                 ]
               },
               {
-                "SUBTABLABEL": "Icing Prob at FL230",
+                "SUBTABLABEL": "Icing Probability at FL230",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_23K",
                 "IMAGE": [
@@ -23393,7 +23405,7 @@
                 ]
               },
               {
-                "SUBTABLABEL": "Icing Prob at FL250",
+                "SUBTABLABEL": "Icing Probability at FL250",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_25K",
                 "IMAGE": [
@@ -23424,7 +23436,7 @@
                 ]
               },
               {
-                "SUBTABLABEL": "Icing Prob at FL270",
+                "SUBTABLABEL": "Icing Probability at FL270",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_27K",
                 "IMAGE": [
@@ -23455,7 +23467,7 @@
                 ]
               },
               {
-                "SUBTABLABEL": "Icing Prob at FL290",
+                "SUBTABLABEL": "Icing Probability at FL290",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
                 "FAVORITE_ID": "FIP_PROB_HR_29K",
                 "IMAGE": [
@@ -23485,8 +23497,9 @@
                   }
                 ]
               }
-          ]
-        }
+            ]
+          }
+        ]
       },
       {
         "TITLE": "Icing Severity",
@@ -23494,8 +23507,10 @@
         "LOOP": "First",
         "ACCESS": "Full",
         "DELAY": 750,
-        "SUBTAB_GROUP": {
-          "SUBTAB": [
+        "SUBTAB_GROUP": [
+          {
+            "GROUP_NAME": "1,000 ft to 9,000 ft",
+            "SUBTAB": [
               {
                 "SUBTABLABEL": "Icing Severity at 1,000'",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
@@ -23650,7 +23665,12 @@
                     "URL": "/wx/data/fip/f18/adds_sev25_5.gif"
                   }
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "GROUP_NAME": "11,000 ft to FL190",
+            "SUBTAB": [
               {
                 "SUBTABLABEL": "Icing Severity at 11,000'",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
@@ -23805,7 +23825,12 @@
                     "URL": "/wx/data/fip/f18/adds_sev25_10.gif"
                   }
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "GROUP_NAME": "FL210 to FL290",
+            "SUBTAB": [
               {
                 "SUBTABLABEL": "Icing Severity at FL210",
                 "JSON_URL": "/wx/data/fip/cip_fip.json",
@@ -23961,8 +23986,9 @@
                   }
                 ]
               }
-          ]
-        }
+            ]
+          }
+        ]
       },
       {
         "TITLE": "Clear Air Turbulence",

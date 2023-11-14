@@ -3,7 +3,13 @@ import MapTabs from '../components/shared/MapTabs';
 import { SvgBackward, SvgBookmark, SvgForward, SvgRefresh, SvgRoute } from '../components/utils/SvgIcons';
 import { AutoCompleteInput } from '../components/common';
 import Meteogram from '../components/airportwx/Meteogram';
-import { useAddRecentAirportMutation, useGetRecentAirportQuery } from '../store/airportwx/airportwxApi';
+import {
+  initialAirportWxState,
+  useAddRecentAirportMutation,
+  useGetAirportwxStateQuery,
+  useGetRecentAirportQuery,
+  useUpdateAirportwxStateMutation,
+} from '../store/airportwx/airportwxApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { selectCurrentAirport, setCurrentAirport } from '../store/airportwx/airportwx';
@@ -25,6 +31,17 @@ function AirportWxPage() {
   const dispatch = useDispatch();
   const [addRecentAirport] = useAddRecentAirportMutation();
   const [showRouteEditor, setShowRouteEditor] = useState(false);
+  const { data: airportwxDbState, isSuccess: isAirportwxStateLoaded } = useGetAirportwxStateQuery(null, {
+    refetchOnMountOrArgChange: true,
+  });
+  const [airportwxState, setAirportwxState] = useState(initialAirportWxState);
+  const [updateAirportwxState] = useUpdateAirportwxStateMutation();
+
+  useEffect(() => {
+    if (airportwxDbState) {
+      setAirportwxState({ ...airportwxDbState });
+    }
+  }, [airportwxDbState]);
 
   useEffect(() => {
     if (isSuccessRecentAirports && recentAirports.length > 0) {
@@ -116,60 +133,62 @@ function AirportWxPage() {
   ];
 
   function changeViews(event: SelectChangeEvent) {
-    console.log(event.target.value);
+    updateAirportwxState({ ...airportwxDbState, viewType: event.target.value });
   }
 
   return (
-    <div className="airportwx-page">
-      <Dialog
-        PaperComponent={PaperComponent}
-        hideBackdrop
-        disableEnforceFocus
-        style={{ position: 'absolute' }}
-        open={showRouteEditor}
-        onClose={() => setShowRouteEditor(false)}
-      >
-        <Route setIsShowModal={setShowRouteEditor} />
-      </Dialog>{' '}
-      <div className="tab-menus">
-        <MapTabs tabMenus={tabMenus} />
-      </div>
-      <div className="main-container">
-        <div className="primary-bar">
-          <FormControl className="select-view">
-            <Select value={'meteogram'} onChange={changeViews}>
-              <MenuItem value={'meteogram'}>Meteogram</MenuItem>
-              <MenuItem value={'metars'}>METARs</MenuItem>
-              <MenuItem value={'tafs'}>TAFs</MenuItem>
-              <MenuItem value={'discussion'}>Discussion</MenuItem>
-              <MenuItem value={'skew-t'}>Skew-T</MenuItem>
-            </Select>
-          </FormControl>
-          <div className="select-airport">
-            <AutoCompleteInput
-              name="default_home_airport"
-              selectedValue={currentAirport as any}
-              handleAutoComplete={(name, value) => {
-                if (value) {
-                  changeCurrentAirport(value);
-                } else {
-                  dispatch(setCurrentAirport(null));
-                }
-              }}
-              onBlur={() => {
-                if (recentAirports && recentAirports.length > 0)
-                  dispatch(setCurrentAirport(recentAirports[0].airportId));
-              }}
-              exceptions={[]}
-              key={'home-airport'}
-            />
+    airportwxDbState && (
+      <div className="airportwx-page">
+        <Dialog
+          PaperComponent={PaperComponent}
+          hideBackdrop
+          disableEnforceFocus
+          style={{ position: 'absolute' }}
+          open={showRouteEditor}
+          onClose={() => setShowRouteEditor(false)}
+        >
+          <Route setIsShowModal={setShowRouteEditor} />
+        </Dialog>{' '}
+        <div className="tab-menus">
+          <MapTabs tabMenus={tabMenus} />
+        </div>
+        <div className="main-container">
+          <div className="primary-bar">
+            <FormControl className="select-view">
+              <Select value={airportwxDbState.viewType} onChange={changeViews}>
+                <MenuItem value={'meteogram'}>Meteogram</MenuItem>
+                <MenuItem value={'metars'}>METARs</MenuItem>
+                <MenuItem value={'tafs'}>TAFs</MenuItem>
+                <MenuItem value={'discussion'}>Discussion</MenuItem>
+                <MenuItem value={'skew-t'}>Skew-T</MenuItem>
+              </Select>
+            </FormControl>
+            <div className="select-airport">
+              <AutoCompleteInput
+                name="default_home_airport"
+                selectedValue={currentAirport as any}
+                handleAutoComplete={(name, value) => {
+                  if (value) {
+                    changeCurrentAirport(value);
+                  } else {
+                    dispatch(setCurrentAirport(null));
+                  }
+                }}
+                onBlur={() => {
+                  if (recentAirports && recentAirports.length > 0)
+                    dispatch(setCurrentAirport(recentAirports[0].airportId));
+                }}
+                exceptions={[]}
+                key={'home-airport'}
+              />
+            </div>
+          </div>
+          <div className="view-container">
+            <Meteogram />
           </div>
         </div>
-        <div className="view-container">
-          <Meteogram />
-        </div>
       </div>
-    </div>
+    )
   );
 }
 

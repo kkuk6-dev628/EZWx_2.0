@@ -7,6 +7,9 @@
 
   .tabs {
     position: relative;
+    @media screen and (orientation: landscape) {
+      height: 100%;
+    }
   }
   .main-container {
     width: calc(100vw - 82px);
@@ -23,12 +26,17 @@
       .rv-xy-plot {
         position: relative;
         .elevation-tooltip{
+          margin-left: 10px;
+          margin-right: 10px;
           @media screen and (max-width: 1500px){
             position: fixed !important;
             margin-bottom: 52px;
+            margin-left: 40px;
+            margin-right: 40px;
           }
           @media screen and (orientation: landscape){
-            margin-left: 80px;
+            left: auto !important;
+            margin-left: 10px;
           }
         }
       }

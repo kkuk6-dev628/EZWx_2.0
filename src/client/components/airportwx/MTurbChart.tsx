@@ -154,6 +154,14 @@ const MTurbChart = (props) => {
         }
       });
 
+      turbData.push({
+        x0: chartWidth + 0.5,
+        y0: 0,
+        x: chartWidth + (airportwxState.chartDays === 1 ? 1 : 3),
+        y: airportwxState.maxAltitude * 100,
+        color: colorsByEdr.na,
+        opacity: 0.8,
+      });
       setNoDepicted(!existTurbulence);
       setTurbSeries(turbData);
     }
