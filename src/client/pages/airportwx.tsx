@@ -19,6 +19,7 @@ import dynamic from 'next/dynamic';
 import { setDataLoadTime } from '../store/layers/DataLoadTimeSlice';
 import { selectActiveRoute } from '../store/route/routes';
 import { RoutePoint } from '../interfaces/route';
+import Metar from '../components/airportwx/Metar';
 const Route = dynamic(() => import('../components/shared/Route'), {
   ssr: false,
 });
@@ -157,7 +158,7 @@ function AirportWxPage() {
             <FormControl className="select-view">
               <Select value={airportwxDbState.viewType} onChange={changeViews}>
                 <MenuItem value={'meteogram'}>Meteogram</MenuItem>
-                <MenuItem value={'metars'}>METARs</MenuItem>
+                <MenuItem value={'metar'}>METARs</MenuItem>
                 <MenuItem value={'tafs'}>TAFs</MenuItem>
                 <MenuItem value={'discussion'}>Discussion</MenuItem>
                 <MenuItem value={'skew-t'}>Skew-T</MenuItem>
@@ -184,7 +185,8 @@ function AirportWxPage() {
             </div>
           </div>
           <div className="view-container">
-            <Meteogram />
+            {airportwxDbState.viewType === 'meteogram' && <Meteogram />}
+            {airportwxDbState.viewType === 'metar' && <Metar />}
           </div>
         </div>
       </div>

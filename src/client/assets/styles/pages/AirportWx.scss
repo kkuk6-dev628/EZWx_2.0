@@ -1,5 +1,11 @@
+body > div {
+  height: 100%;
+}
 .airportwx-page {
   display: flex;
+  height: -moz-available;
+  height: -webkit-fill-available;
+  height: stretch;
   @media screen and (orientation: portrait){
     width: calc(100vw);
     flex-direction: column;
@@ -17,6 +23,43 @@
       width: calc(100vw);
       .label-chart .fixed-label.right {
         margin: 2px;
+      }
+    }
+    .view-container {
+      height: -moz-available;
+      height: -webkit-fill-available;
+      .metar-container {
+        height: calc(100vh - 144px);
+        overflow: auto;
+        background: #eeeeee;
+        margin: 12px;
+        @media screen and (orientation: portrait){
+          height: calc(100vh - 194px);
+        }
+        .metar-scroll-content {
+          padding: 12px;
+          .airport-name {
+            font-size: 22px;
+            margin: 8px;
+            color: var(--color-primary);
+          }
+          .metar-text {
+            padding: 8px;
+            margin-left: 8px;
+            font-size: 16px;
+            line-height: 28px;
+            border-bottom: solid 1px gray;
+            &>div{
+              text-wrap: nowrap;
+            }
+            .second-line {
+              margin-left: 16px;
+            }
+            .brown {
+              color: brown;
+            }
+          }
+        }
       }
     }
     .label-chart .fixed-label {

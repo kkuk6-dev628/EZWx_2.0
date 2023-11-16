@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, Request, Param } from '@nestjs/common';
 import { AirportwxService } from './airportwx.service';
 import { JwtAuthGuard } from '../../auth/jwt/jwt-auth.guard';
 
@@ -36,5 +36,11 @@ export class AirportwxController {
     airportwxState.updated_at = undefined;
     airportwxState.created_at = undefined;
     return this.airportwxService.updateAirportwxState(airportwxState);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/:icaoid/metar')
+  getMetarText(@Param('icaoid') icaoid) {
+    return this.airportwxService.getMetarText(icaoid);
   }
 }

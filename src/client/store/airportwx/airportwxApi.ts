@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { transformTimeBands } from '../route-profile/routeProfileApi';
 import { AirportWxState } from '../../interfaces/airportwx';
 
-const baseUrl = '';
+const baseUrl = '/api/airportwx';
 
 export const initialAirportWxState: AirportWxState = {
   chartType: 'Wind',
@@ -18,19 +18,19 @@ export const initialAirportWxState: AirportWxState = {
 
 export const airportwxApi = createApi({
   reducerPath: 'airportwxApi',
-  baseQuery: fetchBaseQuery({ baseUrl }),
+  baseQuery: fetchBaseQuery(),
   tagTypes: ['airportwxApi', 'airportwxState'],
   endpoints: (builder) => ({
     getRecentAirport: builder.query({
-      query: () => ({ url: '/api/airportwx/get-recent', method: 'Get' }),
+      query: () => ({ url: baseUrl + '/get-recent', method: 'Get' }),
       providesTags: [{ type: 'airportwxApi', id: 'LIST' }],
     }),
     addRecentAirport: builder.mutation({
-      query: (data) => ({ url: '/api/airportwx/add-recent', method: 'Post', body: data }),
+      query: (data) => ({ url: baseUrl + '/add-recent', method: 'Post', body: data }),
       invalidatesTags: ['airportwxApi'],
     }),
     getAirportwxState: builder.query({
-      query: () => ({ url: '/api/airportwx/get-airportwx-state', method: 'Get' }),
+      query: () => ({ url: baseUrl + '/get-airportwx-state', method: 'Get' }),
       transformResponse: (response: AirportWxState): AirportWxState => {
         if (!response) {
           return initialAirportWxState;
@@ -44,7 +44,7 @@ export const airportwxApi = createApi({
       providesTags: ['airportwxState'],
     }),
     updateAirportwxState: builder.mutation({
-      query: (data) => ({ url: '/api/airportwx/update-airportwx-state', method: 'Post', body: data }),
+      query: (data) => ({ url: baseUrl + '/update-airportwx-state', method: 'Post', body: data }),
       invalidatesTags: ['airportwxState'],
     }),
     getMeteogramData: builder.query({
@@ -71,6 +71,10 @@ export const airportwxApi = createApi({
         };
       },
     }),
+
+    getMetarText: builder.query<[{ raw_text: string }], string>({
+      query: (icaoid: string) => ({ url: `${baseUrl}/${icaoid}/metar`, method: 'Get' }),
+    }),
   }),
 });
 
@@ -80,4 +84,5 @@ export const {
   useGetMeteogramDataQuery,
   useGetAirportwxStateQuery,
   useUpdateAirportwxStateMutation,
+  useGetMetarTextQuery,
 } = airportwxApi;

@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { RecentAirport } from './recent-airport.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { User } from '../../user/user.entity';
 import { AirportwxState } from './airportwx-state.entity';
+import { Metar } from './metars.gisdb-entity';
 @Injectable()
 export class AirportwxService {
   constructor(
@@ -13,6 +14,8 @@ export class AirportwxService {
     private recentAirportRepository: Repository<RecentAirport>,
     @InjectRepository(AirportwxState)
     private airportwxStateRepository: Repository<AirportwxState>,
+    @InjectRepository(Metar, 'gisDB')
+    private metar: Repository<Metar>,
   ) {}
 
   async getRecentAirport(user: User) {
@@ -39,7 +42,20 @@ export class AirportwxService {
     });
     return res;
   }
+
   async updateAirportwxState(airportwxState) {
     return (await this.airportwxStateRepository.upsert(airportwxState, ['userId'])).generatedMaps[0].id;
+  }
+
+  async getMetarText(icaoid: string) {
+    const res = await this.metar.find({
+      where: {
+        station_id: Like(`%${icaoid}%`),
+      },
+      order: {
+        observation_time: 'DESC',
+      },
+    });
+    return res;
   }
 }

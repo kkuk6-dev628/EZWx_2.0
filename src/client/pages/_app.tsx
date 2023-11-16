@@ -7,6 +7,7 @@ import Footer from '../components/layout/Footer';
 import { useRouter } from 'next/router';
 import { wrapper } from '../store/store';
 import { Provider } from 'react-redux';
+import Head from 'next/head';
 
 const App = ({ Component, ...rest }: AppProps) => {
   const { store, props } = wrapper.useWrappedStore(rest);
@@ -28,24 +29,30 @@ const App = ({ Component, ...rest }: AppProps) => {
   }, [pathname]);
 
   return (
-    <Provider store={store}>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
+    <>
+      <Head>
+        <meta name="theme-color" content="#3D0D68" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+      </Head>
+      <Provider store={store}>
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
               window.dataLayer = window.dataLayer || [];
               function gtag(){window.dataLayer.push(arguments);}
               gtag('js', new Date());
               gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
             `}
-      </Script>
-      <title>EZWxBrief 2.0</title>
-      <Header />
-      <Component {...pageProps} />
-      {showFooter && <Footer />}
-    </Provider>
+        </Script>
+        <title>EZWxBrief 2.0</title>
+        <Header />
+        <Component {...pageProps} />
+        {showFooter && <Footer />}
+      </Provider>
+    </>
   );
 };
 
