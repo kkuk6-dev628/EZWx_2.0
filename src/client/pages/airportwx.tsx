@@ -20,6 +20,7 @@ import { setDataLoadTime } from '../store/layers/DataLoadTimeSlice';
 import { selectActiveRoute } from '../store/route/routes';
 import { RoutePoint } from '../interfaces/route';
 import Metar from '../components/airportwx/Metar';
+import Taf from '../components/airportwx/Taf';
 const Route = dynamic(() => import('../components/shared/Route'), {
   ssr: false,
 });
@@ -187,6 +188,7 @@ function AirportWxPage() {
           <div className="view-container">
             {airportwxDbState.viewType === 'meteogram' && <Meteogram />}
             {airportwxDbState.viewType === 'metar' && <Metar />}
+            {airportwxDbState.viewType === 'tafs' && <Taf />}
           </div>
         </div>
       </div>

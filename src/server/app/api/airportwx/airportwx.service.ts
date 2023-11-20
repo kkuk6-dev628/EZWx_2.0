@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { User } from '../../user/user.entity';
 import { AirportwxState } from './airportwx-state.entity';
-import { Metar } from './metars.gisdb-entity';
+import { Metar, Taf } from './airportwx.gisdb-entity';
 @Injectable()
 export class AirportwxService {
   constructor(
@@ -15,7 +15,9 @@ export class AirportwxService {
     @InjectRepository(AirportwxState)
     private airportwxStateRepository: Repository<AirportwxState>,
     @InjectRepository(Metar, 'gisDB')
-    private metar: Repository<Metar>,
+    private metarRepository: Repository<Metar>,
+    @InjectRepository(Taf, 'gisDB')
+    private tafRepository: Repository<Taf>,
   ) {}
 
   async getRecentAirport(user: User) {
@@ -48,14 +50,22 @@ export class AirportwxService {
   }
 
   async getMetarText(icaoid: string) {
-    const res = await this.metar.find({
-      where: {
-        station_id: Like(`%${icaoid}%`),
-      },
-      order: {
-        observation_time: 'DESC',
-      },
-    });
+    const res = await this.metarRepository
+      .createQueryBuilder()
+      .where({ station_id: Like(`%${icaoid}`) })
+      .distinctOn(['observation_time'])
+      .orderBy({ observation_time: 'DESC' })
+      .getMany();
+    return res;
+  }
+
+  async getTafText(icaoid: string) {
+    const res = await this.tafRepository
+      .createQueryBuilder()
+      .where({ station_id: Like(`%${icaoid}`) })
+      .distinctOn(['issue_time'])
+      .orderBy({ issue_time: 'DESC' })
+      .getMany();
     return res;
   }
 }

@@ -43,4 +43,10 @@ export class AirportwxController {
   getMetarText(@Param('icaoid') icaoid) {
     return this.airportwxService.getMetarText(icaoid);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/:icaoid/taf')
+  getTafText(@Param('icaoid') icaoid) {
+    return this.airportwxService.getTafText(icaoid);
+  }
 }

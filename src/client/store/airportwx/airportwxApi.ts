@@ -75,6 +75,10 @@ export const airportwxApi = createApi({
     getMetarText: builder.query<[{ raw_text: string }], string>({
       query: (icaoid: string) => ({ url: `${baseUrl}/${icaoid}/metar`, method: 'Get' }),
     }),
+
+    getTafText: builder.query<[{ raw_text: string }], string>({
+      query: (icaoid: string) => ({ url: `${baseUrl}/${icaoid}/taf`, method: 'Get' }),
+    }),
   }),
 });
 
@@ -85,4 +89,5 @@ export const {
   useGetAirportwxStateQuery,
   useUpdateAirportwxStateMutation,
   useGetMetarTextQuery,
+  useGetTafTextQuery,
 } = airportwxApi;

@@ -51,6 +51,13 @@ body > div {
             border-bottom: solid 1px gray;
             &>div{
               text-wrap: nowrap;
+              white-space: nowrap;
+            }
+            .indent20 {
+              margin-left: 20px;
+            }
+            .indent40 {
+              margin-left: 40px;
             }
             .second-line {
               margin-left: 16px;
@@ -58,6 +65,10 @@ body > div {
             .brown {
               color: brown;
             }
+          }
+          .nodata-message {
+            font-size: 18px;
+            margin: 20px;
           }
         }
       }

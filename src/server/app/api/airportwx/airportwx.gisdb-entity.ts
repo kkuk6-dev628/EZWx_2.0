@@ -14,3 +14,18 @@ export class Metar {
   @Column()
   raw_text: string;
 }
+
+@Entity('taf')
+export class Taf {
+  @PrimaryColumn()
+  index: number;
+
+  @Column()
+  station_id: string;
+
+  @Column()
+  issue_time: Date;
+
+  @Column()
+  raw_text: string;
+}

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
-import React, { FocusEventHandler, KeyboardEvent, useRef, useState } from 'react';
+import React, { FocusEventHandler, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { RoutePoint } from '../../interfaces/route';
 import { useGetAirportQuery } from '../../store/route/airportApi';
@@ -130,7 +130,15 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete, onBlur, ex
   }
   return (
     <>
-      <div className="auto_complete__input__container" onBlur={onBlur}>
+      <div
+        className="auto_complete__input__container"
+        onBlur={(e) => {
+          if (onBlur) {
+            onBlur(e);
+            setTimeout(() => setShowSuggestion(false), 500);
+          }
+        }}
+      >
         {selectedValue ? (
           <span className="auto__complete__label">{displayText}</span>
         ) : (

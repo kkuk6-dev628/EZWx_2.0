@@ -5,12 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RecentAirport } from './recent-airport.entity';
 import { AirportwxService } from './airportwx.service';
 import { AirportwxState } from './airportwx-state.entity';
-import { Metar } from './metars.gisdb-entity';
+import { Metar, Taf } from './airportwx.gisdb-entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([RecentAirport, AirportwxState]),
-    TypeOrmModule.forFeature([Metar], 'gisDB'),
+    TypeOrmModule.forFeature([Metar, Taf], 'gisDB'),
     HttpModule,
   ],
   controllers: [AirportwxController],
