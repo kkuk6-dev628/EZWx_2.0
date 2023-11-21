@@ -5,7 +5,6 @@ import {
   VerticalGridLines,
   HorizontalGridLines,
   XAxis,
-  YAxis,
   LineSeries,
   AreaSeries,
   Hint,
@@ -13,17 +12,9 @@ import {
   GradientDefs,
   VerticalRectSeries,
   CustomSVGSeries,
-  LineMarkSeries,
 } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
-import {
-  SegmentPoint,
-  calcEndMargin,
-  calcHighResolution,
-  extendLine,
-  getLineLength,
-  interpolateRouteByInterval,
-} from './RouteProfileDataLoader';
+import { calcEndMargin, calcHighResolution, extendLine, interpolateRouteByInterval } from './RouteProfileDataLoader';
 import { getSegmentsCount } from './RouteProfileDataLoader';
 import { getTimeGradientStops, weatherFontContents } from '../../utils/utils';
 import { getIndexByElevation, getMinMaxValueByElevation, getValueFromDatasetByElevation } from '../../utils/utils';
@@ -56,14 +47,12 @@ import {
   visibilityMileToMeter,
 } from '../map/common/AreoFunctions';
 import fly, * as flyjs from '../../fly-js/fly';
-import { getNbmFlightCategory } from '../map/leaflet/layers/StationMarkersLayer';
 import { getNbmWeatherMarkerIcon } from '../../utils/utils';
 import { flightCategoryToColor } from '../../utils/utils';
 import { MetarSkyValuesToString } from '../map/common/AreoConstants';
 import { Conrec } from '../../conrec-js/conrec';
 import { AirportNbmData, RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
 import Route from '../shared/Route';
-import { LatLng } from 'leaflet';
 import { makeWeatherString } from '../../utils/utils';
 import { hourInMili } from '../../utils/constants';
 import { iPadPortraitWidth, mobileLandscapeHeight, temperatureContourColors } from '../../utils/constants';

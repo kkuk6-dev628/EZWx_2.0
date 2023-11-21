@@ -24,13 +24,13 @@ import { selectSettings } from '../../store/user/UserSettings';
 import { selectFetchedDate, setFetchedDate, setRouteSegments } from '../../store/route-profile/RouteProfile';
 import { windQueryElevations } from '../../utils/constants';
 import { useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
-import { useGetAirportQuery } from '../../store/route/airportApi';
 import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import Point from '../../fly-js/src/Point';
 import Latitude from '../../fly-js/src/Latitude';
 import Longitude from '../../fly-js/src/Longitude';
 import { flightCategoryDivide, totalNumberOfElevations, cacheKeys } from '../../utils/constants';
 import { getValueFromDatasetByElevation } from '../../utils/utils';
+import { useGetAllAirportsQuery } from '../../store/airportwx/airportwxApi';
 
 /**
  * calculate length of polyline.
@@ -329,7 +329,7 @@ const RouteProfileDataLoader = () => {
   const dispatch = useDispatch();
   const fetchedDate = useSelector(selectFetchedDate);
   const [isLoading, setIsLoading] = useState(true);
-  const { isSuccess: isLoadedAirports, data: airportsTable } = useGetAirportQuery('');
+  const { isSuccess: isLoadedAirports, data: airportsTable } = useGetAllAirportsQuery('');
 
   if (auth.id) {
     useGetRoutesQuery('');

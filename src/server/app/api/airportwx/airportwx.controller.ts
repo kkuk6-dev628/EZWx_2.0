@@ -49,4 +49,20 @@ export class AirportwxController {
   getTafText(@Param('icaoid') icaoid) {
     return this.airportwxService.getTafText(icaoid);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/:lon/:lat/afd')
+  getAfdText(@Param('lon') lon, @Param('lat') lat) {
+    return this.airportwxService.getAfdText(lon, lat);
+  }
+
+  @Get('/airports')
+  getAllAirports() {
+    return this.airportwxService.getAllAirports();
+  }
+
+  @Get('/waypoints')
+  getAllWaypoints() {
+    return this.airportwxService.getAllWaypoints();
+  }
 }

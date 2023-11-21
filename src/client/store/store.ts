@@ -8,8 +8,6 @@ import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import { createWrapper } from 'next-redux-wrapper';
 import authSlice from './auth/authSlice';
 import { apiSlice } from './api/apiSlice';
-import { airportApi } from './route/airportApi';
-import { waypointApi } from './route/waypointApi';
 import DataLoadTimeSlice from './layers/DataLoadTimeSlice';
 import { routeProfileApi } from './route-profile/routeProfileApi';
 import { elevationApi } from './route-profile/elevationApi';
@@ -23,8 +21,6 @@ const makeStore = () =>
   configureStore({
     reducer: {
       [DataLoadTimeSlice.name]: DataLoadTimeSlice.reducer,
-      [airportApi.reducerPath]: airportApi.reducer,
-      [waypointApi.reducerPath]: waypointApi.reducer,
       [routeApi.reducerPath]: routeApi.reducer,
       [layerControlApi.reducerPath]: layerControlApi.reducer,
       [routeProfileApi.reducerPath]: routeProfileApi.reducer,
@@ -47,8 +43,6 @@ const makeStore = () =>
       const middleWares = getDefaultMiddlewares();
       middleWares.push(
         apiSlice.middleware,
-        airportApi.middleware,
-        waypointApi.middleware,
         routeApi.middleware,
         layerControlApi.middleware,
         routeProfileApi.middleware,

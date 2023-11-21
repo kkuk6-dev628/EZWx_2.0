@@ -6,7 +6,6 @@ import L from 'leaflet';
 import styles from './Map.module.css';
 import MapTabs from '../../shared/MapTabs';
 import {
-  SvgAir,
   SvgLayer,
   SvgBaseMap,
   SvgProfileCharge,
@@ -19,22 +18,15 @@ import {
 import ReactDOMServer from 'react-dom/server';
 import { useRouter } from 'next/router';
 import Dialog from '@material-ui/core/Dialog';
-import Paper from '@material-ui/core/Paper';
-import Draggable from 'react-draggable';
 import Route from '../../shared/Route';
 import DepartureAdvisor from '../../shared/DepartureAdvisor';
-import DepartureAdvisorPopup from '../../shared/DepartureAdvisorPopup';
 import MeteoLayers from './layers/MeteoLayers';
-// import './plugins/CacheTileLayer';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import BaseMapLayers from './layers/BaseMapLayers';
 import { selectBaseMapLayerControl, setBaseMapLayerControl } from '../../../store/layers/BaseMapLayerControl';
 import { selectAuth } from '../../../store/auth/authSlice';
 import { toast } from 'react-hot-toast';
-import { useGetAirportQuery } from '../../../store/route/airportApi';
-import { useGetWaypointsQuery } from '../../../store/route/waypointApi';
-import { simpleTimeOnlyFormat } from '../common/AreoFunctions';
 import MapSideButtons from '../../shared/MapSideButtons';
 import {
   useLazyGetBaseLayerControlStateQuery,
@@ -48,6 +40,7 @@ import { selectLayerControlState, setLayerControlState } from '../../../store/la
 import { selectActiveRoute } from '../../../store/route/routes';
 import { useCookies } from 'react-cookie';
 import { PaperComponent } from '../../common/PaperComponent';
+import { useGetAllAirportsQuery, useGetAllWaypointsQuery } from '../../../store/airportwx/airportwxApi';
 
 const maxScreenDimension = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
 const minZoom = maxScreenDimension > 1024 ? 4 : 3;
@@ -67,8 +60,8 @@ const LeafletMap = () => {
   const [cookies] = useCookies(['logged_in']);
   const loggedin = auth.id || cookies.logged_in;
   const activeRoute = useSelector(selectActiveRoute);
-  useGetWaypointsQuery('');
-  useGetAirportQuery('');
+  useGetAllWaypointsQuery('');
+  useGetAllAirportsQuery('');
   const layerControlState = useSelector(selectLayerControlState);
   const [updateLayerControlState] = useUpdateLayerControlStateMutation();
   const [updateBaseLayerControlState] = useUpdateBaseLayerControlStateMutation();

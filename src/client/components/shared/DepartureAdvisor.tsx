@@ -25,7 +25,6 @@ import {
 import { interpolateRouteByInterval } from '../route-profile/RouteProfileDataLoader';
 import { getSegmentsCount } from '../route-profile/RouteProfileDataLoader';
 import { getValueFromDatasetByElevation } from '../../utils/utils';
-import { getRouteLength } from '../route-profile/RouteProfileDataLoader';
 import { cacheKeys, flightCategoryDivide } from '../../utils/constants';
 import { selectActiveRoute } from '../../store/route/routes';
 import { LatLng } from 'leaflet';
@@ -33,18 +32,15 @@ import fly from '../../fly-js/fly';
 import { getAirportNbmData } from '../../utils/utils';
 import { UserSettings } from '../../interfaces/users';
 import { jsonClone } from '../utils/ObjectUtil';
-import { DateObject } from 'react-multi-date-picker';
 import DepartureAdvisorPopup, { getEvaluationByTime } from './DepartureAdvisorPopup';
 import { getMaxForecastTime } from '../../utils/utils';
 import { PaperComponent } from '../common/PaperComponent';
 import DepartureAdvisorTimeBlockComponent from './DepartureAdvisorTimeBlockComponent';
 import DepartureAdvisor3Bars from './DepartureAdvisor3Bars';
-import { useGetAirportQuery } from '../../store/route/airportApi';
-import { iOS } from '../Imagery/Imagery';
-import toast from 'react-hot-toast';
 import Nouislider from 'nouislider-react';
 import { hourInMili } from '../../utils/constants';
 import { FetchUserSettings } from './FetchUserSettings';
+import { useGetAllAirportsQuery } from '../../store/airportwx/airportwxApi';
 
 type personalMinValue = 0 | 1 | 2 | 10;
 type personalMinColor = 'red' | 'yellow' | 'green' | 'grey';
@@ -1030,7 +1026,7 @@ function DepartureAdvisor(props: { showPast: boolean }) {
   const [queryAirportNbm, queryAirportNbmResult] = useQueryAirportNbmMutation({
     fixedCacheKey: cacheKeys.nbmAllAirport,
   });
-  const { isSuccess: isLoadedAirports, data: airportsTable } = useGetAirportQuery('');
+  const { isSuccess: isLoadedAirports, data: airportsTable } = useGetAllAirportsQuery('');
   const { isSuccess: isLoadedLastTime, data: lastDepartureTime } = useGetLastDepartureDataTimeQuery('');
   const scrollContentRef = useRef<HTMLDivElement>();
   const scrollParentRef = useRef<HTMLDivElement>();

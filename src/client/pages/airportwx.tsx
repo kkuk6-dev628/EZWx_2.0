@@ -7,12 +7,13 @@ import {
   initialAirportWxState,
   useAddRecentAirportMutation,
   useGetAirportwxStateQuery,
+  useGetAllAirportsQuery,
   useGetRecentAirportQuery,
   useUpdateAirportwxStateMutation,
 } from '../store/airportwx/airportwxApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { selectCurrentAirport, setCurrentAirport } from '../store/airportwx/airportwx';
+import { selectCurrentAirport, setCurrentAirport, setCurrentAirportPos } from '../store/airportwx/airportwx';
 import { selectSettings } from '../store/user/UserSettings';
 import { PaperComponent } from '../components/common/PaperComponent';
 import dynamic from 'next/dynamic';
@@ -21,6 +22,7 @@ import { selectActiveRoute } from '../store/route/routes';
 import { RoutePoint } from '../interfaces/route';
 import Metar from '../components/airportwx/Metar';
 import Taf from '../components/airportwx/Taf';
+import Afd from '../components/airportwx/Afd';
 const Route = dynamic(() => import('../components/shared/Route'), {
   ssr: false,
 });
@@ -38,6 +40,7 @@ function AirportWxPage() {
   });
   const [airportwxState, setAirportwxState] = useState(initialAirportWxState);
   const [updateAirportwxState] = useUpdateAirportwxStateMutation();
+  const { data: airports } = useGetAllAirportsQuery('');
 
   useEffect(() => {
     if (airportwxDbState) {
@@ -46,17 +49,34 @@ function AirportWxPage() {
   }, [airportwxDbState]);
 
   useEffect(() => {
-    if (isSuccessRecentAirports && recentAirports.length > 0) {
+    if (recentAirports && recentAirports.length > 0) {
       dispatch(setCurrentAirport(recentAirports[0].airportId));
     } else {
       dispatch(setCurrentAirport(settingsState.default_home_airport));
     }
-  }, [isSuccessRecentAirports]);
+  }, [recentAirports]);
+
+  useEffect(() => {
+    if (currentAirport && airports && airports.length > 0) {
+      const airport = airports.filter((curr) => {
+        return curr.key === currentAirport;
+      });
+      if (airport.length > 0) {
+        dispatch(
+          setCurrentAirportPos({
+            lat: airport[0].position.coordinates[1],
+            lng: airport[0].position.coordinates[0],
+          }),
+        );
+      }
+    }
+  }, [airports, currentAirport]);
 
   function changeCurrentAirport(airport) {
     dispatch(setCurrentAirport(airport.key || airport));
     addRecentAirport({ airportId: airport.key || airport });
   }
+
   function handler(id: string) {
     switch (id) {
       case 'route':
@@ -96,6 +116,7 @@ function AirportWxPage() {
         break;
     }
   }
+
   const tabMenus = [
     {
       id: 'save',
@@ -154,43 +175,51 @@ function AirportWxPage() {
         <div className="tab-menus">
           <MapTabs tabMenus={tabMenus} />
         </div>
-        <div className="main-container">
-          <div className="primary-bar">
-            <FormControl className="select-view">
-              <Select value={airportwxDbState.viewType} onChange={changeViews}>
-                <MenuItem value={'meteogram'}>Meteogram</MenuItem>
-                <MenuItem value={'metar'}>METARs</MenuItem>
-                <MenuItem value={'tafs'}>TAFs</MenuItem>
-                <MenuItem value={'discussion'}>Discussion</MenuItem>
-                <MenuItem value={'skew-t'}>Skew-T</MenuItem>
-              </Select>
-            </FormControl>
-            <div className="select-airport">
-              <AutoCompleteInput
-                name="default_home_airport"
-                selectedValue={currentAirport as any}
-                handleAutoComplete={(name, value) => {
-                  if (value) {
-                    changeCurrentAirport(value);
-                  } else {
-                    dispatch(setCurrentAirport(null));
-                  }
-                }}
-                onBlur={() => {
-                  if (recentAirports && recentAirports.length > 0)
-                    dispatch(setCurrentAirport(recentAirports[0].airportId));
-                }}
-                exceptions={[]}
-                key={'home-airport'}
-              />
+        {airports ? (
+          <div className="main-container">
+            <div className="primary-bar">
+              <FormControl className="select-view">
+                <Select value={airportwxDbState.viewType} onChange={changeViews}>
+                  <MenuItem value={'meteogram'}>Meteogram</MenuItem>
+                  <MenuItem value={'metar'}>METARs</MenuItem>
+                  <MenuItem value={'tafs'}>TAFs</MenuItem>
+                  <MenuItem value={'afd'}>Discussion</MenuItem>
+                  <MenuItem value={'skew-t'}>Skew-T</MenuItem>
+                </Select>
+              </FormControl>
+              <div className="select-airport">
+                <AutoCompleteInput
+                  name="default_home_airport"
+                  selectedValue={currentAirport as any}
+                  handleAutoComplete={(name, value) => {
+                    if (value) {
+                      changeCurrentAirport(value);
+                    } else {
+                      dispatch(setCurrentAirport(null));
+                    }
+                  }}
+                  onBlur={() => {
+                    if (recentAirports && recentAirports.length > 0) {
+                      dispatch(setCurrentAirport(recentAirports[0].airportId));
+                    } else if (settingsState.default_home_airport) {
+                      dispatch(setCurrentAirport(settingsState.default_home_airport));
+                    }
+                  }}
+                  exceptions={[]}
+                  key={'home-airport'}
+                />
+              </div>
+            </div>
+            <div className="view-container">
+              {airportwxDbState.viewType === 'meteogram' && <Meteogram />}
+              {airportwxDbState.viewType === 'metar' && <Metar />}
+              {airportwxDbState.viewType === 'tafs' && <Taf />}
+              {airportwxDbState.viewType === 'afd' && <Afd />}
             </div>
           </div>
-          <div className="view-container">
-            {airportwxDbState.viewType === 'meteogram' && <Meteogram />}
-            {airportwxDbState.viewType === 'metar' && <Metar />}
-            {airportwxDbState.viewType === 'tafs' && <Taf />}
-          </div>
-        </div>
+        ) : (
+          <div className="loading"></div>
+        )}
       </div>
     )
   );

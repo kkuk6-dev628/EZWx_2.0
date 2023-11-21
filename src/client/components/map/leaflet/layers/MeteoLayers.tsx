@@ -31,10 +31,10 @@ import { InBaseLayerControl } from '../layer-control/BaseMapLayerControl';
 import RadarLayer from './RadarLayer';
 import { StationMarkersLayer } from './StationMarkersLayer';
 import StationForecastPopup from '../popups/StationForecastPopup';
-import { useGetAirportQuery } from '../../../../store/route/airportApi';
 import { selectActiveRoute } from '../../../../store/route/routes';
 import { addRouteToMap } from '../../../shared/Route';
 import { selectLayerControlState } from '../../../../store/layers/LayerControl';
+import { useGetAllAirportsQuery } from '../../../../store/airportwx/airportwxApi';
 
 const maxLayers = 6;
 
@@ -42,7 +42,7 @@ const MeteoLayers = () => {
   const layers = useMeteoLayersContext();
   const debugLayerGroupRef = useRef(null);
   const personalMinimums = useSelector(selectPersonalMinimums);
-  const { data: airportsData } = useGetAirportQuery('');
+  const { data: airportsData } = useGetAllAirportsQuery('');
   const settingsState = useSelector(selectSettings);
   const activeRoute = useSelector(selectActiveRoute);
   const layerControlState = useSelector(selectLayerControlState);

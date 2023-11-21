@@ -1,7 +1,6 @@
 import { useSelector } from 'react-redux';
 import { selectCurrentAirport } from '../../store/airportwx/airportwx';
-import { useGetMetarTextQuery } from '../../store/airportwx/airportwxApi';
-import { useGetAirportQuery } from '../../store/route/airportApi';
+import { useGetAllAirportsQuery, useGetMetarTextQuery } from '../../store/airportwx/airportwxApi';
 import { useEffect, useState } from 'react';
 import { initialUserSettingsState } from '../../store/user/UserSettings';
 import { getMetarCeilingCategory, getMetarVisibilityCategory } from '../map/common/AreoFunctions';
@@ -51,26 +50,26 @@ export function colorCoding(text: string): string {
     firstLine.push(x);
   });
   let firstLineStr = firstLine.join(' ');
-  firstLineStr = firstLineStr.replace(
-    /\S*TSRA|\bTS\b|\S*TSPL|\S*TSSN|\S*VCTS|\S*SHRA|\S*VCSH|\S*FZRA|\S*FZDZ/,
+  firstLineStr = firstLineStr.replaceAll(
+    /\S*TSRA|\bTS\b|\S*TSPL|\S*TSSN|\S*VCTS|\S*SHRA|\S*VCSH|\S*FZRA|\S*FZDZ/g,
     (match) => `<span style="color: red">${match}</span>`,
   );
-  firstLineStr = firstLineStr.replace(/\bFZFG\b|\bFG\b/, (match) => `<span style="color: magenta">${match}</span>`);
+  firstLineStr = firstLineStr.replaceAll(/\bFZFG\b|\bFG\b/g, (match) => `<span style="color: magenta">${match}</span>`);
   let ceiling = '';
   if (/BKN/.test(firstLineStr)) {
-    const matches = /BKN\d+/.exec(firstLineStr);
+    const matches = /BKN\d+\w*/.exec(firstLineStr);
     ceiling = getMinCeiling(matches);
   } else if (/OVC/.test(firstLineStr)) {
-    const matches = /OVC\d+/.exec(firstLineStr);
+    const matches = /OVC\d+\w*/.exec(firstLineStr);
     ceiling = getMinCeiling(matches);
   } else if (/FEW/.test(firstLineStr)) {
-    const matches = /FEW\d+/.exec(firstLineStr);
+    const matches = /FEW\d+\w*/.exec(firstLineStr);
     ceiling = getMinCeiling(matches);
   } else if (/SCT/.test(firstLineStr)) {
-    const matches = /SCT\d+/.exec(firstLineStr);
+    const matches = /SCT\d+\w*/.exec(firstLineStr);
     ceiling = getMinCeiling(matches);
   } else if (/VV/.test(firstLineStr)) {
-    const matches = /VV\d+/.exec(firstLineStr);
+    const matches = /VV\d+\w*/.exec(firstLineStr);
     ceiling = getMinCeiling(matches);
   }
   const c = parseInt(ceiling.replace(/[^0-9]+/, '')) * 100;
@@ -89,7 +88,7 @@ const Metar = () => {
   const { data: metarText, isSuccess: loadedMetar } = useGetMetarTextQuery(airportId, {
     refetchOnMountOrArgChange: true,
   });
-  const { data: airports, isSuccess: loadedAirports } = useGetAirportQuery('');
+  const { data: airports, isSuccess: loadedAirports } = useGetAllAirportsQuery('');
   const [airportName, setAirportName] = useState('');
 
   useEffect(() => {
@@ -128,8 +127,12 @@ const Metar = () => {
             }
             return (
               <div className="metar-text" key={'metar-' + i}>
-                {lines.map((line) => (
-                  <div className="first-line" dangerouslySetInnerHTML={{ __html: colorCoding(line) }} />
+                {lines.map((line, index) => (
+                  <div
+                    key={`line-${i}-${index}`}
+                    className="first-line"
+                    dangerouslySetInnerHTML={{ __html: colorCoding(line) }}
+                  />
                 ))}
               </div>
             );

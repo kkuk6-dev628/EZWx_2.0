@@ -23,7 +23,6 @@ import {
   setViewHeight,
   setViewWidth,
 } from '../../store/airportwx/airportwx';
-import { useGetAirportQuery } from '../../store/route/airportApi';
 import {
   initialAirportWxState,
   useGetAirportwxStateQuery,
@@ -43,8 +42,6 @@ import { calcChartWidth, isTouchScreenDevice } from '../../utils/utils';
 function Meteogram() {
   const userSettings = useSelector(selectSettings);
   const interval = 1;
-  const currentAirport = useSelector(selectCurrentAirport);
-  const { isSuccess, data: airports } = useGetAirportQuery('');
   const currentAirportPos = useSelector(selectCurrentAirportPos);
   const { isSuccess: isLoadedMGramData, data: meteogramData } = useGetMeteogramDataQuery(currentAirportPos, {
     skip: currentAirportPos === null,
@@ -64,22 +61,6 @@ function Meteogram() {
       setAirportwxState({ ...airportwxDbState });
     }
   }, [airportwxDbState]);
-
-  useEffect(() => {
-    if (isSuccess && airports.length > 0) {
-      const airport = airports.filter((curr) => {
-        return curr.key === currentAirport;
-      });
-      if (airport.length > 0) {
-        dispatch(
-          setCurrentAirportPos({
-            lat: airport[0].position.coordinates[1],
-            lng: airport[0].position.coordinates[0],
-          }),
-        );
-      }
-    }
-  }, [isSuccess, currentAirport]);
 
   function handleUpdateState(state: AirportWxState) {
     setAirportwxState(state);

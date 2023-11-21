@@ -75,6 +75,13 @@ function AirportSelectModal({ setIsShowModal }) {
               handleAutoComplete={(name, value) => {
                 setSelectedAirport(value);
               }}
+              onBlur={() => {
+                if (recentAirports && recentAirports.length > 0) {
+                  setSelectedAirport(recentAirports[0].airportId);
+                } else if (settingsState.default_home_airport) {
+                  setSelectedAirport(settingsState.default_home_airport);
+                }
+              }}
               exceptions={[]}
               key={'home-airport'}
               // handleCloseSuggestion={handleCloseSuggestion}

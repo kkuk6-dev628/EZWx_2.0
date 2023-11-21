@@ -3,8 +3,8 @@ import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
 import React, { FocusEventHandler, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { RoutePoint } from '../../interfaces/route';
-import { useGetAirportQuery } from '../../store/route/airportApi';
 import { matchLowerCaseRegex } from '../utils/RegexUtils';
+import { useGetAllAirportsQuery } from '../../store/airportwx/airportwxApi';
 interface Props {
   selectedValue: RoutePoint;
   name: string;
@@ -19,7 +19,7 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete, onBlur, ex
   const [showSuggestion, setShowSuggestion] = useState(false);
   const parentRef = useRef(null);
 
-  const { isLoading, data: airports } = useGetAirportQuery('');
+  const { isLoading, data: airports } = useGetAllAirportsQuery('');
 
   const renderItem = (name: string, val: string, exceptions: string[]) => {
     try {
@@ -178,7 +178,7 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete, onBlur, ex
             </div>
           </ClickAwayListener>
         ) : (
-          <Typography> No Record</Typography>
+          <Typography> Identifier not found</Typography>
         ))}
     </>
   );

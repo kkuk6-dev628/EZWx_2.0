@@ -3,12 +3,11 @@ import { CircularProgress, ClickAwayListener, Typography } from '@mui/material';
 import React, { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { RouteOfFlight, RoutePoint } from '../../interfaces/route';
-import { useGetAirportQuery } from '../../store/route/airportApi';
-import { useGetWaypointsQuery } from '../../store/route/waypointApi';
 import { matchLowerCaseRegex } from '../utils/RegexUtils';
 import * as ReactDOM from 'react-dom';
 //@ts-ignore
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { useGetAllAirportsQuery, useGetAllWaypointsQuery } from '../../store/airportwx/airportwxApi';
 
 let portal;
 
@@ -51,8 +50,8 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
   const [currentFocus, setCurrentFocus] = useState(0);
   const parentRef = useRef(null);
   // const dragElementsParentRef = useRef(null);
-  const { isLoading, data: airports } = useGetAirportQuery('');
-  const { isLoading: isLoadingWaypoints, data: waypoints } = useGetWaypointsQuery('');
+  const { isLoading, data: airports } = useGetAllAirportsQuery('');
+  const { isLoading: isLoadingWaypoints, data: waypoints } = useGetAllWaypointsQuery('');
 
   useEffect(() => {
     portal = document?.createElement('div');
@@ -268,7 +267,7 @@ const MultiSelectInput = ({ name, handleAutoComplete, selectedValues }: Props) =
             </div>
           </ClickAwayListener>
         ) : (
-          <Typography> No Record</Typography>
+          <Typography> Identifier not found</Typography>
         ))}
     </>
   );

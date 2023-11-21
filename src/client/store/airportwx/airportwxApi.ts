@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { transformTimeBands } from '../route-profile/routeProfileApi';
 import { AirportWxState } from '../../interfaces/airportwx';
+import { RoutePoint } from '../../interfaces/route';
 
 const baseUrl = '/api/airportwx';
 
@@ -79,6 +80,62 @@ export const airportwxApi = createApi({
     getTafText: builder.query<[{ raw_text: string }], string>({
       query: (icaoid: string) => ({ url: `${baseUrl}/${icaoid}/taf`, method: 'Get' }),
     }),
+
+    getAfdText: builder.query<{ afd_content: string }, { lat: number; lng: number }>({
+      query: ({ lat, lng }) => ({ url: `${baseUrl}/${lng}/${lat}/afd`, method: 'Get' }),
+    }),
+
+    getAllAirports: builder.query({
+      query: () => ({ url: baseUrl + '/airports', method: 'Get' }),
+      transformResponse: (response: { icaoid: string; faaid: string; name: string; lng: number; lat: number }[]) => {
+        return response?.reduce((acc: RoutePoint[], feature) => {
+          if (feature.name !== '') {
+            if (feature.icaoid) {
+              acc.push({
+                key: feature.icaoid,
+                name: feature.name,
+                type: 'icaoid',
+                position: { coordinates: [feature.lng, feature.lat], type: 'Point' },
+              });
+            } else if (feature.faaid) {
+              acc.push({
+                key: feature.faaid,
+                name: feature.name,
+                type: 'faaid',
+                position: { coordinates: [feature.lng, feature.lat], type: 'Point' },
+              });
+            }
+          }
+          return acc;
+        }, []);
+      },
+    }),
+
+    getAllWaypoints: builder.query({
+      query: () => ({ url: baseUrl + '/waypoints', method: 'Get' }),
+      transformResponse: (
+        response: { city: string; state: string; country: string; name: string; lng: number; lat: number }[],
+      ) => {
+        return response?.reduce((acc: RoutePoint[], feature) => {
+          if (feature.city) {
+            acc.push({
+              key: feature.name,
+              name: feature.city,
+              type: 'waypoint',
+              position: { coordinates: [feature.lng, feature.lat], type: 'Point' },
+            });
+          } else {
+            acc.push({
+              key: feature.name,
+              name: feature.state + '/' + feature.country,
+              type: 'waypoint',
+              position: { coordinates: [feature.lng, feature.lat], type: 'Point' },
+            });
+          }
+          return acc;
+        }, []);
+      },
+    }),
   }),
 });
 
@@ -90,4 +147,7 @@ export const {
   useUpdateAirportwxStateMutation,
   useGetMetarTextQuery,
   useGetTafTextQuery,
+  useGetAfdTextQuery,
+  useGetAllAirportsQuery,
+  useGetAllWaypointsQuery,
 } = airportwxApi;

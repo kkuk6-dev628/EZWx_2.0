@@ -41,18 +41,15 @@ import {
   EvaluationType,
 } from '../../../../interfaces/layerControl';
 import { InputFieldWrapper, RadioButton } from '../../../settings-drawer';
-import {
-  useGetLayerControlStateQuery,
-  useUpdateLayerControlStateMutation,
-} from '../../../../store/layers/layerControlApi';
+import { useUpdateLayerControlStateMutation } from '../../../../store/layers/layerControlApi';
 import { useSelector } from 'react-redux';
 import { selectLayerControlState, setLayerControlState } from '../../../../store/layers/LayerControl';
 import { useDispatch } from 'react-redux';
 import { selectAuth } from '../../../../store/auth/authSlice';
 import { useGetUserSettingsQuery } from '../../../../store/user/userSettingsApi';
-import { useGetAirportQuery } from '../../../../store/route/airportApi';
 import { useCookies } from 'react-cookie';
 import { SvgRoundClose } from '../../../utils/SvgIcons';
+import { useGetAllAirportsQuery } from '../../../../store/airportwx/airportwxApi';
 
 interface IProps {
   children?: ReactElement[];
@@ -91,7 +88,7 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
     };
   }
 
-  const { isSuccess: isLoadedAirports, data: airportsTable } = useGetAirportQuery('');
+  const { isSuccess: isLoadedAirports, data: airportsTable } = useGetAllAirportsQuery('');
 
   const map = useMap();
 

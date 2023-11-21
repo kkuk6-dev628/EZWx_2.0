@@ -1,11 +1,7 @@
 import { useSelector } from 'react-redux';
 import { selectCurrentAirport } from '../../store/airportwx/airportwx';
-import { useGetMetarTextQuery, useGetTafTextQuery } from '../../store/airportwx/airportwxApi';
-import { useGetAirportQuery } from '../../store/route/airportApi';
+import { useGetAllAirportsQuery, useGetTafTextQuery } from '../../store/airportwx/airportwxApi';
 import { useEffect, useState } from 'react';
-import { initialUserSettingsState } from '../../store/user/UserSettings';
-import { getMetarCeilingCategory, getMetarVisibilityCategory } from '../map/common/AreoFunctions';
-import { isNumberObject } from 'util/types';
 import { colorCoding } from './Metar';
 
 const Taf = () => {
@@ -14,7 +10,7 @@ const Taf = () => {
   const { data: tafText } = useGetTafTextQuery(airportId, {
     refetchOnMountOrArgChange: true,
   });
-  const { data: airports } = useGetAirportQuery('');
+  const { data: airports } = useGetAllAirportsQuery('');
   const [airportName, setAirportName] = useState('');
 
   useEffect(() => {
@@ -58,14 +54,20 @@ const Taf = () => {
             }
             return (
               <div className="metar-text" key={'metar-' + i}>
-                {lines.map((line) => {
+                {lines.map((line, index) => {
                   let indentClass = '';
-                  if (line.startsWith('FM')) {
+                  if (line.startsWith('FM') || line.startsWith('BECMG')) {
                     indentClass = 'indent20';
-                  } else if (line.startsWith('TEMPO' || line.startsWith('PROB') || line.startsWith('BECMG'))) {
+                  } else if (line.startsWith('TEMPO') || line.startsWith('PROB')) {
                     indentClass = 'indent40';
                   }
-                  return <div className={indentClass} dangerouslySetInnerHTML={{ __html: colorCoding(line) }} />;
+                  return (
+                    <div
+                      key={`line-${i}-${index}`}
+                      className={indentClass}
+                      dangerouslySetInnerHTML={{ __html: colorCoding(line) }}
+                    />
+                  );
                 })}
               </div>
             );
