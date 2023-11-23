@@ -6,6 +6,8 @@ import { DataSource, Like, Repository } from 'typeorm';
 import { User } from '../../user/user.entity';
 import { AirportwxState } from './airportwx-state.entity';
 import { Afd, CountyWarningAreas, Metar, Taf } from './airportwx.gisdb-entity';
+import { AxiosError } from 'axios';
+import { catchError, firstValueFrom } from 'rxjs';
 @Injectable()
 export class AirportwxService {
   constructor(
@@ -95,5 +97,26 @@ export class AirportwxService {
       'select name, city, state, country, ST_X(wkb_geometry) as lng, ST_Y(wkb_geometry) as lat from waypoint',
     );
     return res;
+  }
+
+  async getGSDPage(icaoid, url, query) {
+    const baseUrl = 'https://rucsoundings.noaa.gov/gwt/';
+    let externalUrl = baseUrl;
+    if (query) {
+      externalUrl += url + '?' + query;
+    } else {
+      externalUrl += url;
+    }
+    const { data } = await firstValueFrom(
+      this.httpService.get(externalUrl).pipe(
+        catchError((error, caught) => {
+          // console.log(externalUrl);
+          // console.error(error);
+          // throw 'An error happened!';
+          return caught;
+        }),
+      ),
+    );
+    return data;
   }
 }

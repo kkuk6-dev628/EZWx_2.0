@@ -153,8 +153,8 @@ function buildContour(dataset: RouteProfileDataset[], times, maxAltitude: number
     const minPos = contour.contour.reduce((prev, curr) => (prev.x < curr.x ? prev : curr));
     const maxPos = contour.contour.reduce((prev, curr) => (prev.x > curr.x ? prev : curr));
     const label = !showInCelsius
-      ? celsiusToFahrenheit(contour.temperature) + ' \u00B0'
-      : round(contour.temperature, 1) + ' \u00B0';
+      ? celsiusToFahrenheit(contour.temperature) + '\u00B0'
+      : round(contour.temperature, 1) + '\u00B0';
     const style = {
       fill:
         contour.temperature > 0
@@ -359,11 +359,11 @@ const MeteogramChart = (props: {
     if (currentAirportPos && !queryAirportNbmResult.isLoading) {
       queryNbmAll({ queryPoints: [[currentAirportPos.lng, currentAirportPos.lat]] });
     }
-  }, [currentAirportPos, queryAirportNbmResult.isLoading]);
+  }, [currentAirportPos, queryAirportNbmResult.data]);
 
   useEffect(() => {
     buildTemperatureContourSeries();
-  }, [isLoadedMGramData, userSettings.default_temperature_unit, airportwxDbState]);
+  }, [meteogramData, userSettings.default_temperature_unit, airportwxDbState]);
 
   useEffect(() => {
     const times = getXAxisValues(chartWidth, interval);
@@ -375,7 +375,7 @@ const MeteogramChart = (props: {
       })),
     );
     setGradientStops(stops);
-  }, [isLoadedMGramData, airportwxDbState]);
+  }, [meteogramData, airportwxDbState]);
 
   function getWeatherMarker(time: Date, index) {
     const { value: cloudceiling, time: forecastTime } = getValueFromDatasetByElevation(

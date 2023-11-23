@@ -148,8 +148,8 @@ export function buildContour(
     const minPos = contour.contour.reduce((prev, curr) => (prev.x < curr.x ? prev : curr));
     const maxPos = contour.contour.reduce((prev, curr) => (prev.x > curr.x ? prev : curr));
     const label = !showInCelsius
-      ? celsiusToFahrenheit(contour.temperature) + ' \u00B0'
-      : round(contour.temperature, 1) + ' \u00B0';
+      ? celsiusToFahrenheit(contour.temperature) + '\u00B0'
+      : round(contour.temperature, 1) + '\u00B0';
     const style = {
       fill:
         contour.temperature > 0

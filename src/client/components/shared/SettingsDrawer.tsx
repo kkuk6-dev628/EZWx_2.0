@@ -148,6 +148,9 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                     handleAutoComplete={(name, value) => {
                       setSettings({ ...settings, [name]: value && value.key ? value.key : value });
                     }}
+                    onBlur={() => {
+                      setSettings({ ...settings, default_home_airport: settingsState.default_home_airport });
+                    }}
                     exceptions={[]}
                     key={'home-airport'}
                     // handleCloseSuggestion={handleCloseSuggestion}

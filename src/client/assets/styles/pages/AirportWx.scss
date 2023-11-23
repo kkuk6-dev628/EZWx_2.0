@@ -28,6 +28,10 @@ body > div {
     .view-container {
       height: -moz-available;
       height: -webkit-fill-available;
+      iframe {
+        width: 100%;
+        height: 100%;
+      }
       .metar-container {
         height: calc(100vh - 144px);
         overflow: auto;

@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Post, UseGuards, Request, Param } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, Request, Param, Query, Res } from '@nestjs/common';
 import { AirportwxService } from './airportwx.service';
 import { JwtAuthGuard } from '../../auth/jwt/jwt-auth.guard';
+import { Response } from 'express';
+import * as mime from 'mime/lite';
 
 @Controller('api/airportwx')
 export class AirportwxController {
@@ -64,5 +66,18 @@ export class AirportwxController {
   @Get('/waypoints')
   getAllWaypoints() {
     return this.airportwxService.getAllWaypoints();
+  }
+
+  @Get('/:icaoid/GSD/:url(*)')
+  async getGSDPage(@Res() res: Response, @Param('icaoid') icaoid, @Param('url') url, @Query() query) {
+    const params = new URLSearchParams(query);
+    const contentType = mime.getType(url);
+    if (url.endsWith('.png')) {
+      res.redirect('https://rucsoundings.noaa.gov/gwt/' + url);
+      return;
+    }
+    contentType && res.set('Content-Type', contentType);
+    const content = await this.airportwxService.getGSDPage(icaoid, url, params.toString());
+    res.send(content);
   }
 }

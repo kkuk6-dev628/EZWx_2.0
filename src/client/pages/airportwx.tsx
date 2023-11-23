@@ -1,4 +1,4 @@
-import { Dialog, FormControl, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { CircularProgress, Dialog, FormControl, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import MapTabs from '../components/shared/MapTabs';
 import { SvgBackward, SvgBookmark, SvgForward, SvgRefresh, SvgRoute } from '../components/utils/SvgIcons';
 import { AutoCompleteInput } from '../components/common';
@@ -215,10 +215,18 @@ function AirportWxPage() {
               {airportwxDbState.viewType === 'metar' && <Metar />}
               {airportwxDbState.viewType === 'tafs' && <Taf />}
               {airportwxDbState.viewType === 'afd' && <Afd />}
+              {airportwxDbState.viewType === 'skew-t' && (
+                <iframe
+                  sandbox="allow-scripts allow-same-origin"
+                  src={`/api/airportwx/${currentAirport}/GSD/?data_source=Op40&latest=latest&layout=off&n_hrs=20.0&airport=${currentAirport}`}
+                />
+              )}
             </div>
           </div>
         ) : (
-          <div className="loading"></div>
+          <div className="data-loading">
+            <CircularProgress color="secondary" />
+          </div>
         )}
       </div>
     )
