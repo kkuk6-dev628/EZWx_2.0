@@ -43,7 +43,7 @@ const MCloudsChart = (props) => {
   const [cloudHint, setCloudHint] = useState(null);
 
   function buildCloudSeries() {
-    if (isLoadedMGramData && queryNbmAllAirportResult.isSuccess) {
+    if (isLoadedMGramData && queryNbmAllAirportResult.isSuccess && airportElevation) {
       const cloudData = [];
       const maxForecastTime = getMaxForecastTime(queryNbmAllAirportResult.data.skycover);
       const times = getXAxisValues(chartWidth, interval);
@@ -160,7 +160,7 @@ const MCloudsChart = (props) => {
 
   useEffect(() => {
     buildCloudSeries();
-  }, [isLoadedMGramData, meteogramData, queryNbmAllAirportResult.isSuccess, airportwxState]);
+  }, [isLoadedMGramData, meteogramData, queryNbmAllAirportResult.isSuccess, airportwxState, airportElevation]);
   return (
     <MeteogramChart showDayNightBackground={true} noDataMessage={null}>
       {cloudSeries && (

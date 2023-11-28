@@ -17,7 +17,13 @@ const App = ({ Component, ...rest }: AppProps) => {
   const { pageProps } = props;
 
   useEffect(() => {
-    // serviceWorkerRegistration.register();
+    document.addEventListener('focusout', function (e) {
+      const $body = document.querySelector('body');
+      $body.style.overflow = 'hidden';
+      $body.style.position = 'fixed';
+      $body.style.top = `0`;
+      $body.style.width = '100%';
+    });
   }, []);
 
   useEffect(() => {

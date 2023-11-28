@@ -15,6 +15,7 @@ function AirportSelectModal({ setIsShowModal }) {
   const settingsState = useSelector(selectSettings);
   const currentAirport = useSelector(selectCurrentAirport);
   const [selectedAirport, setSelectedAirport] = useState<any>(currentAirport);
+  const [prevValidAirport, setPrevValidAirport] = useState(currentAirport);
   const router = useRouter();
   const dispatch = useDispatch();
   const { data: recentAirports, isSuccess: isSuccessRecentAirports } = useGetRecentAirportQuery(null);
@@ -24,18 +25,26 @@ function AirportSelectModal({ setIsShowModal }) {
   useEffect(() => {
     if (isSuccessRecentAirports && recentAirports.length > 0) {
       dispatch(setCurrentAirport(recentAirports[0].airportId));
-      setSelectedAirport(recentAirports[0].airportId);
+      updateSelectedAirport(recentAirports[0].airportId);
     } else {
       dispatch(setCurrentAirport(settingsState.default_home_airport));
-      setSelectedAirport(settingsState.default_home_airport);
+      updateSelectedAirport(settingsState.default_home_airport);
     }
   }, [isSuccessRecentAirports]);
 
-  function clickHomeAirport() {
-    setSelectedAirport(settingsState.default_home_airport);
+  function updateSelectedAirport(airport) {
+    setSelectedAirport(airport);
+    if (airport) {
+      setPrevValidAirport(airport);
+    }
+  }
+  function clickHomeAirport(e) {
+    e.stopPropagation();
+    updateSelectedAirport(settingsState.default_home_airport);
   }
 
-  function clickApply() {
+  function clickApply(e) {
+    e.stopPropagation();
     if (selectedAirport) {
       dispatch(setCurrentAirport(selectedAirport.key || selectedAirport));
       addRecentAirport({ airportId: selectedAirport.key || selectedAirport });
@@ -57,7 +66,15 @@ function AirportSelectModal({ setIsShowModal }) {
             <SvgRoundClose />
           </button>
         </DialogTitle>
-        <div className="airport-selector-content">
+        <div
+          className="airport-selector-content"
+          onClick={() => {
+            if (selectedAirport) {
+              return;
+            }
+            setSelectedAirport(prevValidAirport);
+          }}
+        >
           <div className="button-area">
             <button className="home-airport" onClick={clickHomeAirport}>
               <SvgHomeAirport />
@@ -73,14 +90,7 @@ function AirportSelectModal({ setIsShowModal }) {
               name="default_home_airport"
               selectedValue={selectedAirport}
               handleAutoComplete={(name, value) => {
-                setSelectedAirport(value);
-              }}
-              onBlur={() => {
-                if (recentAirports && recentAirports.length > 0) {
-                  setSelectedAirport(recentAirports[0].airportId);
-                } else if (settingsState.default_home_airport) {
-                  setSelectedAirport(settingsState.default_home_airport);
-                }
+                updateSelectedAirport(value);
               }}
               exceptions={[]}
               key={'home-airport'}

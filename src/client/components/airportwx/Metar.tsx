@@ -8,7 +8,7 @@ import { getMetarCeilingCategory, getMetarVisibilityCategory } from '../map/comm
 function getMinCeiling(matches: RegExpMatchArray): string {
   let minCeiling = 100000;
   let ceiling = '';
-  matches.forEach((element) => {
+  matches?.forEach((element) => {
     const c = parseInt(element.replace(/[^0-9]+/, ''));
     if (c < minCeiling) {
       minCeiling = c;

@@ -4,6 +4,7 @@ import { SvgBackward, SvgBookmark, SvgForward, SvgRefresh, SvgRoute } from '../c
 import { AutoCompleteInput } from '../components/common';
 import Meteogram from '../components/airportwx/Meteogram';
 import {
+  airportwxApi,
   initialAirportWxState,
   useAddRecentAirportMutation,
   useGetAirportwxStateQuery,
@@ -17,18 +18,20 @@ import { selectCurrentAirport, setCurrentAirport, setCurrentAirportPos } from '.
 import { selectSettings } from '../store/user/UserSettings';
 import { PaperComponent } from '../components/common/PaperComponent';
 import dynamic from 'next/dynamic';
-import { setDataLoadTime } from '../store/layers/DataLoadTimeSlice';
-import { selectActiveRoute } from '../store/route/routes';
+import { selectDataLoadTime, setDataLoadTime } from '../store/layers/DataLoadTimeSlice';
+import { selectActiveRoute, setActiveRoute } from '../store/route/routes';
 import { RoutePoint } from '../interfaces/route';
 import Metar from '../components/airportwx/Metar';
 import Taf from '../components/airportwx/Taf';
 import Afd from '../components/airportwx/Afd';
+import { useGetRoutesQuery } from '../store/route/routeApi';
 const Route = dynamic(() => import('../components/shared/Route'), {
   ssr: false,
 });
 
 function AirportWxPage() {
   const { data: recentAirports, isSuccess: isSuccessRecentAirports } = useGetRecentAirportQuery(null);
+  const dataLoadedTime = useSelector(selectDataLoadTime);
   const currentAirport = useSelector(selectCurrentAirport);
   const settingsState = useSelector(selectSettings);
   const activeRoute = useSelector(selectActiveRoute);
@@ -41,6 +44,13 @@ function AirportWxPage() {
   const [airportwxState, setAirportwxState] = useState(initialAirportWxState);
   const [updateAirportwxState] = useUpdateAirportwxStateMutation();
   const { data: airports } = useGetAllAirportsQuery('');
+  const [validAirport, setValidAirport] = useState(currentAirport);
+
+  useEffect(() => {
+    if (currentAirport) {
+      setValidAirport(currentAirport);
+    }
+  }, [currentAirport]);
 
   useEffect(() => {
     if (airportwxDbState) {
@@ -84,35 +94,46 @@ function AirportWxPage() {
         break;
       case 'next':
       case 'previous':
+        let airports = [];
         if (activeRoute) {
-          let airports = [
+          airports = [
             activeRoute.departure,
             ...activeRoute.routeOfFlight
               .filter((x) => x.routePoint.type === 'icaoid' || x.routePoint.type === 'faaid')
               .map((x) => x.routePoint),
             activeRoute.destination,
           ];
-          if (id === 'previous') {
-            airports = airports.reverse();
-          }
-          for (let i = 0; i < airports.length; i++) {
-            const airport = airports[i];
-            if (airport.key === currentAirport) {
-              let j = i + 1;
-              if (i === airports.length - 1) {
-                j = 0;
-              }
-              changeCurrentAirport(airports[j]);
-              return;
-            }
-          }
-          changeCurrentAirport(airports[0]);
+        } else {
+          airports = recentAirports.map((x) => x.airportId);
         }
+        if (id === 'previous') {
+          airports = airports.reverse();
+        }
+        for (let i = 0; i < airports.length; i++) {
+          const airport = airports[i];
+          if (airport.key === currentAirport) {
+            let j = i + 1;
+            if (i === airports.length - 1) {
+              j = 0;
+            }
+            changeCurrentAirport(airports[j]);
+            return;
+          }
+        }
+        changeCurrentAirport(airports[0]);
         break;
       case 'save':
         break;
       case 'refresh':
         dispatch(setDataLoadTime(Date.now()));
+        dispatch(
+          airportwxApi.util.invalidateTags([
+            { type: 'meteogramData', id: 'LIST' },
+            { type: 'metar', id: 'LIST' },
+            { type: 'taf', id: 'LIST' },
+            { type: 'afd', id: 'LIST' },
+          ]),
+        );
         break;
     }
   }
@@ -217,8 +238,9 @@ function AirportWxPage() {
               {airportwxDbState.viewType === 'afd' && <Afd />}
               {airportwxDbState.viewType === 'skew-t' && (
                 <iframe
+                  key={dataLoadedTime}
                   sandbox="allow-scripts allow-same-origin"
-                  src={`/api/airportwx/${currentAirport}/GSD/?data_source=Op40&latest=latest&layout=off&n_hrs=20.0&airport=${currentAirport}`}
+                  src={`/api/airportwx/${validAirport}/GSD/?data_source=Op40&latest=latest&layout=off&n_hrs=20.0&airport=${validAirport}`}
                 />
               )}
             </div>

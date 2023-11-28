@@ -20,7 +20,7 @@ export const initialAirportWxState: AirportWxState = {
 export const airportwxApi = createApi({
   reducerPath: 'airportwxApi',
   baseQuery: fetchBaseQuery(),
-  tagTypes: ['airportwxApi', 'airportwxState'],
+  tagTypes: ['airportwxApi', 'airportwxState', 'allWaypoints', 'meteogramData', 'allAirports', 'metar', 'taf', 'afd'],
   endpoints: (builder) => ({
     getRecentAirport: builder.query({
       query: () => ({ url: baseUrl + '/get-recent', method: 'Get' }),
@@ -50,6 +50,7 @@ export const airportwxApi = createApi({
     }),
     getMeteogramData: builder.query({
       query: ({ lat, lng }) => ({ url: '/api/route-profile/data/mgram', method: 'Get', params: { lat, lng } }),
+      providesTags: [{ type: 'meteogramData', id: 'LIST' }],
       transformResponse: (response: any) => {
         return {
           humidity: transformTimeBands(response.humidity),
@@ -75,18 +76,22 @@ export const airportwxApi = createApi({
 
     getMetarText: builder.query<[{ raw_text: string }], string>({
       query: (icaoid: string) => ({ url: `${baseUrl}/${icaoid}/metar`, method: 'Get' }),
+      providesTags: [{ type: 'metar', id: 'LIST' }],
     }),
 
     getTafText: builder.query<[{ raw_text: string }], string>({
       query: (icaoid: string) => ({ url: `${baseUrl}/${icaoid}/taf`, method: 'Get' }),
+      providesTags: [{ type: 'taf', id: 'LIST' }],
     }),
 
     getAfdText: builder.query<{ afd_content: string }, { lat: number; lng: number }>({
       query: ({ lat, lng }) => ({ url: `${baseUrl}/${lng}/${lat}/afd`, method: 'Get' }),
+      providesTags: [{ type: 'afd', id: 'LIST' }],
     }),
 
     getAllAirports: builder.query({
       query: () => ({ url: baseUrl + '/airports', method: 'Get' }),
+      providesTags: [{ type: 'allAirports', id: 'LIST' }],
       transformResponse: (response: { icaoid: string; faaid: string; name: string; lng: number; lat: number }[]) => {
         return response?.reduce((acc: RoutePoint[], feature) => {
           if (feature.name !== '') {
@@ -113,6 +118,7 @@ export const airportwxApi = createApi({
 
     getAllWaypoints: builder.query({
       query: () => ({ url: baseUrl + '/waypoints', method: 'Get' }),
+      providesTags: [{ type: 'allWaypoints', id: 'LIST' }],
       transformResponse: (
         response: { city: string; state: string; country: string; name: string; lng: number; lat: number }[],
       ) => {

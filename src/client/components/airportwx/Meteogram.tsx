@@ -24,6 +24,7 @@ import {
   setViewWidth,
 } from '../../store/airportwx/airportwx';
 import {
+  airportwxApi,
   initialAirportWxState,
   useGetAirportwxStateQuery,
   useGetMeteogramDataQuery,
@@ -55,7 +56,6 @@ function Meteogram() {
   const [updateAirportwxState] = useUpdateAirportwxStateMutation();
   const dispatch = useDispatch();
   const isTouchScreen = isTouchScreenDevice();
-
   useEffect(() => {
     if (airportwxDbState) {
       setAirportwxState({ ...airportwxDbState });

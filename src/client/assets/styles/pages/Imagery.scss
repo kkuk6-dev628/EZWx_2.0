@@ -151,6 +151,10 @@
     @media screen and (orientation: portrait) {
       height: calc(100vh - 135px);
     }
+    .tabs {
+      height: 100%;
+      border-bottom: none;
+    }
   }
 
   &__lft {

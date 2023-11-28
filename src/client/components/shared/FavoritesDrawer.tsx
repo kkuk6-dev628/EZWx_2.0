@@ -23,7 +23,7 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
   const [folders, setFolders] = useState([
     {
       id: 'folder-1',
-      name: 'My Routes',
+      name: 'Routes',
       items: [
         { id: 'item-1', content: 'Item 1' },
         { id: 'item-2', content: 'Item 2' },
@@ -31,7 +31,7 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
     },
     {
       id: 'folder-2',
-      name: 'My Workshops',
+      name: 'Airports',
       items: [
         { id: 'item-3', content: 'Item 3' },
         { id: 'item-4', content: 'Item 4' },
@@ -39,7 +39,7 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
     },
     {
       id: 'folder-3',
-      name: 'My Imagery',
+      name: 'Imagery',
       items: [
         { id: 'item-5', content: 'Item 5' },
         { id: 'item-6', content: 'Item 6' },
@@ -94,9 +94,9 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
       <div className="drawer__container">
         <div className="drawer__sticky__header">
           <div className="drawer__header">
-            <div className="drawer__title">Settings</div>
+            <div className="drawer__title">Saved Items</div>
             <RxCross2 onClick={handleCloseDrawer} className="close__icon" />
-            <div className="drawer__description">Units, Aircraft & Personal Minimums</div>
+            <div className="drawer__description">Routes, Airports & Imagery</div>
           </div>
           <div className="drawer__input_container">
             <div className="drawer__input__suffix">

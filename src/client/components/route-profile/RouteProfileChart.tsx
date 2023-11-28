@@ -16,7 +16,7 @@ import {
 import { selectActiveRoute } from '../../store/route/routes';
 import { calcEndMargin, calcHighResolution, extendLine, interpolateRouteByInterval } from './RouteProfileDataLoader';
 import { getSegmentsCount } from './RouteProfileDataLoader';
-import { getTimeGradientStops, weatherFontContents } from '../../utils/utils';
+import { getTimeGradientStops, isTouchDevice, weatherFontContents } from '../../utils/utils';
 import { getIndexByElevation, getMinMaxValueByElevation, getValueFromDatasetByElevation } from '../../utils/utils';
 import { getSegmentInterval } from './RouteProfileDataLoader';
 import { getRouteLength } from './RouteProfileDataLoader';
@@ -57,6 +57,11 @@ import { makeWeatherString } from '../../utils/utils';
 import { hourInMili } from '../../utils/constants';
 import { iPadPortraitWidth, mobileLandscapeHeight, temperatureContourColors } from '../../utils/constants';
 import { makeSkyConditions, getAirportNbmData } from '../../utils/utils';
+import router from 'next/router';
+import { setCurrentAirport } from '../../store/airportwx/airportwx';
+import { useDispatch } from 'react-redux';
+import { useAddRecentAirportMutation } from '../../store/airportwx/airportwxApi';
+import { primaryInput } from 'detect-it';
 
 const calcChartWidth = (viewWidth: number, _viewHeight: number) => {
   if (viewWidth < iPadPortraitWidth) {
@@ -265,6 +270,9 @@ const RouteProfileChart = (props: {
 
   const isMobile = viewH < mobileLandscapeHeight || viewW < mobileLandscapeHeight;
   const windIconScale = isMobile ? 1 : 2;
+  const [addRecentAirport] = useAddRecentAirportMutation();
+
+  const dispatch = useDispatch();
 
   function buildTemperatureContourSeries() {
     if (queryGfsDataResult.isSuccess && segments.length > 0) {
@@ -454,13 +462,19 @@ const RouteProfileChart = (props: {
     }
   }
 
+  function visitAirport(airportId) {
+    dispatch(setCurrentAirport(airportId));
+    addRecentAirport({ airportId: airportId });
+    router.push('/airportwx');
+  }
+
   function buildAirportLabelSeries() {
     if (segments.length > 0) {
       const weatherSeries = [];
       const segmentsCount = getSegmentsCount(activeRoute);
       const interval = getSegmentInterval(activeRoute, segmentsCount);
       const airportLabels = segments.map((seg, segmentIndex) => {
-        const labelStyle = {
+        const labelStyle: any = {
           fill: 'green',
           dominantBaseline: 'text-after-edge',
           textAnchor: 'middle',
@@ -534,11 +548,15 @@ const RouteProfileChart = (props: {
           airportDist = Math.cos(degree2radian(airportCourse - seg.course)) * airportDelta;
         }
 
+        if (primaryInput === 'mouse' && seg.airport && seg.airport.type !== 'waypoint') {
+          labelStyle.cursor = 'pointer';
+        }
         return {
           x: seg.accDistance + airportDist,
           y: 0,
           yOffset: isMobile ? 36 : 44,
           label: seg.airport?.key || seg.position.lat.toFixed(2) + '/' + seg.position.lng.toFixed(2),
+          showVisitBtn: seg.airport && seg.airport.type !== 'waypoint' && primaryInput !== 'mouse',
           style: labelStyle,
           tooltip: tooltip,
         };
@@ -550,7 +568,7 @@ const RouteProfileChart = (props: {
       ];
       let accDistance = 0;
       const routePointsLabels = routePoints.map((rp, index) => {
-        const labelStyle = {
+        const labelStyle: any = {
           fill: 'green',
           dominantBaseline: 'text-after-edge',
           textAnchor: 'middle',
@@ -634,6 +652,11 @@ const RouteProfileChart = (props: {
           nbmDataIndex,
         );
         labelStyle.fill = getFlightCategoryColor(visibility, cloudceiling);
+        labelStyle.fontSize = index === 0 || index === routePoints.length - 1 ? 14 : 11;
+        if (primaryInput === 'mouse' && rp.type !== 'waypoint') {
+          labelStyle.cursor = 'pointer';
+        }
+
         const tooltip: any = {
           time: forecastTime,
           isAirport: rp.type !== 'waypoint',
@@ -657,7 +680,8 @@ const RouteProfileChart = (props: {
           y: 0,
           yOffset: isMobile ? 26 : 34,
           label: rp.key,
-          style: { ...labelStyle, fontSize: index === 0 || index === routePoints.length - 1 ? 14 : 11 },
+          showVisitBtn: primaryInput !== 'mouse' && rp.type !== 'waypoint',
+          style: { ...labelStyle },
           tooltip: tooltip,
         };
       });
@@ -990,7 +1014,13 @@ const RouteProfileChart = (props: {
             <LabelSeries
               data={airportLabelSeries}
               onValueMouseOver={(value) => setAirportHint(value)}
-              onValueClick={(value) => setAirportHint(value)}
+              onValueClick={(value) => {
+                if (primaryInput !== 'mouse') {
+                  setAirportHint(value);
+                } else if (value.style.cursor === 'pointer') {
+                  visitAirport(value.label);
+                }
+              }}
               onValueMouseOut={() => setAirportHint(null)}
             />
           )}
@@ -1263,7 +1293,11 @@ const RouteProfileChart = (props: {
             </Hint>
           )}
           {airportHint && airportHint.tooltip ? (
-            <Hint value={airportHint} className="time-tooltip" align={{ horizontal: 'auto', vertical: 'top' }}>
+            <Hint
+              value={airportHint}
+              className="time-tooltip airport-hint"
+              align={{ horizontal: 'auto', vertical: 'top' }}
+            >
               <span>
                 <b>Time:</b>&nbsp;{convertTimeFormat(airportHint.tooltip.time, userSettings.default_time_display_unit)}
               </span>
@@ -1353,6 +1387,9 @@ const RouteProfileChart = (props: {
                   ? Math.round(airportHint.tooltip.dewpoint) + ' \u00B0C'
                   : celsiusToFahrenheit(airportHint.tooltip.dewpoint, 0) + ' \u00B0F'}
               </span>
+              {airportHint.showVisitBtn && (
+                <button onClick={(e) => visitAirport(airportHint.label)}>Visit Airport</button>
+              )}
             </Hint>
           ) : null}
         </XYPlot>

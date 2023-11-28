@@ -30,7 +30,8 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete, onBlur, ex
           const title: string = obj.key + ' - ' + obj.name;
           return (
             <span
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 handleAutoComplete(name, obj);
                 setShowSuggestion(false);
               }}
@@ -108,7 +109,9 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete, onBlur, ex
     setCurrentFocus(0);
   };
 
-  const handleClose = () => {
+  const handleClose = (e) => {
+    console.log('clear clicked');
+    e.stopPropagation();
     handleAutoComplete(name, null);
     setShowSuggestion(false);
     setValue('');
@@ -149,6 +152,7 @@ const AutoCompleteInput = ({ selectedValue, name, handleAutoComplete, onBlur, ex
             value={value}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
+            onClick={(e) => e.stopPropagation()}
             className="auto__complete__input"
             placeholder="ENTER ICAO OR FAA AIRPORT ID"
             autoComplete="off"

@@ -636,3 +636,8 @@ export const isTouchScreenDevice = () => {
     return false;
   }
 };
+export function isTouchDevice() {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+}

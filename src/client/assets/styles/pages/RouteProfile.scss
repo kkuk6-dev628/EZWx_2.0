@@ -196,11 +196,14 @@ body>div{
       background: var(--color-secondary);
     }
     .route-profile-chart-container{
-      overflow-x: auto;
       margin: 4px;
-      &>no-touch{
-        ::-webkit-scrollbar{
-          height: 4px;
+      @media screen and (max-width: 940px){
+        overflow-x: auto;
+        overflow-y: hidden;
+        &>no-touch{
+          ::-webkit-scrollbar{
+            height: 4px;
+          }
         }
       }
       @media screen and (max-width: 500px) {
@@ -243,6 +246,9 @@ body>div{
         margin-bottom: -16px;
         margin-left: 20px;
         line-height: 1.5;
+      }
+      .airport-hint {
+        pointer-events: all;
       }
       .nodata-msg {
         font-size: 1.0rem;
