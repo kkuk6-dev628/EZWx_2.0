@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import MeteoLayerControl, { GroupedLayer } from '../layer-control/MeteoLayerControl';
 import { LayerGroup, Pane, useMapEvents } from 'react-leaflet';
-import L, { LatLng, LeafletMouseEvent } from 'leaflet';
+import L, { LatLng, LeafletMouseEvent, Path } from 'leaflet';
 import GairmetLayer from './GairmetLayer';
 import { useContext, useEffect, useRef } from 'react';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
@@ -214,6 +214,23 @@ const MeteoLayers = () => {
     },
   });
 
+  function sortLayers() {
+    if (meteoLayers.gairmet) {
+      meteoLayers.gairmet.bringToFront();
+    }
+    if (meteoLayers.convectiveOutlooks) {
+      meteoLayers.convectiveOutlooks.bringToFront();
+    }
+    if (meteoLayers.intlSigmet) {
+      meteoLayers.intlSigmet.bringToFront();
+    }
+    if (meteoLayers.sigmet) {
+      meteoLayers.sigmet.bringToFront();
+    }
+    if (meteoLayers.cwa) {
+      meteoLayers.cwa.bringToFront();
+    }
+  }
   // useEffect(() => {
   //   L.GridLayer.GridDebug = L.GridLayer.extend({
   //     createTile: function (coords) {
@@ -248,7 +265,8 @@ const MeteoLayers = () => {
       <GroupedLayer
         checked={layerControlState.sigmetState.checked}
         addLayerToStore={(layer) => {
-          meteoLayers.sigmet = layer;
+          meteoLayers.sigmet = layer as Path;
+          sortLayers();
         }}
       >
         <SigmetLayer></SigmetLayer>
@@ -256,7 +274,8 @@ const MeteoLayers = () => {
       <GroupedLayer
         checked={layerControlState.sigmetState.checked && layerControlState.sigmetState.international.checked}
         addLayerToStore={(layer) => {
-          meteoLayers.intlSigmet = layer;
+          meteoLayers.intlSigmet = layer as Path;
+          sortLayers();
         }}
       >
         <IntlSigmetLayer></IntlSigmetLayer>
@@ -264,7 +283,8 @@ const MeteoLayers = () => {
       <GroupedLayer
         checked={layerControlState.sigmetState.checked && layerControlState.sigmetState.outlooks.checked}
         addLayerToStore={(layer) => {
-          meteoLayers.convectiveOutlooks = layer;
+          meteoLayers.convectiveOutlooks = layer as Path;
+          sortLayers();
         }}
       >
         <ConvectiveOutlookLayer></ConvectiveOutlookLayer>
@@ -272,7 +292,8 @@ const MeteoLayers = () => {
       <GroupedLayer
         checked={layerControlState.gairmetState.checked}
         addLayerToStore={(layer) => {
-          meteoLayers.gairmet = layer;
+          meteoLayers.gairmet = layer as Path;
+          sortLayers();
         }}
       >
         {true && <GairmetLayer />}
@@ -280,7 +301,8 @@ const MeteoLayers = () => {
       <GroupedLayer
         checked={layerControlState.cwaState.checked}
         addLayerToStore={(layer) => {
-          meteoLayers.cwa = layer;
+          meteoLayers.cwa = layer as Path;
+          sortLayers();
         }}
       >
         <CWALayer></CWALayer>

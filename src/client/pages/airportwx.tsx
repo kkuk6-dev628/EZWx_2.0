@@ -11,6 +11,7 @@ import {
   useGetAllAirportsQuery,
   useGetRecentAirportQuery,
   useUpdateAirportwxStateMutation,
+  useUpdateRecentAirportMutation,
 } from '../store/airportwx/airportwxApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
@@ -37,6 +38,7 @@ function AirportWxPage() {
   const activeRoute = useSelector(selectActiveRoute);
   const dispatch = useDispatch();
   const [addRecentAirport] = useAddRecentAirportMutation();
+  const [updateRecentAirport] = useUpdateRecentAirportMutation();
   const [showRouteEditor, setShowRouteEditor] = useState(false);
   const { data: airportwxDbState, isSuccess: isAirportwxStateLoaded } = useGetAirportwxStateQuery(null, {
     refetchOnMountOrArgChange: true,
@@ -84,7 +86,13 @@ function AirportWxPage() {
 
   function changeCurrentAirport(airport) {
     dispatch(setCurrentAirport(airport.key || airport));
-    addRecentAirport({ airportId: airport.key || airport });
+    const airportId = airport.key || airport;
+    const exist = recentAirports.find((x) => x.airportId === airportId);
+    if (exist) {
+      updateRecentAirport(exist);
+    } else {
+      addRecentAirport({ airportId: airport.key || airport });
+    }
   }
 
   function handler(id: string) {
@@ -97,30 +105,32 @@ function AirportWxPage() {
         let airports = [];
         if (activeRoute) {
           airports = [
-            activeRoute.departure,
+            activeRoute.departure.key,
             ...activeRoute.routeOfFlight
               .filter((x) => x.routePoint.type === 'icaoid' || x.routePoint.type === 'faaid')
-              .map((x) => x.routePoint),
-            activeRoute.destination,
+              .map((x) => x.routePoint.key),
+            activeRoute.destination.key,
           ];
         } else {
-          airports = recentAirports.map((x) => x.airportId);
+          airports = recentAirports.slice(0, 10).map((x) => x.airportId);
         }
         if (id === 'previous') {
           airports = airports.reverse();
         }
         for (let i = 0; i < airports.length; i++) {
           const airport = airports[i];
-          if (airport.key === currentAirport) {
+          if (airport === currentAirport) {
             let j = i + 1;
             if (i === airports.length - 1) {
               j = 0;
             }
-            changeCurrentAirport(airports[j]);
-            return;
+            if (airports[j] !== currentAirport) {
+              dispatch(setCurrentAirport(airports[j]));
+              return;
+            }
           }
         }
-        changeCurrentAirport(airports[0]);
+        dispatch(setCurrentAirport(airports[0]));
         break;
       case 'save':
         break;

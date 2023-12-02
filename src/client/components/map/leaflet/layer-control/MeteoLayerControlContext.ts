@@ -1,16 +1,16 @@
 import { createContext, useContext } from 'react';
-import { Layer, LayerGroup } from 'leaflet';
+import { Layer, LayerGroup, Path } from 'leaflet';
 
 export interface MeteoLayers {
   metar: Layer;
   nbmMarkers: Layer;
   pirep: Layer;
   radar: Layer;
-  sigmet: Layer;
-  intlSigmet: Layer;
-  convectiveOutlooks: Layer;
-  cwa: Layer;
-  gairmet: Layer;
+  sigmet: Path;
+  intlSigmet: Path;
+  convectiveOutlooks: Path;
+  cwa: Path;
+  gairmet: Path;
   routeGroupLayer: LayerGroup;
 }
 

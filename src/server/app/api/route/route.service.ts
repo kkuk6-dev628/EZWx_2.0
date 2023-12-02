@@ -97,6 +97,19 @@ export class RouteService {
     routeEntity.departure = await this.selectOrInsertRoutePoint(route.departure);
     routeEntity.destination = await this.selectOrInsertRoutePoint(route.destination);
     const res = await this.routeRepository.save(routeEntity);
+    // const oldRows = await this.routeRepository.find({
+    //   select: ['id'],
+    //   where: {
+    //     user: routeEntity.user,
+    //   },
+    //   order: {
+    //     updated_at: 'DESC',
+    //   },
+    //   skip: 10,
+    // });
+    // if (oldRows.length > 0) {
+    //   this.routeRepository.delete(oldRows.map((x) => x.id));
+    // }
 
     const routeOfFlights = [];
     for (let i = 0; i < route.routeOfFlight.length; i++) {

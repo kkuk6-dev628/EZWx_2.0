@@ -25,6 +25,14 @@ export class AirportwxController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('/update-recent')
+  updateRecentAirport(@Request() request, @Body() recentAirport) {
+    recentAirport.updated_at = undefined;
+    recentAirport.created_at = undefined;
+    return this.airportwxService.updateRecentAirport(recentAirport);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('/get-airportwx-state')
   getAirportwxState(@Request() request) {
     return this.airportwxService.getAirportwxState(request.user);

@@ -7,10 +7,19 @@ import { Module } from '@nestjs/common';
 import { RouteProfileModule } from './route-profile/route-profile.module';
 import { ImageryModule } from './imagery/imagery.module';
 import { AirportwxModule } from './airportwx/airportwx.module';
+import { FavoritesModule } from './favorites/favorites.module';
 
 @Module({
   controllers: [ApiController],
-  imports: [StationTimeModule, RouteModule, LayerControlModule, RouteProfileModule, ImageryModule, AirportwxModule],
+  imports: [
+    StationTimeModule,
+    RouteModule,
+    LayerControlModule,
+    RouteProfileModule,
+    ImageryModule,
+    AirportwxModule,
+    FavoritesModule,
+  ],
   providers: [ApiService],
 })
 export class ApiModule {}

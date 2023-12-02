@@ -16,7 +16,7 @@ export class ElevationsService {
     const { data } = await firstValueFrom(
       this.httpService.get(url).pipe(
         catchError((error: AxiosError) => {
-          console.error(error.response.data);
+          console.error(error);
           throw 'An error happened!';
         }),
       ),
@@ -34,7 +34,7 @@ export class ElevationsService {
     const { data } = await firstValueFrom(
       this.httpService.get(url).pipe(
         catchError((error: AxiosError) => {
-          console.error(error.response.data);
+          console.error(error);
           throw 'An error happened!';
         }),
       ),
@@ -71,7 +71,7 @@ export class ElevationsService {
         })
         .pipe(
           catchError((error: AxiosError) => {
-            console.error(error.response.data);
+            console.error(error);
             throw 'An error happened!';
           }),
         ),

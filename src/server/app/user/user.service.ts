@@ -5,6 +5,7 @@ import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { Certification } from '../certification/certification.entity';
+import { FavoriteItem } from '../api/favorites/favorites.entity';
 
 @Injectable()
 export class UserService {
@@ -12,7 +13,21 @@ export class UserService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Certification)
     private certificationsRepository: Repository<Certification>,
+    @InjectRepository(FavoriteItem)
+    private favoriteItemRepository: Repository<FavoriteItem>,
   ) {}
+
+  async createFavoritesDefaultFolder(text: string, userId: number) {
+    const item = this.favoriteItemRepository.create({
+      text,
+      userId,
+      parent: 1,
+      selected: false,
+      droppable: true,
+      data: 'default',
+    });
+    return await this.favoriteItemRepository.save(item);
+  }
 
   async create(dto: CreateUserDto) {
     const { certifications, ...user } = dto;
@@ -23,7 +38,13 @@ export class UserService {
     newUser.displayName = user.firstname + ' ' + user.lastname;
     newUser.certifications = mapcertifications;
 
-    return await this.userRepository.save(newUser);
+    const savedUser = await this.userRepository.save(newUser);
+    if (savedUser.id) {
+      this.createFavoritesDefaultFolder('My Routes', savedUser.id);
+      this.createFavoritesDefaultFolder('My Imagery', savedUser.id);
+      this.createFavoritesDefaultFolder('My Airports', savedUser.id);
+    }
+    return savedUser;
   }
 
   async findOne(params: FindOneOptions<User> = {}) {

@@ -1,0 +1,24 @@
+.root {
+  height: 100%;
+}
+
+.treeRoot {
+  height: 100%;
+}
+
+.draggingSource {
+  opacity: 0.3;
+}
+
+.placeholderContainer {
+  position: relative;
+}
+
+.dropTarget {
+  background-color: #e8f0fe;
+}
+
+.contexify__item:not(.contexify__item--disabled):hover > .contexify__item__content,
+.contexify__item:not(.contexify__item--disabled):focus > .contexify__item__content {
+  background-color: lightgray !important;
+}

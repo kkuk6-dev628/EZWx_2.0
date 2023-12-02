@@ -197,7 +197,7 @@ body>div{
     }
     .route-profile-chart-container{
       margin: 4px;
-      @media screen and (max-width: 940px){
+      @media screen and (max-width: 1500px){
         overflow-x: auto;
         overflow-y: hidden;
         &>no-touch{

@@ -30,14 +30,35 @@ export class AirportwxService {
         userId: user.id,
       },
       order: {
-        created_at: 'DESC',
+        updated_at: 'DESC',
       },
     });
     return res;
   }
 
   async addRecentAirport(recentAirport) {
-    return (await this.recentAirportRepository.insert(recentAirport)).generatedMaps[0].id;
+    const id = (await this.recentAirportRepository.insert(recentAirport)).generatedMaps[0].id;
+    const oldRows = await this.recentAirportRepository.find({
+      select: ['id'],
+      where: {
+        userId: recentAirport.userId,
+      },
+      order: {
+        created_at: 'DESC',
+      },
+      skip: 10,
+    });
+    if (oldRows.length > 0) {
+      this.recentAirportRepository.delete(oldRows.map((x) => x.id));
+    }
+    return id;
+  }
+
+  async updateRecentAirport(recentAirport) {
+    const a = await this.recentAirportRepository.preload(recentAirport);
+    a.updated_at = new Date();
+    const res = await this.recentAirportRepository.save(a);
+    return res;
   }
 
   async getAirportwxState(user: User) {

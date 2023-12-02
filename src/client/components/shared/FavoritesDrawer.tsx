@@ -9,6 +9,7 @@ import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { FaFolder, FaFolderOpen } from 'react-icons/fa';
 //@ts-ignore
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import FavoritesTreeView from '../favorites/FavoritesTreeView';
 
 interface Props {
   onClose: (isOpen: boolean) => void;
@@ -16,77 +17,8 @@ interface Props {
 }
 
 const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
-  const { id } = useSelector(selectAuth);
-  const [showFolders, setShowFolders] = useState(false);
-  const [collapseState, setCollapseState] = useState({});
-
-  const [folders, setFolders] = useState([
-    {
-      id: 'folder-1',
-      name: 'Routes',
-      items: [
-        { id: 'item-1', content: 'Item 1' },
-        { id: 'item-2', content: 'Item 2' },
-      ],
-    },
-    {
-      id: 'folder-2',
-      name: 'Airports',
-      items: [
-        { id: 'item-3', content: 'Item 3' },
-        { id: 'item-4', content: 'Item 4' },
-      ],
-    },
-    {
-      id: 'folder-3',
-      name: 'Imagery',
-      items: [
-        { id: 'item-5', content: 'Item 5' },
-        { id: 'item-6', content: 'Item 6' },
-      ],
-    },
-  ]);
   const handleCloseDrawer = () => {
-    closeDrawer();
-  };
-
-  const closeDrawer = () => {
     onClose(false);
-  };
-
-  const toggleCollapse = (name) => {
-    setCollapseState((prev) => ({
-      ...prev,
-      [name]: !prev[name],
-    }));
-  };
-
-  const onDragEnd = (result) => {
-    if (!result?.destination) return;
-
-    const { source, destination } = result;
-
-    if (source.droppableId !== destination.droppableId) {
-      const sourceFolder = folders.find((folder) => folder.id === source.droppableId);
-      const destinationFolder = folders.find((folder) => folder.id === destination.droppableId);
-      const [removed] = sourceFolder.items.splice(source.index, 1);
-
-      if (result.destination.droppableId.startsWith('folder')) {
-        destinationFolder.items.splice(destination.index, 0, removed);
-      } else {
-        const subFolderItem = destinationFolder.items.find((item) => item.id === destination.droppableId);
-        if (!subFolderItem['subItems']) {
-          subFolderItem['subItems'] = [];
-        }
-        subFolderItem['subItems'].push(removed);
-      }
-      setFolders([...folders]);
-    } else {
-      const folder = folders.find((folder) => folder.id === source.droppableId);
-      const [removed] = folder.items.splice(source.index, 1);
-      folder.items.splice(destination.index, 0, removed);
-      setFolders([...folders]);
-    }
   };
 
   return (
@@ -108,96 +40,7 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
             </div>
           </div>
         </div>
-
-        <div className="drawer__body">
-          <div onClick={() => setShowFolders(!showFolders)} className="root__collapse__title__container">
-            {showFolders ? (
-              <>
-                <AiOutlineMinus /> <FaFolderOpen className="root__folder__icon" />
-              </>
-            ) : (
-              <>
-                <AiOutlinePlus /> <FaFolder className="root__folder__icon" />
-              </>
-            )}
-            <span className="root__collapse__title">{`EZWxBrief (${folders.length})`}</span>
-          </div>
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Collapse in={showFolders} timeout="auto" className="root__collapse">
-              <div className="collapse__container__body">
-                {folders.map((el) => (
-                  <Droppable droppableId={el.id} key={el.id}>
-                    {(provided) => (
-                      <div ref={provided.innerRef} {...provided.droppableProps}>
-                        <div onClick={() => toggleCollapse(el.name)} className="folder__title__container">
-                          {collapseState?.[el.name] ? (
-                            <FaFolderOpen className="folder__icon" />
-                          ) : (
-                            <FaFolder className=" folder__icon" />
-                          )}
-                          <span className="folder__title">{`${el.name} ${
-                            el.items.length > 0 ? `(${el.items.length})` : ''
-                          }`}</span>
-                        </div>
-                        <Collapse in={collapseState?.[el.name] || false}>
-                          <div className="collapse__container__body">
-                            {el.items.map((item, itemIndex) => (
-                              <Draggable key={item.id} draggableId={item.id} index={itemIndex}>
-                                {(provided) => (
-                                  <div
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    ref={provided.innerRef}
-                                    className="folder__title__container"
-                                  >
-                                    {item.content}
-                                    {item && item?.['subItems'] && (
-                                      <Droppable droppableId={item.id} key={item.id}>
-                                        {(provided) => (
-                                          <div ref={provided.innerRef} {...provided.droppableProps}>
-                                            {item &&
-                                              item?.['subItems'].map((subItem, subIndex) => {
-                                                return (
-                                                  <Draggable key={subItem.id} draggableId={subItem.id} index={subIndex}>
-                                                    {(provided) => (
-                                                      <div
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        ref={provided.innerRef}
-                                                        style={{
-                                                          ...provided.draggableProps.style,
-                                                          background: 'lightgrey',
-                                                          padding: '5px',
-                                                          marginBottom: '5px',
-                                                          borderRadius: '5px',
-                                                        }}
-                                                      >
-                                                        {subItem.content}
-                                                      </div>
-                                                    )}
-                                                  </Draggable>
-                                                );
-                                              })}
-                                            {provided.placeholder}
-                                          </div>
-                                        )}
-                                      </Droppable>
-                                    )}
-                                  </div>
-                                )}
-                              </Draggable>
-                            ))}
-                          </div>
-                        </Collapse>
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                ))}
-              </div>
-            </Collapse>
-          </DragDropContext>
-        </div>
+        <FavoritesTreeView></FavoritesTreeView>
       </div>
     </Drawer>
   );

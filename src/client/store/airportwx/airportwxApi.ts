@@ -22,12 +22,16 @@ export const airportwxApi = createApi({
   baseQuery: fetchBaseQuery(),
   tagTypes: ['airportwxApi', 'airportwxState', 'allWaypoints', 'meteogramData', 'allAirports', 'metar', 'taf', 'afd'],
   endpoints: (builder) => ({
-    getRecentAirport: builder.query({
+    getRecentAirport: builder.query<{ airportId: string }[], void>({
       query: () => ({ url: baseUrl + '/get-recent', method: 'Get' }),
       providesTags: [{ type: 'airportwxApi', id: 'LIST' }],
     }),
     addRecentAirport: builder.mutation({
       query: (data) => ({ url: baseUrl + '/add-recent', method: 'Post', body: data }),
+      invalidatesTags: ['airportwxApi'],
+    }),
+    updateRecentAirport: builder.mutation({
+      query: (data) => ({ url: baseUrl + '/update-recent', method: 'Post', body: data }),
       invalidatesTags: ['airportwxApi'],
     }),
     getAirportwxState: builder.query({
@@ -148,6 +152,7 @@ export const airportwxApi = createApi({
 export const {
   useGetRecentAirportQuery,
   useAddRecentAirportMutation,
+  useUpdateRecentAirportMutation,
   useGetMeteogramDataQuery,
   useGetAirportwxStateQuery,
   useUpdateAirportwxStateMutation,

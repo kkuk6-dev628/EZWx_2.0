@@ -7,11 +7,11 @@ import FlexiblePricing from '../components/shared/FlexiblePricing';
 
 const Home: NextPage<{ data: string }> = () => {
   return (
-    <>
+    <div className="home">
       <HomeHero />
       <HomeAbout />
       <FlexiblePricing content={undefined} isShowBtn={undefined} />
-    </>
+    </div>
   );
 };
 
