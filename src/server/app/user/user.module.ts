@@ -4,10 +4,10 @@ import { Certification } from '../certification/certification.entity';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { FavoriteItem } from '../api/favorites/favorites.entity';
+import { SavedItem } from '../api/favorites/saved.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Certification, FavoriteItem])],
+  imports: [TypeOrmModule.forFeature([User, Certification, SavedItem])],
   providers: [UserService],
   controllers: [UserController],
   exports: [UserService],

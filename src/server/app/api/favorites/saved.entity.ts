@@ -8,8 +8,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('favorites_items')
-export class FavoriteItem {
+@Entity('saved_items')
+export class SavedItem {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -56,8 +56,8 @@ export class FavoriteItem {
   deleted_at?: Date;
 }
 
-@Entity('favorites_orders')
-export class FavoritesOrder {
+@Entity('saved_order')
+export class SavedOrder {
   @PrimaryGeneratedColumn()
   id: number;
 

@@ -7,7 +7,7 @@ import { Module } from '@nestjs/common';
 import { RouteProfileModule } from './route-profile/route-profile.module';
 import { ImageryModule } from './imagery/imagery.module';
 import { AirportwxModule } from './airportwx/airportwx.module';
-import { FavoritesModule } from './favorites/favorites.module';
+import { SavedModule } from './favorites/saved.module';
 
 @Module({
   controllers: [ApiController],
@@ -18,7 +18,7 @@ import { FavoritesModule } from './favorites/favorites.module';
     RouteProfileModule,
     ImageryModule,
     AirportwxModule,
-    FavoritesModule,
+    SavedModule,
   ],
   providers: [ApiService],
 })

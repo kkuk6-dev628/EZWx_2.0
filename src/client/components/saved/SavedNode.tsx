@@ -3,11 +3,11 @@ import Typography from '@mui/material/Typography';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { NodeModel, useDragOver } from '@minoru/react-dnd-treeview';
 import { TypeIcon } from './TypeIcon';
-import styles from './FavoritesNode.module.css';
-import { FavoritesData } from './favoritesTypes';
+import styles from './SavedNode.module.css';
+import { SavedItemData } from '../../interfaces/saved';
 
 type Props = {
-  node: NodeModel<FavoritesData>;
+  node: NodeModel<SavedItemData>;
   depth: number;
   isOpen: boolean;
   isSelected?: boolean;
@@ -15,7 +15,7 @@ type Props = {
   onToggle: (id: NodeModel['id']) => void;
 };
 
-export const FavoritesNode: React.FC<Props> = (props) => {
+export const SavedNode: React.FC<Props> = (props) => {
   const { id, droppable, data } = props.node;
   const indent = props.depth * 24;
 
@@ -43,7 +43,7 @@ export const FavoritesNode: React.FC<Props> = (props) => {
         )}
       </div>
       <div>
-        <TypeIcon droppable={droppable || false} fileType={data?.fileType} />
+        <TypeIcon droppable={droppable || false} fileType={data?.type} />
       </div>
       <div className={styles.labelGridItem}>
         <Typography variant="body2">{props.node.text}</Typography>

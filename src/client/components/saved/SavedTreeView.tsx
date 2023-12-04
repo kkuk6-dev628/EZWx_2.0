@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ThemeProvider, CssBaseline } from '@mui/material';
-import { Tree, NodeModel, MultiBackend, getBackendOptions, DndProvider } from '@minoru/react-dnd-treeview';
-import styles from './FavoritesTreeView.module.css';
-import { FavoritesNode } from './FavoritesNode';
-import { FavoritesDragPreview } from './FavoritesDragPreview';
-import { theme } from './favoritesTheme';
+import { Tree, NodeModel, MultiBackend, getBackendOptions, DndProvider, DropOptions } from '@minoru/react-dnd-treeview';
+import styles from './SavedTreeView.module.css';
+import { SavedNode } from './SavedNode';
+import { SavedDragPreview } from './SavedDragPreview';
+import { theme } from './savedTheme';
 import { Menu, Item, useContextMenu } from 'react-contexify';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -14,33 +14,91 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import 'react-contexify/dist/ReactContexify.css';
 import { Placeholder } from './Placeholder';
-import { useGetFavoriteItemsQuery } from '../../store/favorites/favoritesApi';
-import { CustomData } from '../../interfaces/favorites';
+import {
+  useGetSavedItemsQuery,
+  useGetSavedOrderQuery,
+  useUpdateSavedItemMutation,
+  useUpdateSavedOrderMutation,
+} from '../../store/saved/savedApi';
+import { SavedItemData, SavedOrderItem } from '../../interfaces/saved';
+import { opendir } from 'fs';
 
 const ROOT_MENU_ID = 'root-menu';
 const FOLDER_MENU_ID = 'folder-menu';
 const ITEM_MENU_ID = 'item-menu';
 
-function FavoritesTreeView() {
-  const { data: favData } = useGetFavoriteItemsQuery();
-  const [treeData, setTreeData] = useState<NodeModel<CustomData>[]>();
-  const handleDrop = (newTree: NodeModel<CustomData>[]) => setTreeData(newTree);
-  const treeRef = useRef(null);
-  const { show: showContextMenu } = useContextMenu();
+function SavedTreeView() {
+  const { data: savedData, isSuccess: loadedFavItems } = useGetSavedItemsQuery();
+  const [updateSavedItem] = useUpdateSavedItemMutation();
+  const { data: savedOrder, isSuccess: loadedFavOrder } = useGetSavedOrderQuery();
+  const [updateSavedOrder] = useUpdateSavedOrderMutation();
+  const [savedOrderLocal, setSavedOrderLocal] = useState<SavedOrderItem[]>();
+  const [treeData, setTreeData] = useState<NodeModel<SavedItemData>[]>();
   const [selectedNode, setSelectedNode] = useState<NodeModel>(null);
+  const { show: showContextMenu } = useContextMenu();
+  const treeRef = useRef(null);
 
   useEffect(() => {
-    if (favData) {
-      setTreeData(favData);
+    if (savedData) {
+      if (savedOrder && savedOrder.order.length > 0) {
+        setSavedOrderLocal(savedOrder.order);
+        const orderedTreeData = savedOrder.order.map((order) => savedData.find((x) => x.id === order.id));
+        const missed = savedData.filter((x) => !savedOrder.order.find((o) => x.id === o.id));
+        setTreeData(orderedTreeData.concat(missed).filter((x) => x));
+      } else {
+        setTreeData(savedData);
+      }
     }
-  }, [favData]);
+  }, [savedData, savedOrder]);
 
   useEffect(() => {
-    if (treeRef.current) {
-      treeRef.current.open(1);
+    if (savedOrderLocal) {
+      const opened = savedOrderLocal.filter((x) => x.isOpen);
+      if (opened.length > 0 && treeRef?.current) {
+        treeRef?.current.open(opened.map((x) => x.id));
+      }
     }
-  });
+  }, [savedOrderLocal, treeRef]);
 
+  function createNewOrderData() {
+    const newOrder = savedData.map((x) => {
+      return { id: x.id as number, isOpen: false };
+    });
+    setSavedOrderLocal(newOrder);
+    return newOrder;
+  }
+
+  function handleToggle(id: number | string, isOpen: boolean) {
+    if (savedOrderLocal) {
+      const order = savedOrderLocal.map((x) => ({ id: x.id, isOpen: x.id === id ? !isOpen : x.isOpen }));
+      setSavedOrderLocal(order);
+      updateSavedOrder({ ...savedOrder, order: order });
+    } else {
+      const newOrder = createNewOrderData();
+      updateSavedOrder({ order: newOrder });
+    }
+  }
+
+  function handleDrop(newTree: NodeModel<SavedItemData>[], { dragSource }: DropOptions<SavedItemData>) {
+    updateSavedItem({
+      id: dragSource.id as number,
+      parent: dragSource.parent as number,
+    });
+    if (savedOrderLocal) {
+      const updatedOrder = newTree.map((x) => {
+        return { id: x.id as number, isOpen: savedOrderLocal.find((o) => o.id === x.id)?.isOpen || false };
+      });
+      setSavedOrderLocal(updatedOrder);
+      updateSavedOrder({
+        ...savedOrder,
+        order: updatedOrder,
+      });
+    } else {
+      const newOrder = createNewOrderData();
+      updateSavedOrder({ order: newOrder });
+    }
+    setTreeData(newTree);
+  }
   function handleRootMenuItemClick(e) {
     console.log(e);
   }
@@ -78,16 +136,19 @@ function FavoritesTreeView() {
                 rootId={0}
                 render={(nodeModel, { depth, isOpen, onToggle }) => (
                   <div onContextMenu={(e) => displayContextMenu(e, nodeModel)}>
-                    <FavoritesNode
+                    <SavedNode
                       node={nodeModel}
                       depth={depth}
                       isOpen={isOpen}
-                      onToggle={onToggle}
+                      onToggle={(id) => {
+                        onToggle();
+                        handleToggle(id, isOpen);
+                      }}
                       onClick={handleClickTreeItem}
                     />
                   </div>
                 )}
-                dragPreviewRender={(monitorProps) => <FavoritesDragPreview monitorProps={monitorProps} />}
+                dragPreviewRender={(monitorProps) => <SavedDragPreview monitorProps={monitorProps} />}
                 onDrop={handleDrop}
                 classes={{
                   root: styles.treeRoot,
@@ -99,6 +160,9 @@ function FavoritesTreeView() {
                 sort={false}
                 insertDroppableFirst={false}
                 canDrop={(tree, { dragSource, dropTargetId, dropTarget }) => {
+                  if (dragSource.droppable) {
+                    return dropTargetId === 1;
+                  }
                   if (dragSource?.parent === dropTargetId) {
                     return true;
                   }
@@ -164,4 +228,4 @@ function FavoritesTreeView() {
   );
 }
 
-export default FavoritesTreeView;
+export default SavedTreeView;

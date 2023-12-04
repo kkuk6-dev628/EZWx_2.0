@@ -5,7 +5,7 @@ import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { Certification } from '../certification/certification.entity';
-import { FavoriteItem } from '../api/favorites/favorites.entity';
+import { SavedItem } from '../api/favorites/saved.entity';
 
 @Injectable()
 export class UserService {
@@ -13,8 +13,8 @@ export class UserService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Certification)
     private certificationsRepository: Repository<Certification>,
-    @InjectRepository(FavoriteItem)
-    private favoriteItemRepository: Repository<FavoriteItem>,
+    @InjectRepository(SavedItem)
+    private favoriteItemRepository: Repository<SavedItem>,
   ) {}
 
   async createFavoritesDefaultFolder(text: string, userId: number) {

@@ -20,6 +20,7 @@ import { useDispatch } from 'react-redux';
 import PrismaZoom from 'react-prismazoom';
 import toast from 'react-hot-toast';
 import Nouislider from 'nouislider-react';
+import { FetchUserSettings } from '../shared/FetchUserSettings';
 
 const sliderStep = 60 * 1000;
 
@@ -382,6 +383,7 @@ function Imagery() {
 
   return (
     <div className="igry" key={refreshTime}>
+      <FetchUserSettings />
       <Dialog
         PaperComponent={PaperComponent}
         hideBackdrop

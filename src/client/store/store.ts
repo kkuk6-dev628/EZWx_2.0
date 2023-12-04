@@ -16,7 +16,7 @@ import { imageryApi } from './imagery/imageryApi';
 import ImagerySlice from './imagery/imagery';
 import airportwxSlice from './airportwx/airportwx';
 import { airportwxApi } from './airportwx/airportwxApi';
-import { favoritesApi } from './favorites/favoritesApi';
+import { savedApi } from './saved/savedApi';
 
 const makeStore = () =>
   configureStore({
@@ -28,7 +28,7 @@ const makeStore = () =>
       [elevationApi.reducerPath]: elevationApi.reducer,
       [imageryApi.reducerPath]: imageryApi.reducer,
       [airportwxApi.reducerPath]: airportwxApi.reducer,
-      [favoritesApi.reducerPath]: favoritesApi.reducer,
+      [savedApi.reducerPath]: savedApi.reducer,
       [RoutesSlice.name]: RoutesSlice.reducer,
       [ImagerySlice.name]: ImagerySlice.reducer,
       [airportwxSlice.name]: airportwxSlice.reducer,
@@ -51,7 +51,7 @@ const makeStore = () =>
         elevationApi.middleware,
         imageryApi.middleware,
         airportwxApi.middleware as any,
-        favoritesApi.middleware,
+        savedApi.middleware,
       );
       return middleWares;
     },

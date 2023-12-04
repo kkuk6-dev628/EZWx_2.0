@@ -9,7 +9,7 @@ import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { FaFolder, FaFolderOpen } from 'react-icons/fa';
 //@ts-ignore
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import FavoritesTreeView from '../favorites/FavoritesTreeView';
+import SavedTreeView from '../saved/SavedTreeView';
 
 interface Props {
   onClose: (isOpen: boolean) => void;
@@ -40,7 +40,7 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
             </div>
           </div>
         </div>
-        <FavoritesTreeView></FavoritesTreeView>
+        <SavedTreeView></SavedTreeView>
       </div>
     </Drawer>
   );

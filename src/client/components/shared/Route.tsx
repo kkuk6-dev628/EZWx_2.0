@@ -14,10 +14,12 @@ import { Route, RouteOfFlight, RoutePoint } from '../../interfaces/route';
 import { useMeteoLayersContext } from '../map/leaflet/layer-control/MeteoLayerControlContext';
 import L from 'leaflet';
 import 'leaflet-arc';
-import { Button } from '@mui/material';
+import { Button, FormControl, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import MultipleSelect from './MultipleSelect';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useRouter } from 'next/router';
+import { useGetSavedItemsQuery, useUpdateSavedItemMutation } from '../../store/saved/savedApi';
+import { NodeModel } from '@minoru/react-dnd-treeview';
 
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
@@ -83,14 +85,19 @@ function Route({ setIsShowModal }: Props) {
   const [isShowErrorRouteModal, setIsShowErrorRouteModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [altitudeText, setAltitudeText] = useState(routeData.altitude.toLocaleString());
+  const { data: savedData, isSuccess: loadedSavedItems } = useGetSavedItemsQuery();
+  const [updateSavedItem] = useUpdateSavedItemMutation();
+  const [saveFolders, setSaveFolders] = useState<NodeModel[]>(savedData && savedData.filter((x) => x.droppable));
+  const [selectedSaveFolder, setSelectedSaveFolder] = useState(1);
+  const [saveName, setSaveName] = useState('');
   const router = useRouter();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // L.DomEvent.disableClickPropagation(ref.current);
-    // L.DomEvent.disableScrollPropagation(ref.current);
-    // L.DomEvent.on(ref.current, 'mousemove contextmenu', L.DomEvent.stop);
-  }, []);
+    if (savedData && savedData.length > 0) {
+      setSaveFolders(savedData.filter((x) => x.droppable));
+    }
+  }, [savedData]);
 
   useEffect(() => {
     if (activeRoute) {
@@ -180,8 +187,18 @@ function Route({ setIsShowModal }: Props) {
   };
 
   const handleSaveRoute = () => {
-    setIsShowSaveRouteModal(true);
+    updateSavedItem({
+      text: saveName,
+      parent: selectedSaveFolder,
+      data: { type: 'route', data: routeData },
+      droppable: false,
+    });
+    setIsShowSaveRouteModal(false);
   };
+
+  function handleSaveFolderChange(e: SelectChangeEvent) {
+    setSelectedSaveFolder(e.target.value as unknown as number);
+  }
 
   const roundAltitude = (altitude) => {
     if (altitude > 45000) {
@@ -219,7 +236,19 @@ function Route({ setIsShowModal }: Props) {
                 <AiOutlineCloseCircle className="route-editor__icon" />
                 <p className="route-editor__tab__text text">Clear</p>
               </button>
-              <button className="route-editor__tab" type="button" onClick={handleSaveRoute}>
+              <button
+                className="route-editor__tab"
+                type="button"
+                onClick={() => {
+                  const validity = validateRoute(routeData);
+                  if (validity === true) {
+                    setIsShowSaveRouteModal(true);
+                  } else {
+                    setErrorMessage(validity as string);
+                    setIsShowErrorRouteModal(true);
+                  }
+                }}
+              >
                 <BsBookmarkPlus className="route-editor__icon" />
                 <p className="route-editor__tab__text text">Save</p>
               </button>
@@ -385,17 +414,45 @@ function Route({ setIsShowModal }: Props) {
               </label>
               <div className="route__modal__box__input1">
                 <AiOutlineHeart className="route__modal__box__icon" />
-                <input aria-label="name" type="text" className="route__modal__box__input" />
+                <input
+                  aria-label="name"
+                  type="text"
+                  value={saveName}
+                  onChange={(e) => setSaveName(e.target.value)}
+                  className="route__modal__box__input"
+                />
               </div>
             </div>
-            <MultipleSelect />
+            <div>
+              <FormControl sx={{ paddingTop: 1, paddingBottom: 1, mt: 1, border: 'none', minWidth: 270 }}>
+                <label className="label" htmlFor="">
+                  Destination Folder
+                </label>
+
+                <Select
+                  value={selectedSaveFolder as any}
+                  onChange={handleSaveFolderChange}
+                  displayEmpty
+                  inputProps={{ 'aria-label': 'Without label' }}
+                >
+                  {saveFolders &&
+                    saveFolders.map((f) => {
+                      return (
+                        <MenuItem key={'folder-' + f.text} value={f.id}>
+                          {f.text}
+                        </MenuItem>
+                      );
+                    })}
+                </Select>
+              </FormControl>
+            </div>
             <div className="button">
               <BsFolderPlus />
               <Button variant="text">Add New Folder</Button>
             </div>
             <div className="buttonDiv">
               <SecondaryButton onClick={() => setIsShowDeleteRouteModal(false)} text="Cancel" isLoading={false} />
-              <PrimaryButton text="Save" onClick={() => deleteActiveRoute()} isLoading={false} />
+              <PrimaryButton text="Save" onClick={handleSaveRoute} isLoading={false} />
             </div>
           </div>
         }

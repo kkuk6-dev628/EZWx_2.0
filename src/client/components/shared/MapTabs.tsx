@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { SvgAir, SvgBaseMap, SvgTemperature } from '../utils/SvgIcons';
 import ZuluClock from './ZuluClock';
 
 interface TabMenusObj {
