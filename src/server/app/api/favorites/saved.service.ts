@@ -33,6 +33,12 @@ export class SavedService {
     }
   }
 
+  async deleteSavedItem(saveditem) {
+    const deletedChildren = (await this.savedItemRepository.delete({ parent: saveditem.id })).affected;
+    const deleted = (await this.savedItemRepository.delete(saveditem.id)).affected;
+    return { deletedChildren, deleted };
+  }
+
   async updateSavedOrder(savedorder) {
     if (savedorder.id) {
       return await this.savedOrderRepository.update(savedorder.id, savedorder);

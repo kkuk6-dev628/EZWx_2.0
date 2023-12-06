@@ -20,6 +20,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useRouter } from 'next/router';
 import { useGetSavedItemsQuery, useUpdateSavedItemMutation } from '../../store/saved/savedApi';
 import { NodeModel } from '@minoru/react-dnd-treeview';
+import { SaveDialog } from '../saved/SaveDialog';
 
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
@@ -85,19 +86,8 @@ function Route({ setIsShowModal }: Props) {
   const [isShowErrorRouteModal, setIsShowErrorRouteModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [altitudeText, setAltitudeText] = useState(routeData.altitude.toLocaleString());
-  const { data: savedData, isSuccess: loadedSavedItems } = useGetSavedItemsQuery();
-  const [updateSavedItem] = useUpdateSavedItemMutation();
-  const [saveFolders, setSaveFolders] = useState<NodeModel[]>(savedData && savedData.filter((x) => x.droppable));
-  const [selectedSaveFolder, setSelectedSaveFolder] = useState(1);
-  const [saveName, setSaveName] = useState('');
   const router = useRouter();
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (savedData && savedData.length > 0) {
-      setSaveFolders(savedData.filter((x) => x.droppable));
-    }
-  }, [savedData]);
 
   useEffect(() => {
     if (activeRoute) {
@@ -185,20 +175,6 @@ function Route({ setIsShowModal }: Props) {
       router.push('/map');
     }
   };
-
-  const handleSaveRoute = () => {
-    updateSavedItem({
-      text: saveName,
-      parent: selectedSaveFolder,
-      data: { type: 'route', data: routeData },
-      droppable: false,
-    });
-    setIsShowSaveRouteModal(false);
-  };
-
-  function handleSaveFolderChange(e: SelectChangeEvent) {
-    setSelectedSaveFolder(e.target.value as unknown as number);
-  }
 
   const roundAltitude = (altitude) => {
     if (altitude > 45000) {
@@ -401,61 +377,11 @@ function Route({ setIsShowModal }: Props) {
           </>
         }
       />
-      <Modal
+      <SaveDialog
+        title="Save route"
         open={isShowSaveRouteModal}
-        handleClose={() => setIsShowSaveRouteModal(false)}
-        title="Save favorite"
-        description=""
-        footer={
-          <div className="route__modal__box">
-            <div className="route__modal__box__2">
-              <label className="label" htmlFor="">
-                Name
-              </label>
-              <div className="route__modal__box__input1">
-                <AiOutlineHeart className="route__modal__box__icon" />
-                <input
-                  aria-label="name"
-                  type="text"
-                  value={saveName}
-                  onChange={(e) => setSaveName(e.target.value)}
-                  className="route__modal__box__input"
-                />
-              </div>
-            </div>
-            <div>
-              <FormControl sx={{ paddingTop: 1, paddingBottom: 1, mt: 1, border: 'none', minWidth: 270 }}>
-                <label className="label" htmlFor="">
-                  Destination Folder
-                </label>
-
-                <Select
-                  value={selectedSaveFolder as any}
-                  onChange={handleSaveFolderChange}
-                  displayEmpty
-                  inputProps={{ 'aria-label': 'Without label' }}
-                >
-                  {saveFolders &&
-                    saveFolders.map((f) => {
-                      return (
-                        <MenuItem key={'folder-' + f.text} value={f.id}>
-                          {f.text}
-                        </MenuItem>
-                      );
-                    })}
-                </Select>
-              </FormControl>
-            </div>
-            <div className="button">
-              <BsFolderPlus />
-              <Button variant="text">Add New Folder</Button>
-            </div>
-            <div className="buttonDiv">
-              <SecondaryButton onClick={() => setIsShowDeleteRouteModal(false)} text="Cancel" isLoading={false} />
-              <PrimaryButton text="Save" onClick={handleSaveRoute} isLoading={false} />
-            </div>
-          </div>
-        }
+        onClose={() => setIsShowSaveRouteModal(false)}
+        data={{ type: 'route', data: routeData }}
       />
       <Modal
         open={isShowErrorRouteModal}

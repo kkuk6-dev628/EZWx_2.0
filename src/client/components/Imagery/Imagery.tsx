@@ -21,6 +21,7 @@ import PrismaZoom from 'react-prismazoom';
 import toast from 'react-hot-toast';
 import Nouislider from 'nouislider-react';
 import { FetchUserSettings } from '../shared/FetchUserSettings';
+import { SaveDialog } from '../saved/SaveDialog';
 
 const sliderStep = 60 * 1000;
 
@@ -76,6 +77,7 @@ function Imagery() {
   const [selectedImagesData, setSelectedImagesData] = useState<ImageryCollectionItem>(null);
   const [hideWeekDay, setHideWeekDay] = useState(true);
   const showInformation = useSelector(selectShowInformation);
+  const [showSaveImageryDlg, setShowSaveImageryDlg] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -319,6 +321,9 @@ function Imagery() {
   async function handler(id: string) {
     console.log(id);
     switch (id) {
+      case 'save':
+        setShowSaveImageryDlg(true);
+        break;
       case 'collapse':
         prismaRef.current?.reset();
         break;
@@ -410,6 +415,12 @@ function Imagery() {
           )}
         </div>
       </Dialog>
+      <SaveDialog
+        title="Save Imagery"
+        open={showSaveImageryDlg}
+        onClose={() => setShowSaveImageryDlg(false)}
+        data={{ type: 'imagery', data: selectedImageUrl }}
+      />
       <div className="igry__wrp">
         <div className="igry__lft igry__blu">
           <MapTabs tabMenus={tabMenus} />

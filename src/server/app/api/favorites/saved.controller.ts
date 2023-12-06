@@ -21,6 +21,11 @@ export class SavedController {
     saveditem.created_at = undefined;
     return this.savedService.updateSavedItem(saveditem);
   }
+  @UseGuards(JwtAuthGuard)
+  @Post('/delete-saveditem')
+  deleteSavedItem(@Body() saveditem) {
+    return this.savedService.deleteSavedItem(saveditem);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get('/get-savedorder')

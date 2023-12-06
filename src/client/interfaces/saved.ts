@@ -1,5 +1,5 @@
 export type SavedItemData = {
-  type: 'route' | 'imagery' | 'airport';
+  type: 'route' | 'imagery' | 'airport' | 'folder';
   data: any;
 };
 

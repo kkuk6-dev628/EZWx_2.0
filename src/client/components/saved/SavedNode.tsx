@@ -20,11 +20,7 @@ export const SavedNode: React.FC<Props> = (props) => {
   const indent = props.depth * 24;
 
   const handleClick = () => {
-    if (droppable) {
-      props.onToggle(props.node.id);
-    } else {
-      props.onClick(props.node);
-    }
+    props.onClick(props.node);
   };
 
   const dragOverProps = useDragOver(id, props.isOpen, props.onToggle);
@@ -37,7 +33,12 @@ export const SavedNode: React.FC<Props> = (props) => {
     >
       <div className={`${styles.expandIconWrapper} ${props.isOpen ? styles.isOpen : ''}`}>
         {props.node.droppable && (
-          <div>
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              props.onToggle(id);
+            }}
+          >
             <ArrowRightIcon />
           </div>
         )}

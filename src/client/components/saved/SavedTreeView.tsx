@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ThemeProvider, CssBaseline } from '@mui/material';
+import { ThemeProvider, CssBaseline, FormControl, DialogTitle, Dialog } from '@mui/material';
 import { Tree, NodeModel, MultiBackend, getBackendOptions, DndProvider, DropOptions } from '@minoru/react-dnd-treeview';
 import styles from './SavedTreeView.module.css';
 import { SavedNode } from './SavedNode';
@@ -15,13 +15,17 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import 'react-contexify/dist/ReactContexify.css';
 import { Placeholder } from './Placeholder';
 import {
+  useDeleteSavedItemMutation,
   useGetSavedItemsQuery,
   useGetSavedOrderQuery,
   useUpdateSavedItemMutation,
   useUpdateSavedOrderMutation,
 } from '../../store/saved/savedApi';
 import { SavedItemData, SavedOrderItem } from '../../interfaces/saved';
-import { opendir } from 'fs';
+import { SecondaryButton, PrimaryButton, Modal } from '../common';
+import { PaperComponent } from '../common/PaperComponent';
+import { DraggableDlg } from '../common/DraggableDlg';
+import toast from 'react-hot-toast';
 
 const ROOT_MENU_ID = 'root-menu';
 const FOLDER_MENU_ID = 'folder-menu';
@@ -32,11 +36,18 @@ function SavedTreeView() {
   const [updateSavedItem] = useUpdateSavedItemMutation();
   const { data: savedOrder, isSuccess: loadedFavOrder } = useGetSavedOrderQuery();
   const [updateSavedOrder] = useUpdateSavedOrderMutation();
+  const [deleteSavedItem] = useDeleteSavedItemMutation();
   const [savedOrderLocal, setSavedOrderLocal] = useState<SavedOrderItem[]>();
   const [treeData, setTreeData] = useState<NodeModel<SavedItemData>[]>();
   const [selectedNode, setSelectedNode] = useState<NodeModel>(null);
   const { show: showContextMenu } = useContextMenu();
   const treeRef = useRef(null);
+
+  const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
+  const [showRenameFolderModal, setShowRenameFolderModal] = useState(false);
+  const [showDuplicateFolderModal, setShowDuplicateFolderModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [newName, setNewName] = useState('');
 
   useEffect(() => {
     if (savedData) {
@@ -79,16 +90,15 @@ function SavedTreeView() {
     }
   }
 
-  function handleDrop(newTree: NodeModel<SavedItemData>[], { dragSource }: DropOptions<SavedItemData>) {
+  function handleDrop(newTree: NodeModel<SavedItemData>[], { dragSource, dropTargetId }: DropOptions<SavedItemData>) {
     updateSavedItem({
       id: dragSource.id as number,
-      parent: dragSource.parent as number,
+      parent: dropTargetId as number,
     });
     if (savedOrderLocal) {
       const updatedOrder = newTree.map((x) => {
         return { id: x.id as number, isOpen: savedOrderLocal.find((o) => o.id === x.id)?.isOpen || false };
       });
-      setSavedOrderLocal(updatedOrder);
       updateSavedOrder({
         ...savedOrder,
         order: updatedOrder,
@@ -100,11 +110,29 @@ function SavedTreeView() {
     setTreeData(newTree);
   }
   function handleRootMenuItemClick(e) {
-    console.log(e);
+    switch (e.id) {
+      case 'new-folder':
+        setShowCreateFolderModal(true);
+        break;
+      case 'refresh':
+        break;
+    }
   }
 
   function handleFolderMenuItemClick(e) {
-    console.log(e);
+    switch (e.id) {
+      case 'delete':
+        setShowDeleteModal(true);
+        break;
+      case 'rename':
+        setShowRenameFolderModal(true);
+        break;
+      case 'duplicate':
+        setShowDuplicateFolderModal(true);
+        break;
+      case 'refresh':
+        break;
+    }
   }
 
   function handleItemMenuItemClick(e) {
@@ -112,6 +140,7 @@ function SavedTreeView() {
   }
 
   function displayContextMenu(e, nodeModel) {
+    setSelectedNode(nodeModel);
     let menuId = ROOT_MENU_ID;
     if (nodeModel.id > 1) {
       menuId = nodeModel.droppable ? FOLDER_MENU_ID : ITEM_MENU_ID;
@@ -121,6 +150,54 @@ function SavedTreeView() {
 
   function handleClickTreeItem(node) {
     setSelectedNode(node);
+  }
+
+  function handleCreateFolder() {
+    updateSavedItem({
+      text: newName,
+      parent: selectedNode.id as number,
+      data: { type: 'folder', data: {} },
+      droppable: true,
+    });
+    setShowCreateFolderModal(false);
+  }
+
+  function handleRenameFolder() {
+    updateSavedItem({
+      id: selectedNode.id as number,
+      text: newName,
+    });
+    setShowRenameFolderModal(false);
+  }
+
+  async function handleDuplicateFolder() {
+    const result: any = await updateSavedItem({
+      text: newName,
+      parent: selectedNode.parent as number,
+      data: { type: 'folder', data: {} },
+      droppable: true,
+    });
+    if (result.data) {
+      const { id: newFolderId } = result.data.identifiers[0];
+      if (newFolderId) {
+        const children = savedData.filter((x) => x.parent === selectedNode.id);
+        children.map((child) => {
+          updateSavedItem({
+            ...child,
+            parent: newFolderId,
+            id: undefined,
+          });
+        });
+        setShowDuplicateFolderModal(false);
+        return;
+      }
+    }
+    toast.error('There was an error to duplicate folder!');
+  }
+
+  function deleteSelectedItem() {
+    deleteSavedItem(selectedNode.id as number);
+    setShowDeleteModal(false);
   }
 
   return (
@@ -135,7 +212,7 @@ function SavedTreeView() {
                 tree={treeData}
                 rootId={0}
                 render={(nodeModel, { depth, isOpen, onToggle }) => (
-                  <div onContextMenu={(e) => displayContextMenu(e, nodeModel)}>
+                  <div className="context-menu-target" onClick={(e) => displayContextMenu(e, nodeModel)}>
                     <SavedNode
                       node={nodeModel}
                       depth={depth}
@@ -167,6 +244,7 @@ function SavedTreeView() {
                     return true;
                   }
                 }}
+                canDrag={(node) => node.id !== 1 && node.parent !== 0}
                 dropTargetOffset={5}
                 placeholderRender={(node, { depth }) => <Placeholder node={node} depth={depth} />}
               />
@@ -192,7 +270,7 @@ function SavedTreeView() {
             <DeleteIcon />
             <span>Delete</span>
           </Item>
-          <Item id="Duplicate" onClick={handleFolderMenuItemClick}>
+          <Item id="duplicate" onClick={handleFolderMenuItemClick}>
             <ContentCopyIcon />
             <span>Duplicate</span>
           </Item>
@@ -214,7 +292,7 @@ function SavedTreeView() {
             <DeleteIcon />
             <span>Delete</span>
           </Item>
-          <Item id="Duplicate" onClick={handleItemMenuItemClick}>
+          <Item id="duplicate" onClick={handleItemMenuItemClick}>
             <ContentCopyIcon />
             <span>Duplicate</span>
           </Item>
@@ -223,6 +301,92 @@ function SavedTreeView() {
             <span>Refresh</span>
           </Item>
         </Menu>
+        {showCreateFolderModal && (
+          <DraggableDlg
+            title="Add new folder"
+            open={showCreateFolderModal}
+            onClose={() => setShowCreateFolderModal(false)}
+            body={
+              <FormControl className="form-control-input">
+                <label className="label" htmlFor="">
+                  New folder name
+                </label>
+                <input aria-label="name" type="text" onChange={(e) => setNewName(e.target.value)}></input>
+              </FormControl>
+            }
+            footer={
+              <>
+                <SecondaryButton onClick={() => setShowCreateFolderModal(false)} text="Abandon" isLoading={false} />
+                <PrimaryButton text="Add" onClick={handleCreateFolder} isLoading={false} />
+              </>
+            }
+          />
+        )}
+        {showRenameFolderModal && (
+          <DraggableDlg
+            title="Rename folder"
+            open={showRenameFolderModal}
+            onClose={() => setShowRenameFolderModal(false)}
+            body={
+              <FormControl className="form-control-input">
+                <label className="label" htmlFor="">
+                  New folder name
+                </label>
+                <input aria-label="name" type="text" onChange={(e) => setNewName(e.target.value)}></input>
+              </FormControl>
+            }
+            footer={
+              <>
+                <SecondaryButton onClick={() => setShowRenameFolderModal(false)} text="Abandon" isLoading={false} />
+                <PrimaryButton text="Rename" onClick={handleRenameFolder} isLoading={false} />
+              </>
+            }
+          />
+        )}
+        {showDuplicateFolderModal && (
+          <DraggableDlg
+            title="Duplicate folder"
+            open={showDuplicateFolderModal}
+            onClose={() => setShowDuplicateFolderModal(false)}
+            body={
+              <FormControl className="form-control-input">
+                <label className="label" htmlFor="">
+                  New folder name
+                </label>
+                <input aria-label="name" type="text" onChange={(e) => setNewName(e.target.value)}></input>
+              </FormControl>
+            }
+            footer={
+              <>
+                <SecondaryButton onClick={() => setShowDuplicateFolderModal(false)} text="Abandon" isLoading={false} />
+                <PrimaryButton text="Duplicate" onClick={handleDuplicateFolder} isLoading={false} />
+              </>
+            }
+          />
+        )}
+        {showDeleteModal && (
+          <DraggableDlg
+            title={
+              selectedNode.droppable
+                ? 'Please confirm you want to delete this folder!'
+                : 'Please confirm you want to delete this saved item!'
+            }
+            width={440}
+            open={showDeleteModal}
+            onClose={() => setShowDeleteModal(false)}
+            body={
+              selectedNode.droppable
+                ? `Are you sure you want to permanently delete the ${selectedNode.text} folder and its contents?`
+                : `Are you sure you want to permanently delete the ${selectedNode.text} saved item?`
+            }
+            footer={
+              <>
+                <SecondaryButton onClick={() => setShowDeleteModal(false)} text="No" isLoading={false} />
+                <PrimaryButton text="Yes" onClick={() => deleteSelectedItem()} isLoading={false} />
+              </>
+            }
+          />
+        )}
       </>
     )
   );

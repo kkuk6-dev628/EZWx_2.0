@@ -10,6 +10,7 @@ import { useAddRecentAirportMutation, useGetRecentAirportQuery } from '../../sto
 import { useEffect, useState } from 'react';
 import { Modal } from '../common/Modal';
 import { PrimaryButton } from '../common/Buttons';
+import { SaveDialog } from '../saved/SaveDialog';
 
 function AirportSelectModal({ setIsShowModal }) {
   const settingsState = useSelector(selectSettings);
@@ -21,6 +22,7 @@ function AirportSelectModal({ setIsShowModal }) {
   const { data: recentAirports, isSuccess: isSuccessRecentAirports } = useGetRecentAirportQuery(null);
   const [addRecentAirport] = useAddRecentAirportMutation();
   const [showError, setShowError] = useState(false);
+  const [showSaveDlg, setShowSaveDlg] = useState(false);
 
   useEffect(() => {
     if (isSuccessRecentAirports && recentAirports.length > 0) {
@@ -80,7 +82,7 @@ function AirportSelectModal({ setIsShowModal }) {
               <SvgHomeAirport />
               <p className="btn-text">Home airport</p>
             </button>
-            <button className="save">
+            <button className="save" onClick={() => (selectedAirport ? setShowSaveDlg(true) : setShowError(true))}>
               <SvgBookmark />
               <p className="btn-text">Save</p>
             </button>
@@ -113,6 +115,12 @@ function AirportSelectModal({ setIsShowModal }) {
             <PrimaryButton text="Close" onClick={() => setShowError(false)} isLoading={false} />
           </>
         }
+      />
+      <SaveDialog
+        title="Save route"
+        open={showSaveDlg}
+        onClose={() => setShowSaveDlg(false)}
+        data={{ type: 'route', data: selectedAirport }}
       />
     </div>
   );

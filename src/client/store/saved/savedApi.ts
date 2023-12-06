@@ -15,9 +15,13 @@ export const savedApi = createApi({
     }),
     updateSavedItem: builder.mutation<
       any,
-      { id?: number; parent: number; text?: string; data?: SavedItemData; droppable?: any }
+      { id?: number; parent?: number; text?: string; data?: SavedItemData; droppable?: any }
     >({
       query: (data) => ({ url: baseUrl + '/update-saveditem', method: 'Post', body: data }),
+      invalidatesTags: ['savedItems'],
+    }),
+    deleteSavedItem: builder.mutation<any, number>({
+      query: (id) => ({ url: baseUrl + '/delete-saveditem', method: 'Post', body: { id } }),
       invalidatesTags: ['savedItems'],
     }),
     getSavedOrder: builder.query<{ order: SavedOrderItem[] }, void>({
@@ -31,5 +35,10 @@ export const savedApi = createApi({
   }),
 });
 
-export const { useGetSavedItemsQuery, useGetSavedOrderQuery, useUpdateSavedItemMutation, useUpdateSavedOrderMutation } =
-  savedApi;
+export const {
+  useGetSavedItemsQuery,
+  useGetSavedOrderQuery,
+  useUpdateSavedItemMutation,
+  useUpdateSavedOrderMutation,
+  useDeleteSavedItemMutation,
+} = savedApi;
