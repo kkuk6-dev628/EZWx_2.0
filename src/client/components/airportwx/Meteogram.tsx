@@ -14,15 +14,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RouteProfileWindDataType, RouteProfileIcingDataType } from '../../interfaces/route-profile';
 import { selectSettings } from '../../store/user/UserSettings';
-import {
-  selectCurrentAirport,
-  selectCurrentAirportPos,
-  selectViewHeight,
-  selectViewWidth,
-  setCurrentAirportPos,
-  setViewHeight,
-  setViewWidth,
-} from '../../store/airportwx/airportwx';
+import { selectCurrentAirport, selectViewHeight, selectViewWidth } from '../../store/airportwx/airportwx';
 import {
   airportwxApi,
   initialAirportWxState,
@@ -31,21 +23,18 @@ import {
   useUpdateAirportwxStateMutation,
 } from '../../store/airportwx/airportwxApi';
 import { useDispatch } from 'react-redux';
-import dynamic from 'next/dynamic';
 import MWindChart from './MWindChart';
 import { AirportWxState } from '../../interfaces/airportwx';
 import MTurbChart from './MTurbChart';
 import MIcingChart from './MIcingChart';
 import MCloudsChart from './MCloudsChart';
-import { getXAxisValues } from './MeteogramChart';
-import { calcChartWidth, isTouchScreenDevice } from '../../utils/utils';
+import { Position2Latlng, isTouchScreenDevice } from '../../utils/utils';
 
 function Meteogram() {
   const userSettings = useSelector(selectSettings);
-  const interval = 1;
-  const currentAirportPos = useSelector(selectCurrentAirportPos);
-  const { isSuccess: isLoadedMGramData, data: meteogramData } = useGetMeteogramDataQuery(currentAirportPos, {
-    skip: currentAirportPos === null,
+  const currentAirport = useSelector(selectCurrentAirport);
+  useGetMeteogramDataQuery(Position2Latlng(currentAirport.position.coordinates), {
+    skip: currentAirport === null || !currentAirport.position,
   });
   const { data: airportwxDbState, isSuccess: isAirportwxStateLoaded } = useGetAirportwxStateQuery(null, {
     refetchOnMountOrArgChange: true,

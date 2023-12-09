@@ -1,33 +1,19 @@
 import { useSelector } from 'react-redux';
 import { selectCurrentAirport } from '../../store/airportwx/airportwx';
-import { useGetAllAirportsQuery, useGetTafTextQuery } from '../../store/airportwx/airportwxApi';
-import { useEffect, useState } from 'react';
+import { useGetTafTextQuery } from '../../store/airportwx/airportwxApi';
 import { colorCoding } from './Metar';
 
 const Taf = () => {
   const currentAirport = useSelector(selectCurrentAirport);
-  const [airportId, setAirportId] = useState(currentAirport);
-  const { data: tafText } = useGetTafTextQuery(airportId, {
+  const { data: tafText } = useGetTafTextQuery(currentAirport.key, {
     refetchOnMountOrArgChange: true,
   });
-  const { data: airports } = useGetAllAirportsQuery('');
-  const [airportName, setAirportName] = useState('');
-
-  useEffect(() => {
-    if (currentAirport) {
-      setAirportId(currentAirport);
-      if (airports) {
-        const airport = airports.find((x) => x.key === currentAirport);
-        setAirportName(airport?.name);
-      }
-    }
-  }, [airports, currentAirport]);
 
   return (
     <div className="metar-container">
       <div className="metar-scroll-content">
         <div className="airport-name">
-          TAF - {airportName} ({airportId})
+          TAF - {currentAirport.name} ({currentAirport.key})
         </div>
         {tafText && tafText.length > 0 ? (
           tafText.map((metar, i) => {

@@ -1,17 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AppState } from '../store';
+import { RoutePoint } from '../../interfaces/route';
 
 export interface AirportwxState {
-  currentAirport: string;
-  currentAirportPos: { lat: number; lng: number };
+  currentAirport: RoutePoint;
   chartWidth: number;
   viewWidth: number;
   viewHeight: number;
 }
 
 const initialState: AirportwxState = {
-  currentAirport: '',
-  currentAirportPos: null,
+  currentAirport: null,
   chartWidth: 24,
   viewWidth: 1024,
   viewHeight: 768,
@@ -23,9 +22,6 @@ export const airportwxSlice = createSlice({
   reducers: {
     setCurrentAirport: (state, action) => {
       state.currentAirport = action.payload;
-    },
-    setCurrentAirportPos: (state, action) => {
-      state.currentAirportPos = action.payload;
     },
     setChartWidth: (state, action) => {
       state.chartWidth = action.payload;
@@ -39,10 +35,8 @@ export const airportwxSlice = createSlice({
   },
 });
 
-export const { setCurrentAirport, setCurrentAirportPos, setChartWidth, setViewWidth, setViewHeight } =
-  airportwxSlice.actions;
+export const { setCurrentAirport, setChartWidth, setViewWidth, setViewHeight } = airportwxSlice.actions;
 export const selectCurrentAirport = (state: AppState) => state.airportwxState.currentAirport;
-export const selectCurrentAirportPos = (state: AppState) => state.airportwxState.currentAirportPos;
 export const selectChartWidth = (state: AppState) => state.airportwxState.chartWidth;
 export const selectViewWidth = (state: AppState) => state.airportwxState.viewWidth;
 export const selectViewHeight = (state: AppState) => state.airportwxState.viewHeight;

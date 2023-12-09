@@ -24,7 +24,7 @@ export class UserService {
       parent: 1,
       selected: false,
       droppable: true,
-      data: 'default',
+      data: `{ type: 'folder', data: null }`,
     });
     return await this.favoriteItemRepository.save(item);
   }

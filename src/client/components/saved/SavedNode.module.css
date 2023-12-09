@@ -28,6 +28,12 @@
 .labelGridItem {
   padding-inline-start: 8px;
 }
+.labelGridItem>p {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 220px;
+}
 .root.isSelected {
   color: #1967d2;
 }

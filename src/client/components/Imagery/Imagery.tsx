@@ -415,12 +415,15 @@ function Imagery() {
           )}
         </div>
       </Dialog>
-      <SaveDialog
-        title="Save Imagery"
-        open={showSaveImageryDlg}
-        onClose={() => setShowSaveImageryDlg(false)}
-        data={{ type: 'imagery', data: selectedImageUrl }}
-      />
+      {selectedImagesData && (
+        <SaveDialog
+          title="Save Imagery"
+          name={selectedImagesData.SUBTABLABEL || selectedImagesData.TITLE}
+          open={showSaveImageryDlg}
+          onClose={() => setShowSaveImageryDlg(false)}
+          data={{ type: 'imagery', data: selectedImagesData }}
+        />
+      )}
       <div className="igry__wrp">
         <div className="igry__lft igry__blu">
           <MapTabs tabMenus={tabMenus} />

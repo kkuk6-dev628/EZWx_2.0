@@ -22,7 +22,7 @@ export const airportwxApi = createApi({
   baseQuery: fetchBaseQuery(),
   tagTypes: ['airportwxApi', 'airportwxState', 'allWaypoints', 'meteogramData', 'allAirports', 'metar', 'taf', 'afd'],
   endpoints: (builder) => ({
-    getRecentAirport: builder.query<{ airportId: string }[], void>({
+    getRecentAirport: builder.query<{ airportId: string; airport: RoutePoint }[], void>({
       query: () => ({ url: baseUrl + '/get-recent', method: 'Get' }),
       providesTags: [{ type: 'airportwxApi', id: 'LIST' }],
     }),

@@ -15,7 +15,7 @@ import {
 } from '../store/airportwx/airportwxApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { selectCurrentAirport, setCurrentAirport, setCurrentAirportPos } from '../store/airportwx/airportwx';
+import { selectCurrentAirport, setCurrentAirport } from '../store/airportwx/airportwx';
 import { selectSettings } from '../store/user/UserSettings';
 import { PaperComponent } from '../components/common/PaperComponent';
 import dynamic from 'next/dynamic';
@@ -26,6 +26,7 @@ import Metar from '../components/airportwx/Metar';
 import Taf from '../components/airportwx/Taf';
 import Afd from '../components/airportwx/Afd';
 import { useGetRoutesQuery } from '../store/route/routeApi';
+import { SaveDialog } from '../components/saved/SaveDialog';
 const Route = dynamic(() => import('../components/shared/Route'), {
   ssr: false,
 });
@@ -46,13 +47,14 @@ function AirportWxPage() {
   const [airportwxState, setAirportwxState] = useState(initialAirportWxState);
   const [updateAirportwxState] = useUpdateAirportwxStateMutation();
   const { data: airports } = useGetAllAirportsQuery('');
-  const [validAirport, setValidAirport] = useState(currentAirport);
+  const [tempAirport, setTempAirport] = useState(currentAirport);
+  const [showSaveDlg, setShowSaveDlg] = useState(false);
 
   useEffect(() => {
-    if (currentAirport) {
-      setValidAirport(currentAirport);
+    if (tempAirport) {
+      dispatch(setCurrentAirport(tempAirport));
     }
-  }, [currentAirport]);
+  }, [tempAirport]);
 
   useEffect(() => {
     if (airportwxDbState) {
@@ -62,36 +64,25 @@ function AirportWxPage() {
 
   useEffect(() => {
     if (recentAirports && recentAirports.length > 0) {
-      dispatch(setCurrentAirport(recentAirports[0].airportId));
+      dispatch(setCurrentAirport(recentAirports[0].airport));
+      setTempAirport(recentAirports[0].airport);
     } else {
-      dispatch(setCurrentAirport(settingsState.default_home_airport));
-    }
-  }, [recentAirports]);
-
-  useEffect(() => {
-    if (currentAirport && airports && airports.length > 0) {
-      const airport = airports.filter((curr) => {
-        return curr.key === currentAirport;
-      });
-      if (airport.length > 0) {
-        dispatch(
-          setCurrentAirportPos({
-            lat: airport[0].position.coordinates[1],
-            lng: airport[0].position.coordinates[0],
-          }),
-        );
+      if (airports) {
+        const homeAirport = airports.find((x) => x.key === settingsState.default_home_airport);
+        dispatch(setCurrentAirport(homeAirport));
       }
     }
-  }, [airports, currentAirport]);
+  }, [recentAirports, airports]);
 
-  function changeCurrentAirport(airport) {
-    dispatch(setCurrentAirport(airport.key || airport));
-    const airportId = airport.key || airport;
-    const exist = recentAirports.find((x) => x.airportId === airportId);
-    if (exist) {
-      updateRecentAirport(exist);
-    } else {
-      addRecentAirport({ airportId: airport.key || airport });
+  function addAirport2Recent(airport) {
+    const airportId = airport.key;
+    if (recentAirports) {
+      const exist = recentAirports.find((x) => x.airportId === airportId);
+      if (exist) {
+        updateRecentAirport(exist);
+      } else {
+        addRecentAirport({ airportId: airport.key, airport });
+      }
     }
   }
 
@@ -105,34 +96,35 @@ function AirportWxPage() {
         let airports = [];
         if (activeRoute) {
           airports = [
-            activeRoute.departure.key,
+            activeRoute.departure,
             ...activeRoute.routeOfFlight
               .filter((x) => x.routePoint.type === 'icaoid' || x.routePoint.type === 'faaid')
-              .map((x) => x.routePoint.key),
-            activeRoute.destination.key,
+              .map((x) => x.routePoint),
+            activeRoute.destination,
           ];
         } else {
-          airports = recentAirports.slice(0, 10).map((x) => x.airportId);
+          airports = recentAirports.slice(0, 10).map((x) => x.airport);
         }
         if (id === 'previous') {
           airports = airports.reverse();
         }
         for (let i = 0; i < airports.length; i++) {
           const airport = airports[i];
-          if (airport === currentAirport) {
+          if (airport.key === currentAirport.key) {
             let j = i + 1;
             if (i === airports.length - 1) {
               j = 0;
             }
-            if (airports[j] !== currentAirport) {
-              dispatch(setCurrentAirport(airports[j]));
+            if (airports[j].key !== currentAirport.key) {
+              setTempAirport(airports[j]);
               return;
             }
           }
         }
-        dispatch(setCurrentAirport(airports[0]));
+        setTempAirport(airports[0]);
         break;
       case 'save':
+        setShowSaveDlg(true);
         break;
       case 'refresh':
         dispatch(setDataLoadTime(Date.now()));
@@ -202,7 +194,16 @@ function AirportWxPage() {
           onClose={() => setShowRouteEditor(false)}
         >
           <Route setIsShowModal={setShowRouteEditor} />
-        </Dialog>{' '}
+        </Dialog>
+        {currentAirport && (
+          <SaveDialog
+            title="Save airport"
+            open={showSaveDlg}
+            name={`${currentAirport.key} - ${currentAirport.name}`}
+            onClose={() => setShowSaveDlg(false)}
+            data={{ type: 'airport', data: currentAirport }}
+          />
+        )}
         <div className="tab-menus">
           <MapTabs tabMenus={tabMenus} />
         </div>
@@ -221,39 +222,34 @@ function AirportWxPage() {
               <div className="select-airport">
                 <AutoCompleteInput
                   name="default_home_airport"
-                  selectedValue={currentAirport as any}
+                  selectedValue={tempAirport as any}
                   handleAutoComplete={(name, value) => {
-                    if (value) {
-                      changeCurrentAirport(value);
-                    } else {
-                      dispatch(setCurrentAirport(null));
-                    }
+                    setTempAirport(value);
+                    if (value) addAirport2Recent(value);
                   }}
                   onBlur={() => {
-                    if (recentAirports && recentAirports.length > 0) {
-                      dispatch(setCurrentAirport(recentAirports[0].airportId));
-                    } else if (settingsState.default_home_airport) {
-                      dispatch(setCurrentAirport(settingsState.default_home_airport));
-                    }
+                    setTempAirport(currentAirport);
                   }}
                   exceptions={[]}
                   key={'home-airport'}
                 />
               </div>
             </div>
-            <div className="view-container">
-              {airportwxDbState.viewType === 'meteogram' && <Meteogram />}
-              {airportwxDbState.viewType === 'metar' && <Metar />}
-              {airportwxDbState.viewType === 'tafs' && <Taf />}
-              {airportwxDbState.viewType === 'afd' && <Afd />}
-              {airportwxDbState.viewType === 'skew-t' && (
-                <iframe
-                  key={dataLoadedTime}
-                  sandbox="allow-scripts allow-same-origin"
-                  src={`/api/airportwx/${validAirport}/GSD/?data_source=Op40&latest=latest&layout=off&n_hrs=20.0&airport=${validAirport}`}
-                />
-              )}
-            </div>
+            {currentAirport && currentAirport.position && (
+              <div className="view-container">
+                {airportwxDbState.viewType === 'meteogram' && <Meteogram />}
+                {airportwxDbState.viewType === 'metar' && <Metar />}
+                {airportwxDbState.viewType === 'tafs' && <Taf />}
+                {airportwxDbState.viewType === 'afd' && <Afd />}
+                {airportwxDbState.viewType === 'skew-t' && currentAirport && (
+                  <iframe
+                    key={dataLoadedTime}
+                    sandbox="allow-scripts allow-same-origin"
+                    src={`/api/airportwx/${currentAirport.key}/GSD/?data_source=Op40&latest=latest&layout=off&n_hrs=20.0&airport=${currentAirport.key}`}
+                  />
+                )}
+              </div>
+            )}
           </div>
         ) : (
           <div className="data-loading">

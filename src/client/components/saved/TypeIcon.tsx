@@ -1,26 +1,31 @@
 import React from 'react';
-import FolderIcon from '@mui/icons-material/Folder';
-import ImageIcon from '@mui/icons-material/Image';
-import ListAltIcon from '@mui/icons-material/ListAlt';
-import DescriptionIcon from '@mui/icons-material/Description';
+import { Icon } from '@iconify/react';
 
 type Props = {
+  isRoot: boolean;
   droppable: boolean;
+  isOpen: boolean;
   fileType?: string;
 };
 
 export const TypeIcon: React.FC<Props> = (props) => {
   if (props.droppable) {
-    return <FolderIcon />;
+    return (
+      <Icon
+        icon={props.isOpen ? 'el:folder-open' : 'el:folder-close'}
+        width="20"
+        color={props.isRoot ? 'var(--color-primary)' : '#008080'}
+      />
+    );
   }
 
   switch (props.fileType) {
     case 'route':
-      return <ImageIcon />;
+      return <Icon icon="fa6-solid:route" width="20" />;
     case 'imagery':
-      return <ListAltIcon />;
+      return <Icon icon="pajamas:doc-image" width="20" />;
     case 'airport':
-      return <DescriptionIcon />;
+      return <Icon icon="mdi:airport" width="20" />;
     default:
       return null;
   }

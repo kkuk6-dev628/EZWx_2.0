@@ -11,6 +11,7 @@ type Props = {
   depth: number;
   isOpen: boolean;
   isSelected?: boolean;
+  numberOfChildren: number;
   onClick: (e) => void;
   onToggle: (id: NodeModel['id']) => void;
 };
@@ -44,10 +45,12 @@ export const SavedNode: React.FC<Props> = (props) => {
         )}
       </div>
       <div>
-        <TypeIcon droppable={droppable || false} fileType={data?.type} />
+        <TypeIcon isRoot={id === 1} droppable={droppable || false} isOpen={props.isOpen} fileType={data?.type} />
       </div>
       <div className={styles.labelGridItem}>
-        <Typography variant="body2">{props.node.text}</Typography>
+        <Typography variant="body2">
+          {props.node.text + (props.numberOfChildren > 0 ? ` (${props.numberOfChildren})` : '')}
+        </Typography>
       </div>
     </div>
   );

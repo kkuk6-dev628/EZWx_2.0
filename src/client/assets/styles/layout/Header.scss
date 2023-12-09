@@ -393,21 +393,7 @@ visibility: visible;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
-    .button-area {
-      width: 100%;
-      button {
-        width: 50%;
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-        svg, p{
-          color: var(--color-primary);
-        }
-      }
-      .home-airport {
-        border-right: solid #00000066 2px;
-      }
-    }
+
     .selector-area {
       width: 90%;
     }
@@ -419,5 +405,20 @@ visibility: visible;
       color: var(--color-white);
       cursor: pointer;
     }
+  }
+}
+.button-area {
+  width: 100%;
+  button {
+    width: 50%;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    svg, p{
+      color: var(--color-primary);
+    }
+  }
+  .right-separator {
+    border-right: solid #00000066 2px;
   }
 }

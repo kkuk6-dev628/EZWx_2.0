@@ -13,7 +13,7 @@ export class CreateSavedTables1701656460129 implements MigrationInterface {
     );
     await queryRunner.query(`CREATE INDEX "IDX_66f4efcce469ee4ac99d3ef647" ON "saved_order" ("userId") `);
     await queryRunner.query(
-      `INSERT INTO saved_items ("id", "userId", "text", "selected", "droppable", "data", "parent") VALUES(1, 0, 'EZWxBrief', false, true, 'root', 0)`,
+      `INSERT INTO saved_items ("id", "userId", "text", "selected", "droppable", "data", "parent") VALUES(1, 0, 'EZWxBrief', false, true, '{type: "root"}', 0)`,
     );
   }
 

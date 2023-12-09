@@ -641,3 +641,9 @@ export function isTouchDevice() {
   // @ts-ignore
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 }
+export function Position2Latlng(pos: GeoJSON.Position) {
+  return { lat: pos[1], lng: pos[0] };
+}
+export function isSameJson(a: any, b: any): boolean {
+  return JSON.stringify(a) == JSON.stringify(b);
+}

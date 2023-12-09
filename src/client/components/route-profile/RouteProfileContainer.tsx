@@ -42,6 +42,7 @@ import {
   routeProfileTurbDataTypes,
   chartLabels,
 } from '../../utils/constants';
+import { SaveDialog } from '../saved/SaveDialog';
 
 const RouteProfileContainer = () => {
   const { data: routeProfileApiState, isSuccess: isRouteProfileStateLoaded } = useGetRouteProfileStateQuery(null, {
@@ -56,6 +57,7 @@ const RouteProfileContainer = () => {
   const segments = useSelector(selectRouteSegments);
   const activeRoute = useSelector(selectActiveRoute);
   const userSettings = useSelector(selectSettings);
+  const [showSaveRouteModal, setShowSaveRouteModal] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -78,6 +80,9 @@ const RouteProfileContainer = () => {
         } else {
           toast.error('Please sign in to create route!');
         }
+        break;
+      case 'save':
+        setShowSaveRouteModal(true);
         break;
       case 'airport':
         break;
@@ -134,6 +139,15 @@ const RouteProfileContainer = () => {
           >
             <Route setIsShowModal={setShowRouteEditor} />
           </Dialog>
+          {activeRoute && (
+            <SaveDialog
+              title="Save route"
+              name={`${activeRoute.departure.key}_${activeRoute.destination.key}`}
+              open={showSaveRouteModal}
+              onClose={() => setShowSaveRouteModal(false)}
+              data={{ type: 'route', data: activeRoute }}
+            />
+          )}
           <MapTabs tabMenus={tabMenus} />
           <div className="route-profile-container">
             <RouteProfileDataLoader key={dataLoadTime} />

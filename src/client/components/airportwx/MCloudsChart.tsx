@@ -3,38 +3,42 @@ import { useSelector } from 'react-redux';
 import { VerticalRectSeries, LineSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
 import {
+  Position2Latlng,
   getMaxForecastTime,
   getValueFromDatasetByElevation,
   getValuesFromDatasetAllElevationByElevation,
-  getIndexByElevation,
 } from '../../utils/utils';
 import { selectSettings } from '../../store/user/UserSettings';
-import { cacheKeys, flightCategoryDivide, hatchOpacity, visibleOpacity } from '../../utils/constants';
-import { useGetSingleElevationQuery, useQueryElevationApiMutation } from '../../store/route-profile/elevationApi';
+import { cacheKeys, hatchOpacity, visibleOpacity } from '../../utils/constants';
+import { useGetSingleElevationQuery } from '../../store/route-profile/elevationApi';
 import flyjs from '../../fly-js/fly';
 import { meterToFeet } from '../map/common/AreoFunctions';
 import { cloudColor1, cloudColor2, humidityThresholds } from '../../utils/constants';
-import { selectCurrentAirportPos } from '../../store/airportwx/airportwx';
 import { useGetMeteogramDataQuery, useGetAirportwxStateQuery } from '../../store/airportwx/airportwxApi';
-import CloudsChart from '../route-profile/CloudsChart';
-import RouteProfileChart from '../route-profile/RouteProfileChart';
 import { icingSevLegend } from './MIcingChart';
 import { useQueryNbmAllMutation } from '../../store/route-profile/routeProfileApi';
 import MeteogramChart, { getXAxisValues } from './MeteogramChart';
+import { selectCurrentAirport } from '../../store/airportwx/airportwx';
 
 const MCloudsChart = (props) => {
-  const currentAirportPos = useSelector(selectCurrentAirportPos);
-  const { isSuccess: isLoadedMGramData, data: meteogramData } = useGetMeteogramDataQuery(currentAirportPos, {
-    skip: currentAirportPos === null,
-  });
-  const { data: airportElevation, isSuccess: isElevationLoaded } = useGetSingleElevationQuery(currentAirportPos, {
-    skip: currentAirportPos === null,
-  });
-  const [queryNbmAll, queryNbmAllAirportResult] = useQueryNbmAllMutation({
+  const currentAirport = useSelector(selectCurrentAirport);
+  const { isSuccess: isLoadedMGramData, data: meteogramData } = useGetMeteogramDataQuery(
+    Position2Latlng(currentAirport.position.coordinates),
+    {
+      skip: currentAirport === null || !currentAirport.position,
+    },
+  );
+  const { data: airportElevation, isSuccess: isElevationLoaded } = useGetSingleElevationQuery(
+    Position2Latlng(currentAirport.position.coordinates),
+    {
+      skip: currentAirport === null || !currentAirport.position,
+    },
+  );
+  const [, queryNbmAllAirportResult] = useQueryNbmAllMutation({
     fixedCacheKey: cacheKeys.nbm,
   });
   const userSettings = useSelector(selectSettings);
-  const { data: airportwxState, isSuccess: isAirportwxStateLoaded } = useGetAirportwxStateQuery(null, {
+  const { data: airportwxState } = useGetAirportwxStateQuery(null, {
     refetchOnMountOrArgChange: true,
   });
   const chartWidth = 24 * airportwxState.chartDays;

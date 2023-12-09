@@ -7,12 +7,13 @@ interface Props {
   open: boolean;
   onClose: () => void;
   width?: number;
+  toolButtons?: ReactNode;
   body?: ReactNode;
-  footer?: ReactNode | null;
+  footer?: ReactNode;
   title: string;
 }
 
-export const DraggableDlg = ({ open, onClose, body, footer, title, width }: Props) => {
+export const DraggableDlg = ({ open, onClose, toolButtons, body, footer, title, width }: Props) => {
   return (
     <Dialog
       PaperComponent={PaperComponent}
@@ -30,6 +31,7 @@ export const DraggableDlg = ({ open, onClose, body, footer, title, width }: Prop
               <SvgRoundClose />
             </button>
           </DialogTitle>
+          <div className="dialog__box__toolbuttons">{toolButtons}</div>
           <div className="dialog__box__body">{body}</div>
           <div className="dialog__box__footer">{footer}</div>
         </div>

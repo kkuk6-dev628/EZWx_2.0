@@ -3,7 +3,9 @@
 }
 
 .treeRoot {
-  height: 100%;
+  height: calc(100vh - 117px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: auto;
 }
 
 .draggingSource {
@@ -21,4 +23,27 @@
 .contexify__item:not(.contexify__item--disabled):hover > .contexify__item__content,
 .contexify__item:not(.contexify__item--disabled):focus > .contexify__item__content {
   background-color: lightgray !important;
+}
+
+.treeRoot::-webkit-scrollbar {
+    -webkit-appearance: none !important;
+}
+
+.treeRoot::-webkit-scrollbar:vertical {
+    width: 12px !important;
+}
+
+.treeRoot::-webkit-scrollbar:horizontal {
+    height: 12px !important;
+}
+
+.treeRoot::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, .5) !important;
+    border-radius: 10px !important;
+    border: 2px solid #ffffff !important;
+}
+
+.treeRoot::-webkit-scrollbar-track {
+    border-radius: 10px !important;
+    background-color: #ffffff !important;
 }

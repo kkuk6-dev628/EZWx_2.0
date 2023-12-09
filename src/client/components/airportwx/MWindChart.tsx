@@ -1,22 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { CustomSVGSeries, Hint, MarkSeries } from 'react-vis';
-import { getValueFromDatasetByElevation } from '../../utils/utils';
+import { Position2Latlng, getValueFromDatasetByElevation } from '../../utils/utils';
 import { selectSettings } from '../../store/user/UserSettings';
 import { celsiusToFahrenheit, convertTimeFormat, getStandardTemp, round } from '../map/common/AreoFunctions';
 import { addLeadingZeroes } from '../map/common/AreoFunctions';
 import { windDataElevations } from '../../utils/constants';
 import MeteogramChart, { getXAxisValues } from './MeteogramChart';
 import { useGetAirportwxStateQuery, useGetMeteogramDataQuery } from '../../store/airportwx/airportwxApi';
-import { selectCurrentAirportPos } from '../../store/airportwx/airportwx';
+import { selectCurrentAirport } from '../../store/airportwx/airportwx';
 
 const MWindChart = () => {
-  const currentAirportPos = useSelector(selectCurrentAirportPos);
-  const { isSuccess: isLoadedMGramData, data: meteogramData } = useGetMeteogramDataQuery(currentAirportPos, {
-    skip: currentAirportPos === null,
-  });
+  const currentAirport = useSelector(selectCurrentAirport);
+  const { isSuccess: isLoadedMGramData, data: meteogramData } = useGetMeteogramDataQuery(
+    Position2Latlng(currentAirport.position.coordinates),
+    {
+      skip: currentAirport === null || !currentAirport.position,
+    },
+  );
   const userSettings = useSelector(selectSettings);
-  const { data: airportwxState, isSuccess: isAirportwxStateLoaded } = useGetAirportwxStateQuery(null, {
+  const { data: airportwxState } = useGetAirportwxStateQuery(null, {
     refetchOnMountOrArgChange: true,
   });
   const chartWidth = 24 * airportwxState.chartDays;
@@ -71,7 +74,7 @@ const MWindChart = () => {
             x,
             y: el,
             tooltip: {
-              position: currentAirportPos,
+              position: Position2Latlng(currentAirport.position.coordinates),
               time: windspeedTime,
               windSpeed: Math.round(windSpeed),
               windDir: Math.round(windDir),

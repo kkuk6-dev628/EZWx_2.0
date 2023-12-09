@@ -1,29 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { VerticalRectSeries, LineSeries, Hint, LabelSeries } from 'react-vis';
-import { selectActiveRoute } from '../../store/route/routes';
-import { getIndexByElevation, getMaxForecastTime, getValueFromDatasetByElevation } from '../../utils/utils';
-import { cacheKeys, flightCategoryDivide } from '../../utils/constants';
+import { VerticalRectSeries, Hint } from 'react-vis';
+import { Position2Latlng, getMaxForecastTime, getValueFromDatasetByElevation } from '../../utils/utils';
 import { selectSettings } from '../../store/user/UserSettings';
-import {
-  useGetRouteProfileStateQuery,
-  useQueryDepartureAdvisorDataMutation,
-  useQueryIcingTurbDataMutation,
-} from '../../store/route-profile/routeProfileApi';
-import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import { convertTimeFormat } from '../map/common/AreoFunctions';
 import { hourInMili } from '../../utils/constants';
-import fly from '../../fly-js/fly';
 import MeteogramChart, { getXAxisValues } from './MeteogramChart';
-import { selectCurrentAirportPos } from '../../store/airportwx/airportwx';
+import { selectCurrentAirport } from '../../store/airportwx/airportwx';
 import { useGetMeteogramDataQuery, useGetAirportwxStateQuery } from '../../store/airportwx/airportwxApi';
-import {
-  interpolateRouteByInterval,
-  getSegmentsCount,
-  calcHighResolution,
-  calcEndMargin,
-  getRouteLength,
-} from '../route-profile/RouteProfileDataLoader';
 
 export const takeoffEdrTable = {
   light: { light: 13, moderate: 16, severe: 36, extreme: 64 },
@@ -41,19 +25,21 @@ export const colorsByEdr = {
 };
 
 const MTurbChart = (props) => {
-  const currentAirportPos = useSelector(selectCurrentAirportPos);
-  const { isSuccess: isLoadedMGramData, data: meteogramData } = useGetMeteogramDataQuery(currentAirportPos, {
-    skip: currentAirportPos === null,
-  });
+  const currentAirport = useSelector(selectCurrentAirport);
+  const { isSuccess: isLoadedMGramData, data: meteogramData } = useGetMeteogramDataQuery(
+    Position2Latlng(currentAirport.position.coordinates),
+    {
+      skip: currentAirport === null || !currentAirport.position,
+    },
+  );
   const userSettings = useSelector(selectSettings);
-  const { data: airportwxState, isSuccess: isAirportwxStateLoaded } = useGetAirportwxStateQuery(null, {
+  const { data: airportwxState } = useGetAirportwxStateQuery(null, {
     refetchOnMountOrArgChange: true,
   });
   const chartWidth = 24 * airportwxState.chartDays;
   const interval = 1;
   const [turbSeries, setTurbSeries] = useState([]);
   const [turbHint, setTurbHint] = useState(null);
-  const [noForecast, setNoForecast] = useState(false);
   const [noDepicted, setNoDepicted] = useState(false);
 
   function buildTurbSeries() {
@@ -64,12 +50,10 @@ const MTurbChart = (props) => {
 
       let existTurbulence = false;
       if (Date.now() > maxForecastTime.getTime() + hourInMili) {
-        setNoForecast(true);
         setNoDepicted(false);
         setTurbSeries([]);
         return;
       }
-      setNoForecast(false);
       const maxElevation = airportwxState.maxAltitude * 100;
       let hasNoData = false;
       times.forEach(({ time, index }) => {

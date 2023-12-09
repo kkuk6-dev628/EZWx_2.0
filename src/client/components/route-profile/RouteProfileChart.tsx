@@ -462,9 +462,9 @@ const RouteProfileChart = (props: {
     }
   }
 
-  function visitAirport(airportId) {
-    dispatch(setCurrentAirport(airportId));
-    addRecentAirport({ airportId: airportId });
+  function visitAirport(airport) {
+    dispatch(setCurrentAirport(airport));
+    addRecentAirport({ airportId: airport.key, airport });
     router.push('/airportwx');
   }
 
@@ -557,6 +557,7 @@ const RouteProfileChart = (props: {
           yOffset: isMobile ? 36 : 44,
           label: seg.airport?.key || seg.position.lat.toFixed(2) + '/' + seg.position.lng.toFixed(2),
           showVisitBtn: seg.airport && seg.airport.type !== 'waypoint' && primaryInput !== 'mouse',
+          airport: seg.airport,
           style: labelStyle,
           tooltip: tooltip,
         };
@@ -681,6 +682,7 @@ const RouteProfileChart = (props: {
           yOffset: isMobile ? 26 : 34,
           label: rp.key,
           showVisitBtn: primaryInput !== 'mouse' && rp.type !== 'waypoint',
+          airport: rp,
           style: { ...labelStyle },
           tooltip: tooltip,
         };
@@ -1388,7 +1390,7 @@ const RouteProfileChart = (props: {
                   : celsiusToFahrenheit(airportHint.tooltip.dewpoint, 0) + ' \u00B0F'}
               </span>
               {airportHint.showVisitBtn && (
-                <button onClick={(e) => visitAirport(airportHint.label)}>Visit Airport</button>
+                <button onClick={(e) => visitAirport(airportHint.airport)}>Visit Airport</button>
               )}
             </Hint>
           ) : null}

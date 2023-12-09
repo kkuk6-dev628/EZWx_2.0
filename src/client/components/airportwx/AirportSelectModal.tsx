@@ -6,7 +6,11 @@ import { selectSettings } from '../../store/user/UserSettings';
 import { useDispatch } from 'react-redux';
 import { selectCurrentAirport, setCurrentAirport } from '../../store/airportwx/airportwx';
 import { useRouter } from 'next/router';
-import { useAddRecentAirportMutation, useGetRecentAirportQuery } from '../../store/airportwx/airportwxApi';
+import {
+  useAddRecentAirportMutation,
+  useGetAllAirportsQuery,
+  useGetRecentAirportQuery,
+} from '../../store/airportwx/airportwxApi';
 import { useEffect, useState } from 'react';
 import { Modal } from '../common/Modal';
 import { PrimaryButton } from '../common/Buttons';
@@ -23,16 +27,26 @@ function AirportSelectModal({ setIsShowModal }) {
   const [addRecentAirport] = useAddRecentAirportMutation();
   const [showError, setShowError] = useState(false);
   const [showSaveDlg, setShowSaveDlg] = useState(false);
+  const { data: allAirports } = useGetAllAirportsQuery('');
+  const [homeAirport, setHomeAirport] = useState(null);
 
   useEffect(() => {
     if (isSuccessRecentAirports && recentAirports.length > 0) {
-      dispatch(setCurrentAirport(recentAirports[0].airportId));
-      updateSelectedAirport(recentAirports[0].airportId);
-    } else {
-      dispatch(setCurrentAirport(settingsState.default_home_airport));
-      updateSelectedAirport(settingsState.default_home_airport);
+      dispatch(setCurrentAirport(recentAirports[0].airport));
+      updateSelectedAirport(recentAirports[0].airport);
     }
   }, [isSuccessRecentAirports]);
+
+  useEffect(() => {
+    if (allAirports) {
+      const found = allAirports.find((x) => x.key === settingsState.default_home_airport);
+      setHomeAirport(found);
+      if (!recentAirports) {
+        dispatch(setCurrentAirport(found));
+        updateSelectedAirport(found);
+      }
+    }
+  }, [isSuccessRecentAirports, allAirports]);
 
   function updateSelectedAirport(airport) {
     setSelectedAirport(airport);
@@ -42,14 +56,14 @@ function AirportSelectModal({ setIsShowModal }) {
   }
   function clickHomeAirport(e) {
     e.stopPropagation();
-    updateSelectedAirport(settingsState.default_home_airport);
+    updateSelectedAirport(homeAirport);
   }
 
   function clickApply(e) {
     e.stopPropagation();
     if (selectedAirport) {
-      dispatch(setCurrentAirport(selectedAirport.key || selectedAirport));
-      addRecentAirport({ airportId: selectedAirport.key || selectedAirport });
+      dispatch(setCurrentAirport(selectedAirport));
+      addRecentAirport({ airportId: selectedAirport.key, airport: selectedAirport });
       setIsShowModal(false);
       router.push('/airportwx');
     } else {
@@ -78,7 +92,7 @@ function AirportSelectModal({ setIsShowModal }) {
           }}
         >
           <div className="button-area">
-            <button className="home-airport" onClick={clickHomeAirport}>
+            <button className="right-separator" onClick={clickHomeAirport}>
               <SvgHomeAirport />
               <p className="btn-text">Home airport</p>
             </button>
@@ -116,12 +130,15 @@ function AirportSelectModal({ setIsShowModal }) {
           </>
         }
       />
-      <SaveDialog
-        title="Save route"
-        open={showSaveDlg}
-        onClose={() => setShowSaveDlg(false)}
-        data={{ type: 'route', data: selectedAirport }}
-      />
+      {selectedAirport && (
+        <SaveDialog
+          title="Save airport"
+          name={`${selectedAirport.key} - ${selectedAirport.name}`}
+          open={showSaveDlg}
+          onClose={() => setShowSaveDlg(false)}
+          data={{ type: 'airport', data: selectedAirport }}
+        />
+      )}
     </div>
   );
 }

@@ -377,12 +377,19 @@ function Route({ setIsShowModal }: Props) {
           </>
         }
       />
-      <SaveDialog
-        title="Save route"
-        open={isShowSaveRouteModal}
-        onClose={() => setIsShowSaveRouteModal(false)}
-        data={{ type: 'route', data: routeData }}
-      />
+      {routeData && routeData.departure && routeData.destination && (
+        <SaveDialog
+          title="Save route"
+          name={`${routeData.departure.key}${
+            routeData.routeOfFlight && routeData.routeOfFlight.length > 0
+              ? `_` + routeData.routeOfFlight.map((x) => x.routePoint.key).join('_')
+              : ''
+          }_${routeData.destination.key}_${routeData.altitude}`}
+          open={isShowSaveRouteModal}
+          onClose={() => setIsShowSaveRouteModal(false)}
+          data={{ type: 'route', data: routeData }}
+        />
+      )}
       <Modal
         open={isShowErrorRouteModal}
         handleClose={() => setIsShowErrorRouteModal(false)}

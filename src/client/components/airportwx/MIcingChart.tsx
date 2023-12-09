@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { VerticalRectSeries, CustomSVGSeries, Hint, LabelSeries } from 'react-vis';
 import { selectActiveRoute } from '../../store/route/routes';
-import { getTimeGradientStops } from '../../utils/utils';
+import { Position2Latlng, getTimeGradientStops } from '../../utils/utils';
 import {
   getIndexByElevation,
   getMaxForecastElevation,
@@ -13,24 +13,13 @@ import {
 } from '../../utils/utils';
 import { cacheKeys, flightCategoryDivide, totalNumberOfElevations } from '../../utils/constants';
 import { selectSettings } from '../../store/user/UserSettings';
-import {
-  useGetRouteProfileStateQuery,
-  useQueryDepartureAdvisorDataMutation,
-  useQueryIcingTurbDataMutation,
-} from '../../store/route-profile/routeProfileApi';
-import { selectRouteSegments } from '../../store/route-profile/RouteProfile';
 import { hatchOpacity, visibleOpacity } from '../../utils/constants';
-import { Conrec } from '../../conrec-js/conrec';
-import { celsiusToFahrenheit, convertTimeFormat, round } from '../map/common/AreoFunctions';
-import { Route } from '../../interfaces/route';
-import { RouteProfileDataset, RouteSegment } from '../../interfaces/route-profile';
-import flyjs from '../../fly-js/fly';
+import { convertTimeFormat } from '../map/common/AreoFunctions';
 import { hourInMili } from '../../utils/constants';
-import fly from '../../fly-js/fly';
 import MeteogramChart, { getXAxisValues } from './MeteogramChart';
 import { colorsByEdr } from './MTurbChart';
-import { selectCurrentAirportPos } from '../../store/airportwx/airportwx';
 import { useGetMeteogramDataQuery, useGetAirportwxStateQuery } from '../../store/airportwx/airportwxApi';
+import { selectCurrentAirport } from '../../store/airportwx/airportwx';
 
 export const icingSevLegend = [
   { value: 0, color: '#F6F6F6', label: 'None' },
@@ -68,10 +57,13 @@ const icingSldLegend = [
 const noIcingAbove30000Msg = 'No icing forecast above 30,000 feet';
 
 const MIcingChart = (props) => {
-  const currentAirportPos = useSelector(selectCurrentAirportPos);
-  const { isSuccess: isLoadedMGramData, data: meteogramData } = useGetMeteogramDataQuery(currentAirportPos, {
-    skip: currentAirportPos === null,
-  });
+  const currentAirport = useSelector(selectCurrentAirport);
+  const { isSuccess: isLoadedMGramData, data: meteogramData } = useGetMeteogramDataQuery(
+    Position2Latlng(currentAirport.position.coordinates),
+    {
+      skip: currentAirport === null || !currentAirport.position,
+    },
+  );
   const userSettings = useSelector(selectSettings);
   const { data: airportwxState, isSuccess: isAirportwxStateLoaded } = useGetAirportwxStateQuery(null, {
     refetchOnMountOrArgChange: true,
@@ -97,8 +89,6 @@ const MIcingChart = (props) => {
       }
       setNoForecast(false);
       setNoDepicted(true);
-      const accDistance = 0;
-      const maxElevation = Math.min(airportwxState.maxAltitude * 100, maxForecastElevation);
       const times = getXAxisValues(chartWidth, interval);
       times.forEach(({ time, index }) => {
         for (let elevation = 1000; elevation <= airportwxState.maxAltitude * 100; elevation += 1000) {

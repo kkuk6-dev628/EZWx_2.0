@@ -20,6 +20,20 @@ export class RecentAirport {
   @Column()
   airportId: string;
 
+  @Column({
+    transformer: {
+      from: (value: string) => {
+        try {
+          return JSON.parse(value);
+        } catch (e) {
+          return false;
+        }
+      },
+      to: (value: any) => JSON.stringify(value),
+    },
+  })
+  airport: string;
+
   @Column()
   @CreateDateColumn()
   created_at: Date;

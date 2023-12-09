@@ -84,6 +84,9 @@ export class AirportwxController {
       res.redirect('https://rucsoundings.noaa.gov/gwt/' + url);
       return;
     }
+    if (url.endsWith('log_gwtSoundings.cgi')) {
+      return res.sendStatus(404);
+    }
     contentType && res.set('Content-Type', contentType);
     const content = await this.airportwxService.getGSDPage(icaoid, url, params.toString());
     res.send(content);

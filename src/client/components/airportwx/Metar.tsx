@@ -84,28 +84,15 @@ export function colorCoding(text: string): string {
 
 const Metar = () => {
   const currentAirport = useSelector(selectCurrentAirport);
-  const [airportId, setAirportId] = useState(currentAirport);
-  const { data: metarText, isSuccess: loadedMetar } = useGetMetarTextQuery(airportId, {
+  const { data: metarText } = useGetMetarTextQuery(currentAirport.key, {
     refetchOnMountOrArgChange: true,
   });
-  const { data: airports, isSuccess: loadedAirports } = useGetAllAirportsQuery('');
-  const [airportName, setAirportName] = useState('');
-
-  useEffect(() => {
-    if (currentAirport) {
-      setAirportId(currentAirport);
-      if (airports) {
-        const airport = airports.find((x) => x.key === currentAirport);
-        setAirportName(airport?.name);
-      }
-    }
-  }, [airports, currentAirport]);
 
   return (
     <div className="metar-container">
       <div className="metar-scroll-content">
         <div className="airport-name">
-          METAR - {airportName} ({airportId})
+          METAR - {currentAirport.name} ({currentAirport.key})
         </div>
         {metarText &&
           metarText.map((metar, i) => {

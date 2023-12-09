@@ -591,6 +591,38 @@ function SvgLeftRight() {
     </svg>
   );
 }
+
+function SvgSaveFilled() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="#3F0C69" xmlns="http://www.w3.org/2000/svg">
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M7.75 3H16.25C17.355 3 18.25 3.895 18.25 5V21L12 18L5.75 21V5C5.75 3.9 6.65 3 7.75 3Z"
+        stroke="#3F0C69"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+function SvgSaveOutlined() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M7.75 3H16.25C17.355 3 18.25 3.895 18.25 5V21L12 18L5.75 21V5C5.75 3.9 6.65 3 7.75 3Z"
+        stroke="#3F0C69"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function SvgBookmark() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
@@ -718,4 +750,6 @@ export {
   SvgRoundPlus,
   SvgForward,
   SvgBackward,
+  SvgSaveFilled,
+  SvgSaveOutlined,
 };

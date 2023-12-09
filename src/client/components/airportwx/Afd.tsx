@@ -1,34 +1,20 @@
-import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { selectCurrentAirport, selectCurrentAirportPos } from '../../store/airportwx/airportwx';
-import { useGetAfdTextQuery, useGetAllAirportsQuery } from '../../store/airportwx/airportwxApi';
+import { selectCurrentAirport } from '../../store/airportwx/airportwx';
+import { useGetAfdTextQuery } from '../../store/airportwx/airportwxApi';
+import { Position2Latlng } from '../../utils/utils';
 
 const Afd = () => {
   const currentAirport = useSelector(selectCurrentAirport);
-  const currentAirportPos = useSelector(selectCurrentAirportPos);
-  const [airportId, setAirportId] = useState(currentAirport);
-  const { data: afdText } = useGetAfdTextQuery(currentAirportPos, {
+  const { data: afdText } = useGetAfdTextQuery(Position2Latlng(currentAirport.position.coordinates), {
     refetchOnMountOrArgChange: true,
-    skip: currentAirportPos === null,
+    skip: currentAirport === null || !currentAirport.position,
   });
-  const { data: airports } = useGetAllAirportsQuery('');
-  const [airportName, setAirportName] = useState('');
-
-  useEffect(() => {
-    if (currentAirport) {
-      setAirportId(currentAirport);
-      if (airports) {
-        const airport = airports.find((x) => x.key === currentAirport);
-        setAirportName(airport?.name);
-      }
-    }
-  }, [airports, currentAirport]);
 
   return (
     <div className="metar-container">
       <div className="metar-scroll-content">
         <div className="airport-name">
-          AFD - {airportName} ({airportId})
+          AFD - {currentAirport.name} ({currentAirport.key})
         </div>
         {afdText ? (
           <div

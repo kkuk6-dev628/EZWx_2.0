@@ -1,54 +1,106 @@
-import { Button, FormControl, MenuItem, Select } from '@mui/material';
+import { FormControl, MenuItem, Select } from '@mui/material';
 import { DraggableDlg } from '../common/DraggableDlg';
-import { AiOutlineHeart } from 'react-icons/ai';
 import { NodeModel } from '@minoru/react-dnd-treeview';
 import { useEffect, useState } from 'react';
-import { useGetSavedItemsQuery, useUpdateSavedItemMutation } from '../../store/saved/savedApi';
-import { BsFolderPlus } from 'react-icons/bs';
+import {
+  useDeleteSavedItemMutation,
+  useGetSavedItemsQuery,
+  useGetSavedOrderQuery,
+  useUpdateSavedItemMutation,
+  useUpdateSavedOrderMutation,
+} from '../../store/saved/savedApi';
 import { SecondaryButton, PrimaryButton } from '../common';
 import { SavedItemData } from '../../interfaces/saved';
+import { SvgSaveFilled, SvgSaveOutlined } from '../utils/SvgIcons';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
+import { isSameJson } from '../../utils/utils';
+import { isSameRoutes } from '../map/common/AreoFunctions';
 
 interface Props {
   title: string;
+  name: string;
   open: boolean;
   onClose: () => void;
   data: SavedItemData;
 }
 
-export const SaveDialog = ({ title, open, onClose, data }: Props) => {
+export const SaveDialog = ({ title, name, open, onClose, data }: Props) => {
   const { data: savedData } = useGetSavedItemsQuery();
+  const { data: savedOrder } = useGetSavedOrderQuery();
+  const [updateSavedOrder] = useUpdateSavedOrderMutation();
   const [updateSavedItem] = useUpdateSavedItemMutation();
   const [saveFolders, setSaveFolders] = useState<NodeModel[]>(savedData && savedData.filter((x) => x.droppable));
   const [selectedSaveFolder, setSelectedSaveFolder] = useState(1);
-  const [saveName, setSaveName] = useState('');
+  const [saveName, setSaveName] = useState(name);
   const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
+  const [existSameItem, setExistSameItem] = useState(false);
+  const [existingItems, setExistingItems] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [deleteSavedItem] = useDeleteSavedItemMutation();
+
+  useEffect(() => {
+    setSaveName(name);
+  }, [name]);
 
   useEffect(() => {
     if (savedData && savedData.length > 0) {
       setSaveFolders(savedData.filter((x) => x.droppable));
+      const items = savedData.filter((x) => {
+        if (data.type === 'route') {
+          return isSameRoutes(x.data.data, data.data);
+        } else {
+          return isSameJson(x.data, data);
+        }
+      });
+      setExistingItems(items);
+      setExistSameItem(items.length > 0 ? true : false);
     }
-  }, [savedData]);
+  }, [savedData, data]);
 
-  const handleSaveItem = () => {
-    updateSavedItem({
+  const handleSaveItem = async () => {
+    const { data: d } = (await updateSavedItem({
       text: saveName,
       parent: selectedSaveFolder,
       data: data,
       droppable: false,
-    });
+    })) as any;
     onClose();
+    if (d && d.identifiers && d.identifiers.length > 0) {
+      updateSavedOrder({ ...savedOrder, order: [{ id: d.identifiers[0].id, isOpen: false }, ...savedOrder.order] });
+    }
   };
 
-  function handleCreateFolder() {
-    updateSavedItem({
+  async function handleCreateFolder() {
+    if (!newFolderName.trim()) {
+      setNewFolderName('');
+      setErrorMessage('New folder name must not be left blank!');
+      return;
+    }
+    const { data } = (await updateSavedItem({
       text: newFolderName,
       parent: 1,
       data: { type: 'folder', data: {} },
       droppable: true,
-    });
+    })) as any;
+    if (data && data.identifiers && data.identifiers.length > 0) {
+      setSelectedSaveFolder(data.identifiers[0].id);
+      updateSavedOrder({ ...savedOrder, order: [{ id: data.identifiers[0].id, isOpen: false }, ...savedOrder.order] });
+    }
     setShowCreateFolderModal(false);
   }
+
+  function deleteSelectedItem() {
+    const sameItems = savedData.filter((x) => isSameJson(x.data, data));
+    sameItems.forEach((x) => {
+      deleteSavedItem(x.id as number);
+    });
+    setShowDeleteModal(false);
+  }
+
+  const itemName = data.type === 'imagery' ? 'imagery collection' : data.type;
 
   return (
     <>
@@ -56,20 +108,38 @@ export const SaveDialog = ({ title, open, onClose, data }: Props) => {
         title={title}
         open={open}
         onClose={onClose}
+        toolButtons={
+          <>
+            <button className="right-separator width50" onClick={() => setShowCreateFolderModal(true)}>
+              <CreateNewFolderOutlinedIcon />
+              <p className="btn-text">New Folder</p>
+            </button>
+            <button
+              className="width50"
+              onClick={() => {
+                setShowDeleteModal(true);
+              }}
+            >
+              <DeleteOutlineIcon />
+              <p className="btn-text">Delete</p>
+            </button>
+          </>
+        }
         body={
           <>
             <FormControl>
               <label className="label" htmlFor="">
                 Name
               </label>
-              <div className="route__modal__box__input1">
-                <AiOutlineHeart className="route__modal__box__icon" />
+              <div className="icon_input">
+                {existSameItem ? <SvgSaveFilled /> : <SvgSaveOutlined />}
                 <input
                   aria-label="name"
                   type="text"
                   value={saveName}
                   onChange={(e) => setSaveName(e.target.value)}
-                  className="route__modal__box__input"
+                  className="modal__box__input"
+                  style={{ width: '90%' }}
                 />
               </div>
             </FormControl>
@@ -84,21 +154,40 @@ export const SaveDialog = ({ title, open, onClose, data }: Props) => {
                 displayEmpty
               >
                 {saveFolders &&
-                  saveFolders.map((f) => {
+                  saveFolders.map((f, index) => {
                     return (
-                      <MenuItem key={'folder-' + f.text} value={f.id}>
+                      <MenuItem key={`folder-${index}`} value={f.id}>
                         {f.text}
                       </MenuItem>
                     );
                   })}
               </Select>
             </FormControl>
-            <div className="button">
-              <BsFolderPlus />
-              <Button variant="text" onClick={() => setShowCreateFolderModal(true)}>
-                Add New Folder
-              </Button>
-            </div>
+            {showDeleteModal && (
+              <DraggableDlg
+                title={existSameItem ? `Delete this saved ${itemName}?` : `No saved ${itemName} found!`}
+                width={440}
+                open={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                body={
+                  existSameItem
+                    ? `Are you sure you want to delete this saved ${itemName} from all folders?`
+                    : `This ${itemName} was not found to exist in any saved folders`
+                }
+                footer={
+                  <>
+                    <SecondaryButton
+                      onClick={() => setShowDeleteModal(false)}
+                      text={existSameItem ? 'Abandon' : 'Close'}
+                      isLoading={false}
+                    />
+                    {existSameItem && (
+                      <PrimaryButton text="Delete" onClick={() => deleteSelectedItem()} isLoading={false} />
+                    )}
+                  </>
+                }
+              />
+            )}
           </>
         }
         footer={
@@ -113,12 +202,15 @@ export const SaveDialog = ({ title, open, onClose, data }: Props) => {
         open={showCreateFolderModal}
         onClose={() => setShowCreateFolderModal(false)}
         body={
-          <FormControl className="form-control-input">
-            <label className="label" htmlFor="">
-              New folder name
-            </label>
-            <input aria-label="name" type="text" onChange={(e) => setNewFolderName(e.target.value)}></input>
-          </FormControl>
+          <>
+            <FormControl className="form-control-input">
+              <label className="label" htmlFor="">
+                New folder name
+              </label>
+              <input aria-label="name" type="text" onChange={(e) => setNewFolderName(e.target.value)}></input>
+            </FormControl>
+            {!newFolderName && <div className="error-msg">{errorMessage}</div>}
+          </>
         }
         footer={
           <>
