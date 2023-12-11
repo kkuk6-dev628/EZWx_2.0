@@ -37,6 +37,16 @@ export class AirportwxService {
   }
 
   async addRecentAirport(recentAirport) {
+    const existItem = await this.recentAirportRepository.find({
+      where: { airportId: recentAirport.airportId, userId: recentAirport.userId },
+    });
+    if (existItem.length > 0) {
+      existItem.forEach((x) => {
+        x.updated_at = new Date();
+        this.recentAirportRepository.save(x);
+      });
+      return existItem[0].id;
+    }
     const id = (await this.recentAirportRepository.insert(recentAirport)).generatedMaps[0].id;
     const oldRows = await this.recentAirportRepository.find({
       select: ['id'],

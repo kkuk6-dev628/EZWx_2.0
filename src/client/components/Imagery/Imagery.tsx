@@ -22,6 +22,9 @@ import toast from 'react-hot-toast';
 import Nouislider from 'nouislider-react';
 import { FetchUserSettings } from '../shared/FetchUserSettings';
 import { SaveDialog } from '../saved/SaveDialog';
+import { useGetSavedItemsQuery } from '../../store/saved/savedApi';
+import { isSameJson, isSameSavedItem } from '../../utils/utils';
+import { Icon } from '@iconify/react';
 
 const sliderStep = 60 * 1000;
 
@@ -79,6 +82,15 @@ function Imagery() {
   const showInformation = useSelector(selectShowInformation);
   const [showSaveImageryDlg, setShowSaveImageryDlg] = useState(false);
   const dispatch = useDispatch();
+  const { data: savedData } = useGetSavedItemsQuery();
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    if (selectedImagesData && savedData) {
+      const saved = savedData.find((x) => isSameSavedItem(x.data, { type: 'imagery', data: selectedImagesData }));
+      setIsSaved(saved ? true : false);
+    }
+  }, [savedData, selectedImagesData]);
 
   useEffect(() => {
     handleWindowSizeChange();
@@ -359,7 +371,11 @@ function Imagery() {
     {
       id: 'save',
       name: 'Save',
-      svg: <SvgBookmark />,
+      svg: isSaved ? (
+        <Icon icon="bi:bookmark-plus-fill" color="var(--color-primary)" width={24} />
+      ) : (
+        <Icon icon="bi:bookmark-plus" color="var(--color-primary)" width={24} />
+      ),
       handler: handler,
       isHideResponsive: false,
     },
@@ -421,7 +437,7 @@ function Imagery() {
           name={selectedImagesData.SUBTABLABEL || selectedImagesData.TITLE}
           open={showSaveImageryDlg}
           onClose={() => setShowSaveImageryDlg(false)}
-          data={{ type: 'imagery', data: selectedImagesData }}
+          data={{ type: 'imagery', data: { FAVORITE_ID: selectedImagesData.FAVORITE_ID } }}
         />
       )}
       <div className="igry__wrp">

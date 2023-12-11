@@ -201,16 +201,18 @@ const LeafletMap = () => {
           zoomInText={ReactDOMServer.renderToString(<SvgRoundPlus></SvgRoundPlus>)}
           zoomOutText={ReactDOMServer.renderToString(<SvgRoundMinus></SvgRoundMinus>)}
         />
-        <Dialog
-          PaperComponent={PaperComponent}
-          hideBackdrop
-          disableEnforceFocus
-          style={{ position: 'absolute' }}
-          open={isShowModal}
-          onClose={() => setIsShowModal(false)}
-        >
-          <Route setIsShowModal={setIsShowModal} />
-        </Dialog>
+        {isShowModal && (
+          <Dialog
+            PaperComponent={PaperComponent}
+            hideBackdrop
+            disableEnforceFocus
+            style={{ position: 'absolute' }}
+            open={isShowModal}
+            onClose={() => setIsShowModal(false)}
+          >
+            <Route setIsShowModal={setIsShowModal} />
+          </Dialog>
+        )}
       </MapContainer>
       <DepartureAdvisor showPast={true} />
     </div>

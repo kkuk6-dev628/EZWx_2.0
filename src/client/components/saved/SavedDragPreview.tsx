@@ -14,7 +14,7 @@ export const SavedDragPreview: React.FC<Props> = (props) => {
   return (
     <div className={styles.root}>
       <div className={styles.icon}>
-        <TypeIcon droppable={item.droppable || false} fileType={item?.data?.type} />
+        <TypeIcon isRoot={false} isOpen={false} droppable={item.droppable || false} fileType={item?.data?.type} />
       </div>
       <div className={styles.label}>{item.text}</div>
     </div>

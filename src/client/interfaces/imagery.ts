@@ -12,6 +12,7 @@ export interface SubtabItem {
 export interface SubtabGroupItem {
   GROUP_NAME: string;
   SUBTAB: SubtabItem[];
+  FAVORITE_ID?: string;
   IMAGE?: { URL: string }[];
 }
 

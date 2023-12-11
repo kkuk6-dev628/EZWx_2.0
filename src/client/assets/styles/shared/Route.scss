@@ -11,9 +11,9 @@
   }
 }
 .route-editor {
-  max-width: 480px;
+  max-width: 387px;
   @media (max-width: 460px) {
-    max-width: 344px;
+    max-width: 314px;
   }
 
   button {
@@ -32,7 +32,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 10px 0 20px;
+    padding: 0 10px 0 20px !important;
   }
 
   &__top__text {
@@ -141,7 +141,7 @@
 
   &__swd {
     display: flex;
-    grid-gap: 40px;
+    grid-gap: 36px;
     align-items: center;
   }
 
@@ -213,6 +213,7 @@
     grid-gap: 20px;
     justify-content: center;
     padding-bottom: 20px;
+    background-color: white;
   }
 
   &__btn--btm {

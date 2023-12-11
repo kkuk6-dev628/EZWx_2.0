@@ -15,6 +15,9 @@ import { useEffect, useState } from 'react';
 import { Modal } from '../common/Modal';
 import { PrimaryButton } from '../common/Buttons';
 import { SaveDialog } from '../saved/SaveDialog';
+import { useGetSavedItemsQuery } from '../../store/saved/savedApi';
+import { isSameSavedItem } from '../../utils/utils';
+import { Icon } from '@iconify/react';
 
 function AirportSelectModal({ setIsShowModal }) {
   const settingsState = useSelector(selectSettings);
@@ -29,6 +32,15 @@ function AirportSelectModal({ setIsShowModal }) {
   const [showSaveDlg, setShowSaveDlg] = useState(false);
   const { data: allAirports } = useGetAllAirportsQuery('');
   const [homeAirport, setHomeAirport] = useState(null);
+  const { data: savedData } = useGetSavedItemsQuery();
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    if (selectedAirport && savedData) {
+      const saved = savedData.find((x) => isSameSavedItem(x.data, { type: 'airport', data: selectedAirport }));
+      setIsSaved(saved ? true : false);
+    }
+  }, [savedData, selectedAirport]);
 
   useEffect(() => {
     if (isSuccessRecentAirports && recentAirports.length > 0) {
@@ -97,7 +109,11 @@ function AirportSelectModal({ setIsShowModal }) {
               <p className="btn-text">Home airport</p>
             </button>
             <button className="save" onClick={() => (selectedAirport ? setShowSaveDlg(true) : setShowError(true))}>
-              <SvgBookmark />
+              {isSaved ? (
+                <Icon icon="bi:bookmark-plus-fill" color="var(--color-primary)" width={24} />
+              ) : (
+                <Icon icon="bi:bookmark-plus" color="var(--color-primary)" width={24} />
+              )}
               <p className="btn-text">Save</p>
             </button>
           </div>

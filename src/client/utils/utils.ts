@@ -15,7 +15,8 @@ import {
   mobileLandscapeHeight,
 } from './constants';
 import * as d3 from 'd3-scale';
-import { roundCloudHeight } from '../components/map/common/AreoFunctions';
+import { isSameRoutes, roundCloudHeight } from '../components/map/common/AreoFunctions';
+import { SavedItemData } from '../interfaces/saved';
 
 export const flightCategoryToColor = (flightCategory: string): string => {
   return initialUserSettingsState.personalMinimumsState[flightCategory]
@@ -646,4 +647,15 @@ export function Position2Latlng(pos: GeoJSON.Position) {
 }
 export function isSameJson(a: any, b: any): boolean {
   return JSON.stringify(a) == JSON.stringify(b);
+}
+
+export function isSameSavedItem(a: SavedItemData, b: SavedItemData) {
+  switch (a.type) {
+    case 'airport':
+      return a.data.key === b.data.key;
+    case 'imagery':
+      return a.data.FAVORITE_ID === b.data.FAVORITE_ID;
+    case 'route':
+      return isSameRoutes(a.data, b.data);
+  }
 }

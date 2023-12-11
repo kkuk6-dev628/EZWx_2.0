@@ -52,10 +52,16 @@
       padding-bottom: 8px;
     }
     .icon_input{
-      margin-left: -24px;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
+      >svg{
+        position: absolute;
+        background: #CCCACA;
+        margin: 1px;
+        padding: 1.5px;
+      }
+      >input{
+        padding-left: 28px !important;
+        width: calc(100% - 34px)
+      }
     }
     &__toolbuttons{
       display: flex;

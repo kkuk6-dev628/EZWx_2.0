@@ -27,6 +27,9 @@ import Taf from '../components/airportwx/Taf';
 import Afd from '../components/airportwx/Afd';
 import { useGetRoutesQuery } from '../store/route/routeApi';
 import { SaveDialog } from '../components/saved/SaveDialog';
+import { useGetSavedItemsQuery } from '../store/saved/savedApi';
+import { isSameJson } from '../utils/utils';
+import { Icon } from '@iconify/react';
 const Route = dynamic(() => import('../components/shared/Route'), {
   ssr: false,
 });
@@ -49,6 +52,15 @@ function AirportWxPage() {
   const { data: airports } = useGetAllAirportsQuery('');
   const [tempAirport, setTempAirport] = useState(currentAirport);
   const [showSaveDlg, setShowSaveDlg] = useState(false);
+  const { data: savedData } = useGetSavedItemsQuery();
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    if (currentAirport && savedData) {
+      const saved = savedData.find((x) => isSameJson(x.data.data, currentAirport));
+      setIsSaved(saved ? true : false);
+    }
+  }, [savedData, currentAirport]);
 
   useEffect(() => {
     if (tempAirport) {
@@ -57,12 +69,21 @@ function AirportWxPage() {
   }, [tempAirport]);
 
   useEffect(() => {
+    if (currentAirport) {
+      setTempAirport(currentAirport);
+    }
+  }, [currentAirport]);
+
+  useEffect(() => {
     if (airportwxDbState) {
       setAirportwxState({ ...airportwxDbState });
     }
   }, [airportwxDbState]);
 
   useEffect(() => {
+    if (currentAirport) {
+      return;
+    }
     if (recentAirports && recentAirports.length > 0) {
       dispatch(setCurrentAirport(recentAirports[0].airport));
       setTempAirport(recentAirports[0].airport);
@@ -144,7 +165,11 @@ function AirportWxPage() {
     {
       id: 'save',
       name: 'Save',
-      svg: <SvgBookmark />,
+      svg: isSaved ? (
+        <Icon icon="bi:bookmark-plus-fill" color="var(--color-primary)" width={24} />
+      ) : (
+        <Icon icon="bi:bookmark-plus" color="var(--color-primary)" width={24} />
+      ),
       handler: handler,
       isHideResponsive: false,
     },

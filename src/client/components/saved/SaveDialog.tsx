@@ -14,7 +14,7 @@ import { SavedItemData } from '../../interfaces/saved';
 import { SvgSaveFilled, SvgSaveOutlined } from '../utils/SvgIcons';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
-import { isSameJson } from '../../utils/utils';
+import { isSameJson, isSameSavedItem } from '../../utils/utils';
 import { isSameRoutes } from '../map/common/AreoFunctions';
 
 interface Props {
@@ -26,7 +26,7 @@ interface Props {
 }
 
 export const SaveDialog = ({ title, name, open, onClose, data }: Props) => {
-  const { data: savedData } = useGetSavedItemsQuery();
+  const { data: savedData, refetch: refetchSavedItems } = useGetSavedItemsQuery();
   const { data: savedOrder } = useGetSavedOrderQuery();
   const [updateSavedOrder] = useUpdateSavedOrderMutation();
   const [updateSavedItem] = useUpdateSavedItemMutation();
@@ -42,19 +42,17 @@ export const SaveDialog = ({ title, name, open, onClose, data }: Props) => {
   const [deleteSavedItem] = useDeleteSavedItemMutation();
 
   useEffect(() => {
+    refetchSavedItems();
+  }, []);
+
+  useEffect(() => {
     setSaveName(name);
   }, [name]);
 
   useEffect(() => {
     if (savedData && savedData.length > 0) {
       setSaveFolders(savedData.filter((x) => x.droppable));
-      const items = savedData.filter((x) => {
-        if (data.type === 'route') {
-          return isSameRoutes(x.data.data, data.data);
-        } else {
-          return isSameJson(x.data, data);
-        }
-      });
+      const items = savedData.filter((x) => isSameSavedItem(x.data, data));
       setExistingItems(items);
       setExistSameItem(items.length > 0 ? true : false);
     }

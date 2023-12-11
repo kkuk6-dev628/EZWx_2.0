@@ -9,6 +9,11 @@ import {
   useGetImageryStateQuery,
   useUpdateImageryStateMutation,
 } from '../../store/imagery/imageryApi';
+import { Icon } from '@iconify/react';
+import { useGetSavedItemsQuery } from '../../store/saved/savedApi';
+import { selectSelectedFavoriteId, setSelectedFavoriteId } from '../../store/imagery/imagery';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 interface ImageryDropDownProps {
   imageryCollectionData: ImageryCollectionItem[];
@@ -35,11 +40,67 @@ const ImageryDropDown = ({
   });
   const [updateImageryState] = useUpdateImageryStateMutation();
   const selectedComponentRef = useRef(null);
+  const { data: savedData } = useGetSavedItemsQuery();
+  const selectedFavoriteId = useSelector(selectSelectedFavoriteId);
+  const dispatch = useDispatch();
+
+  function isSavedImagery({ FAVORITE_ID }) {
+    if (savedData) {
+      const saved = savedData.find((x) => x.data.type === 'imagery' && x.data.data.FAVORITE_ID === FAVORITE_ID);
+      return saved ? true : false;
+    }
+    return false;
+  }
 
   function selectImage(item: ImageryCollectionItem) {
     setIsShowDropDown(false);
     setSelectedImage(item);
+    dispatch(setSelectedFavoriteId(item.FAVORITE_ID));
   }
+
+  useEffect(() => {
+    if (selectedFavoriteId && imageryCollections) {
+      for (let i1 = 0; i1 < imageryCollections.length; i1++) {
+        const x1 = imageryCollections[i1];
+        if (x1.FAVORITE_ID === selectedFavoriteId) {
+          setSelectedLevel1(i1);
+          setSelectedImage(x1);
+          break;
+        } else if (x1.SUBTAB_GROUP) {
+          const ch1 = Array.isArray(x1.SUBTAB_GROUP) ? x1.SUBTAB_GROUP : x1.SUBTAB_GROUP.SUBTAB;
+          if (!Array.isArray(ch1)) {
+            console.log('Invalid data structure in wx.json');
+          } else {
+            for (let i2 = 0; i2 < ch1.length; i2++) {
+              const x2 = ch1[i2];
+              if (x2.FAVORITE_ID === selectedFavoriteId) {
+                setSelectedLevel1(i1);
+                setSelectedLevel2(i2);
+                setSelectedImage({ ...x1, ...x2 });
+                return;
+              } else if ((x2 as SubtabGroupItem).SUBTAB) {
+                const ch2 = (x2 as SubtabGroupItem).SUBTAB;
+                if (!Array.isArray(ch2)) {
+                  console.log('Invalid data structure in wx.json', ch2);
+                } else {
+                  for (let i3 = 0; i3 < ch2.length; i3++) {
+                    const x3 = ch2[i3];
+                    if (x3.FAVORITE_ID === selectedFavoriteId) {
+                      setSelectedLevel1(i1);
+                      setSelectedLevel2(i2);
+                      setSelectedLevel3(i3);
+                      setSelectedImage({ ...x1, ...x3 });
+                      return;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }, [selectedFavoriteId, imageryCollections]);
 
   useEffect(() => {
     if (selectedImage) {
@@ -56,6 +117,9 @@ const ImageryDropDown = ({
   }, [selectedImage]);
 
   useEffect(() => {
+    if (selectedFavoriteId && imageryState && selectedFavoriteId !== imageryState.selectedImageryId) {
+      return;
+    }
     if ((imageryCollections && isImageryStateLoaded) || isImageryStateError) {
       setImageData(imageryCollections);
       let imagerySt = null;
@@ -110,7 +174,7 @@ const ImageryDropDown = ({
         }
       }
     }
-  }, [isImageryStateLoaded, imageryCollections, isImageryStateError]);
+  }, [isImageryStateLoaded, selectedFavoriteId, imageryCollections, isImageryStateError]);
 
   useEffect(() => {
     if (selectedComponentRef.current && isShowDropDown) {
@@ -228,6 +292,14 @@ const ImageryDropDown = ({
                         className={`igryDrop__menu__item ${item.IMAGE && 'last-item'}`}
                         {...itemProps}
                       >
+                        {item.IMAGE && isSavedImagery(item) && (
+                          <Icon
+                            style={{ marginLeft: -30, marginRight: 17 }}
+                            icon="bi:bookmark-fill"
+                            color="var(--color-primary)"
+                            width={16}
+                          />
+                        )}
                         {item.IMAGE && selectedLevel1 === index1 && <span className="blue-dot"></span>}
                         <p className="igryDrop__menu__text">{item.TITLE.replace(/&amp;/g, '&')}</p>
                         {children && (
@@ -274,6 +346,14 @@ const ImageryDropDown = ({
                                     }`}
                                     {...itemProps}
                                   >
+                                    {child.IMAGE && isSavedImagery(child) && (
+                                      <Icon
+                                        style={{ marginLeft: -50, marginRight: 38 }}
+                                        icon="bi:bookmark-fill"
+                                        color="var(--color-primary)"
+                                        width={16}
+                                      />
+                                    )}
                                     {child.IMAGE && selectedLevel2 === index2 && <span className="blue-dot"></span>}
                                     <p className="igryDrop__menu__text">
                                       {child.SUBTABLABEL
@@ -314,6 +394,14 @@ const ImageryDropDown = ({
                                             key={child3.SUBTABLABEL || child3.GROUP_NAME}
                                             {...itemProps}
                                           >
+                                            {child3.IMAGE && isSavedImagery(child3) && (
+                                              <Icon
+                                                style={{ marginLeft: -70, marginRight: 54 }}
+                                                icon="bi:bookmark-fill"
+                                                color="var(--color-primary)"
+                                                width={16}
+                                              />
+                                            )}
                                             {child3.IMAGE && selectedLevel3 === index3 && (
                                               <span className="blue-dot"></span>
                                             )}

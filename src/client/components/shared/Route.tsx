@@ -21,6 +21,8 @@ import { useRouter } from 'next/router';
 import { useGetSavedItemsQuery, useUpdateSavedItemMutation } from '../../store/saved/savedApi';
 import { NodeModel } from '@minoru/react-dnd-treeview';
 import { SaveDialog } from '../saved/SaveDialog';
+import { isSameSavedItem } from '../../utils/utils';
+import { Icon } from '@iconify/react';
 
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
@@ -88,6 +90,15 @@ function Route({ setIsShowModal }: Props) {
   const [altitudeText, setAltitudeText] = useState(routeData.altitude.toLocaleString());
   const router = useRouter();
   const dispatch = useDispatch();
+  const { data: savedData } = useGetSavedItemsQuery();
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    if (routeData && savedData) {
+      const saved = savedData.find((x) => isSameSavedItem(x.data, { type: 'route', data: routeData }));
+      setIsSaved(saved ? true : false);
+    }
+  }, [savedData, routeData]);
 
   useEffect(() => {
     if (activeRoute) {
@@ -220,12 +231,18 @@ function Route({ setIsShowModal }: Props) {
                   if (validity === true) {
                     setIsShowSaveRouteModal(true);
                   } else {
-                    setErrorMessage(validity as string);
+                    setErrorMessage(
+                      'A saved route must include a valid departure and destination airport and valid optional route of flight.',
+                    );
                     setIsShowErrorRouteModal(true);
                   }
                 }}
               >
-                <BsBookmarkPlus className="route-editor__icon" />
+                {isSaved ? (
+                  <Icon icon="bi:bookmark-plus-fill" color="var(--color-primary)" width={24} />
+                ) : (
+                  <Icon icon="bi:bookmark-plus" color="var(--color-primary)" width={24} />
+                )}
                 <p className="route-editor__tab__text text">Save</p>
               </button>
             </div>
@@ -393,7 +410,7 @@ function Route({ setIsShowModal }: Props) {
       <Modal
         open={isShowErrorRouteModal}
         handleClose={() => setIsShowErrorRouteModal(false)}
-        title="Route Error"
+        title="No valid route entered!"
         description={errorMessage}
         footer={
           <>

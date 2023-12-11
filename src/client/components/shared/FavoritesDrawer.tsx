@@ -34,7 +34,7 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
             </div>
           </div>
         </div>
-        <SavedTreeView></SavedTreeView>
+        <SavedTreeView handleCloseDrawer={handleCloseDrawer}></SavedTreeView>
       </div>
     </Drawer>
   );

@@ -25,15 +25,22 @@ import { SavedItemData, SavedOrderItem } from '../../interfaces/saved';
 import { SecondaryButton, PrimaryButton } from '../common';
 import { DraggableDlg } from '../common/DraggableDlg';
 import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { setCurrentAirport } from '../../store/airportwx/airportwx';
+import { useRouter } from 'next/router';
+import { setActiveRoute } from '../../store/route/routes';
+import { setSelectedFavoriteId } from '../../store/imagery/imagery';
+import { useAddRecentAirportMutation } from '../../store/airportwx/airportwxApi';
+import { useCreateRouteMutation } from '../../store/route/routeApi';
 
 const ROOT_MENU_ID = 'root-menu';
 const FOLDER_MENU_ID = 'folder-menu';
 const ITEM_MENU_ID = 'item-menu';
 
-function SavedTreeView() {
-  const { data: savedData, isSuccess: loadedFavItems } = useGetSavedItemsQuery();
+function SavedTreeView({ handleCloseDrawer }) {
+  const { data: savedData, refetch: refetchSavedItems } = useGetSavedItemsQuery();
   const [updateSavedItem] = useUpdateSavedItemMutation();
-  const { data: savedOrder, isSuccess: loadedFavOrder } = useGetSavedOrderQuery();
+  const { data: savedOrder, refetch: refetchSavedOrder } = useGetSavedOrderQuery();
   const [updateSavedOrder] = useUpdateSavedOrderMutation();
   const [deleteSavedItem] = useDeleteSavedItemMutation();
   const [savedOrderLocal, setSavedOrderLocal] = useState<SavedOrderItem[]>();
@@ -48,6 +55,20 @@ function SavedTreeView() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [addRecentAirport] = useAddRecentAirportMutation();
+  const [createRoute] = useCreateRouteMutation();
+
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  useEffect(() => {
+    refresh();
+  }, []);
+
+  function refresh() {
+    refetchSavedItems();
+    refetchSavedOrder();
+  }
 
   useEffect(() => {
     if (savedData) {
@@ -116,6 +137,7 @@ function SavedTreeView() {
         setShowCreateFolderModal(true);
         break;
       case 'refresh':
+        refresh();
         break;
     }
   }
@@ -133,6 +155,7 @@ function SavedTreeView() {
         setShowDuplicateFolderModal(true);
         break;
       case 'refresh':
+        refresh();
         break;
     }
   }
@@ -141,6 +164,27 @@ function SavedTreeView() {
     setNewName(selectedNode.text);
     switch (e.id) {
       case 'view':
+        if (selectedNode.data.type === 'airport') {
+          dispatch(setCurrentAirport(selectedNode.data.data));
+          addRecentAirport({ airportId: selectedNode.data.data.key, airport: selectedNode.data.data });
+          router.push('/airportwx');
+        } else if (selectedNode.data.type === 'imagery') {
+          dispatch(setSelectedFavoriteId(selectedNode.data.data.FAVORITE_ID));
+          router.push('/imagery');
+        }
+        handleCloseDrawer();
+        break;
+      case 'view-map':
+        dispatch(setActiveRoute(selectedNode.data.data));
+        createRoute(selectedNode.data.data);
+        router.push('/map');
+        handleCloseDrawer();
+        break;
+      case 'view-profile':
+        dispatch(setActiveRoute(selectedNode.data.data));
+        createRoute(selectedNode.data.data);
+        router.push('/route-profile');
+        handleCloseDrawer();
         break;
       case 'delete':
         setShowDeleteModal(true);
@@ -152,6 +196,7 @@ function SavedTreeView() {
         setShowDuplicateFolderModal(true);
         break;
       case 'refresh':
+        refresh();
         break;
     }
   }
@@ -268,11 +313,7 @@ function SavedTreeView() {
                     node={nodeModel}
                     depth={depth}
                     isOpen={isOpen}
-                    numberOfChildren={
-                      nodeModel.id === 1
-                        ? treeData.length - 1
-                        : treeData.filter((x) => x.parent === nodeModel.id).length
-                    }
+                    numberOfChildren={treeData.filter((x) => x.parent === nodeModel.id).length}
                     onToggle={(id) => {
                       onToggle();
                       handleToggle(id, isOpen);
@@ -335,10 +376,23 @@ function SavedTreeView() {
           </Item>
         </Menu>
         <Menu id={ITEM_MENU_ID}>
-          <Item id="view" onClick={handleItemMenuItemClick}>
-            <VisibilityIcon />
-            <span>View</span>
-          </Item>
+          {selectedNode && selectedNode.data && selectedNode.data.type == 'route' ? (
+            <>
+              <Item id="view-map" onClick={handleItemMenuItemClick}>
+                <VisibilityIcon />
+                <span>View in Map</span>
+              </Item>
+              <Item id="view-profile" onClick={handleItemMenuItemClick}>
+                <VisibilityIcon />
+                <span>View in Profile</span>
+              </Item>
+            </>
+          ) : (
+            <Item id="view" onClick={handleItemMenuItemClick}>
+              <VisibilityIcon />
+              <span>View</span>
+            </Item>
+          )}
           <Item id="rename" onClick={handleItemMenuItemClick}>
             <TitleIcon />
             <span>Rename</span>
