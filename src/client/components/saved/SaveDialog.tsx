@@ -40,6 +40,7 @@ export const SaveDialog = ({ title, name, open, onClose, data }: Props) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [deleteSavedItem] = useDeleteSavedItemMutation();
+  const [newFolderId, setNewFolderId] = useState(0);
 
   useEffect(() => {
     refetchSavedItems();
@@ -51,12 +52,23 @@ export const SaveDialog = ({ title, name, open, onClose, data }: Props) => {
 
   useEffect(() => {
     if (savedData && savedData.length > 0) {
-      setSaveFolders(savedData.filter((x) => x.droppable));
+      let folders = savedData.filter((x) => x.droppable && (x.id as number) > 1 && x.id !== newFolderId);
+      if (savedOrder && savedOrder.order.length > 0) {
+        const orderedTreeData = savedOrder.order.map((order) => folders.find((x) => x.id === order.id));
+        const missed = folders.filter((x) => !savedOrder.order.find((o) => x.id === o.id));
+        folders = orderedTreeData.concat(missed).filter((x) => x);
+      }
+      if (newFolderId) {
+        folders = [savedData.find((x) => x.id === 1), savedData.find((x) => x.id === newFolderId), ...folders];
+      } else {
+        folders = [savedData.find((x) => x.id === 1), ...folders];
+      }
+      setSaveFolders(folders);
       const items = savedData.filter((x) => isSameSavedItem(x.data, data));
       setExistingItems(items);
       setExistSameItem(items.length > 0 ? true : false);
     }
-  }, [savedData, data]);
+  }, [savedData, savedOrder, data]);
 
   const handleSaveItem = async () => {
     const { data: d } = (await updateSavedItem({
@@ -85,6 +97,7 @@ export const SaveDialog = ({ title, name, open, onClose, data }: Props) => {
     })) as any;
     if (data && data.identifiers && data.identifiers.length > 0) {
       setSelectedSaveFolder(data.identifiers[0].id);
+      setNewFolderId(data.identifiers[0].id);
       updateSavedOrder({ ...savedOrder, order: [{ id: data.identifiers[0].id, isOpen: false }, ...savedOrder.order] });
     }
     setShowCreateFolderModal(false);

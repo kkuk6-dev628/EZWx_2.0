@@ -17,6 +17,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "experimentalDecorators": true,
+    "downlevelIteration": true,
     "jsx": "preserve",
     "incremental": true,
     "plugins": [

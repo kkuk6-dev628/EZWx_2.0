@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React from 'react';
+import React, { useState } from 'react';
 import { Drawer } from '@mui/material';
 import { RxCross2 } from 'react-icons/rx';
 import { FiFilter } from 'react-icons/fi';
@@ -11,6 +11,7 @@ interface Props {
 }
 
 const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
+  const [filter, setFilter] = useState('');
   const handleCloseDrawer = () => {
     onClose(false);
   };
@@ -28,13 +29,13 @@ const FavoritesDrawer = ({ onClose, isOpen }: Props) => {
             <div className="drawer__input__suffix">
               <FiFilter />
             </div>
-            <input type="text" placeholder="Search..." />
-            <div className="drawer__input__suffix">
+            <input type="text" value={filter} placeholder="Search..." onChange={(e) => setFilter(e.target.value)} />
+            <div className="drawer__input__suffix" onClick={() => setFilter('')}>
               <RxCross2 />
             </div>
           </div>
         </div>
-        <SavedTreeView handleCloseDrawer={handleCloseDrawer}></SavedTreeView>
+        <SavedTreeView handleCloseDrawer={handleCloseDrawer} filter={filter}></SavedTreeView>
       </div>
     </Drawer>
   );

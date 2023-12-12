@@ -37,7 +37,7 @@ const ROOT_MENU_ID = 'root-menu';
 const FOLDER_MENU_ID = 'folder-menu';
 const ITEM_MENU_ID = 'item-menu';
 
-function SavedTreeView({ handleCloseDrawer }) {
+function SavedTreeView({ handleCloseDrawer, filter }) {
   const { data: savedData, refetch: refetchSavedItems } = useGetSavedItemsQuery();
   const [updateSavedItem] = useUpdateSavedItemMutation();
   const { data: savedOrder, refetch: refetchSavedOrder } = useGetSavedOrderQuery();
@@ -72,16 +72,24 @@ function SavedTreeView({ handleCloseDrawer }) {
 
   useEffect(() => {
     if (savedData) {
+      let filtered = savedData.filter((x) => x.text.toLowerCase().indexOf(filter.toLowerCase()) > -1);
+      const missedParentIds = filtered.filter((x) => !filtered.find((o) => o.id === x.parent)).map((x) => x.parent);
+      const missedParents = savedData.filter((x) => [...new Set(missedParentIds)].includes(x.id));
+      filtered = filtered.concat(missedParents);
+      if (!filtered.find((x) => x.id === 1)) {
+        filtered.push(savedData.find((x) => x.id === 1));
+      }
       if (savedOrder && savedOrder.order.length > 0) {
         setSavedOrderLocal(savedOrder.order);
-        const orderedTreeData = savedOrder.order.map((order) => savedData.find((x) => x.id === order.id));
-        const missed = savedData.filter((x) => !savedOrder.order.find((o) => x.id === o.id));
-        setTreeData(orderedTreeData.concat(missed).filter((x) => x));
+        const orderedTreeData = savedOrder.order.map((order) => filtered.find((x) => x.id === order.id));
+        const missed = filtered.filter((x) => !savedOrder.order.find((o) => x.id === o.id));
+        const final = orderedTreeData.concat(missed).filter((x) => x);
+        setTreeData(final);
       } else {
-        setTreeData(savedData);
+        setTreeData(filtered);
       }
     }
-  }, [savedData, savedOrder]);
+  }, [savedData, savedOrder, filter]);
 
   useEffect(() => {
     if (savedOrderLocal) {
