@@ -194,3 +194,5 @@ export const humidityThresholds = {
 };
 export const cloudColor1 = '#FFFFFF';
 export const cloudColor2 = '#CCCCCC';
+export const icingIntensity = ['None', 'Trc', 'Lgt', 'Mod', 'Hvy'];
+export const convectivePotential = ['None', 'Very Lo', 'Lo', 'Mod', 'Hi', 'Very Hi'];

@@ -7,7 +7,8 @@ import { convertTimeFormat, simpleTimeFormat } from '../map/common/AreoFunctions
 import { useSelector } from 'react-redux';
 import { selectSettings } from '../../store/user/UserSettings';
 import DialogTitle from '@mui/material/DialogTitle';
-import { convectivePotential, icingIntensity } from './SettingsDrawer';
+import { convectivePotential } from '../../utils/constants';
+import { icingIntensity } from '../../utils/constants';
 import { useGetLastDepartureDataTimeQuery } from '../../store/route-profile/routeProfileApi';
 import { SvgRoundClose } from '../utils/SvgIcons';
 

@@ -18,10 +18,8 @@ import { AutoCompleteInput, Modal, PrimaryButton, SecondaryButton } from '../com
 import { ColoredRangeSlider, formatForDecimal, formatForInteger } from '../common/ColoredRangeSlider';
 import { toast } from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
-
-export const icingIntensity = ['None', 'Trc', 'Lgt', 'Mod', 'Hvy'];
-
-export const convectivePotential = ['None', 'Very Lo', 'Lo', 'Mod', 'Hi', 'Very Hi'];
+import { icingIntensity } from '../../utils/constants';
+import { convectivePotential } from '../../utils/constants';
 
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;

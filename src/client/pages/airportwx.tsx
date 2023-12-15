@@ -25,7 +25,6 @@ import { RoutePoint } from '../interfaces/route';
 import Metar from '../components/airportwx/Metar';
 import Taf from '../components/airportwx/Taf';
 import Afd from '../components/airportwx/Afd';
-import { useGetRoutesQuery } from '../store/route/routeApi';
 import { SaveDialog } from '../components/saved/SaveDialog';
 import { useGetSavedItemsQuery } from '../store/saved/savedApi';
 import { isSameJson } from '../utils/utils';
