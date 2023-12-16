@@ -14,7 +14,7 @@ export class Imagery {
   id: number;
 
   @Index()
-  @Column({ unique: true })
+  @Column()
   userId: number;
 
   @Column()

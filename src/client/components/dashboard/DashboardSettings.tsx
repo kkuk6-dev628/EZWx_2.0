@@ -17,7 +17,7 @@ function DashboardSettings() {
             </div>
             <div className="card-item">
               <p>
-                <b>Temperature:</b> {!settings.default_temperature_unit ? 'Celsius' : 'Facinate'}
+                <b>Temperature:</b> {!settings.default_temperature_unit ? 'Celsius' : 'Fahrenheit'}
               </p>
             </div>
             <div className="card-item">
@@ -27,14 +27,14 @@ function DashboardSettings() {
             </div>
             <div className="card-item">
               <p>
-                <b>Wind Speed:</b> {!settings.default_wind_speed_unit ? 'Knots' : 'Meters'}
+                <b>Wind Speed:</b> {!settings.default_wind_speed_unit ? 'Knots' : 'MPH'}
               </p>
             </div>
           </div>
           <div className="col">
             <div className="card-item">
               <p>
-                <b>Distance:</b> {!settings.default_distance_unit ? 'Nautical miles' : 'Meters'}
+                <b>Distance:</b> {!settings.default_distance_unit ? 'Nautical miles' : 'Kilometers'}
               </p>
             </div>
             <div className="card-item">
@@ -44,12 +44,14 @@ function DashboardSettings() {
             </div>
             <div className="card-item">
               <p>
-                <b>True airspeed:</b> {settings.true_airspeed}knots
+                <b>True airspeed:</b> {settings.true_airspeed} knots
               </p>
             </div>
             <div className="card-item">
               <p>
-                <b>Aircraft class:</b> {settings.max_takeoff_weight_category}
+                <b>Aircraft class:</b>{' '}
+                {settings.max_takeoff_weight_category.slice(0, 1).toUpperCase() +
+                  settings.max_takeoff_weight_category.slice(1)}
               </p>
             </div>
           </div>

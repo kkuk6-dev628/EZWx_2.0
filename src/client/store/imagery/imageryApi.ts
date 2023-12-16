@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { ImageryCollectionItem, ImageryState } from '../../interfaces/imagery';
 
-const baseUrl = '/';
+const baseUrl = '/api/imagery';
 
 export const initialImageryState: ImageryState = {
   selectedLvl1: 0,
@@ -22,25 +22,25 @@ export const imageryApi = createApi({
         return response.TABS;
       },
     }),
-    getImageryState: builder.query({
-      query: () => ({ url: '/api/imagery', method: 'Get' }),
-      transformResponse: (response: ImageryState): ImageryState => {
+    getRecentImagery: builder.query({
+      query: () => ({ url: baseUrl + '/recents', method: 'Get' }),
+      transformResponse: (response: ImageryState[]): ImageryState[] => {
         if (!response) {
-          return initialImageryState;
+          return [initialImageryState];
         }
         return response;
       },
-      transformErrorResponse: (response): ImageryState => {
+      transformErrorResponse: (response): ImageryState[] => {
         console.error(response);
-        return initialImageryState;
+        return [initialImageryState];
       },
       providesTags: [{ type: 'ImageryState', id: 'LIST' }],
     }),
-    updateImageryState: builder.mutation({
-      query: (data) => ({ url: '/api/imagery', method: 'Post', body: data }),
+    addRecentImagery: builder.mutation({
+      query: (data) => ({ url: baseUrl + '/add-recent', method: 'Post', body: data }),
       invalidatesTags: ['ImageryState'],
     }),
   }),
 });
 
-export const { useGetWxJsonQuery, useGetImageryStateQuery, useUpdateImageryStateMutation } = imageryApi;
+export const { useGetWxJsonQuery, useGetRecentImageryQuery, useAddRecentImageryMutation } = imageryApi;

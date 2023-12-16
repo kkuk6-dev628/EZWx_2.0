@@ -38,6 +38,7 @@
       .card-item {
         display: flex;
         align-items: center;
+        cursor: pointer;
         margin: 4px;
         .item-label {
           width: 100%;
@@ -78,6 +79,7 @@
         width: 144px;
         border-radius: 20px;
         box-shadow: none;
+        cursor: pointer;
       }
     }
   }

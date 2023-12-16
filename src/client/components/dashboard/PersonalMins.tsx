@@ -26,8 +26,9 @@ function PersonalMins() {
             </div>
             <div className="card-item">
               <p>
-                <b>Departure Xwind:</b> <span className="color-red">{settings.crosswinds_at_departure_airport[0]}</span>
-                -<span className="color-green">{settings.crosswinds_at_departure_airport[1]}</span>
+                <b>Departure Xwind:</b>{' '}
+                <span className="color-green">{settings.crosswinds_at_departure_airport[0]}</span>-
+                <span className="color-red">{settings.crosswinds_at_departure_airport[1]}</span>
               </p>
             </div>
             <div className="card-item">

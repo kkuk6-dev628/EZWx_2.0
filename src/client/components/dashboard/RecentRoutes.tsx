@@ -4,6 +4,7 @@ import { useGetSavedItemsQuery } from '../../store/saved/savedApi';
 import { isSameRoutes } from '../map/common/AreoFunctions';
 import { SvgSaveFilled } from '../utils/SvgIcons';
 import { Route } from '../../interfaces/route';
+import { ICON_INDENT } from '../../utils/constants';
 
 function RecentRoutes() {
   const { data: recentRoutes } = useGetRoutesQuery(null);
@@ -36,7 +37,7 @@ function RecentRoutes() {
             return (
               <div className="card-item" key={`recent-route-${index}`} onClick={() => routeClick(route)}>
                 {isSaved && <SvgSaveFilled />}
-                <p style={!isSaved ? { paddingInlineStart: 24 } : null}>
+                <p style={!isSaved ? { paddingInlineStart: ICON_INDENT } : null}>
                   {route.departure.key} to {route.destination.key}
                 </p>
               </div>

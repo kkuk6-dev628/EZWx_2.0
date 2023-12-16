@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useGetSavedItemsQuery } from '../../store/saved/savedApi';
 import { SvgSaveFilled } from '../utils/SvgIcons';
-import { useGetRecentAirportQuery } from '../../store/airportwx/airportwxApi';
+import { useAddRecentAirportMutation, useGetRecentAirportQuery } from '../../store/airportwx/airportwxApi';
+import { ICON_INDENT } from '../../utils/constants';
+import { useRouter } from 'next/router';
 
 function RecentAirports() {
   const { data: recentAirports } = useGetRecentAirportQuery(null);
+  const [addRecentAirport] = useAddRecentAirportMutation();
   const { data: savedData } = useGetSavedItemsQuery();
   const [savedAirports, setSavedAirports] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     if (recentAirports && savedData) {
@@ -17,8 +21,9 @@ function RecentAirports() {
     }
   }, [savedData, recentAirports]);
 
-  function routeClick(airport) {
-    console.log(airport);
+  function airportClick(airport) {
+    addRecentAirport(airport);
+    router.push('/airportwx');
   }
 
   return (
@@ -26,20 +31,20 @@ function RecentAirports() {
       <div className="card-title">Recent Airports</div>
       <div className="card-body">
         {recentAirports &&
-          recentAirports.map((route, index) => {
-            const isSaved = savedAirports.includes(route);
+          recentAirports.map((airport, index) => {
+            const isSaved = savedAirports.includes(airport);
             return (
-              <div className="card-item" key={`recent-airport-${index}`} onClick={() => routeClick(route)}>
+              <div className="card-item" key={`recent-airport-${index}`} onClick={() => airportClick(airport)}>
                 {isSaved && <SvgSaveFilled />}
-                <p style={!isSaved ? { paddingInlineStart: 24 } : null}>
-                  {route.airport.key} to {route.airport.name}
+                <p style={!isSaved ? { paddingInlineStart: ICON_INDENT } : null}>
+                  {airport.airport.key} ({airport.airport.name})
                 </p>
               </div>
             );
           })}
       </div>
       <div className="card-footer">
-        <button className="dashboard-btn" value="Modify">
+        <button className="dashboard-btn" value="Modify" onClick={() => router.push('/airportwx')}>
           Airports
         </button>
       </div>

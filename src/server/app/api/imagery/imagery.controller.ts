@@ -12,18 +12,18 @@ export class ImageryController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get()
-  find(@Request() request) {
-    return this.imageryService.getImageryState(request.user);
+  @Get('recents')
+  getRecentImageries(@Request() request) {
+    return this.imageryService.getRecentImageries(request.user);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post()
+  @Post('add-recent')
   update(@Request() request, @Body() imageryState) {
     imageryState.userId = request.user.id;
     imageryState.id = undefined;
     imageryState.updated_at = undefined;
     imageryState.created_at = undefined;
-    return this.imageryService.updateImageryState(imageryState);
+    return this.imageryService.addRecentImagery(imageryState, request.user);
   }
 }

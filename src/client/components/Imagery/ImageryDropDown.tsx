@@ -6,8 +6,8 @@ import { ImageryCollectionItem, ImageryState, SubtabGroupItem, SubtabItem } from
 import { SvgDropDown } from '../utils/SvgIcons';
 import {
   initialImageryState,
-  useGetImageryStateQuery,
-  useUpdateImageryStateMutation,
+  useAddRecentImageryMutation,
+  useGetRecentImageryQuery,
 } from '../../store/imagery/imageryApi';
 import { Icon } from '@iconify/react';
 import { useGetSavedItemsQuery } from '../../store/saved/savedApi';
@@ -31,17 +31,14 @@ const ImageryDropDown = ({
   const [selectedImage, setSelectedImage] = useState<ImageryCollectionItem>(null);
   const [filterInput, setFilterInput] = useState('');
   const [imageData, setImageData] = useState([]);
-  const {
-    data: imageryState,
-    isSuccess: isImageryStateLoaded,
-    isError: isImageryStateError,
-  } = useGetImageryStateQuery(null, {
+  const { data: recentImageries } = useGetRecentImageryQuery(null, {
     refetchOnMountOrArgChange: true,
   });
-  const [updateImageryState] = useUpdateImageryStateMutation();
+  const [addRecentImagery] = useAddRecentImageryMutation();
   const selectedComponentRef = useRef(null);
   const { data: savedData } = useGetSavedItemsQuery();
   const selectedFavoriteId = useSelector(selectSelectedFavoriteId);
+  const [selectedDBImagery, setSelectedDBImagery] = useState<ImageryState>(initialImageryState);
   const dispatch = useDispatch();
 
   function isSavedImagery({ FAVORITE_ID }) {
@@ -52,11 +49,25 @@ const ImageryDropDown = ({
     return false;
   }
 
-  function selectImage(item: ImageryCollectionItem) {
+  function selectImage(item: ImageryCollectionItem, l1, l2, l3) {
     setIsShowDropDown(false);
     setSelectedImage(item);
     dispatch(setSelectedFavoriteId(item.FAVORITE_ID));
+    const imageryState: ImageryState = {
+      selectedLvl1: l1,
+      selectedLvl2: l2,
+      selectedLvl3: l3,
+      selectedImageryName: item.SUBTABLABEL ? item.SUBTABLABEL : item.TITLE,
+      selectedImageryId: item.FAVORITE_ID,
+    };
+    addRecentImagery(imageryState);
   }
+
+  useEffect(() => {
+    if (recentImageries && recentImageries.length > 0) {
+      setSelectedDBImagery(recentImageries[0]);
+    }
+  }, [recentImageries]);
 
   useEffect(() => {
     if (selectedFavoriteId && imageryCollections) {
@@ -81,7 +92,11 @@ const ImageryDropDown = ({
               } else if ((x2 as SubtabGroupItem).SUBTAB) {
                 const ch2 = (x2 as SubtabGroupItem).SUBTAB;
                 if (!Array.isArray(ch2)) {
-                  console.log('Invalid data structure in wx.json', ch2);
+                  if ((ch2 as SubtabItem).FAVORITE_ID === selectedFavoriteId) {
+                    setSelectedLevel1(i1);
+                    setSelectedLevel2(i2);
+                    setSelectedImage({ ...x1, ...x2 });
+                  }
                 } else {
                   for (let i3 = 0; i3 < ch2.length; i3++) {
                     const x3 = ch2[i3];
@@ -104,31 +119,17 @@ const ImageryDropDown = ({
 
   useEffect(() => {
     if (selectedImage) {
-      const imageryState: ImageryState = {
-        selectedLvl1: selectedLevel1,
-        selectedLvl2: selectedLevel2,
-        selectedLvl3: selectedLevel3,
-        selectedImageryName: selectedImage.TITLE ? selectedImage.TITLE : selectedImage.SUBTABLABEL,
-        selectedImageryId: selectedImage.FAVORITE_ID,
-      };
-      updateImageryState(imageryState);
       handleSelectImageCollection(selectedImage);
     }
   }, [selectedImage]);
 
   useEffect(() => {
-    if (selectedFavoriteId && imageryState && selectedFavoriteId !== imageryState.selectedImageryId) {
+    if (selectedFavoriteId && selectedDBImagery && selectedFavoriteId !== selectedDBImagery.selectedImageryId) {
       return;
     }
-    if ((imageryCollections && isImageryStateLoaded) || isImageryStateError) {
+    if (imageryCollections && selectedDBImagery) {
       setImageData(imageryCollections);
-      let imagerySt = null;
-      if (isImageryStateLoaded) {
-        imagerySt = imageryState;
-      }
-      if (isImageryStateError) {
-        imagerySt = initialImageryState;
-      }
+      const imagerySt = selectedDBImagery;
       setSelectedLevel1(imagerySt.selectedLvl1);
       setSelectedLevel2(imagerySt.selectedLvl2);
       setSelectedLevel3(imagerySt.selectedLvl3);
@@ -174,7 +175,7 @@ const ImageryDropDown = ({
         }
       }
     }
-  }, [isImageryStateLoaded, selectedFavoriteId, imageryCollections, isImageryStateError]);
+  }, [selectedDBImagery, selectedFavoriteId, imageryCollections]);
 
   useEffect(() => {
     if (selectedComponentRef.current && isShowDropDown) {
@@ -266,163 +267,174 @@ const ImageryDropDown = ({
             </div>
             <div className="menu-items-container">
               <div className="igryDrop__menu" key={'children-' + Date.now()}>
-                {imageData.map((item, index1) => {
-                  const children = item.SUBTAB_GROUP
-                    ? Array.isArray(item.SUBTAB_GROUP)
-                      ? item.SUBTAB_GROUP
-                      : item.SUBTAB_GROUP.SUBTAB
-                    : null;
-                  const itemProps =
-                    index1 == selectedLevel1 && item.IMAGE !== undefined ? { ref: selectedComponentRef } : null;
-                  return (
-                    <div key={index1}>
-                      <div
-                        onClick={(e) => {
-                          if (selectedLevel1 === index1) {
-                            setSelectedLevel1(-1);
-                            return;
-                          }
-                          setSelectedLevel1(index1);
-                          setSelectedLevel2(-1);
-                          setSelectedLevel3(-1);
-                          if (item.IMAGE) {
-                            selectImage(item);
-                          }
-                        }}
-                        className={`igryDrop__menu__item ${item.IMAGE && 'last-item'}`}
-                        {...itemProps}
-                      >
-                        {item.IMAGE && isSavedImagery(item) && (
-                          <Icon
-                            style={{ marginLeft: -30, marginRight: 17 }}
-                            icon="bi:bookmark-fill"
-                            color="var(--color-primary)"
-                            width={16}
-                          />
-                        )}
-                        {item.IMAGE && selectedLevel1 === index1 && <span className="blue-dot"></span>}
-                        <p className="igryDrop__menu__text">{item.TITLE.replace(/&amp;/g, '&')}</p>
-                        {children && (
-                          <div
-                            className={`igryDrop__menu__icon ${
-                              selectedLevel1 === index1 && 'igryDrop__menu__icon--rotate'
-                            }`}
-                          >
-                            <SvgDropDown />
-                          </div>
-                        )}
-                      </div>
-                      {children && selectedLevel1 === index1 && (
-                        <div className="level1-container">
-                          {Array.isArray(children) &&
-                            children.map((child, index2) => {
-                              const children2 =
-                                child.SUBTAB === undefined || Array.isArray(child.SUBTAB)
-                                  ? child.SUBTAB
-                                  : [child.SUBTAB];
-                              const itemProps =
-                                index2 == selectedLevel2 && child.IMAGE !== undefined
-                                  ? { ref: selectedComponentRef }
-                                  : null;
-                              return (
-                                <div key={index2}>
-                                  <div
-                                    onClick={(e) => {
-                                      if (selectedLevel2 === index2) {
-                                        setSelectedLevel2(-1);
-                                      } else {
-                                        setSelectedLevel2(index2);
-                                        setSelectedLevel3(-1);
-                                        if (child.IMAGE) {
-                                          selectImage({
-                                            ...child,
-                                            ...item,
-                                          });
+                {imageData &&
+                  imageData.map((item, index1) => {
+                    const children = item.SUBTAB_GROUP
+                      ? Array.isArray(item.SUBTAB_GROUP)
+                        ? item.SUBTAB_GROUP
+                        : item.SUBTAB_GROUP.SUBTAB
+                      : null;
+                    const itemProps =
+                      index1 == selectedLevel1 && item.IMAGE !== undefined ? { ref: selectedComponentRef } : null;
+                    return (
+                      <div key={index1}>
+                        <div
+                          onClick={(e) => {
+                            if (selectedLevel1 === index1) {
+                              setSelectedLevel1(-1);
+                              return;
+                            }
+                            setSelectedLevel1(index1);
+                            setSelectedLevel2(-1);
+                            setSelectedLevel3(-1);
+                            if (item.IMAGE) {
+                              selectImage(item, index1, -1, -1);
+                            }
+                          }}
+                          className={`igryDrop__menu__item ${item.IMAGE && 'last-item'}`}
+                          {...itemProps}
+                        >
+                          {item.IMAGE && isSavedImagery(item) && (
+                            <Icon
+                              style={{ marginLeft: -30, marginRight: 17 }}
+                              icon="bi:bookmark-fill"
+                              color="var(--color-primary)"
+                              width={16}
+                            />
+                          )}
+                          {item.IMAGE && selectedLevel1 === index1 && <span className="blue-dot"></span>}
+                          <p className="igryDrop__menu__text">{item.TITLE.replace(/&amp;/g, '&')}</p>
+                          {children && (
+                            <div
+                              className={`igryDrop__menu__icon ${
+                                selectedLevel1 === index1 && 'igryDrop__menu__icon--rotate'
+                              }`}
+                            >
+                              <SvgDropDown />
+                            </div>
+                          )}
+                        </div>
+                        {children && selectedLevel1 === index1 && (
+                          <div className="level1-container">
+                            {Array.isArray(children) &&
+                              children.map((child, index2) => {
+                                const children2 =
+                                  child.SUBTAB === undefined || Array.isArray(child.SUBTAB)
+                                    ? child.SUBTAB
+                                    : [child.SUBTAB];
+                                const itemProps =
+                                  index2 == selectedLevel2 && child.IMAGE !== undefined
+                                    ? { ref: selectedComponentRef }
+                                    : null;
+                                return (
+                                  <div key={index2}>
+                                    <div
+                                      onClick={(e) => {
+                                        if (selectedLevel2 === index2) {
+                                          setSelectedLevel2(-1);
+                                        } else {
+                                          setSelectedLevel2(index2);
+                                          setSelectedLevel3(-1);
+                                          if (child.IMAGE) {
+                                            selectImage(
+                                              {
+                                                ...child,
+                                                ...item,
+                                              },
+                                              selectedLevel1,
+                                              index2,
+                                              -1,
+                                            );
+                                          }
                                         }
-                                      }
-                                    }}
-                                    className={`igryDrop__menu__item igryDrop__menu__item--cld ${
-                                      child.IMAGE && 'last-item'
-                                    }`}
-                                    {...itemProps}
-                                  >
-                                    {child.IMAGE && isSavedImagery(child) && (
-                                      <Icon
-                                        style={{ marginLeft: -50, marginRight: 38 }}
-                                        icon="bi:bookmark-fill"
-                                        color="var(--color-primary)"
-                                        width={16}
-                                      />
-                                    )}
-                                    {child.IMAGE && selectedLevel2 === index2 && <span className="blue-dot"></span>}
-                                    <p className="igryDrop__menu__text">
-                                      {child.SUBTABLABEL
-                                        ? child.SUBTABLABEL.replace(/&amp;/g, '&')
-                                        : child.GROUP_NAME.replace(/&amp;/g, '&')}
-                                    </p>
-                                    {children2 && (
-                                      <div
-                                        className={`igryDrop__menu__icon ${
-                                          selectedLevel2 === index2 && 'igryDrop__menu__icon--rotate'
-                                        }`}
-                                      >
-                                        <SvgDropDown />
+                                      }}
+                                      className={`igryDrop__menu__item igryDrop__menu__item--cld ${
+                                        child.IMAGE && 'last-item'
+                                      }`}
+                                      {...itemProps}
+                                    >
+                                      {child.IMAGE && isSavedImagery(child) && (
+                                        <Icon
+                                          style={{ marginLeft: -50, marginRight: 38 }}
+                                          icon="bi:bookmark-fill"
+                                          color="var(--color-primary)"
+                                          width={16}
+                                        />
+                                      )}
+                                      {child.IMAGE && selectedLevel2 === index2 && <span className="blue-dot"></span>}
+                                      <p className="igryDrop__menu__text">
+                                        {child.SUBTABLABEL
+                                          ? child.SUBTABLABEL.replace(/&amp;/g, '&')
+                                          : child.GROUP_NAME.replace(/&amp;/g, '&')}
+                                      </p>
+                                      {children2 && (
+                                        <div
+                                          className={`igryDrop__menu__icon ${
+                                            selectedLevel2 === index2 && 'igryDrop__menu__icon--rotate'
+                                          }`}
+                                        >
+                                          <SvgDropDown />
+                                        </div>
+                                      )}
+                                    </div>
+                                    {children2 && selectedLevel2 == index2 && (
+                                      <div className="level2-container">
+                                        {children2.map((child3, index3) => {
+                                          const itemProps =
+                                            index3 == selectedLevel3 && child3.IMAGE !== undefined
+                                              ? { ref: selectedComponentRef }
+                                              : null;
+                                          return (
+                                            <div
+                                              onClick={() => {
+                                                setSelectedLevel3(index3);
+                                                if (child3.IMAGE) {
+                                                  selectImage(
+                                                    {
+                                                      ...child3,
+                                                      ...item,
+                                                    },
+                                                    selectedLevel1,
+                                                    selectedLevel2,
+                                                    index3,
+                                                  );
+                                                }
+                                              }}
+                                              className={`igryDrop__menu__item igryDrop__menu__item--cld ${
+                                                selectedLevel2 === index2 && 'igryDrop__menu__item--cld--show'
+                                              } ${child3.IMAGE && 'last-item'}`}
+                                              key={child3.SUBTABLABEL || child3.GROUP_NAME}
+                                              {...itemProps}
+                                            >
+                                              {child3.IMAGE && isSavedImagery(child3) && (
+                                                <Icon
+                                                  style={{ marginLeft: -70, marginRight: 54 }}
+                                                  icon="bi:bookmark-fill"
+                                                  color="var(--color-primary)"
+                                                  width={16}
+                                                />
+                                              )}
+                                              {child3.IMAGE && selectedLevel3 === index3 && (
+                                                <span className="blue-dot"></span>
+                                              )}
+                                              <p className="igryDrop__menu__text">
+                                                {child3.SUBTABLABEL
+                                                  ? child3.SUBTABLABEL.replace(/&amp;/g, '&')
+                                                  : child3.GROUP_NAME.replace(/&amp;/g, '&')}
+                                              </p>
+                                            </div>
+                                          );
+                                        })}
                                       </div>
                                     )}
                                   </div>
-                                  {children2 && selectedLevel2 == index2 && (
-                                    <div className="level2-container">
-                                      {children2.map((child3, index3) => {
-                                        const itemProps =
-                                          index3 == selectedLevel3 && child3.IMAGE !== undefined
-                                            ? { ref: selectedComponentRef }
-                                            : null;
-                                        return (
-                                          <div
-                                            onClick={() => {
-                                              setSelectedLevel3(index3);
-                                              if (child3.IMAGE) {
-                                                selectImage({
-                                                  ...child3,
-                                                  ...item,
-                                                });
-                                              }
-                                            }}
-                                            className={`igryDrop__menu__item igryDrop__menu__item--cld ${
-                                              selectedLevel2 === index2 && 'igryDrop__menu__item--cld--show'
-                                            } ${child3.IMAGE && 'last-item'}`}
-                                            key={child3.SUBTABLABEL || child3.GROUP_NAME}
-                                            {...itemProps}
-                                          >
-                                            {child3.IMAGE && isSavedImagery(child3) && (
-                                              <Icon
-                                                style={{ marginLeft: -70, marginRight: 54 }}
-                                                icon="bi:bookmark-fill"
-                                                color="var(--color-primary)"
-                                                width={16}
-                                              />
-                                            )}
-                                            {child3.IMAGE && selectedLevel3 === index3 && (
-                                              <span className="blue-dot"></span>
-                                            )}
-                                            <p className="igryDrop__menu__text">
-                                              {child3.SUBTABLABEL
-                                                ? child3.SUBTABLABEL.replace(/&amp;/g, '&')
-                                                : child3.GROUP_NAME.replace(/&amp;/g, '&')}
-                                            </p>
-                                          </div>
-                                        );
-                                      })}
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                                );
+                              })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           </div>

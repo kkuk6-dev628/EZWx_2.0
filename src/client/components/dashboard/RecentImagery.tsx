@@ -2,45 +2,50 @@ import { useEffect, useState } from 'react';
 import { useGetSavedItemsQuery } from '../../store/saved/savedApi';
 import { SvgSaveFilled } from '../utils/SvgIcons';
 import { useGetRecentAirportQuery } from '../../store/airportwx/airportwxApi';
+import { ICON_INDENT } from '../../utils/constants';
+import { useAddRecentImageryMutation, useGetRecentImageryQuery } from '../../store/imagery/imageryApi';
+import { isSameSavedItem } from '../../utils/utils';
+import { useRouter } from 'next/router';
 
 function RecentImagery() {
-  const { data: recentAirports } = useGetRecentAirportQuery(null);
+  const { data: recentImageries } = useGetRecentImageryQuery(null);
   const { data: savedData } = useGetSavedItemsQuery();
-  const [savedAirports, setSavedAirports] = useState([]);
+  const [savedImageries, setSavedImageries] = useState([]);
+  const [addRecentAirport] = useAddRecentImageryMutation();
+  const router = useRouter();
 
   useEffect(() => {
-    if (recentAirports && savedData) {
-      const saved = recentAirports.filter((r) =>
-        savedData.find((d) => d.data.type === 'airport' && d.data.data.key === r.airportId),
+    if (recentImageries && savedData) {
+      const saved = recentImageries.filter((r) =>
+        savedData.find((d) => isSameSavedItem(d.data, { type: 'imagery', data: { FAVORITE_ID: r.selectedImageryId } })),
       );
-      setSavedAirports(saved);
+      setSavedImageries(saved);
     }
-  }, [savedData, recentAirports]);
+  }, [savedData, recentImageries]);
 
-  function routeClick(airport) {
-    console.log(airport);
+  function imageryClick(imagery) {
+    addRecentAirport(imagery);
+    router.push('/imagery');
   }
 
   return (
     <div className="dashboard-card">
       <div className="card-title">Recent Imagery</div>
       <div className="card-body">
-        {recentAirports &&
-          recentAirports.map((route, index) => {
-            const isSaved = savedAirports.includes(route);
+        {recentImageries &&
+          recentImageries.map((imagery, index) => {
+            const isSaved = savedImageries.includes(imagery);
             return (
-              <div className="card-item" key={`recent-airport-${index}`} onClick={() => routeClick(route)}>
+              <div className="card-item" key={`recent-imagery-${index}`} onClick={() => imageryClick(imagery)}>
                 {isSaved && <SvgSaveFilled />}
-                <p style={!isSaved ? { paddingInlineStart: 24 } : null}>
-                  {route.airport.key} to {route.airport.name}
-                </p>
+                <p style={!isSaved ? { paddingInlineStart: ICON_INDENT } : null}>{imagery.selectedImageryName}</p>
               </div>
             );
           })}
       </div>
       <div className="card-footer">
-        <button className="dashboard-btn" value="Modify">
-          Airports
+        <button className="dashboard-btn" value="Modify" onClick={() => router.push('/imagery')}>
+          Imagery
         </button>
       </div>
     </div>

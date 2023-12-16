@@ -14,17 +14,45 @@ export class ImageryService {
     private imageryRepository: Repository<Imagery>,
   ) {}
 
-  async getImageryState(user: User) {
-    const res = await this.imageryRepository.findOne({
+  async getRecentImageries(user: User) {
+    return await this.imageryRepository.find({
       where: {
         userId: user.id,
       },
+      order: {
+        updated_at: 'DESC',
+      },
     });
-    return res;
   }
 
-  async updateImageryState(imageryState) {
-    return (await this.imageryRepository.upsert(imageryState, ['userId'])).generatedMaps[0].id;
+  async addRecentImagery(imagery, user: User) {
+    const existing = await this.imageryRepository.findOne({
+      where: {
+        selectedImageryId: imagery.selectedImageryId,
+        userId: user.id,
+      },
+    });
+    if (existing) {
+      existing.updated_at = new Date();
+      return (await this.imageryRepository.save(existing)).id;
+    } else {
+      imagery.userId = user.id;
+      const id = (await this.imageryRepository.insert(imagery)).generatedMaps[0].id;
+      const oldRows = await this.imageryRepository.find({
+        select: ['id'],
+        where: {
+          userId: user.id,
+        },
+        order: {
+          created_at: 'DESC',
+        },
+        skip: 10,
+      });
+      if (oldRows.length > 0) {
+        this.imageryRepository.delete(oldRows.map((x) => x.id));
+      }
+      return id;
+    }
   }
 
   async getTimeStamp(url: string) {

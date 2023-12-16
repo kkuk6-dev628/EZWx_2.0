@@ -18,6 +18,8 @@ export const flightCategoryDivide = 5;
 
 export const NODATA = -9999;
 
+export const ICON_INDENT = 22;
+
 export const SUNSET_SUNRISE = {
   night: {
     start: 20,
