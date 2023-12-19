@@ -1,13 +1,14 @@
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectSettings } from '../../store/user/UserSettings';
-import { icingSevLegend } from '../airportwx/MIcingChart';
 import { convectivePotential, icingIntensity } from '../../utils/constants';
+import { setShowGeneralSettings, setShowPersonalMins, setShowSettingsView } from '../../store/header/header';
 
 function PersonalMins() {
   const settings = useSelector(selectSettings);
+  const dispatch = useDispatch();
 
   return settings ? (
-    <div className="dashboard-card w2x">
+    <div className={`dashboard-card w2x`}>
       <div className="card-title">Personal Mins</div>
       <div className="card-body">
         <div className="row">
@@ -95,7 +96,15 @@ function PersonalMins() {
         </div>
       </div>
       <div className="card-footer">
-        <button className="dashboard-btn" value="Modify">
+        <button
+          className="dashboard-btn"
+          value="Modify"
+          onClick={() => {
+            dispatch(setShowSettingsView());
+            dispatch(setShowPersonalMins(true));
+            dispatch(setShowGeneralSettings(false));
+          }}
+        >
           Modify
         </button>
       </div>

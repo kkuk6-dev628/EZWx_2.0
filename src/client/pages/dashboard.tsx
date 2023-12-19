@@ -14,8 +14,6 @@ function Dashboard() {
         <RecentRoutes />
         <RecentAirports />
         <RecentImagery />
-      </div>
-      <div className="dashboard-row">
         <FetchUserSettings />
         <DashboardSettings />
         <PersonalMins />

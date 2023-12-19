@@ -6,6 +6,7 @@
   .dashboard-row {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
   }
   .dashboard-card {
     background: white;
@@ -20,6 +21,13 @@
     justify-content: space-between;
     &.w2x{
       width: 610px;
+      @media screen and (max-width: 1180px){
+        width: 240px;
+      }
+    }
+    @media screen and (max-width: 1180px){
+      width: 240px;
+      height: 280px;
     }
     .card-title {
       font-size: 1.2rem;

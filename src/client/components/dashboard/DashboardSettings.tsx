@@ -1,8 +1,11 @@
 import { useSelector } from 'react-redux';
 import { selectSettings } from '../../store/user/UserSettings';
+import { useDispatch } from 'react-redux';
+import { setShowGeneralSettings, setShowPersonalMins, setShowSettingsView } from '../../store/header/header';
 
 function DashboardSettings() {
   const settings = useSelector(selectSettings);
+  const dispatch = useDispatch();
 
   return settings ? (
     <div className="dashboard-card w2x">
@@ -58,7 +61,15 @@ function DashboardSettings() {
         </div>
       </div>
       <div className="card-footer">
-        <button className="dashboard-btn" value="Modify">
+        <button
+          className="dashboard-btn"
+          value="Modify"
+          onClick={() => {
+            dispatch(setShowSettingsView());
+            dispatch(setShowGeneralSettings(true));
+            dispatch(setShowPersonalMins(false));
+          }}
+        >
           Modify
         </button>
       </div>

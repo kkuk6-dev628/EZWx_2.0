@@ -23,24 +23,17 @@ import { NodeModel } from '@minoru/react-dnd-treeview';
 import { SaveDialog } from '../saved/SaveDialog';
 import { isSameSavedItem } from '../../utils/utils';
 import { Icon } from '@iconify/react';
+import { emptyRouteData } from '../../utils/constants';
 
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
+  route?: Route;
 }
 
 const DEPARTURE = 'departure';
 const ROUTE_OF_FLIGHT = 'routeOfFlight';
 const DESTINATION = 'destination';
 const altitudeStep = 500;
-
-const emptyFormData: Route = {
-  id: undefined,
-  departure: null,
-  routeOfFlight: [],
-  destination: null,
-  altitude: 10000,
-  useForecastWinds: false,
-};
 
 export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
   if (!routeGroupLayer) {
@@ -75,11 +68,11 @@ export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
   });
 };
 
-function Route({ setIsShowModal }: Props) {
+function Route({ setIsShowModal, route }: Props) {
   const activeRoute = useSelector(selectActiveRoute);
   const [createRoute] = useCreateRouteMutation();
   const [deleteRoute] = useDeleteRouteMutation();
-  const [routeData, setRouteData] = useState(activeRoute || emptyFormData);
+  const [routeData, setRouteData] = useState(route || activeRoute || emptyRouteData);
   const ref = useRef();
   const meteoLayers = useMeteoLayersContext();
   const [forceRerenderKey, setForceRerenderKey] = useState(Date.now());
@@ -162,9 +155,9 @@ function Route({ setIsShowModal }: Props) {
     });
   };
   const handleClickClear = () => {
-    setRouteData(emptyFormData);
+    setRouteData(emptyRouteData);
     setForceRerenderKey(Date.now());
-    setAltitudeText(emptyFormData.altitude.toLocaleString());
+    setAltitudeText(emptyRouteData.altitude.toLocaleString());
   };
 
   const addRoute = () => {

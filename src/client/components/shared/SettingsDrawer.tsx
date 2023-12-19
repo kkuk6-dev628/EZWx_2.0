@@ -12,7 +12,7 @@ import {
 import { StyledSlider } from './Slider';
 import { useSelector } from 'react-redux';
 import { initialUserSettingsState, selectSettings, setUserSettings } from '../../store/user/UserSettings';
-import { useGetUserSettingsQuery, useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
+import { useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
 import { selectAuth } from '../../store/auth/authSlice';
 import { AutoCompleteInput, Modal, PrimaryButton, SecondaryButton } from '../common';
 import { ColoredRangeSlider, formatForDecimal, formatForInteger } from '../common/ColoredRangeSlider';
@@ -20,6 +20,12 @@ import { toast } from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { icingIntensity } from '../../utils/constants';
 import { convectivePotential } from '../../utils/constants';
+import {
+  selectShowGeneralSettings,
+  selectShowPersonalMins,
+  setShowGeneralSettings,
+  setShowPersonalMins,
+} from '../../store/header/header';
 
 interface Props {
   setIsShowSettingsDrawer: (isShowSettingsDrawer: boolean) => void;
@@ -29,9 +35,9 @@ interface Props {
 const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props) => {
   const settingsState = useSelector(selectSettings);
   const { id } = useSelector(selectAuth);
-  const [isShowGeneralSettings, setIsShowGeneralSettings] = useState(false);
+  const isShowGeneralSettings = useSelector(selectShowGeneralSettings);
   const [isShowAirCraftSettings, setIsShowAirCraftSettings] = useState(false);
-  const [isShowPersonalMinimumSettings, setIsShowPersonalMinimumSettings] = useState(false);
+  const isShowPersonalMinimumSettings = useSelector(selectShowPersonalMins);
   const [isShowRestoreSettingModal, setIsShowRestoreSettingModal] = useState(false);
   const [isShowSaveSettingModal, setIsShowSaveSettingModal] = useState(false);
   const [settings, setSettings] = useState(settingsState);
@@ -131,7 +137,10 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
         <div className="drawer__body">
           {/* general Settings */}
 
-          <div onClick={() => setIsShowGeneralSettings(!isShowGeneralSettings)} className="collapsed__title__container">
+          <div
+            onClick={() => dispatch(setShowGeneralSettings(!isShowGeneralSettings))}
+            className="collapsed__title__container"
+          >
             {isShowGeneralSettings ? <AiOutlineMinus /> : <AiOutlinePlus />}
             <span className="collapse__title">General Settings</span>
           </div>
@@ -271,7 +280,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
           {/* Personal Minimums settings  */}
 
           <div
-            onClick={() => setIsShowPersonalMinimumSettings(!isShowPersonalMinimumSettings)}
+            onClick={() => dispatch(setShowPersonalMins(!isShowPersonalMinimumSettings))}
             className="collapsed__title__container"
           >
             {isShowPersonalMinimumSettings ? <AiOutlineMinus style={{ color: 'purple' }} /> : <AiOutlinePlus />}

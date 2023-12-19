@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux';
 import { setActiveRoute } from '../../store/route/routes';
 import { useCreateRouteMutation } from '../../store/route/routeApi';
 import { setSelectedFavoriteId } from '../../store/imagery/imagery';
+import { setShowSavedView } from '../../store/header/header';
 
 function SavedDashboard() {
   const { data: savedData } = useGetSavedItemsQuery();
@@ -102,7 +103,13 @@ function SavedDashboard() {
         </DndProvider>
       </div>
       <div className="card-footer">
-        <button className="dashboard-btn" value="Modify">
+        <button
+          className="dashboard-btn"
+          value="Modify"
+          onClick={() => {
+            dispatch(setShowSavedView());
+          }}
+        >
           Modify
         </button>
       </div>

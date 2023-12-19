@@ -17,6 +17,7 @@ import ImagerySlice from './imagery/imagery';
 import airportwxSlice from './airportwx/airportwx';
 import { airportwxApi } from './airportwx/airportwxApi';
 import { savedApi } from './saved/savedApi';
+import HeaderSlice from './header/header';
 
 const makeStore = () =>
   configureStore({
@@ -39,6 +40,7 @@ const makeStore = () =>
       [BaseMapLayerControlSlice.name]: BaseMapLayerControlSlice.reducer,
       [SettingsLoadTimeSlice.name]: SettingsLoadTimeSlice.reducer,
       [RouteProfileSlice.name]: RouteProfileSlice.reducer,
+      [HeaderSlice.name]: HeaderSlice.reducer,
     },
     devTools: process.env.NODE_ENV !== 'production',
     middleware: (getDefaultMiddlewares) => {

@@ -18,6 +18,12 @@ import { setShowInformation } from '../../store/imagery/imagery';
 import AirportSelectModal from '../airportwx/AirportSelectModal';
 import { PaperComponent } from '../common/PaperComponent';
 import { setViewHeight, setViewWidth } from '../../store/airportwx/airportwx';
+import {
+  selectShowSavedView,
+  selectShowSettingsView,
+  setShowSavedView,
+  setShowSettingsView,
+} from '../../store/header/header';
 const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
 const menusHome = [
@@ -194,9 +200,9 @@ export default function Header() {
   const [isShowProfileModal, setIsShowProfileModal] = useState(false);
   const [activeResponsiveMenu, setActiveResponsiveMenu] = useState(false);
   const [isUserLoginUser, setIsUserLoginUser] = useState(false);
-  const [userSettingDrawer, setIsShowSettingsDrawer] = useState(false);
-  const [favoritesDrawer, setFavoritesDrawer] = useState(false);
   const [showAirportSelect, setShowAirportSelect] = useState(false);
+  const userSettingDrawer = useSelector(selectShowSettingsView);
+  const favoritesDrawer = useSelector(selectShowSavedView);
   const auth = useSelector(selectAuth);
   const [cookies] = useCookies(['logged_in']);
   useGetUserQuery(null, { refetchOnMountOrArgChange: true });
@@ -251,8 +257,8 @@ export default function Header() {
 
   const closeAllModals = () => {
     setIsShowProfileModal(false);
-    setIsShowSettingsDrawer(false);
-    setFavoritesDrawer(false);
+    dispatch(setShowSettingsView());
+    dispatch(setShowSavedView());
   };
 
   const handleProfileModal = () => {
@@ -360,7 +366,7 @@ export default function Header() {
                     className="header__rgt__btn header__rgt__btn--icon btn"
                     onClick={() => {
                       closeAllModals();
-                      setFavoritesDrawer(true);
+                      dispatch(setShowSavedView());
                     }}
                   >
                     <SvgSave />
@@ -369,7 +375,7 @@ export default function Header() {
                     className="header__rgt__btn header__rgt__btn--icon btn"
                     onClick={() => {
                       closeAllModals();
-                      setIsShowSettingsDrawer(true);
+                      dispatch(setShowSettingsView());
                     }}
                   >
                     <SvgSetting />
@@ -395,9 +401,9 @@ export default function Header() {
         </div>
         <SettingsDrawer
           isShowSettingsDrawer={userSettingDrawer}
-          setIsShowSettingsDrawer={() => setIsShowSettingsDrawer(false)}
+          setIsShowSettingsDrawer={() => dispatch(setShowSettingsView())}
         />
-        <FavoritesDrawer isOpen={favoritesDrawer} onClose={() => setFavoritesDrawer(false)} />
+        <FavoritesDrawer isOpen={favoritesDrawer} onClose={() => dispatch(setShowSavedView())} />
         <ProfileModal
           setIsUserLoginUser={setIsUserLoginUser}
           isShowProfileModal={isShowProfileModal}
