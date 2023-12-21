@@ -19,11 +19,11 @@ export const HeaderSlice = createSlice({
   name: 'headerState',
   initialState,
   reducers: {
-    setShowSavedView: (state) => {
-      state.showSavedView = !state.showSavedView;
+    setShowSavedView: (state, action) => {
+      state.showSavedView = action.payload;
     },
-    setShowSettingsView: (state) => {
-      state.showSettingsView = !state.showSettingsView;
+    setShowSettingsView: (state, action) => {
+      state.showSettingsView = action.payload;
     },
     setShowGeneralSettings: (state, action) => {
       state.showGeneralSettings = action.payload;

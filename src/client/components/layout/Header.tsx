@@ -24,6 +24,7 @@ import {
   setShowSavedView,
   setShowSettingsView,
 } from '../../store/header/header';
+import { FaBullseye } from 'react-icons/fa';
 const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
 const menusHome = [
@@ -201,8 +202,8 @@ export default function Header() {
   const [activeResponsiveMenu, setActiveResponsiveMenu] = useState(false);
   const [isUserLoginUser, setIsUserLoginUser] = useState(false);
   const [showAirportSelect, setShowAirportSelect] = useState(false);
-  const userSettingDrawer = useSelector(selectShowSettingsView);
-  const favoritesDrawer = useSelector(selectShowSavedView);
+  const showSettingsView = useSelector(selectShowSettingsView);
+  const showSavedView = useSelector(selectShowSavedView);
   const auth = useSelector(selectAuth);
   const [cookies] = useCookies(['logged_in']);
   useGetUserQuery(null, { refetchOnMountOrArgChange: true });
@@ -257,8 +258,8 @@ export default function Header() {
 
   const closeAllModals = () => {
     setIsShowProfileModal(false);
-    dispatch(setShowSettingsView());
-    dispatch(setShowSavedView());
+    dispatch(setShowSettingsView(false));
+    dispatch(setShowSavedView(false));
   };
 
   const handleProfileModal = () => {
@@ -366,7 +367,7 @@ export default function Header() {
                     className="header__rgt__btn header__rgt__btn--icon btn"
                     onClick={() => {
                       closeAllModals();
-                      dispatch(setShowSavedView());
+                      dispatch(setShowSavedView(true));
                     }}
                   >
                     <SvgSave />
@@ -375,7 +376,7 @@ export default function Header() {
                     className="header__rgt__btn header__rgt__btn--icon btn"
                     onClick={() => {
                       closeAllModals();
-                      dispatch(setShowSettingsView());
+                      dispatch(setShowSettingsView(true));
                     }}
                   >
                     <SvgSetting />
@@ -400,10 +401,10 @@ export default function Header() {
           </div>
         </div>
         <SettingsDrawer
-          isShowSettingsDrawer={userSettingDrawer}
-          setIsShowSettingsDrawer={() => dispatch(setShowSettingsView())}
+          isShowSettingsDrawer={showSettingsView}
+          setIsShowSettingsDrawer={(show) => dispatch(setShowSettingsView(show))}
         />
-        <FavoritesDrawer isOpen={favoritesDrawer} onClose={() => dispatch(setShowSavedView())} />
+        <FavoritesDrawer isOpen={showSavedView} onClose={() => dispatch(setShowSavedView(false))} />
         <ProfileModal
           setIsUserLoginUser={setIsUserLoginUser}
           isShowProfileModal={isShowProfileModal}
