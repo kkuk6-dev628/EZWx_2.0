@@ -9,9 +9,9 @@ import { selectViewHeight, selectViewWidth, setCurrentAirport } from '../../stor
 import { Icon } from '@iconify/react';
 
 function RecentAirports() {
-  const { data: recentAirports } = useGetRecentAirportQuery(null);
+  const { data: recentAirports } = useGetRecentAirportQuery(null, { refetchOnMountOrArgChange: true });
   const [addRecentAirport] = useAddRecentAirportMutation();
-  const { data: savedData } = useGetSavedItemsQuery();
+  const { data: savedData } = useGetSavedItemsQuery(null, { refetchOnMountOrArgChange: true });
   const [savedAirports, setSavedAirports] = useState([]);
   const router = useRouter();
   const dispatch = useDispatch();

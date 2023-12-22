@@ -17,8 +17,8 @@ const RouteEditor = dynamic(() => import('../shared/Route'), {
 });
 
 function RecentRoutes() {
-  const { data: recentRoutes } = useGetRoutesQuery(null);
-  const { data: savedData } = useGetSavedItemsQuery();
+  const { data: recentRoutes } = useGetRoutesQuery(null, { refetchOnMountOrArgChange: true });
+  const { data: savedData } = useGetSavedItemsQuery(null, { refetchOnMountOrArgChange: true });
   const [savedRoutes, setSavedRoutes] = useState([]);
   const [showRouteEditor, setShowRouteEditor] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState(null);

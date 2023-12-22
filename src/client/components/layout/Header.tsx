@@ -14,7 +14,7 @@ import { useCookies } from 'react-cookie';
 import { useGetUserQuery } from '../../store/auth/authApi';
 import { Dialog } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { setShowInformation } from '../../store/imagery/imagery';
+import { selectShowInformation, setShowInformation } from '../../store/imagery/imagery';
 import AirportSelectModal from '../airportwx/AirportSelectModal';
 import { PaperComponent } from '../common/PaperComponent';
 import { setViewHeight, setViewWidth } from '../../store/airportwx/airportwx';
@@ -25,6 +25,7 @@ import {
   setShowSettingsView,
 } from '../../store/header/header';
 import { FaBullseye } from 'react-icons/fa';
+import { DraggableDlg } from '../common/DraggableDlg';
 const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
 const menusHome = [
@@ -57,33 +58,6 @@ const menusHome = [
     id: 6,
     name: 'Pilots guide',
     link: '/pilots-guide',
-  },
-  {
-    id: 7,
-    name: 'About us',
-    link: '#',
-    children: [
-      {
-        id: 9,
-        name: 'Contact Us',
-        link: '/contact',
-      },
-      {
-        id: 10,
-        name: 'Support',
-        link: '/support',
-      },
-      {
-        id: 11,
-        name: 'Team EZWxBrief',
-        link: '/team',
-      },
-    ],
-  },
-  {
-    id: 8,
-    name: 'FAQ',
-    link: '/faq',
   },
 ];
 const menusHomeNotAuth = [
@@ -205,6 +179,7 @@ export default function Header() {
   const showSettingsView = useSelector(selectShowSettingsView);
   const showSavedView = useSelector(selectShowSavedView);
   const auth = useSelector(selectAuth);
+  const showInformation = useSelector(selectShowInformation);
   const [cookies] = useCookies(['logged_in']);
   useGetUserQuery(null, { refetchOnMountOrArgChange: true });
   const dispatch = useDispatch();
@@ -274,6 +249,20 @@ export default function Header() {
         setShowAirportSelect(true);
         break;
     }
+  }
+
+  let infoTitle = 'Info:';
+  let infoBody = '';
+  switch (pathname) {
+    case '/imagery':
+      infoTitle = 'Info: Imagery';
+      infoBody = '';
+      break;
+    case '/dashboard':
+      infoTitle = 'Info: Dashboard';
+      infoBody =
+        'This is the EZWxBrief Dashboard. From this page you can visit items in your saved folders as well as the most recent routes, airports and imagery collections. Up to ten recent routes, airports and imagery collections are provided beginning with the most recent at the top of the list. Simply click on the route, airport or imagery listed in these groups to visit the page for that specific saved or recent item. Saved or recent routes can be opened up in the Map or Route Profile page. If a ribbon icon appears next to the route, airport or imagery collection that means that it is saved in one or more of your saved folders. Within this Dashboard you can also view your general and aircraft settings as well as the settings for each of your personal weather minimums.';
+      break;
   }
   return (
     <div className={`header ${sticky && 'header--fixed'}`}>
@@ -345,20 +334,13 @@ export default function Header() {
           </div>
           <div className="header__rgt">
             <div className="header__rgt__btns flex flex-align-center">
-              <Link href="/home">
-                {mapMenu ? (
-                  <button className="header__rgt__btn header__rgt__btn--map btn">Home</button>
-                ) : (
-                  <button className="header__rgt__btn header__rgt__btn--lft btn">New to EZWxBrief?</button>
-                )}
-              </Link>
               {isUserLoginUser ? (
                 <div className="header__icon__area">
                   <button
                     className="header__rgt__btn header__rgt__btn--icon btn"
                     onClick={() => {
                       closeAllModals();
-                      dispatch(setShowInformation());
+                      dispatch(setShowInformation(true));
                     }}
                   >
                     <SvgWarn />
@@ -421,6 +403,14 @@ export default function Header() {
           <AirportSelectModal setIsShowModal={setShowAirportSelect} />
         </Dialog>
       </div>
+      {pathname !== '/imagery' && (
+        <DraggableDlg
+          title={infoTitle}
+          open={showInformation}
+          onClose={() => dispatch(setShowInformation(false))}
+          body={infoBody}
+        ></DraggableDlg>
+      )}
       <ResponsiveMenu
         activeResponsiveMenu={activeResponsiveMenu}
         activeMenu={activeMenu}

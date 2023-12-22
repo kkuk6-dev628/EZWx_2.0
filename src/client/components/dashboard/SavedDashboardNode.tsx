@@ -12,9 +12,7 @@ function SavedDashboardNode(props) {
   return (
     <div className="card-item" style={{ paddingInlineStart: indent }} onClick={handleClick}>
       <div className="item-label">
-        <Typography variant="body2">
-          {props.node.text + (props.numberOfChildren > 0 ? ` (${props.numberOfChildren})` : '')}
-        </Typography>
+        <p>{props.node.text + (props.numberOfChildren > 0 ? ` (${props.numberOfChildren})` : '')}</p>
       </div>
       <div className={`expandIconWrapper ${props.isOpen ? 'open' : ''}`}>
         {props.node.droppable && (

@@ -21,8 +21,8 @@ const RouteEditor = dynamic(() => import('../shared/Route'), {
 });
 
 function SavedDashboard() {
-  const { data: savedData } = useGetSavedItemsQuery();
-  const { data: savedOrder } = useGetSavedOrderQuery();
+  const { data: savedData } = useGetSavedItemsQuery(null, { refetchOnMountOrArgChange: true });
+  const { data: savedOrder } = useGetSavedOrderQuery(null, { refetchOnMountOrArgChange: true });
   const [treeData, setTreeData] = useState<NodeModel<SavedItemData>[]>([]);
   const [showRouteEditor, setShowRouteEditor] = useState(false);
   const [addRecentAirport] = useAddRecentAirportMutation();

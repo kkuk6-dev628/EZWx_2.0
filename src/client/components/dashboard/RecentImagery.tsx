@@ -11,8 +11,8 @@ import { useSelector } from 'react-redux';
 import { selectViewWidth, selectViewHeight } from '../../store/airportwx/airportwx';
 
 function RecentImagery() {
-  const { data: recentImageries } = useGetRecentImageryQuery(null);
-  const { data: savedData } = useGetSavedItemsQuery();
+  const { data: recentImageries } = useGetRecentImageryQuery(null, { refetchOnMountOrArgChange: true });
+  const { data: savedData } = useGetSavedItemsQuery(null, { refetchOnMountOrArgChange: true });
   const [savedImageries, setSavedImageries] = useState([]);
   const [addRecentAirport] = useAddRecentImageryMutation();
   const router = useRouter();

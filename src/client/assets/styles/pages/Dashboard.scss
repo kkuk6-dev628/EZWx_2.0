@@ -41,7 +41,7 @@
     justify-content: space-between;
     &.w2x{
       width: calc(100vw / 2 - 72px);
-      @media screen and (max-width: 1100px){
+      @media screen and (max-width: 1070px){
         width: calc(100vw / 3 - 72px);
       }
       @media screen and (max-width: 1020px){
@@ -72,7 +72,7 @@
     }
     .card-body {
       margin-top: 24px;
-      height: 260px;
+      height: calc(100% - 82px);
       overflow: auto;
       .row {
         display: flex;
@@ -89,7 +89,7 @@
           width: 100%;
         }
         p {
-          font-size: 1.2rem !important;
+          font-size: 1.1rem !important;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;

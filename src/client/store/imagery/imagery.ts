@@ -15,8 +15,8 @@ export const ImagerySlice = createSlice({
   name: 'imageryState',
   initialState,
   reducers: {
-    setShowInformation: (state) => {
-      state.showInformation = !state.showInformation;
+    setShowInformation: (state, action) => {
+      state.showInformation = action.payload;
     },
     setSelectedFavoriteId: (state, action) => {
       state.selectedFavoriteId = action.payload;

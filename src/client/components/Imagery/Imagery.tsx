@@ -411,13 +411,13 @@ function Imagery() {
         disableEnforceFocus
         style={{ position: 'absolute' }}
         open={showInformation}
-        onClose={() => dispatch(setShowInformation())}
+        onClose={() => dispatch(setShowInformation(false))}
       >
         <DialogTitle className="departure-advisor-popup-title">
           <p className="text" id="draggable-dialog-title">
             Info: {selectedImagesData && (selectedImagesData.TITLE || selectedImagesData.SUBTABLABEL)}
           </p>
-          <button onClick={() => dispatch(setShowInformation())} className="dlg-close" type="button">
+          <button onClick={() => dispatch(setShowInformation(false))} className="dlg-close" type="button">
             <SvgRoundClose />
           </button>
         </DialogTitle>
