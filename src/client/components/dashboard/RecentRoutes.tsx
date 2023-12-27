@@ -62,7 +62,7 @@ function RecentRoutes() {
           )}
         </div>
         <div className="card-body">
-          {recentRoutes &&
+          {recentRoutes && recentRoutes.length ? (
             recentRoutes.map((route, index) => {
               const isSaved = savedRoutes.includes(route);
               return (
@@ -73,7 +73,12 @@ function RecentRoutes() {
                   </p>
                 </div>
               );
-            })}
+            })
+          ) : (
+            <div className="card-item">
+              <p>None</p>
+            </div>
+          )}
         </div>
         <div className="card-footer">
           <button className="dashboard-btn" value="Modify" onClick={planRouteClick}>

@@ -84,7 +84,7 @@ const ImageryDropDown = ({
           } else {
             for (let i2 = 0; i2 < ch1.length; i2++) {
               const x2 = ch1[i2];
-              if (x2.FAVORITE_ID === selectedFavoriteId) {
+              if (x2.FAVORITE_ID === selectedFavoriteId && x2.IMAGE) {
                 setSelectedLevel1(i1);
                 setSelectedLevel2(i2);
                 setSelectedImage({ ...x1, ...x2 });
@@ -92,15 +92,15 @@ const ImageryDropDown = ({
               } else if ((x2 as SubtabGroupItem).SUBTAB) {
                 const ch2 = (x2 as SubtabGroupItem).SUBTAB;
                 if (!Array.isArray(ch2)) {
-                  if ((ch2 as SubtabItem).FAVORITE_ID === selectedFavoriteId) {
+                  if ((ch2 as SubtabItem).FAVORITE_ID === selectedFavoriteId && (ch2 as SubtabItem).IMAGE) {
                     setSelectedLevel1(i1);
                     setSelectedLevel2(i2);
-                    setSelectedImage({ ...x1, ...x2 });
+                    setSelectedImage({ ...x1, ...(ch2 as SubtabItem) });
                   }
                 } else {
                   for (let i3 = 0; i3 < ch2.length; i3++) {
                     const x3 = ch2[i3];
-                    if (x3.FAVORITE_ID === selectedFavoriteId) {
+                    if (x3.FAVORITE_ID === selectedFavoriteId && x3.IMAGE) {
                       setSelectedLevel1(i1);
                       setSelectedLevel2(i2);
                       setSelectedLevel3(i3);
@@ -169,6 +169,9 @@ const ImageryDropDown = ({
           }
           if (selectedLvl3Data.IMAGE) {
             setSelectedImage({ ...selectedLvl1Data, ...selectedLvl3Data });
+            if (imagerySt == initialImageryState) {
+              addRecentImagery(imagerySt);
+            }
           } else {
             setSelectedImage({ ...selectedLvl1Data, ...childrenLvl2[0] });
           }

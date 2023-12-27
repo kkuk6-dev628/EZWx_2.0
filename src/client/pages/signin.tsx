@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { GrFacebook } from 'react-icons/gr';
 import { FaTwitterSquare, FaYoutubeSquare, FaCheck } from 'react-icons/fa';
 import { BsInstagram } from 'react-icons/bs';
@@ -6,6 +6,8 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { useSigninMutation } from '../store/auth/authApi';
 import { useRouter } from 'next/router';
 import { toast } from 'react-hot-toast';
+import { useGetUserSettingsQuery } from '../store/user/userSettingsApi';
+import { landingPages } from '../utils/constants';
 interface IFormInput {
   email: string;
   password: string;
@@ -22,14 +24,25 @@ function signin() {
     console.log(data);
     signin(data);
   };
+  const { data: settings } = useGetUserSettingsQuery(data?.id, {
+    skip: !data,
+    refetchOnMountOrArgChange: true,
+  });
 
   if (isLoading) {
     console.log('loading');
   } else if (!isLoading && responseError) {
     toast.error((responseError as any).data.message);
   } else if (!isLoading && !responseError && data) {
-    router.push('/map');
+    // router.push('/map');
   }
+
+  useEffect(() => {
+    if (settings) {
+      router.push(landingPages[settings.landing_page].url);
+    }
+  }, [settings]);
+
   return (
     <div className="sign">
       <div className="sign__wrp">

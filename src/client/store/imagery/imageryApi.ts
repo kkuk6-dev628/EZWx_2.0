@@ -40,7 +40,16 @@ export const imageryApi = createApi({
       query: (data) => ({ url: baseUrl + '/add-recent', method: 'Post', body: data }),
       invalidatesTags: ['ImageryState'],
     }),
+    deleteRecentImagery: builder.mutation({
+      query: (data) => ({ url: baseUrl + '/del-recent', method: 'Post', body: data }),
+      invalidatesTags: ['ImageryState'],
+    }),
   }),
 });
 
-export const { useGetWxJsonQuery, useGetRecentImageryQuery, useAddRecentImageryMutation } = imageryApi;
+export const {
+  useGetWxJsonQuery,
+  useGetRecentImageryQuery,
+  useAddRecentImageryMutation,
+  useDeleteRecentImageryMutation,
+} = imageryApi;

@@ -3,17 +3,34 @@ import { selectSettings } from '../../store/user/UserSettings';
 import { useDispatch } from 'react-redux';
 import { setShowGeneralSettings, setShowPersonalMins, setShowSettingsView } from '../../store/header/header';
 import { Icon } from '@iconify/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { selectViewHeight, selectViewWidth } from '../../store/airportwx/airportwx';
+import { landingPages } from '../../utils/constants';
+import { PrimaryButton, SecondaryButton } from '../common';
+import { DraggableDlg } from '../common/DraggableDlg';
+import { useGetUserSettingsQuery, useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
+import { selectAuth } from '../../store/auth/authSlice';
 
 function DashboardSettings() {
-  const settings = useSelector(selectSettings);
+  const { id } = useSelector(selectAuth);
+  const { data: settings } = useGetUserSettingsQuery(id, { skip: id === '', refetchOnMountOrArgChange: true });
   const dispatch = useDispatch();
   const viewW = useSelector(selectViewWidth);
   const viewH = useSelector(selectViewHeight);
   const showExpandBtn = viewW < 480 || viewH < 480;
   const [expanded, setExpanded] = useState(false);
   const showTwoColumns = viewW > 1070;
+  const [showLandingPageDlg, setShowLandingPageDlg] = useState(false);
+  const [updateUserSettings] = useUpdateUserSettingsMutation();
+
+  useEffect(() => {
+    if (settings) {
+      if (!settings.landing_page) {
+        setShowLandingPageDlg(true);
+        updateUserSettings({ ...settings, landing_page: 'dashboard' });
+      }
+    }
+  }, [settings]);
 
   return settings ? (
     <>
@@ -37,6 +54,12 @@ function DashboardSettings() {
                 <div className="card-item">
                   <p>
                     <b>Home airport:</b> {settings.default_home_airport}
+                  </p>
+                </div>
+                <div className="card-item">
+                  <p>
+                    <b>Landing page:</b>{' '}
+                    {settings.landing_page ? landingPages[settings.landing_page].name : landingPages.dashboard.name}
                   </p>
                 </div>
                 <div className="card-item">
@@ -142,6 +165,24 @@ function DashboardSettings() {
         </div>
       </div>
       {expanded && <div className="dashboard-card"></div>}
+      <DraggableDlg
+        open={showLandingPageDlg}
+        onClose={() => setShowLandingPageDlg(false)}
+        title="Choose your initial landing page"
+        body={
+          'Would you like the Dashboard to be your primary landing page when you sign in? You can always choose other options later in the Settings.'
+        }
+        footer={
+          <>
+            <SecondaryButton
+              onClick={() => setShowLandingPageDlg(false)}
+              text="Decide later"
+              isLoading={false}
+            ></SecondaryButton>
+            <PrimaryButton onClick={() => setShowLandingPageDlg(false)} text="Accept" isLoading={false}></PrimaryButton>
+          </>
+        }
+      />
     </>
   ) : (
     <></>

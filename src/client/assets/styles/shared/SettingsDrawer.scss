@@ -105,6 +105,12 @@
           flex-grow: 1;
         }
       }
+      .select-landing-page {
+        margin-top: 8px;
+        &>div {
+          padding: 10px;
+        }
+      }
     }
   }
 }

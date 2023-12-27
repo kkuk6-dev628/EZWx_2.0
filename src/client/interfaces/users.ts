@@ -13,6 +13,7 @@ export interface UserSettings {
   observation_time: number;
   observation_interval: number;
   default_home_airport: string;
+  landing_page: string;
   default_temperature_unit: boolean;
   default_time_display_unit: boolean;
   default_wind_speed_unit: boolean;

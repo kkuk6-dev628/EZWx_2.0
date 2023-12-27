@@ -21,6 +21,8 @@ export class UserSettings {
   default_distance_unit: boolean;
   @Column()
   default_visibility_unit: boolean;
+  @Column({ default: null, nullable: true })
+  landing_page: string;
 
   //AirCraft Setting Fields
   @Column()

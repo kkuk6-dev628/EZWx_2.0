@@ -26,4 +26,10 @@ export class ImageryController {
     imageryState.created_at = undefined;
     return this.imageryService.addRecentImagery(imageryState, request.user);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('del-recent')
+  delete(@Request() request, @Body() imageryState) {
+    return this.imageryService.deleteRecentImagery(imageryState.id, request.user);
+  }
 }

@@ -55,6 +55,11 @@ export class ImageryService {
     }
   }
 
+  async deleteRecentImagery(imageryId, user: User) {
+    const result = await this.imageryRepository.delete(imageryId);
+    return result.affected;
+  }
+
   async getTimeStamp(url: string) {
     const { data } = await firstValueFrom(
       this.httpService.get(url).pipe(

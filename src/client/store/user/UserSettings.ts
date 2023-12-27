@@ -34,6 +34,7 @@ export const initialUserSettingsState: {
     observation_time: Date.now(),
     observation_interval: 75,
     default_home_airport: 'KCLT',
+    landing_page: undefined,
     default_temperature_unit: false,
     default_time_display_unit: false,
     default_wind_speed_unit: false,
@@ -65,6 +66,7 @@ export const UserSettingsSlice = createSlice({
       state.settings.observation_time = action.payload.observation_time;
       state.settings.observation_interval = action.payload.observation_interval;
       state.settings.default_home_airport = action.payload.default_home_airport;
+      state.settings.landing_page = action.payload.landing_page;
       state.settings.default_temperature_unit = action.payload.default_temperature_unit;
       state.settings.default_time_display_unit = action.payload.default_time_display_unit;
       state.settings.default_wind_speed_unit = action.payload.default_wind_speed_unit;

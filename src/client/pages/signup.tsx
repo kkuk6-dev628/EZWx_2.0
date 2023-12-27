@@ -105,7 +105,7 @@ function signup() {
   } else if (!isLoading && responseError) {
     console.log(responseError);
   } else if (!isLoading && !responseError && data) {
-    router.push('/map');
+    router.push('/dashboard');
   }
 
   return (

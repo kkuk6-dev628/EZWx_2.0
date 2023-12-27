@@ -3,23 +3,34 @@ import { useGetSavedItemsQuery } from '../../store/saved/savedApi';
 import { SvgSaveFilled } from '../utils/SvgIcons';
 import { useGetRecentAirportQuery } from '../../store/airportwx/airportwxApi';
 import { ICON_INDENT } from '../../utils/constants';
-import { useAddRecentImageryMutation, useGetRecentImageryQuery } from '../../store/imagery/imageryApi';
+import {
+  useAddRecentImageryMutation,
+  useDeleteRecentImageryMutation,
+  useGetRecentImageryQuery,
+  useGetWxJsonQuery,
+} from '../../store/imagery/imageryApi';
 import { isSameSavedItem } from '../../utils/utils';
 import { useRouter } from 'next/router';
 import { Icon } from '@iconify/react';
 import { useSelector } from 'react-redux';
 import { selectViewWidth, selectViewHeight } from '../../store/airportwx/airportwx';
+import { SubtabGroupItem, SubtabItem } from '../../interfaces/imagery';
+import { DraggableDlg } from '../common/DraggableDlg';
+import { SecondaryButton } from '../common/Buttons';
 
 function RecentImagery() {
   const { data: recentImageries } = useGetRecentImageryQuery(null, { refetchOnMountOrArgChange: true });
   const { data: savedData } = useGetSavedItemsQuery(null, { refetchOnMountOrArgChange: true });
   const [savedImageries, setSavedImageries] = useState([]);
-  const [addRecentAirport] = useAddRecentImageryMutation();
+  const [addRecentImagery] = useAddRecentImageryMutation();
+  const [deleteRecentImagery] = useDeleteRecentImageryMutation();
   const router = useRouter();
   const [expanded, setExpanded] = useState(false);
   const viewW = useSelector(selectViewWidth);
   const viewH = useSelector(selectViewHeight);
   const showExpandBtn = viewW < 480 || viewH < 480;
+  const { data: imageryData, refetch: refetchWxJson } = useGetWxJsonQuery('');
+  const [showImageryMissing, setShowImageryMissing] = useState(false);
 
   useEffect(() => {
     if (recentImageries && savedData) {
@@ -31,8 +42,50 @@ function RecentImagery() {
   }, [savedData, recentImageries]);
 
   function imageryClick(imagery) {
-    addRecentAirport(imagery);
-    router.push('/imagery');
+    let exist = false;
+    if (imageryData && imageryData.TAB) {
+      for (let i1 = 0; i1 < imageryData.TAB.length; i1++) {
+        const x1 = imageryData.TAB[i1];
+        if (x1.FAVORITE_ID === imagery.selectedImageryId) {
+          exist = true;
+          break;
+        } else if (x1.SUBTAB_GROUP) {
+          const ch1 = Array.isArray(x1.SUBTAB_GROUP) ? x1.SUBTAB_GROUP : x1.SUBTAB_GROUP.SUBTAB;
+          if (!Array.isArray(ch1)) {
+            console.log('Invalid data structure in wx.json');
+          } else {
+            for (let i2 = 0; i2 < ch1.length; i2++) {
+              const x2 = ch1[i2];
+              if (x2.FAVORITE_ID === imagery.selectedImageryId) {
+                exist = true;
+                break;
+              } else if ((x2 as SubtabGroupItem).SUBTAB) {
+                const ch2 = (x2 as SubtabGroupItem).SUBTAB;
+                if (!Array.isArray(ch2)) {
+                  if ((ch2 as SubtabItem).FAVORITE_ID === imagery.selectedImageryId) {
+                    exist = true;
+                  }
+                } else {
+                  for (let i3 = 0; i3 < ch2.length; i3++) {
+                    const x3 = ch2[i3];
+                    if (x3.FAVORITE_ID === imagery.selectedImageryId) {
+                      exist = true;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    if (exist) {
+      addRecentImagery(imagery);
+      router.push('/imagery');
+    } else {
+      setShowImageryMissing(true);
+      deleteRecentImagery(imagery);
+    }
   }
 
   return (
@@ -51,7 +104,7 @@ function RecentImagery() {
           )}
         </div>
         <div className="card-body">
-          {recentImageries &&
+          {recentImageries && recentImageries.length ? (
             recentImageries.map((imagery, index) => {
               const isSaved = savedImageries.includes(imagery);
               return (
@@ -60,7 +113,12 @@ function RecentImagery() {
                   <p style={!isSaved ? { paddingInlineStart: ICON_INDENT } : null}>{imagery.selectedImageryName}</p>
                 </div>
               );
-            })}
+            })
+          ) : (
+            <div className="card-item">
+              <p>None</p>
+            </div>
+          )}
         </div>
         <div className="card-footer">
           <button className="dashboard-btn" value="Modify" onClick={() => router.push('/imagery')}>
@@ -69,6 +127,19 @@ function RecentImagery() {
         </div>
       </div>{' '}
       {expanded && <div className="dashboard-card"></div>}
+      <DraggableDlg
+        open={showImageryMissing}
+        onClose={() => setShowImageryMissing(false)}
+        title="This imagery collection has been removed!"
+        body={'This imagery collection no longer exists and will be removed from the recent imagery dashboard.'}
+        footer={
+          <SecondaryButton
+            onClick={() => setShowImageryMissing(false)}
+            text="Dismiss"
+            isLoading={false}
+          ></SecondaryButton>
+        }
+      />
     </>
   );
 }

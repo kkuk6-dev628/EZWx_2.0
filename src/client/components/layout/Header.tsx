@@ -24,11 +24,16 @@ import {
   setShowSavedView,
   setShowSettingsView,
 } from '../../store/header/header';
-import { FaBullseye } from 'react-icons/fa';
 import { DraggableDlg } from '../common/DraggableDlg';
 const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
-const menusHome = [
+interface menuItem {
+  id: number;
+  name: string;
+  link: string;
+  children?: any;
+}
+const menusHome: menuItem[] = [
   {
     id: 1,
     name: 'Home',
@@ -60,7 +65,7 @@ const menusHome = [
     link: '/pilots-guide',
   },
 ];
-const menusHomeNotAuth = [
+const menusHomeNotAuth: menuItem[] = [
   {
     id: 1,
     name: 'Home',
@@ -122,7 +127,7 @@ const menusHomeNotAuth = [
   },
 ];
 
-const menusMap = [
+const menusMap: menuItem[] = [
   {
     id: 1,
     name: 'Dashboard',
@@ -150,7 +155,7 @@ const menusMap = [
   },
 ];
 
-const menusMapNotAuth = [
+const menusMapNotAuth: menuItem[] = [
   {
     id: 1,
     name: 'Dashboard',
@@ -311,7 +316,11 @@ export default function Header() {
                   ))
                 : homeMenu.map((link) => (
                     <li key={link.id} className="header__nav__item">
-                      <Link className="header__nav__anc" href={link.link}>
+                      <Link
+                        className="header__nav__anc"
+                        href={link.link}
+                        onClick={(e) => handleClickMenu(e, link.link)}
+                      >
                         <span className="header__nav__link">{link.name}</span>
                         <div className="header__nav__icon">{link.children && <SvgDropDown />}</div>
                       </Link>
@@ -468,7 +477,7 @@ const ResponsiveMenu = ({
                   activeMenu && activeMenu === link.id ? 'responsive__menu__active' : ''
                 }`}
               >
-                <Link href={link.link}>
+                <Link href={link.link} onClick={(e) => handleClickMenu(e, link.link)}>
                   <span className="responsive__menu__link">{link.name}</span>
                 </Link>
                 {link.children && (

@@ -31,7 +31,7 @@ export const DraggableDlg = ({ open, onClose, toolButtons, body, footer, title, 
               <SvgRoundClose />
             </button>
           </DialogTitle>
-          <div className="dialog__box__toolbuttons">{toolButtons}</div>
+          {toolButtons && <div className="dialog__box__toolbuttons">{toolButtons}</div>}
           <div className="dialog__box__body">{body}</div>
           <div className="dialog__box__footer">{footer}</div>
         </div>

@@ -90,6 +90,7 @@ function AirportWxPage() {
       if (airports) {
         const homeAirport = airports.find((x) => x.key === settingsState.default_home_airport);
         dispatch(setCurrentAirport(homeAirport));
+        addRecentAirport({ airportId: homeAirport.key, airport: homeAirport });
       }
     }
   }, [recentAirports, airports]);

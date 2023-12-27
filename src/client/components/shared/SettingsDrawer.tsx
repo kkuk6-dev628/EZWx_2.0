@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { CircularProgress, Collapse, Drawer } from '@mui/material';
+import {
+  CircularProgress,
+  Collapse,
+  Drawer,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from '@mui/material';
 import { AiOutlineMinus, AiOutlinePlus } from 'react-icons/ai';
 import { RxCross2 } from 'react-icons/rx';
 import {
@@ -18,7 +27,7 @@ import { AutoCompleteInput, Modal, PrimaryButton, SecondaryButton } from '../com
 import { ColoredRangeSlider, formatForDecimal, formatForInteger } from '../common/ColoredRangeSlider';
 import { toast } from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
-import { icingIntensity } from '../../utils/constants';
+import { icingIntensity, landingPages } from '../../utils/constants';
 import { convectivePotential } from '../../utils/constants';
 import {
   selectShowGeneralSettings,
@@ -165,7 +174,21 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
                   />
                 </div>
               </InputFieldWrapper>
-
+              <FormControl fullWidth>
+                <SettingFieldLabel title="Landing page" description="default landing page" />
+                <Select
+                  value={settings.landing_page}
+                  onChange={(e: SelectChangeEvent) => setSettings({ ...settings, landing_page: e.target.value })}
+                  inputProps={{ 'aria-label': 'default landing page' }}
+                  className="select-landing-page"
+                >
+                  {Object.entries(landingPages).map(([key, value]) => (
+                    <MenuItem key={key} value={key}>
+                      {value.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <ToggleFieldWrapper>
                 <SettingFieldLabel title="Temperature" description="default temperature units" />
                 <ToggleButton

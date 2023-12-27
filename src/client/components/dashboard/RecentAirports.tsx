@@ -51,7 +51,7 @@ function RecentAirports() {
           )}
         </div>
         <div className="card-body">
-          {recentAirports &&
+          {recentAirports && recentAirports.length ? (
             recentAirports.map((airport, index) => {
               const isSaved = savedAirports.includes(airport);
               return (
@@ -62,7 +62,12 @@ function RecentAirports() {
                   </p>
                 </div>
               );
-            })}
+            })
+          ) : (
+            <div className="card-item">
+              <p>None</p>
+            </div>
+          )}
         </div>
         <div className="card-footer">
           <button className="dashboard-btn" value="Modify" onClick={() => router.push('/airportwx')}>

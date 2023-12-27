@@ -1,4 +1,3 @@
-import { Route } from '../components/shared/Route';
 import { Route } from '../interfaces/route';
 import {
   RouteProfileChartType,
@@ -207,4 +206,22 @@ export const emptyRouteData: Route = {
   destination: null,
   altitude: 10000,
   useForecastWinds: false,
+};
+export const landingPages = {
+  home: {
+    url: '/home',
+    name: 'Home',
+  },
+  dashboard: {
+    url: '/dashboard',
+    name: 'Dashboard',
+  },
+  map: {
+    url: '/map',
+    name: 'Map',
+  },
+  imagery: {
+    url: '/imagery',
+    name: 'Imagery',
+  },
 };
