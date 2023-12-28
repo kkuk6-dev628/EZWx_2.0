@@ -177,7 +177,7 @@ const SettingsDrawer = ({ setIsShowSettingsDrawer, isShowSettingsDrawer }: Props
               <FormControl fullWidth>
                 <SettingFieldLabel title="Landing page" description="default landing page" />
                 <Select
-                  value={settings.landing_page}
+                  value={settings.landing_page || 'dashboard'}
                   onChange={(e: SelectChangeEvent) => setSettings({ ...settings, landing_page: e.target.value })}
                   inputProps={{ 'aria-label': 'default landing page' }}
                   className="select-landing-page"

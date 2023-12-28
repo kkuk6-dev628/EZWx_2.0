@@ -42,12 +42,12 @@ function AirportSelectModal({ setIsShowModal }) {
     }
   }, [savedData, selectedAirport]);
 
-  useEffect(() => {
-    if (isSuccessRecentAirports && recentAirports.length > 0) {
-      dispatch(setCurrentAirport(recentAirports[0].airport));
-      updateSelectedAirport(recentAirports[0].airport);
-    }
-  }, [isSuccessRecentAirports]);
+  // useEffect(() => {
+  //   if (isSuccessRecentAirports && recentAirports.length > 0) {
+  //     dispatch(setCurrentAirport(recentAirports[0].airport));
+  //     updateSelectedAirport(recentAirports[0].airport);
+  //   }
+  // }, [isSuccessRecentAirports]);
 
   useEffect(() => {
     if (allAirports) {

@@ -17,6 +17,8 @@ import { selectViewWidth, selectViewHeight } from '../../store/airportwx/airport
 import { SubtabGroupItem, SubtabItem } from '../../interfaces/imagery';
 import { DraggableDlg } from '../common/DraggableDlg';
 import { SecondaryButton } from '../common/Buttons';
+import { useDispatch } from 'react-redux';
+import { setSelectedFavoriteId } from '../../store/imagery/imagery';
 
 function RecentImagery() {
   const { data: recentImageries } = useGetRecentImageryQuery(null, { refetchOnMountOrArgChange: true });
@@ -31,6 +33,7 @@ function RecentImagery() {
   const showExpandBtn = viewW < 480 || viewH < 480;
   const { data: imageryData, refetch: refetchWxJson } = useGetWxJsonQuery('');
   const [showImageryMissing, setShowImageryMissing] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (recentImageries && savedData) {
@@ -81,6 +84,7 @@ function RecentImagery() {
     }
     if (exist) {
       addRecentImagery(imagery);
+      dispatch(setSelectedFavoriteId(imagery.selectedImageryId));
       router.push('/imagery');
     } else {
       setShowImageryMissing(true);

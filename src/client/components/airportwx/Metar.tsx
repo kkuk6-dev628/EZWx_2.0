@@ -117,7 +117,7 @@ const Metar = () => {
                 {lines.map((line, index) => (
                   <div
                     key={`line-${i}-${index}`}
-                    className="first-line"
+                    className={'first-line' + (line.startsWith('RMK') ? ' indent20' : '')}
                     dangerouslySetInnerHTML={{ __html: colorCoding(line) }}
                   />
                 ))}

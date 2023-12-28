@@ -12,8 +12,7 @@ import { useGetUserSettingsQuery, useUpdateUserSettingsMutation } from '../../st
 import { selectAuth } from '../../store/auth/authSlice';
 
 function DashboardSettings() {
-  const { id } = useSelector(selectAuth);
-  const { data: settings } = useGetUserSettingsQuery(id, { skip: id === '', refetchOnMountOrArgChange: true });
+  const { data: settings } = useGetUserSettingsQuery({ refetchOnMountOrArgChange: true });
   const dispatch = useDispatch();
   const viewW = useSelector(selectViewWidth);
   const viewH = useSelector(selectViewHeight);

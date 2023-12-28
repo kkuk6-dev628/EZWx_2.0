@@ -61,7 +61,7 @@ const menusHome: menuItem[] = [
   },
   {
     id: 6,
-    name: 'Pilots guide',
+    name: 'Pilots Guide',
     link: '/pilots-guide',
   },
 ];

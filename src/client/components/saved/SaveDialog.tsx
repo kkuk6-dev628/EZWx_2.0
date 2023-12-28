@@ -79,7 +79,11 @@ export const SaveDialog = ({ title, name, open, onClose, data }: Props) => {
     })) as any;
     onClose();
     if (d && d.identifiers && d.identifiers.length > 0) {
-      updateSavedOrder({ ...savedOrder, order: [{ id: d.identifiers[0].id, isOpen: false }, ...savedOrder.order] });
+      let newOrder = [{ id: d.identifiers[0].id, isOpen: false }];
+      if (savedOrder && savedOrder.order) {
+        newOrder = newOrder.concat(savedOrder.order);
+      }
+      updateSavedOrder({ ...savedOrder, order: newOrder });
     }
   };
 
@@ -166,11 +170,13 @@ export const SaveDialog = ({ title, name, open, onClose, data }: Props) => {
               >
                 {saveFolders &&
                   saveFolders.map((f, index) => {
-                    return (
-                      <MenuItem key={`folder-${index}`} value={f.id}>
-                        {f.text}
-                      </MenuItem>
-                    );
+                    if (f) {
+                      return (
+                        <MenuItem key={`folder-${index}`} value={f.id}>
+                          {f.text}
+                        </MenuItem>
+                      );
+                    }
                   })}
               </Select>
             </FormControl>

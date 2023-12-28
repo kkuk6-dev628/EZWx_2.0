@@ -6,7 +6,7 @@ import { selectAuth } from '../../store/auth/authSlice';
 
 export const FetchUserSettings = () => {
   const { id } = useSelector(selectAuth);
-  const { data, isSuccess } = useGetUserSettingsQuery(id, { skip: id === '', refetchOnMountOrArgChange: true });
+  const { data, isSuccess } = useGetUserSettingsQuery({ refetchOnMountOrArgChange: true });
   const [updateUserSettings, { isLoading: isUpdating, isSuccess: isSuccessUpdate }] = useUpdateUserSettingsMutation({
     fixedCacheKey: 'user-settings',
   });

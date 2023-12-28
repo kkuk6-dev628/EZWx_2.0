@@ -80,15 +80,12 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
   const [updateLayerControlStateAPI] = useUpdateLayerControlStateMutation();
   const layerControlState = useSelector(selectLayerControlState);
   const dispatch = useDispatch();
-  let refetchUserSettings;
-  if (auth.id || cookies.logged_in) {
-    const { refetch } = useGetUserSettingsQuery(auth.id);
-    refetchUserSettings = () => {
-      refetch();
-    };
-  }
+  const { refetch } = useGetUserSettingsQuery({ refetchOnMountOrArgChange: true });
+  const refetchUserSettings = () => {
+    refetch();
+  };
 
-  const { isSuccess: isLoadedAirports, data: airportsTable } = useGetAllAirportsQuery('');
+  const { data: airportsTable } = useGetAllAirportsQuery('');
 
   const map = useMap();
 

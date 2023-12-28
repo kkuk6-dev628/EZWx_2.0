@@ -246,6 +246,10 @@ body>div{
       }
       .airport-hint {
         pointer-events: all;
+        button {
+          font-size: 14px;
+          font-weight: bold;
+        }
       }
       .nodata-msg {
         font-size: 1.0rem;
@@ -258,18 +262,14 @@ body>div{
       }
     }
   }
-  .data-loading{
-    position: absolute;
-    z-index: 1000;
-    width: 100%;
-    height: 98%;
-    border-radius: 8px;
-    margin-top: 2px;
-    margin-right: 8px;
-    margin-bottom: 32px;
-    background: var(--color-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+}
+.data-loading{
+  position: absolute;
+  z-index: 1000;
+  width: 100%;
+  height: 100%;
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

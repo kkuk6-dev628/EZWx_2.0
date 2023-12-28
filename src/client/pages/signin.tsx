@@ -24,7 +24,7 @@ function signin() {
     console.log(data);
     signin(data);
   };
-  const { data: settings } = useGetUserSettingsQuery(data?.id, {
+  const { data: settings } = useGetUserSettingsQuery({
     skip: !data,
     refetchOnMountOrArgChange: true,
   });
@@ -39,7 +39,7 @@ function signin() {
 
   useEffect(() => {
     if (settings) {
-      router.push(landingPages[settings.landing_page].url);
+      router.push(landingPages[settings.landing_page]?.url || '/dashboard');
     }
   }, [settings]);
 

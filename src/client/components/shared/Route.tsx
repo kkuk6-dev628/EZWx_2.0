@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useRef, useState } from 'react';
-import { AiOutlineClose, AiOutlineCloseCircle, AiOutlineHeart } from 'react-icons/ai';
-import { BsBookmarkPlus, BsFolderPlus } from 'react-icons/bs';
+import { AiOutlineCloseCircle } from 'react-icons/ai';
 import { AiOutlineMinus } from 'react-icons/ai';
 import { SvgBin, SvgLeftRight, SvgRoundClose } from '../utils/SvgIcons';
 import Switch from 'react-switch';
@@ -14,16 +13,14 @@ import { Route, RouteOfFlight, RoutePoint } from '../../interfaces/route';
 import { useMeteoLayersContext } from '../map/leaflet/layer-control/MeteoLayerControlContext';
 import L from 'leaflet';
 import 'leaflet-arc';
-import { Button, FormControl, MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import MultipleSelect from './MultipleSelect';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useRouter } from 'next/router';
-import { useGetSavedItemsQuery, useUpdateSavedItemMutation } from '../../store/saved/savedApi';
-import { NodeModel } from '@minoru/react-dnd-treeview';
+import { useGetSavedItemsQuery } from '../../store/saved/savedApi';
 import { SaveDialog } from '../saved/SaveDialog';
 import { isSameSavedItem } from '../../utils/utils';
 import { Icon } from '@iconify/react';
 import { emptyRouteData } from '../../utils/constants';
+import { useGetUserSettingsQuery, useUpdateUserSettingsMutation } from '../../store/user/userSettingsApi';
 
 interface Props {
   setIsShowModal: (isShowModal: boolean) => void;
@@ -71,7 +68,8 @@ export const addRouteToMap = (route: Route, routeGroupLayer: L.LayerGroup) => {
 function Route({ setIsShowModal, route }: Props) {
   const activeRoute = useSelector(selectActiveRoute);
   const [createRoute] = useCreateRouteMutation();
-  const [deleteRoute] = useDeleteRouteMutation();
+  const [updateUserSettings] = useUpdateUserSettingsMutation();
+  const { data: settings } = useGetUserSettingsQuery({ refetchOnMountOrArgChange: true });
   const [routeData, setRouteData] = useState(route || activeRoute || emptyRouteData);
   const ref = useRef();
   const meteoLayers = useMeteoLayersContext();
@@ -79,6 +77,7 @@ function Route({ setIsShowModal, route }: Props) {
   const [isShowDeleteRouteModal, setIsShowDeleteRouteModal] = useState(false);
   const [isShowSaveRouteModal, setIsShowSaveRouteModal] = useState(false);
   const [isShowErrorRouteModal, setIsShowErrorRouteModal] = useState(false);
+  const [isShowNoActiveRouteModal, setIsShowNoActiveRouteModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [altitudeText, setAltitudeText] = useState(routeData.altitude.toLocaleString());
   const router = useRouter();
@@ -143,7 +142,11 @@ function Route({ setIsShowModal, route }: Props) {
     }
   };
   const handleClickDelete = () => {
-    setIsShowDeleteRouteModal(true);
+    if (activeRoute) {
+      setIsShowDeleteRouteModal(true);
+    } else {
+      setIsShowNoActiveRouteModal(true);
+    }
   };
   const handleClickReverse = () => {
     setForceRerenderKey(Date.now());
@@ -171,7 +174,8 @@ function Route({ setIsShowModal, route }: Props) {
 
   const deleteActiveRoute = () => {
     meteoLayers.routeGroupLayer?.clearLayers();
-    deleteRoute(activeRoute.id);
+    dispatch(setActiveRoute(null));
+    updateUserSettings({ ...settings, active_route: null });
     setIsShowDeleteRouteModal(false);
     setIsShowModal(false);
     handleClickClear();
@@ -384,6 +388,17 @@ function Route({ setIsShowModal, route }: Props) {
           <>
             <SecondaryButton onClick={() => setIsShowDeleteRouteModal(false)} text="No" isLoading={false} />
             <PrimaryButton text="Yes" onClick={() => deleteActiveRoute()} isLoading={false} />
+          </>
+        }
+      />
+      <Modal
+        open={isShowNoActiveRouteModal}
+        handleClose={() => setIsShowNoActiveRouteModal(false)}
+        title="No active route exists"
+        description="There are no active routes to delete"
+        footer={
+          <>
+            <SecondaryButton onClick={() => setIsShowNoActiveRouteModal(false)} text="Dismiss" isLoading={false} />
           </>
         }
       />

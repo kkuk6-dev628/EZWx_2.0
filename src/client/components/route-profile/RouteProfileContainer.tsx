@@ -127,6 +127,7 @@ const RouteProfileContainer = () => {
   return (
     isRouteProfileStateLoaded && (
       <>
+        <RouteProfileDataLoader key={dataLoadTime} />
         <div className="route-profile">
           <FetchUserSettings />
           <Dialog
@@ -150,7 +151,6 @@ const RouteProfileContainer = () => {
           )}
           <MapTabs tabMenus={tabMenus} />
           <div className="route-profile-container">
-            <RouteProfileDataLoader key={dataLoadTime} />
             <div className="route-profile-header">
               <div className="header-left">
                 <InputFieldWrapper>

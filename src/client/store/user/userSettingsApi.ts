@@ -8,12 +8,13 @@ import { setActiveRoute } from '../route/routes';
 const userSettingsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getUserSettings: builder.query({
-      query: (id) => ({
-        url: `/settings/${id}`,
+      providesTags: [{ type: 'userSettings', id: 'LIST' }],
+      query: () => ({
+        url: `/settings/`,
         method: 'GET',
       }),
       transformResponse: (response: UserSettings) => {
-        if (response) {
+        if (response.user_id) {
           return { ...response, observation_time: parseInt(response.observation_time as unknown as string) };
         }
         return initialUserSettingsState.settings;
@@ -50,6 +51,7 @@ const userSettingsApi = apiSlice.injectEndpoints({
         method: 'PUT',
         body: data,
       }),
+      invalidatesTags: ['userSettings'],
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
