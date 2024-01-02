@@ -103,17 +103,17 @@ const MeteoLayerControl = ({ position, children }: IProps) => {
   const showLayer = (layerObj: Layer, layerName: string) => {
     map.closePopup();
     if (!layerObj) return;
-    if (checkEmptyLayer(layerObj)) {
-      toast.error(`No ${layerName}'s data displayed`);
-    }
+    // if (checkEmptyLayer(layerObj)) {
+    //   toast.error(`No ${layerName}'s data displayed`);
+    // }
   };
 
   const hideLayer = (layerObj: Layer, layerName: string) => {
     map.closePopup();
     if (!layerObj) return;
-    if (checkEmptyLayer(layerObj)) {
-      toast.error(`No ${layerName}'s data displayed`);
-    }
+    // if (checkEmptyLayer(layerObj)) {
+    //   toast.error(`No ${layerName}'s data displayed`);
+    // }
   };
 
   const isCheckedAllMetarFlightCategory = (cloned: StationMarkersLayerState): boolean =>

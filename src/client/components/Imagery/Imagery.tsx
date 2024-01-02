@@ -109,8 +109,8 @@ function Imagery() {
     if (timeImage) {
       if (timeImage.image != selectedImageUrl) {
         setSelectedImageUrl(timeImage.image);
-        setSelectedTime(timeImage.time);
       }
+      setSelectedTime(timeImage.time);
     } else if (selectedImages.length > 0) {
       setSelectedImageUrl(selectedImages[0]);
       dataTimes && setSelectedTime(dataTimes[0]);
@@ -157,7 +157,7 @@ function Imagery() {
       setSliderValue(sliderVal);
       updateSliderValue(sliderVal);
     }
-  }, [dataTimes]);
+  }, [dataTimes, userSettings.default_time_display_unit]);
 
   function getImageBySliderValue(value) {
     if (
@@ -532,8 +532,8 @@ function Imagery() {
                       const newValue = parseInt(value[0]);
                       const timeImage = getImageBySliderValue(newValue);
                       if (timeImage) {
-                        setSelectedImageUrl(timeImage.image);
-                        setSelectedTime(timeImage.time);
+                        // setSelectedImageUrl(timeImage.image);
+                        // setSelectedTime(timeImage.time);
                         setSliderValue(timeImage.sliderValue);
                         updateSliderValue(timeImage.sliderValue);
                       }

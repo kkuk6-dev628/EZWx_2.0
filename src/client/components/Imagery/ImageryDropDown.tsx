@@ -31,7 +31,7 @@ const ImageryDropDown = ({
   const [selectedImage, setSelectedImage] = useState<ImageryCollectionItem>(null);
   const [filterInput, setFilterInput] = useState('');
   const [imageData, setImageData] = useState([]);
-  const { data: recentImageries } = useGetRecentImageryQuery(null, {
+  const { data: recentImageries, isSuccess: isLoadedRecentImageries } = useGetRecentImageryQuery(null, {
     refetchOnMountOrArgChange: true,
   });
   const [addRecentImagery] = useAddRecentImageryMutation();
@@ -169,7 +169,11 @@ const ImageryDropDown = ({
           }
           if (selectedLvl3Data.IMAGE) {
             setSelectedImage({ ...selectedLvl1Data, ...selectedLvl3Data });
-            if (imagerySt == initialImageryState) {
+            if (
+              imagerySt == initialImageryState &&
+              isLoadedRecentImageries &&
+              (!recentImageries || recentImageries.length === 0)
+            ) {
               addRecentImagery(imagerySt);
             }
           } else {

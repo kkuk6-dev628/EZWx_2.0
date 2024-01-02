@@ -113,6 +113,7 @@
     "react-select": "^5.7.3",
     "react-switch": "^7.0.0",
     "react-transition-group": "^4.4.5",
+    "react-use": "^17.4.2",
     "react-vis": "^1.11.12",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^4.4.0",

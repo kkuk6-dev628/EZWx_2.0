@@ -18,6 +18,7 @@ import { selectShowInformation, setShowInformation } from '../../store/imagery/i
 import AirportSelectModal from '../airportwx/AirportSelectModal';
 import { PaperComponent } from '../common/PaperComponent';
 import { setViewHeight, setViewWidth } from '../../store/airportwx/airportwx';
+import { useOrientation } from 'react-use';
 import {
   selectShowSavedView,
   selectShowSettingsView,
@@ -188,9 +189,16 @@ export default function Header() {
   const [cookies] = useCookies(['logged_in']);
   useGetUserQuery(null, { refetchOnMountOrArgChange: true });
   const dispatch = useDispatch();
+  const { type: orientation } = useOrientation();
 
   useEffect(() => {
-    if (pathname === '/map' || pathname === '/imagery' || pathname === '/route-profile' || pathname === '/airportwx') {
+    if (
+      pathname === '/map' ||
+      pathname === '/imagery' ||
+      pathname === '/route-profile' ||
+      pathname === '/airportwx' ||
+      pathname === '/dashboard'
+    ) {
       setMapMenu(true);
     } else {
       setMapMenu(false);
@@ -201,6 +209,10 @@ export default function Header() {
       setIsUserLoginUser(false);
     }
   }, [pathname]);
+
+  useEffect(() => {
+    setActiveResponsiveMenu(false);
+  }, [orientation]);
 
   const handleActiveMenu = (id, hideResponsiveMenu) => {
     setActiveMenu(id);

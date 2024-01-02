@@ -107,6 +107,11 @@ export class ViewController {
   public async Dashboard(@Req() req: Request, @Res() res: Response) {
     await this.handler(req, res);
   }
+  @UseGuards(JwtAuthGuard)
+  @Get('pilots-guide')
+  public async PilotsGuide(@Req() req: Request, @Res() res: Response) {
+    await this.handler(req, res);
+  }
 
   @Get('_next*')
   public async assets(@Req() req: Request, @Res() res: Response) {

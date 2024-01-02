@@ -66,7 +66,7 @@ export const SimplifiedMarkersLayer = forwardRef(
 
     useEffect(() => {
       if (visible) setSimplifiedFeatures(data);
-    }, [data, activeRoute]);
+    }, [data, activeRoute, visible]);
 
     const map = useMapEvents({
       zoomend: () => {
