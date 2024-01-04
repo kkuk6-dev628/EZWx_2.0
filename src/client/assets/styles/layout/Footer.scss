@@ -1,14 +1,14 @@
 .ftr{
   padding: 18px;
+  background-color: white;
   &__wrp{
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
     justify-content: space-between;
     align-items: center;
     grid-gap: 20px;
 
     @media (max-width: 650px) {
-      grid-template-columns: 1fr;
+      flex-direction: column;
       justify-content: center;
       text-align: center;
     }

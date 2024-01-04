@@ -1,5 +1,5 @@
 .home {
-  height: 100%;
+  height: calc(100% - 75px);
   overflow: auto;
 }
 .hero {
@@ -31,6 +31,7 @@
     z-index: 2;
     text-align: center;
     transform: translateY(50%);
+    padding: 12px 10%;
 
     @media (max-width: 991px) {
       transform: translateY(20%);
@@ -41,7 +42,6 @@
     color: var(--color-white);
     margin-bottom: 30px;
     font-weight: 700;
-    text-transform: capitalize;
     font-size: 46px;
 
     @media (max-width: 991px) {

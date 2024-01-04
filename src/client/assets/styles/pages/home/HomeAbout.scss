@@ -53,6 +53,9 @@
     font-size: 18px;
     line-height: 26px;
     color: var(--color-dark);
+    a {
+      color: blue
+    }
   }
 
   &__cards{
@@ -62,7 +65,7 @@
     justify-content: center;
 
     @media screen and (max-width: 991px){
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(1, 1fr);
     }
     @media screen and (max-width: 650px){
       grid-template-columns: repeat(1, 1fr);
@@ -78,6 +81,7 @@
     &:hover{
       .about__card__icon{
         background: var(--color-white);
+        color: var(--color-primary);
         svg{
           fill: var(--color-primary);
           path{
@@ -92,14 +96,13 @@
 
   &__card_img__area{
     position: relative;
-    height: 0;
-    padding-bottom: 60%;
+    // height: 0;
+    // padding-bottom: 60%;
     border-radius:4px 4px 0 0;
-    overflow: hidden;
+    // overflow: hidden;
   }
 
   &__img{
-    position: absolute;
     height: 100%;
     width: 100%;
     object-fit: cover;
@@ -123,10 +126,10 @@
     margin-top: -50px;
     position: relative;
     transition: all 0.3s ease;
+    color: white;
     svg{
       fill: var(--color-white);
       path{
-
         stroke: var(--color-white);
       }
     }

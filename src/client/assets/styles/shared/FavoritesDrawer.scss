@@ -1,5 +1,4 @@
 * {
-  color: var(--white);
   font-family: var(--font-other);
 }
 .drawer__container {
@@ -77,6 +76,7 @@
           border: none;
           height: 36.44px;
           border-radius: 4px;
+          color: white;
           cursor: pointer;
           &:hover {
             background-color: var(--color-primary-highlight);

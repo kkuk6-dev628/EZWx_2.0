@@ -47,23 +47,45 @@ const menusHome: menuItem[] = [
   },
   {
     id: 3,
-    name: 'Map',
-    link: '/map',
+    name: 'Pricing',
+    link: '/home#pricing',
   },
   {
     id: 4,
-    name: 'Airport Wx',
-    link: '/airportwx',
+    name: 'Training',
+    link: 'https://avwxtraining.com',
   },
   {
     id: 5,
-    name: 'Imagery',
-    link: '/imagery',
+    name: 'Blog',
+    link: 'https://avwxtraining.com/blog',
   },
   {
     id: 6,
-    name: 'Pilots Guide',
-    link: '/pilots-guide',
+    name: 'About Us',
+    link: '#',
+    children: [
+      {
+        id: 8,
+        name: 'Contact Us',
+        link: '/contact',
+      },
+      {
+        id: 9,
+        name: 'Support',
+        link: '/support',
+      },
+      {
+        id: 10,
+        name: 'Team EZWxBrief',
+        link: '/team',
+      },
+    ],
+  },
+  {
+    id: 7,
+    name: 'FAQ',
+    link: '/faq',
   },
 ];
 const menusHomeNotAuth: menuItem[] = [
@@ -74,57 +96,50 @@ const menusHomeNotAuth: menuItem[] = [
   },
   {
     id: 2,
-    name: 'Samples',
-    link: '/samples',
-    children: [
-      {
-        id: 3,
-        name: 'Imagery',
-        link: '/imagery',
-      },
-    ],
+    name: 'Try EZWxBrief',
+    link: '/signup',
+  },
+  {
+    id: 3,
+    name: 'Pricing',
+    link: '/home#pricing',
+  },
+  {
+    id: 4,
+    name: 'Training',
+    link: 'https://avwxtraining.com',
   },
   {
     id: 5,
-    name: 'Try EZWxBrief',
-    link: '/try-ezwxbrief',
+    name: 'Blog',
+    link: 'https://avwxtraining.com/blog',
   },
   {
     id: 6,
-    name: 'Pricing',
-    link: '/pricing',
-  },
-  {
-    id: 7,
-    name: 'Training',
-    link: '/training',
-  },
-  {
-    id: 8,
-    name: 'Blog',
-    link: '/blog',
-  },
-  {
-    id: 9,
-    name: 'About us',
+    name: 'About Us',
     link: '#',
     children: [
       {
-        id: 9,
+        id: 7,
         name: 'Contact Us',
         link: '/contact',
       },
       {
-        id: 10,
+        id: 8,
         name: 'Support',
         link: '/support',
       },
       {
-        id: 11,
+        id: 9,
         name: 'Team EZWxBrief',
         link: '/team',
       },
     ],
+  },
+  {
+    id: 10,
+    name: 'FAQ',
+    link: '/faq',
   },
 ];
 
@@ -215,7 +230,7 @@ export default function Header() {
   }, [orientation]);
 
   const handleActiveMenu = (id, hideResponsiveMenu) => {
-    setActiveMenu(id);
+    setActiveMenu((prevState) => (prevState === id ? 0 : id));
     setActiveResponsiveMenu(hideResponsiveMenu);
   };
 
@@ -269,7 +284,7 @@ export default function Header() {
   }
 
   let infoTitle = 'Info:';
-  let infoBody = '';
+  let infoBody: any = '';
   switch (pathname) {
     case '/imagery':
       infoTitle = 'Info: Imagery';
@@ -280,6 +295,21 @@ export default function Header() {
       infoBody =
         'This is the EZWxBrief Dashboard. From this page you can visit items in your saved folders as well as the most recent routes, airports and imagery collections. Up to ten recent routes, airports and imagery collections are provided beginning with the most recent at the top of the list. Simply click on the route, airport or imagery listed in these groups to visit the page for that specific saved or recent item. Saved or recent routes can be opened up in the Map or Route Profile page. If a ribbon icon appears next to the route, airport or imagery collection that means that it is saved in one or more of your saved folders. Within this Dashboard you can also view your general and aircraft settings as well as the settings for each of your personal weather minimums.';
       break;
+    case '/home':
+      infoTitle = 'Info: EZWxBrief Home page';
+      infoBody = (
+        <>
+          EZWxBrief an affordable progressive web app elegantly designed to blend high resolution supplemental weather
+          guidance with your personal weather minimums. All of this is seamlessly integrated with the EZDeparture
+          Advisor™ a unique approach that quantifies your risk and instantly lets you know the most favorable time to
+          depart based on your personal weather minimums. Check out our{' '}
+          <a className="link-text" target="_blank" href="https://youtube.com/@ezwxbrief">
+            YouTube channel
+          </a>{' '}
+          for tutorials on how to utilize EZWxBrief.
+        </>
+      );
+      break;
   }
   return (
     <div className={`header ${sticky && 'header--fixed'}`}>
@@ -287,16 +317,24 @@ export default function Header() {
         <Toaster />
         <div className="header__wrp">
           {!mapMenu ? (
-            <div className="header__lft">
+            <div className="header__left">
               <Link href="/home">
                 <div className="header__img__area">
-                  <Image src="/images/Logo.png" loading="eager" fill alt="logo" className="header__img" />
+                  <Image
+                    src="/images/Logo.png"
+                    loading="eager"
+                    width={100}
+                    height={72}
+                    alt="logo"
+                    className="header__img"
+                  />
                 </div>
               </Link>
               <button onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)} className="header__menu btn">
                 {activeResponsiveMenu ? <SvgRoundClose /> : <SvgMenuBurger />}
               </button>
               {mapMenu && <button className="header__tab__text"></button>}
+              {isUserLoginUser && <ZuluClock textColor="white" />}
             </div>
           ) : (
             <div className="header__left">
@@ -308,7 +346,7 @@ export default function Header() {
               <button onClick={() => setActiveResponsiveMenu(!activeResponsiveMenu)} className="header__menu btn">
                 {activeResponsiveMenu ? <SvgRoundClose /> : <SvgMenuBurger />}
               </button>
-              <ZuluClock textColor="white" />
+              {isUserLoginUser && <ZuluClock textColor="white" />}
               {/* <div style={{ color: 'white' }}>version 20230713</div> */}
             </div>
           )}
@@ -395,10 +433,15 @@ export default function Header() {
                   </button>
                 </div>
               ) : (
-                <button className="header__rgt__btn header__rgt__btn--rgt btn">
-                  <Link href="/signup">Join Now</Link>
-                  <Link href="/signin"> | Sign in</Link>
-                </button>
+                <>
+                  <div className="new-message">
+                    <center>New to EZWxBrief?</center>
+                  </div>
+                  <button className="header__rgt__btn header__rgt__btn--rgt btn">
+                    <Link href="/signup">Join Now</Link>
+                    <Link href="/signin"> | Sign in</Link>
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -462,13 +505,30 @@ const ResponsiveMenu = ({
     },
     ...workMenu,
   ];
+  const { type: orientation } = useOrientation();
+  const [height, setHeight] = useState(orientation === 'landscape-primary' ? 'calc(100vh - 70px)' : 330);
+  const [submenuOpened, setSubmenuOpened] = useState(false);
+  useEffect(() => {
+    if (orientation !== 'landscape-primary') {
+      setHeight(submenuOpened ? 480 : 330);
+    } else {
+      setHeight('calc(100vh - 70px)');
+    }
+  }, [orientation, submenuOpened]);
+
   return (
-    <div className={`responsive__menu ${activeResponsiveMenu ? 'responsive__menu__show' : ''}`}>
+    <div className={`responsive__menu ${activeResponsiveMenu ? 'responsive__menu__show' : ''}`} style={{ height }}>
       {mapMenu
         ? responsiveMenu.map((link) => (
             <div key={link.id}>
               <div
-                onClick={() => handleActiveMenu(link.id, link.children !== undefined)}
+                onClick={() => {
+                  handleActiveMenu(link.id, link.children !== undefined);
+                  if (link.children !== undefined) {
+                    orientation !== 'landscape-primary' && setHeight(520);
+                    setSubmenuOpened((prevState) => !prevState);
+                  }
+                }}
                 key={link.id}
                 className={`responsive__menu__item ${
                   activeMenu && activeMenu === link.id ? 'responsive__menu__active' : ''
@@ -483,7 +543,13 @@ const ResponsiveMenu = ({
         : homeMenu.map((link) => (
             <div key={link.id}>
               <div
-                onClick={() => handleActiveMenu(link.id, link.children !== undefined)}
+                onClick={() => {
+                  handleActiveMenu(link.id, link.children !== undefined);
+                  if (link.children !== undefined) {
+                    orientation !== 'landscape-primary' && setHeight(480);
+                    setSubmenuOpened((prevState) => !prevState);
+                  }
+                }}
                 key={link.id}
                 className={`responsive__menu__item ${
                   activeMenu && activeMenu === link.id ? 'responsive__menu__active' : ''

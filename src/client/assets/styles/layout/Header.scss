@@ -1,8 +1,13 @@
+  .link-text {
+    color: blue;
+  }
+  
 .header {
   background-color: var(--color-primary);
   width: 100%;
   z-index: 1000;
   position: relative;
+
 
   &--fixed{
     position: fixed;
@@ -84,11 +89,14 @@
     }
   }
 
+  &__img__area {
+    line-height: 0;
+  }
 
   &__img {
-    position: absolute;
-    height: 100%;
-    width: 100%;
+    // position: absolute;
+    // height: 100%;
+    // width: 100%;
     object-fit: contain;
   }
 
@@ -188,12 +196,12 @@
   &__nav__dropdown__anc {
     font-family: var(--font-main);
     font-weight: 600;
-    font-size: 20px;
-    line-height: 24px;
+    font-size: 16px;
+    line-height: 20px;
   }
 
   &__nav__dropdown__list {
-    padding: 28px 64px 28px 30px;
+    padding: 16px 16px 16px 32px;
     grid-gap: 28px;
 
   }
@@ -202,21 +210,28 @@
     // padding: 28px 64px 0 20px;
     position: relative;
 
-    &::before {
-      content: "";
-      position: absolute;
-      top: 8px;
-      left: -14px;
-      width: 5px;
-      height: 5px;
-      background-color: var(--color-white);
-      border-radius: 50%;
-    }
+    // &::before {
+    //   content: "";
+    //   position: absolute;
+    //   top: 8px;
+    //   left: -14px;
+    //   width: 5px;
+    //   height: 5px;
+    //   background-color: var(--color-white);
+    //   border-radius: 50%;
+    // }
   }
 
   &__rgt__btns {
     grid-gap: 20px;
-
+    .new-message {
+      color: white;
+      font-size: 16px;
+      line-height: 18px;
+      @media (max-width: 500px) {
+        font-size: 12px;
+      }
+    }
     @media (max-width: 500px) {
       grid-gap: 15px;
     }
@@ -344,26 +359,26 @@
   }
 
   &__dropdown__list-visible{
-    padding: 14px 0 28px 0;
-height: auto;
-overflow: inherit;
-opacity: 1;
-visibility: visible;
+    padding: 14px 0 14px 0;
+    height: auto;
+    overflow: inherit;
+    opacity: 1;
+    visibility: visible;
   }
 
   &__dropdown__link{
     position: relative;
-    &::before {
-      content: "";
-      position: absolute;
-      top: 8px;
-      left: -14px;
-      width: 5px;
-      height: 5px;
-      background-color: var(--color-white);
-      border-radius: 50%;
+    // &::before {
+    //   content: "";
+    //   position: absolute;
+    //   top: 8px;
+    //   left: -14px;
+    //   width: 5px;
+    //   height: 5px;
+    //   background-color: var(--color-white);
+    //   border-radius: 50%;
     
-    }
+    // }
     
   }
 

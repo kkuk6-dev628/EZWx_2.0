@@ -56,7 +56,6 @@ const App = ({ Component, ...rest }: AppProps) => {
         <title>EZWxBrief 2.0</title>
         <Header />
         <Component {...pageProps} />
-        {showFooter && <Footer />}
       </Provider>
     </>
   );

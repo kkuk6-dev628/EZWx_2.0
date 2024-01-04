@@ -4,6 +4,7 @@ import HomeHero from '../components/home/HomeHero';
 import HomeAbout from '../components/home/HomeAbout';
 
 import FlexiblePricing from '../components/shared/FlexiblePricing';
+import Footer from '../components/layout/Footer';
 
 const Home: NextPage<{ data: string }> = () => {
   return (
@@ -11,6 +12,7 @@ const Home: NextPage<{ data: string }> = () => {
       <HomeHero />
       <HomeAbout />
       <FlexiblePricing content={undefined} isShowBtn={undefined} />
+      <Footer />
     </div>
   );
 };
