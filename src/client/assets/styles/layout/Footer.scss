@@ -1,6 +1,18 @@
 .ftr{
   padding: 18px;
   background-color: white;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 100;
+  @media (max-width: 650px) {
+    position: relative;
+  }
+ 
+  p.text {
+    color: black;
+  }
   &__wrp{
     display: flex;
     justify-content: space-between;
@@ -21,6 +33,7 @@
     align-items: center;
     grid-gap: 18px;
     justify-content: flex-end;
+    margin: 0 20px;
 
     @media (max-width: 650px) {
       justify-content: center;

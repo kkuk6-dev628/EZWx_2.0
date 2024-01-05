@@ -11,7 +11,7 @@ const Home: NextPage<{ data: string }> = () => {
     <div className="home">
       <HomeHero />
       <HomeAbout />
-      <FlexiblePricing content={undefined} isShowBtn={undefined} />
+      <FlexiblePricing />
       <Footer />
     </div>
   );

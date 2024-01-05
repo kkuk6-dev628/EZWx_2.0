@@ -112,6 +112,46 @@ export class ViewController {
   public async PilotsGuide(@Req() req: Request, @Res() res: Response) {
     await this.handler(req, res);
   }
+  @UseGuards(JwtAuthGuard)
+  @Get('instant-answers')
+  public async InstantAnswers(@Req() req: Request, @Res() res: Response) {
+    await this.handler(req, res);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('amazing-imagery')
+  public async AmazingImagery(@Req() req: Request, @Res() res: Response) {
+    await this.handler(req, res);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('stunning-visualizations')
+  public async StunningVisualizations(@Req() req: Request, @Res() res: Response) {
+    await this.handler(req, res);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('pricing')
+  public async Pricing(@Req() req: Request, @Res() res: Response) {
+    await this.handler(req, res);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('contact-us')
+  public async ContactUs(@Req() req: Request, @Res() res: Response) {
+    await this.handler(req, res);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('support')
+  public async Support(@Req() req: Request, @Res() res: Response) {
+    await this.handler(req, res);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('team-ezwxbrief')
+  public async Team(@Req() req: Request, @Res() res: Response) {
+    await this.handler(req, res);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('faq')
+  public async Faq(@Req() req: Request, @Res() res: Response) {
+    await this.handler(req, res);
+  }
 
   @Get('_next*')
   public async assets(@Req() req: Request, @Res() res: Response) {

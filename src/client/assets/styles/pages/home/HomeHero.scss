@@ -1,9 +1,11 @@
 .home {
   height: calc(100% - 75px);
-  overflow: auto;
+  overflow: hidden auto;
 }
 .hero {
-
+  p, h1, h2, h3, h4, h5 {
+    font-family: 'Montserrat', sans-serif;
+  }
   &__slider {
     position: relative;
     height: 0;
@@ -42,7 +44,7 @@
     color: var(--color-white);
     margin-bottom: 30px;
     font-weight: 700;
-    font-size: 46px;
+    font-size: 4vh;
 
     @media (max-width: 991px) {
       font-weight: 400;
@@ -51,7 +53,7 @@
   }
 
   &__subtitle {
-    font-size: 28px;
+    font-size: 3vh;
     color: var(--color-white);
     margin-bottom: 30px;
 
@@ -65,4 +67,36 @@
     display: block;
   }
 
+}
+.content-page {
+  overflow: auto;
+  height: calc(100vh - 48px);
+  .img-content-background {
+    position: absolute;
+  }
+  .content-container {
+    z-index: 10;
+    position: relative;
+    text-align: center;
+    padding: 40px 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    @media (max-width: 500px) {
+      padding: 20px 0;
+    }
+    p, h1 {
+      color: white;
+    }
+    h1 {
+      font-size: 1.8rem;
+    }
+    p {
+      font-size: 1.2rem;
+      margin: 20px;
+    }
+    button {
+      margin: 20px;
+    }
+  }
 }

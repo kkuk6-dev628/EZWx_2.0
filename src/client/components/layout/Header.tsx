@@ -48,7 +48,7 @@ const menusHome: menuItem[] = [
   {
     id: 3,
     name: 'Pricing',
-    link: '/home#pricing',
+    link: '/pricing',
   },
   {
     id: 4,
@@ -102,7 +102,7 @@ const menusHomeNotAuth: menuItem[] = [
   {
     id: 3,
     name: 'Pricing',
-    link: '/home#pricing',
+    link: '/pricing',
   },
   {
     id: 4,

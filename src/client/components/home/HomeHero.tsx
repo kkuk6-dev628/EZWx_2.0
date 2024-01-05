@@ -4,8 +4,10 @@ import { Navigation, Autoplay } from 'swiper';
 import Image from 'next/image';
 import 'swiper/css/navigation';
 import 'swiper/css';
+import { useRouter } from 'next/router';
 
 function HomeHero() {
+  const router = useRouter();
   return (
     <div className="hero">
       <div className="hero__slider__area">
@@ -21,7 +23,9 @@ function HomeHero() {
             <div className="container hero__slider__content">
               <h1 className="hero__title">Featuring the EZDeparture Advisor</h1>
               <p className="hero__subtitle">With personal weather minimums to stack the deck in your favor</p>
-              <button className="btn btn--primary">Learn More</button>
+              <button className="btn btn--primary" onClick={() => router.push('/instant-answers')}>
+                Learn More
+              </button>
             </div>
           </SwiperSlide>
           <SwiperSlide className="hero__slider">
@@ -29,7 +33,9 @@ function HomeHero() {
             <div className="container hero__slider__content">
               <h1 className="hero__title">Comprehensive weather imagery</h1>
               <p className="hero__subtitle">This is not your ordinary static imagery</p>
-              <button className="btn btn--primary">Learn More</button>
+              <button className="btn btn--primary" onClick={() => router.push('/amazing-imagery')}>
+                Learn More
+              </button>
             </div>
           </SwiperSlide>
           <SwiperSlide className="hero__slider">
@@ -37,7 +43,9 @@ function HomeHero() {
             <div className="container hero__slider__content">
               <h1 className="hero__title">Vertical route profile adds absolute clarity</h1>
               <p className="hero__subtitle">Enjoy the simplicity of EZWxBrief!™</p>
-              <button className="btn btn--primary">Learn More</button>
+              <button className="btn btn--primary" onClick={() => router.push('/stunning-visualizations')}>
+                Learn More
+              </button>
             </div>
           </SwiperSlide>
         </Swiper>
