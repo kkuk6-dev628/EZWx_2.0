@@ -1,17 +1,15 @@
 .ftr{
-  padding: 18px;
+  padding: 18px 0;
   background-color: white;
-  position: absolute;
-  left: 0;
-  bottom: 0;
+  position: relative;
   width: 100%;
   z-index: 100;
-  @media (max-width: 650px) {
-    position: relative;
-  }
  
   p.text {
     color: black;
+    @media (max-width: 650px) {
+      font-size: 13px;
+    }    
   }
   &__wrp{
     display: flex;

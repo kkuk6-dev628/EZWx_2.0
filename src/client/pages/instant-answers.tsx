@@ -38,7 +38,6 @@ function InstantAnswers() {
           </button>
         )}
       </div>
-      <Footer></Footer>
     </div>
   );
 }

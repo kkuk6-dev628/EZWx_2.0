@@ -12,7 +12,6 @@ const Home: NextPage<{ data: string }> = () => {
       <HomeHero />
       <HomeAbout />
       <FlexiblePricing />
-      <Footer />
     </div>
   );
 };

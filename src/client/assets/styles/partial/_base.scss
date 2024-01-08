@@ -6,6 +6,8 @@ body {
   overflow: hidden;
   width: 100%;
   height: 100%;
+  font-weight: 400;
+  line-height: 1.47;
 }
 body::-webkit-scrollbar{
     display: none;
@@ -26,6 +28,12 @@ p {
 	font-size: rem($fs-base);
 	letter-spacing: 0.1px;
   color: var(--color-dark);
+  font-weight: 400;
+  line-height: 1.47;
+}
+
+strong {
+  font-weight: 500;
 }
 
 a {
@@ -40,6 +48,11 @@ ul{
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+@font-face {
+    font-family: "bahnschrift";
+    src: url("/fonts/BAHNSCHRIFT.TTF") format("truetype");
 }
 
 .container {
@@ -101,7 +114,9 @@ ul{
 
   &--transparent{
     
-  }
-
-  
+  }  
+}
+.root {
+  height: calc(100% - 75px);
+  overflow: hidden auto;
 }

@@ -82,7 +82,6 @@ function Pricing() {
           </button>
         </div>
       )}
-      <Footer />
     </div>
   );
 }

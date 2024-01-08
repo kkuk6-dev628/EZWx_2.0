@@ -37,7 +37,6 @@ function AmazingImagery() {
           </button>
         )}
       </div>
-      <Footer></Footer>
     </div>
   );
 }

@@ -68,7 +68,7 @@ const menusHome: menuItem[] = [
       {
         id: 8,
         name: 'Contact Us',
-        link: '/contact',
+        link: '/contact-us',
       },
       {
         id: 9,
@@ -78,7 +78,7 @@ const menusHome: menuItem[] = [
       {
         id: 10,
         name: 'Team EZWxBrief',
-        link: '/team',
+        link: '/team-ezwxbrief',
       },
     ],
   },
@@ -122,7 +122,7 @@ const menusHomeNotAuth: menuItem[] = [
       {
         id: 7,
         name: 'Contact Us',
-        link: '/contact',
+        link: '/contact-us',
       },
       {
         id: 8,
@@ -132,7 +132,7 @@ const menusHomeNotAuth: menuItem[] = [
       {
         id: 9,
         name: 'Team EZWxBrief',
-        link: '/team',
+        link: '/team-ezwxbrief',
       },
     ],
   },
@@ -275,6 +275,7 @@ export default function Header() {
   };
 
   function handleClickMenu(e, link) {
+    setActiveResponsiveMenu(false);
     switch (link) {
       case '/airportwx':
         e.preventDefault();
@@ -555,7 +556,12 @@ const ResponsiveMenu = ({
                   activeMenu && activeMenu === link.id ? 'responsive__menu__active' : ''
                 }`}
               >
-                <Link href={link.link} onClick={(e) => handleClickMenu(e, link.link)}>
+                <Link
+                  href={link.link}
+                  onClick={(e) => {
+                    handleClickMenu(e, link.link);
+                  }}
+                >
                   <span className="responsive__menu__link">{link.name}</span>
                 </Link>
                 {link.children && (
@@ -571,7 +577,13 @@ const ResponsiveMenu = ({
                   }`}
                 >
                   {link.children.map((child) => (
-                    <Link href={child.link} key={child.id}>
+                    <Link
+                      href={child.link}
+                      key={child.id}
+                      onClick={(e) => {
+                        handleClickMenu(e, link.link);
+                      }}
+                    >
                       <span className="responsive__menu__dropdown__link">{child.name}</span>
                     </Link>
                   ))}

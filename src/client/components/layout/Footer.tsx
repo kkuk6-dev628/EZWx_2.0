@@ -1,6 +1,6 @@
 import React from 'react';
 import { GrFacebook } from 'react-icons/gr';
-import { FaTwitterSquare, FaYoutubeSquare } from 'react-icons/fa';
+import { FaYoutubeSquare } from 'react-icons/fa';
 import { BsInstagram } from 'react-icons/bs';
 function Footer() {
   const year = new Date().getFullYear();
@@ -13,7 +13,7 @@ function Footer() {
           </div>
           <div className="ftr__rgt">
             <div className="ftr__rgt__items">
-              <a target="_blank" href="/eula" className="ftr__rgt__item">
+              <a href="/account/eula" className="ftr__rgt__item">
                 License
               </a>
               <a target="_blank" href="https://facebook.com/ezwxbrief" className="ftr__rgt__item ftr__fb">

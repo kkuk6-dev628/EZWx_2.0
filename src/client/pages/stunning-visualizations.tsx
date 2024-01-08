@@ -41,7 +41,6 @@ function StunningVisualizations() {
           </button>
         )}
       </div>
-      <Footer></Footer>
     </div>
   );
 }

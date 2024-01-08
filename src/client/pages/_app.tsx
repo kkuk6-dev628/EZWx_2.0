@@ -27,7 +27,7 @@ const App = ({ Component, ...rest }: AppProps) => {
   }, []);
 
   useEffect(() => {
-    if (['/map', '/imagery', '/route-profile', '/airportwx'].includes(pathname)) {
+    if (['/map', '/imagery', '/route-profile', '/airportwx', '/dashboard'].includes(pathname)) {
       setShowFooter(false);
     } else {
       setShowFooter(true);
@@ -55,7 +55,10 @@ const App = ({ Component, ...rest }: AppProps) => {
         </Script>
         <title>EZWxBrief 2.0</title>
         <Header />
-        <Component {...pageProps} />
+        <div className="root" style={{ overflowY: showFooter ? 'auto' : 'hidden' }}>
+          <Component {...pageProps} />
+          {showFooter && <Footer />}
+        </div>
       </Provider>
     </>
   );
