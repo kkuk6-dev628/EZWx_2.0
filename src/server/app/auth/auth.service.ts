@@ -4,10 +4,12 @@ import * as bcrypt from 'bcrypt';
 import { UserService } from '../user/user.service';
 import { TypeORMError } from 'typeorm';
 import { JwtAuthService } from './jwt/jwt-auth.service';
+import { MailService } from '../mail/mail.service';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService, private jwtService: JwtAuthService) {}
+  constructor(private userService: UserService, private jwtService: JwtAuthService, private mailService: MailService) {}
 
   async signup(dto: AuthSignupDto) {
     const hash = await bcrypt.hash(dto.password, 2);
@@ -86,5 +88,18 @@ export class AuthService {
       email: user.email,
       displayName: user.displayName,
     };
+  }
+
+  async resetPasswordStart(host: string, email) {
+    const user = await this.userService.findOne({
+      where: {
+        email: email,
+      },
+    });
+    if (user) {
+      return this.mailService.sendResetPasswordMail(host, user, 'ssdfsdf');
+    } else {
+      return false;
+    }
   }
 }

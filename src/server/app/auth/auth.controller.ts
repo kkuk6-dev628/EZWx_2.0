@@ -49,6 +49,11 @@ export class AuthController {
     return this.authService.getUser(request.user.id);
   }
 
+  @Get('reset-password-start')
+  async resetPasswordStart(@Request() request) {
+    return this.authService.resetPasswordStart(request.get('Host'), request.query.email);
+  }
+
   @Post('signout')
   @HttpCode(HttpStatus.NO_CONTENT)
   async signout(@Res() res: Response) {

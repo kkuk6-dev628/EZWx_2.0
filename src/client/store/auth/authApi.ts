@@ -87,7 +87,7 @@ const authApi = apiSlice.injectEndpoints({
       },
     }),
     existUser: builder.query<boolean, string>({
-      query: (email) => ({ url: '/user/find?email=' + email }),
+      query: (email) => ({ url: '/auth/reset-password-start?email=' + email }),
     }),
   }),
 });

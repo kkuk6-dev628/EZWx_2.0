@@ -14,6 +14,7 @@ import { UserModule } from './user/user.module';
 import { typeOrmConfig } from 'ormconfig';
 import { CertificationModule } from './certification/certification.module';
 import { SettingsModule } from './settings/settings.module';
+import { MailModule } from './mail/mail.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,6 +32,7 @@ import { SettingsModule } from './settings/settings.module';
     UserModule,
     CertificationModule,
     SettingsModule,
+    MailModule,
   ],
   providers: [AppService],
   controllers: [AppController],
