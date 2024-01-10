@@ -21,6 +21,17 @@ export class UserController {
     return user;
   }
 
+  @Get('find')
+  async find(@Query() query: any) {
+    console.log('query is ', query);
+    const user = await this.userService.findOne({
+      where: {
+        email: query.email,
+      },
+    });
+    return user ? true : false;
+  }
+
   @Put('update/:id')
   update(@Param('id') id: string, @Body() updateUserDto: any) {
     return this.userService.update(id, updateUserDto);

@@ -5,7 +5,7 @@ import { userLoggedIn, userLoggedOut } from './authSlice';
 const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     signup: builder.mutation<authUser, any>({
-      query: (data) => ({
+      query: (data: any) => ({
         url: '/auth/signup',
         method: 'POST',
         body: data,
@@ -86,7 +86,10 @@ const authApi = apiSlice.injectEndpoints({
         }
       },
     }),
+    existUser: builder.query<boolean, string>({
+      query: (email) => ({ url: '/user/find?email=' + email }),
+    }),
   }),
 });
 
-export const { useSigninMutation, useSignupMutation, useGetUserQuery, useSignoutMutation } = authApi;
+export const { useSigninMutation, useSignupMutation, useGetUserQuery, useSignoutMutation, useExistUserQuery } = authApi;

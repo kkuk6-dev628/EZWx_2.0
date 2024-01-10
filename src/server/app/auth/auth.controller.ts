@@ -11,32 +11,36 @@ export class AuthController {
   @Post('signup')
   async signup(@Body(new ValidationPipe()) dto: AuthSignupDto, @Res() res: Response) {
     const { access_token, id, email, displayName } = await this.authService.signup(dto);
-    res
-      .cookie('access_token', access_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-      })
-      .cookie('logged_in', true)
-      .status(HttpStatus.OK)
-      .json({ message: 'Signup successfully 😊 👌', id, email, displayName });
+    return (
+      res
+        .cookie('access_token', access_token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+        })
+        .cookie('logged_in', true)
+        // .status(HttpStatus.OK)
+        .json({ message: 'Signup successfully', id, email, displayName })
+    );
   }
 
   @Post('signin')
   async signin(@Body(new ValidationPipe()) dto: AuthSinginDto, @Res() res: Response) {
     const { access_token, id, email, displayName } = await this.authService.signin(dto);
-    res
-      .cookie('access_token', access_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-      })
-      .cookie('logged_in', true)
-      .status(HttpStatus.OK)
-      .json({
-        message: 'Logged in successfully 😊 👌',
-        id,
-        email,
-        displayName,
-      });
+    return (
+      res
+        .cookie('access_token', access_token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+        })
+        .cookie('logged_in', true)
+        // .status(HttpStatus.OK)
+        .json({
+          message: 'Logged in successfully',
+          id,
+          email,
+          displayName,
+        })
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -50,6 +54,6 @@ export class AuthController {
   async signout(@Res() res: Response) {
     res.clearCookie('access_token', { httpOnly: true });
     res.clearCookie('logged_in');
-    res.send({ message: 'Signout Successful' });
+    return res.json({ message: 'Signout Successful' });
   }
 }

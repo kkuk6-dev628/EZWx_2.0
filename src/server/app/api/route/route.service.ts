@@ -144,7 +144,7 @@ export class RouteService {
 
   async cleanRoutes(user: User) {
     const ids = await this.routeRepository.find({
-      select: ['id'],
+      select: ['id', 'updated_at'],
       where: {
         user: user,
       },

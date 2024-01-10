@@ -9,6 +9,7 @@ import { api } from '../../utils';
 import { useSigninMutation, useSignoutMutation } from '../../store/auth/authApi';
 import { Drawer } from '@mui/material';
 import { RxCross2 } from 'react-icons/rx';
+import { useCookies } from 'react-cookie';
 
 //handleProfileModal
 
@@ -22,16 +23,19 @@ function ProfileModal({ handleProfileModal, isShowProfileModal, setIsUserLoginUs
   const router = useRouter();
   const user = useSelector(selectAuth);
   const dispatch = useDispatch();
-  const [signoutApi, signoutApiResult] = useSignoutMutation();
+  const [signoutApi] = useSignoutMutation();
+  const [cookies, setCookie, removeCookie] = useCookies(['logged_in']);
 
   const changeRoute = () => {
     handleProfileModal();
     setIsUserLoginUser(false);
-    router.push('/map');
+    router.push('/home');
   };
 
   const handleSignout = () => {
     handleProfileModal();
+    router.push('/home');
+    removeCookie('logged_in');
     signoutApi(null);
   };
 

@@ -74,9 +74,9 @@ const faqData = [
         question: 'Q. Do you offer a trial membership?',
         answer: (
           <>
-            A. Yes. You can <a href="/account/register">register</a> for a 30-day trial membership and get access to all
+            A. Yes. You can <a href="/account/register">register</a> for a 30 day trial membership and get access to all
             of the features in this progressive web app. If you do not want to continue beyond 30 days, simply cancel
-            your membership in your user profile prior to the 30-day trial period and there will be no cost to you.
+            your membership in your user profile prior to the 30 day trial period and there will be no cost to you.
           </>
         ),
       },
@@ -118,7 +118,7 @@ const faqData = [
         answer: (
           <>
             A. No. We do not offer any discounts for the monthly memberships. When you register, you will get to try out
-            the EZWxBrief app for 30-days for free. You can cancel your membership at any time.
+            the EZWxBrief app for 30 days for free. You can cancel your membership at any time.
           </>
         ),
       },
@@ -152,8 +152,9 @@ const faqData = [
         answer: (
           <>
             Yes. The avwxworkshops.com domain was retired in March 2023. Many of these workshops were created over a
-            decade ago and have reach their end of life. All of the educational material can be found in the EZWxBrief
-            blog along with videos posted in the EZWxBrief <a href="https://youtube.com/@ezwxbrief">YouTube channel</a>.
+            decade ago and have reach their end of life. All of the educational material can be found in the{' '}
+            <a href="https://avwxtraining.com/blog">EZWxBrief blog</a> along with videos posted in the EZWxBrief{' '}
+            <a href="https://youtube.com/@ezwxbrief">YouTube channel</a>.
           </>
         ),
       },
@@ -183,8 +184,8 @@ const faqData = [
             password, simply go to the <a href="https://ezwxbrief.com/account/login">sign in screen</a> and click on the
             Forgot my password link. An email will be sent to you shortly with instructions on how to reset your
             password (please check your spam folder). If you are not sure of the email address you used when you joined
-            or forgot your password, you can always reach out to our support team here. We'd be happy to help get you
-            into your account.
+            or forgot your password, you can always reach out to <Link href="/contact-us">our support team</Link> here.
+            We'd be happy to help get you into your account.
           </>
         ),
       },
@@ -203,7 +204,7 @@ const faqData = [
           <>
             A. No. At this time, we do not provide a native app. However, EZWxBrief is designed to run as a progressive
             web application (PWA) on all devices and will look and feel just like any native app. Go to{' '}
-            <a href="https://www.avwxtraining.com/post/eztip-no-8-ezwxbrief-as-a-progressive-web-app">this blog post</a>
+            <a href="https://www.avwxtraining.com/post/eztip-no-8-ezwxbrief-as-a-progressive-web-app">this blog post</a>{' '}
             to learn more about how to install EZWxBrief as a PWA.
           </>
         ),

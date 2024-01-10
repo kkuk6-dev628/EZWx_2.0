@@ -20,12 +20,16 @@ import { PaperComponent } from '../common/PaperComponent';
 import { setViewHeight, setViewWidth } from '../../store/airportwx/airportwx';
 import { useOrientation } from 'react-use';
 import {
+  selectLoadedLandingPage,
   selectShowSavedView,
   selectShowSettingsView,
+  setLoadedLandingPage,
   setShowSavedView,
   setShowSettingsView,
 } from '../../store/header/header';
 import { DraggableDlg } from '../common/DraggableDlg';
+import { useGetUserSettingsQuery } from '../../store/user/userSettingsApi';
+import { landingPages } from '../../utils/constants';
 const FavoritesDrawer = dynamic(() => import('../shared/FavoritesDrawer'), { ssr: false });
 
 interface menuItem {
@@ -201,10 +205,16 @@ export default function Header() {
   const showSavedView = useSelector(selectShowSavedView);
   const auth = useSelector(selectAuth);
   const showInformation = useSelector(selectShowInformation);
+  const loadedLandingPage = useSelector(selectLoadedLandingPage);
   const [cookies] = useCookies(['logged_in']);
   useGetUserQuery(null, { refetchOnMountOrArgChange: true });
   const dispatch = useDispatch();
   const { type: orientation } = useOrientation();
+  const { data: settings } = useGetUserSettingsQuery({
+    skip: !auth.id,
+    refetchOnMountOrArgChange: true,
+  });
+  const router = useRouter();
 
   useEffect(() => {
     if (
@@ -223,11 +233,18 @@ export default function Header() {
     } else {
       setIsUserLoginUser(false);
     }
-  }, [pathname]);
+  }, [pathname, auth, cookies]);
 
   useEffect(() => {
     setActiveResponsiveMenu(false);
   }, [orientation]);
+
+  useEffect(() => {
+    if (!loadedLandingPage && settings) {
+      router.push(landingPages[settings.landing_page]?.url || '/dashboard');
+      dispatch(setLoadedLandingPage(true));
+    }
+  }, [settings]);
 
   const handleActiveMenu = (id, hideResponsiveMenu) => {
     setActiveMenu((prevState) => (prevState === id ? 0 : id));
@@ -440,7 +457,7 @@ export default function Header() {
                   </div>
                   <button className="header__rgt__btn header__rgt__btn--rgt btn">
                     <Link href="/signup">Join Now</Link>
-                    <Link href="/signin"> | Sign in</Link>
+                    <Link href="/signin"> | Sign In</Link>
                   </button>
                 </>
               )}

@@ -61,6 +61,7 @@ export class ViewController {
     await this.viewService.getNextServer().render(req, res, parsedUrl.pathname);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('map')
   public async tryEZWxBrief(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);
@@ -71,6 +72,7 @@ export class ViewController {
       .render(req, res, parsedUrl.pathname, Object.assign(parsedUrl.query, serverSideProps));
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('imagery')
   public async imagery(@Req() req: Request, @Res() res: Response) {
     const parsedUrl = parse(req.url, true);
@@ -150,6 +152,11 @@ export class ViewController {
 
   @Get('faq')
   public async Faq(@Req() req: Request, @Res() res: Response) {
+    await this.handler(req, res);
+  }
+
+  @Get('reset-password')
+  public async ResetPassword(@Req() req: Request, @Res() res: Response) {
     await this.handler(req, res);
   }
 
