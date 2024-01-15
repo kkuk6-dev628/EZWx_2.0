@@ -89,7 +89,25 @@ const authApi = apiSlice.injectEndpoints({
     existUser: builder.query<boolean, string>({
       query: (email) => ({ url: '/auth/reset-password-start?email=' + email }),
     }),
+    validateToken: builder.query<{ email: string }, string>({
+      query: (token) => ({ url: '/auth/validate-token/' + token }),
+    }),
+    reset: builder.mutation<any, any>({
+      query: (data) => ({
+        url: '/auth/reset-password',
+        method: 'POST',
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { useSigninMutation, useSignupMutation, useGetUserQuery, useSignoutMutation, useExistUserQuery } = authApi;
+export const {
+  useSigninMutation,
+  useSignupMutation,
+  useGetUserQuery,
+  useSignoutMutation,
+  useExistUserQuery,
+  useValidateTokenQuery,
+  useResetMutation,
+} = authApi;

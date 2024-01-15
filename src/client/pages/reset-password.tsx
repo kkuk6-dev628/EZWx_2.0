@@ -37,7 +37,6 @@ function ResetPassword() {
         </div>
       ) : (
         <>
-          {' '}
           <div className="description">
             <h3>Do you need to reset your password?</h3>
             <h1>Not a problem. Happens to the best of us. Just use the form below to reset it!</h1>

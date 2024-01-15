@@ -1,12 +1,13 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res, UseGuards, Request, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthSignupDto, AuthSinginDto } from './dto';
 import { ValidationPipe } from '@nestjs/common';
 import { Response } from 'express';
 import { JwtAuthGuard } from './jwt/jwt-auth.guard';
+import { UserService } from '../user/user.service';
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private userService: UserService) {}
 
   @Post('signup')
   async signup(@Body(new ValidationPipe()) dto: AuthSignupDto, @Res() res: Response) {
@@ -52,6 +53,17 @@ export class AuthController {
   @Get('reset-password-start')
   async resetPasswordStart(@Request() request) {
     return this.authService.resetPasswordStart(request.get('Host'), request.query.email);
+  }
+
+  @Get('validate-token/:token')
+  async validateToken(@Param('token') token) {
+    console.log(token);
+    return this.userService.validateToken(token);
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() dto: AuthSinginDto) {
+    return this.authService.updatePassword(dto);
   }
 
   @Post('signout')

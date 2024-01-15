@@ -15,6 +15,7 @@ import { typeOrmConfig } from 'ormconfig';
 import { CertificationModule } from './certification/certification.module';
 import { SettingsModule } from './settings/settings.module';
 import { MailModule } from './mail/mail.module';
+import { ViewModule } from '../view/view.module';
 @Module({
   imports: [
     ConfigModule.forRoot({

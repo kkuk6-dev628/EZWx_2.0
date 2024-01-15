@@ -28,7 +28,6 @@ function ProfileModal({ handleProfileModal, isShowProfileModal, setIsUserLoginUs
 
   const changeRoute = () => {
     handleProfileModal();
-    setIsUserLoginUser(false);
     router.push('/home');
   };
 

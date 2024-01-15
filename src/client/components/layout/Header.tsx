@@ -464,26 +464,30 @@ export default function Header() {
             </div>
           </div>
         </div>
-        <SettingsDrawer
-          isShowSettingsDrawer={showSettingsView}
-          setIsShowSettingsDrawer={(show) => dispatch(setShowSettingsView(show))}
-        />
-        <FavoritesDrawer isOpen={showSavedView} onClose={() => dispatch(setShowSavedView(false))} />
-        <ProfileModal
-          setIsUserLoginUser={setIsUserLoginUser}
-          isShowProfileModal={isShowProfileModal}
-          handleProfileModal={handleProfileModal}
-        />
-        <Dialog
-          PaperComponent={PaperComponent}
-          hideBackdrop
-          disableEnforceFocus
-          style={{ position: 'absolute' }}
-          open={showAirportSelect}
-          onClose={() => setShowAirportSelect(false)}
-        >
-          <AirportSelectModal setIsShowModal={setShowAirportSelect} />
-        </Dialog>
+        {isUserLoginUser && (
+          <>
+            <SettingsDrawer
+              isShowSettingsDrawer={showSettingsView}
+              setIsShowSettingsDrawer={(show) => dispatch(setShowSettingsView(show))}
+            />
+            <FavoritesDrawer isOpen={showSavedView} onClose={() => dispatch(setShowSavedView(false))} />
+            <ProfileModal
+              setIsUserLoginUser={setIsUserLoginUser}
+              isShowProfileModal={isShowProfileModal}
+              handleProfileModal={handleProfileModal}
+            />
+            <Dialog
+              PaperComponent={PaperComponent}
+              hideBackdrop
+              disableEnforceFocus
+              style={{ position: 'absolute' }}
+              open={showAirportSelect}
+              onClose={() => setShowAirportSelect(false)}
+            >
+              <AirportSelectModal setIsShowModal={setShowAirportSelect} />
+            </Dialog>
+          </>
+        )}
       </div>
       {pathname !== '/imagery' && (
         <DraggableDlg

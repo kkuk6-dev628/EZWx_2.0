@@ -1,16 +1,18 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { User } from './../user/user.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MailService {
-  constructor(private mailerService: MailerService) {}
+  constructor(private mailerService: MailerService, private config: ConfigService) {}
 
   async sendUserConfirmation(host: string, user: User, token: string) {
     const url = `${host}/auth/confirm?token=${token}`;
 
     await this.mailerService.sendMail({
       to: user.email,
+      cc: this.config.get('MAIL_CC'),
       // from: '"Support Team" <support@example.com>', // override default from
       subject: 'Welcome to EZWxBrief 2.0! Confirm your Email',
       template: './confirmation', // `.hbs` extension is appended automatically
@@ -27,6 +29,7 @@ export class MailService {
 
     await this.mailerService.sendMail({
       to: user.email,
+      bcc: this.config.get('MAIL_CC'),
       // from: '"Support Team" <support@example.com>', // override default from
       subject: 'Here are the instructions to reset your EZWxBrief password',
       template: './password-reset', // `.hbs` extension is appended automatically

@@ -159,6 +159,10 @@ export class ViewController {
   public async ResetPassword(@Req() req: Request, @Res() res: Response) {
     await this.handler(req, res);
   }
+  @Get('auth/reset')
+  public async ResetPasswordPage(@Req() req: Request, @Res() res: Response) {
+    await this.handler(req, res);
+  }
 
   @Get('account/eula')
   public async Eula(@Req() req: Request, @Res() res: Response) {

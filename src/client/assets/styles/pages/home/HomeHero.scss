@@ -362,7 +362,6 @@
   background-color: #504D7F;
   margin: auto;
   text-align: center;
-  padding-bottom: 40px;
   .description {
     padding: 40px 20px;
     h3 {
@@ -392,6 +391,9 @@
       @media (max-width: 500px) {
         max-width: calc(100% - 3rem);
       }
+      input:disabled {
+        background-color: #E0E0E0;
+      }
       .email-error-message {
         font-size: 13px;
         a {
@@ -401,6 +403,10 @@
       .btn-submit {
         display: flex;
         justify-content: flex-end;
+        button {
+          font-size: 1.2rem;
+          height: 40px;
+        }
       }
     }
   }
@@ -410,5 +416,11 @@
     font-size: 1.1875rem;
     opacity: 0.8;
     padding-top: 40px;
+    a {
+      font-size: 1.1875rem;
+      font-family: bahnschrift;
+      color: #886ab5;
+      text-decoration: underline;
+    }
   }
 }

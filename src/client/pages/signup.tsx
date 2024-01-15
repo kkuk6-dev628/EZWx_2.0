@@ -6,6 +6,7 @@ import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { useSignupMutation } from '../store/auth/authApi';
 import { useRouter } from 'next/router';
 import { api } from '../utils';
+import { validateConfirmPassword, validateEmail, validatePassword } from '../utils/utils';
 // import { error } from 'console';
 
 interface certifications {
@@ -69,32 +70,6 @@ function signup() {
     delete data.terms;
     delete data.newsletter;
     signup(data);
-  };
-
-  const validateEmail = (value: string) => {
-    const emailRegex =
-      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return emailRegex.test(value) ? true : 'Invalid email';
-  };
-
-  const validatePassword = (value: string) => {
-    console.log(value);
-    if (!value && value === '') {
-      return 'Password is required';
-    }
-
-    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\da-zA-Z]).{6,}$/;
-    return passwordRegex.test(value)
-      ? true
-      : 'Password must be at least 6 characters and contain at least one upper case (A-Z), one lower case (a-z), one number (0-9) and one special character (e.g. !@#$%^&*-,.)';
-  };
-
-  const validateConfirmPassword = (value: string) => {
-    console.log(value, 'hb ', password);
-    if (value !== password) {
-      return 'The password and confirm password do not match.';
-    }
-    return true;
   };
 
   // render logic
@@ -210,7 +185,7 @@ function signup() {
                   <input
                     {...register('confirmPassword', {
                       required: true,
-                      validate: validateConfirmPassword,
+                      validate: (value) => validateConfirmPassword(value, password),
                     })}
                     type="password"
                     id="password"

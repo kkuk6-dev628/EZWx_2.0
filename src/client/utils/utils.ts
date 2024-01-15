@@ -659,3 +659,28 @@ export function isSameSavedItem(a: SavedItemData, b: SavedItemData) {
       return isSameRoutes(a.data, b.data);
   }
 }
+
+export const validateEmail = (value: string) => {
+  const emailRegex =
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return emailRegex.test(value) ? true : 'Invalid email';
+};
+
+export const validatePassword = (value: string) => {
+  console.log(value);
+  if (!value && value === '') {
+    return 'Password is required';
+  }
+
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\da-zA-Z]).{6,}$/;
+  return passwordRegex.test(value)
+    ? true
+    : 'Password must be at least 6 characters and contain at least one upper case (A-Z), one lower case (a-z), one number (0-9) and one special character (e.g. !@#$%^&*-,.)';
+};
+
+export const validateConfirmPassword = (value: string, password: string) => {
+  if (value !== password) {
+    return 'The password and confirm password do not match.';
+  }
+  return true;
+};

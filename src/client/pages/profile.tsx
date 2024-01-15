@@ -8,6 +8,7 @@ import Switch from 'react-switch';
 import ChangePasswordModal from '../components/shared/ChangePasswordModal';
 import { useSelector } from 'react-redux';
 import { selectAuth } from '../store/auth/authSlice';
+import { SecondaryButton } from '../components/common';
 
 interface certifications {
   name: string;
@@ -593,6 +594,7 @@ function profile({ setIsShowModal }: Props) {
                 ))}
               </div>
               <div className="profile__submit__area">
+                <SecondaryButton text={'Abandon'} isLoading={false}></SecondaryButton>
                 <button className="profile__sub__btn">Save</button>
               </div>
             </form>

@@ -1,15 +1,21 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, Req, Res } from '@nestjs/common';
 import { AuthSignupDto, AuthSinginDto } from './dto';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '../user/user.service';
 import { TypeORMError } from 'typeorm';
 import { JwtAuthService } from './jwt/jwt-auth.service';
 import { MailService } from '../mail/mail.service';
-import { User } from '../user/user.entity';
+import { ViewService } from 'src/server/view/view.service';
+import { parse } from 'url';
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService, private jwtService: JwtAuthService, private mailService: MailService) {}
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtAuthService,
+    private mailService: MailService,
+    private viewService: ViewService,
+  ) {}
 
   async signup(dto: AuthSignupDto) {
     const hash = await bcrypt.hash(dto.password, 2);
@@ -97,9 +103,16 @@ export class AuthService {
       },
     });
     if (user) {
-      return this.mailService.sendResetPasswordMail(host, user, 'ssdfsdf');
+      const token = await this.userService.createToken(user);
+      return this.mailService.sendResetPasswordMail(host, user, token);
     } else {
       return false;
     }
+  }
+
+  async updatePassword(dto: AuthSinginDto) {
+    const hash = await bcrypt.hash(dto.password, 2);
+    const user = await this.userService.updatePassword(dto.email, hash);
+    return user.affected;
   }
 }
