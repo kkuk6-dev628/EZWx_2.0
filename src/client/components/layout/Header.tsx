@@ -12,7 +12,7 @@ import { selectAuth } from '../../store/auth/authSlice';
 import ZuluClock from '../shared/ZuluClock';
 import { useCookies } from 'react-cookie';
 import { useGetUserQuery } from '../../store/auth/authApi';
-import { Dialog } from '@mui/material';
+import { Avatar, Dialog } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { selectShowInformation, setShowInformation } from '../../store/imagery/imagery';
 import AirportSelectModal from '../airportwx/AirportSelectModal';
@@ -241,7 +241,7 @@ export default function Header() {
 
   useEffect(() => {
     if (!loadedLandingPage && settings) {
-      router.push(landingPages[settings.landing_page]?.url || '/dashboard');
+      // router.push(landingPages[settings.landing_page]?.url || '/dashboard');
       dispatch(setLoadedLandingPage(true));
     }
   }, [settings]);
@@ -447,7 +447,11 @@ export default function Header() {
                     }}
                     className="header__rgt__btn header__rgt__btn--icon btn"
                   >
-                    <SvgProfile />
+                    {auth.avatar ? (
+                      <Avatar src={`/user/${auth.avatar}`} alt="profile" sx={{ width: 32, height: 32 }} />
+                    ) : (
+                      <SvgProfile />
+                    )}
                   </button>
                 </div>
               ) : (

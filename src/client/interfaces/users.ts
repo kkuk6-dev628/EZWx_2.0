@@ -4,6 +4,7 @@ export interface authUser {
   email: string;
   id: string;
   displayName: string;
+  avatar: string;
 }
 
 export type TakeoffWeightCategory = 'light' | 'medium' | 'heavy';

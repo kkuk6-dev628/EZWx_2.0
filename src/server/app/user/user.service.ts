@@ -8,6 +8,7 @@ import { Certification } from '../certification/certification.entity';
 import { SavedItem } from '../api/favorites/saved.entity';
 import { Token } from './token.entity';
 import * as jwt from 'jsonwebtoken';
+import { unlink } from 'fs';
 
 @Injectable()
 export class UserService {
@@ -101,5 +102,19 @@ export class UserService {
 
   async updatePassword(email, hash) {
     return await this.userRepository.update({ email }, { hash: hash });
+  }
+
+  async setAvatar(userid: number, avatarPath: string) {
+    const user = await this.userRepository.findOneBy({ id: userid });
+    if (user.avatar) {
+      unlink(user.avatar, (err) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        console.log(`file removed ${user.avatar}`);
+      });
+    }
+    this.userRepository.update(userid, { avatar: avatarPath });
   }
 }

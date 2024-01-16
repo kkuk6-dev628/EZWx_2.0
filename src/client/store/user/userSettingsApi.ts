@@ -6,6 +6,7 @@ import { initialUserSettingsState, setUserSettings } from './UserSettings';
 import { setActiveRoute } from '../route/routes';
 
 const userSettingsApi = apiSlice.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     getUserSettings: builder.query({
       providesTags: [{ type: 'userSettings', id: 'LIST' }],

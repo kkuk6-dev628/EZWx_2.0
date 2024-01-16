@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { validateConfirmPassword, validatePassword } from '../../utils/utils';
 
 interface IFormInput {
   currentPassword: string;
@@ -30,25 +31,7 @@ function ChangePasswordModal({ setIsShowModal }: IProps) {
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
     console.log(data);
   };
-  const validatePassword = (value: string) => {
-    console.log(value);
-    if (!value && value === '') {
-      return 'Password is required';
-    }
 
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
-    return passwordRegex.test(value)
-      ? true
-      : 'Password must be at least 6 characters and contain at least one upper case (A-Z), one lower case (a-z), one number (0-9) and one special character (e.g. !@#$%^&*-,.)';
-  };
-
-  const validateConfirmPassword = (value: string) => {
-    console.log(value, 'hb ', password);
-    if (value !== password) {
-      return 'The password and confirm password do not match.';
-    }
-    return true;
-  };
   return (
     <div className="pmodal">
       <div className="pmodal__wrp">
@@ -62,7 +45,7 @@ function ChangePasswordModal({ setIsShowModal }: IProps) {
           <div className="csuinp">
             <div className="csuinp__ipt__wrp">
               <label htmlFor="password" className="csuinp__lbl">
-                Please pick a password *
+                Current Password *
               </label>
               <div className="csuinp__wrp__two">
                 <input
@@ -83,7 +66,7 @@ function ChangePasswordModal({ setIsShowModal }: IProps) {
           <div className="csuinp">
             <div className="csuinp__ipt__wrp">
               <label htmlFor="password" className="csuinp__lbl">
-                Please pick a password *
+                New Password *
               </label>
               <div className="csuinp__wrp__two">
                 <input
@@ -104,13 +87,13 @@ function ChangePasswordModal({ setIsShowModal }: IProps) {
           <div className="csuinp">
             <div className="csuinp__ipt__wrp">
               <label htmlFor="password" className="csuinp__lbl">
-                Please confirm your password *
+                Confirm Password *
               </label>
               <div className="">
                 <input
                   {...register('confirmPassword', {
-                    required: true,
-                    validate: validateConfirmPassword,
+                    required: 'Confirm password is required',
+                    validate: (value) => validateConfirmPassword(value, newPassword),
                   })}
                   type="password"
                   id="password"

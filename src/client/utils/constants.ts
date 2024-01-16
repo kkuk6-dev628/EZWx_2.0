@@ -225,3 +225,486 @@ export const landingPages = {
     name: 'Imagery',
   },
 };
+
+export const countryStates = [
+  {
+    Name: 'ALABAMA',
+    CountryId: '1',
+    Abbreviation: 'AL',
+  },
+  {
+    Name: 'ALASKA',
+    CountryId: '1',
+    Abbreviation: 'AK',
+  },
+  {
+    Name: 'NEW MEXICO',
+    CountryId: '1',
+    Abbreviation: 'NM',
+  },
+  {
+    Name: 'NEW JERSEY',
+    CountryId: '1',
+    Abbreviation: 'NJ',
+  },
+  {
+    Name: 'NEW HAMPSHIRE',
+    CountryId: '1',
+    Abbreviation: 'NH',
+  },
+  {
+    Name: 'NEVADA',
+    CountryId: '1',
+    Abbreviation: 'NV',
+  },
+  {
+    Name: 'NEBRASKA',
+    CountryId: '1',
+    Abbreviation: 'NE',
+  },
+  {
+    Name: 'MONTANA',
+    CountryId: '1',
+    Abbreviation: 'MT',
+  },
+  {
+    Name: 'MISSOURI',
+    CountryId: '1',
+    Abbreviation: 'MO',
+  },
+  {
+    Name: 'MISSISSIPPI',
+    CountryId: '1',
+    Abbreviation: 'MS',
+  },
+  {
+    Name: 'MINNESOTA',
+    CountryId: '1',
+    Abbreviation: 'MN',
+  },
+  {
+    Name: 'MICHIGAN',
+    CountryId: '1',
+    Abbreviation: 'MI',
+  },
+  {
+    Name: 'MASSACHUSETTS',
+    CountryId: '1',
+    Abbreviation: 'MA',
+  },
+  {
+    Name: 'MARYLAND',
+    CountryId: '1',
+    Abbreviation: 'MD',
+  },
+  {
+    Name: 'MAINE',
+    CountryId: '1',
+    Abbreviation: 'ME',
+  },
+  {
+    Name: 'LOUISIANA',
+    CountryId: '1',
+    Abbreviation: 'LA',
+  },
+  {
+    Name: 'KENTUCKY',
+    CountryId: '1',
+    Abbreviation: 'KY',
+  },
+  {
+    Name: 'IOWA',
+    CountryId: '1',
+    Abbreviation: 'IA',
+  },
+  {
+    Name: 'INDIANA',
+    CountryId: '1',
+    Abbreviation: 'IN',
+  },
+  {
+    Name: 'ILLINOIS',
+    CountryId: '1',
+    Abbreviation: 'IL',
+  },
+  {
+    Name: 'IDAHO',
+    CountryId: '1',
+    Abbreviation: '"ID"',
+  },
+  {
+    Name: 'HAWAII',
+    CountryId: '1',
+    Abbreviation: 'HI',
+  },
+  {
+    Name: 'GEORGIA',
+    CountryId: '1',
+    Abbreviation: 'GA',
+  },
+  {
+    Name: 'FLORIDA',
+    CountryId: '1',
+    Abbreviation: 'FL',
+  },
+  {
+    Name: 'DISTRICT OF COLUMBIA',
+    CountryId: '1',
+    Abbreviation: 'DC',
+  },
+  {
+    Name: 'DELAWARE',
+    CountryId: '1',
+    Abbreviation: 'DE',
+  },
+  {
+    Name: 'CONNECTICUT',
+    CountryId: '1',
+    Abbreviation: 'CL',
+  },
+  {
+    Name: 'COLORADO',
+    CountryId: '1',
+    Abbreviation: 'CO',
+  },
+  {
+    Name: 'CALIFORNIA',
+    CountryId: '1',
+    Abbreviation: 'CA',
+  },
+  {
+    Name: 'ARKANSAS',
+    CountryId: '1',
+    Abbreviation: 'AR',
+  },
+  {
+    Name: 'ARIZONA',
+    CountryId: '1',
+    Abbreviation: 'AZ',
+  },
+  {
+    Name: 'NEW YORK',
+    CountryId: '1',
+    Abbreviation: 'NY',
+  },
+  {
+    Name: 'KANSAS',
+    CountryId: '1',
+    Abbreviation: 'KS',
+  },
+  {
+    Name: 'NORTH DAKOTA',
+    CountryId: '1',
+    Abbreviation: 'ND',
+  },
+  {
+    Name: 'OHIO',
+    CountryId: '1',
+    Abbreviation: 'OH',
+  },
+  {
+    Name: 'OKLAHOMA',
+    CountryId: '1',
+    Abbreviation: 'OK',
+  },
+  {
+    Name: 'OREGON',
+    CountryId: '1',
+    Abbreviation: 'OK',
+  },
+  {
+    Name: 'PENNSYLVANIA',
+    CountryId: '1',
+    Abbreviation: 'PA',
+  },
+  {
+    Name: 'RHODE ISLAND',
+    CountryId: '1',
+    Abbreviation: 'RI',
+  },
+  {
+    Name: 'NORTH CAROLINA',
+    CountryId: '1',
+    Abbreviation: 'NC',
+  },
+  {
+    Name: 'SOUTH CAROLINA',
+    CountryId: '1',
+    Abbreviation: 'SC',
+  },
+  {
+    Name: 'SOUTH DAKOTA',
+    CountryId: '1',
+    Abbreviation: 'SD',
+  },
+  {
+    Name: 'TENNESSEE',
+    CountryId: '1',
+    Abbreviation: 'TN',
+  },
+  {
+    Name: 'TEXAS',
+    CountryId: '1',
+    Abbreviation: 'TX',
+  },
+  {
+    Name: 'UTAH',
+    CountryId: '1',
+    Abbreviation: 'UT',
+  },
+  {
+    Name: 'VERMONT',
+    CountryId: '1',
+    Abbreviation: 'VT',
+  },
+  {
+    Name: 'VIRGINIA',
+    CountryId: '1',
+    Abbreviation: 'VA',
+  },
+  {
+    Name: 'WASHINGTON',
+    CountryId: '1',
+    Abbreviation: 'WA',
+  },
+  {
+    Name: 'WEST VIRGINIA',
+    CountryId: '1',
+    Abbreviation: 'WV',
+  },
+  {
+    Name: 'WISCONSIN',
+    CountryId: '1',
+    Abbreviation: 'WI',
+  },
+  {
+    Name: 'WYOMING',
+    CountryId: '1',
+    Abbreviation: 'WY',
+  },
+  {
+    Name: 'YUKON',
+    CountryId: '2',
+    Abbreviation: 'YT',
+  },
+  {
+    Name: 'SASKATCHEWAN',
+    CountryId: '2',
+    Abbreviation: 'SK',
+  },
+  {
+    Name: 'QUEBEC',
+    CountryId: '2',
+    Abbreviation: 'QC',
+  },
+  {
+    Name: 'PRINCE EDWARD ISLAND',
+    CountryId: '2',
+    Abbreviation: 'PE',
+  },
+  {
+    Name: 'ONTARIO',
+    CountryId: '2',
+    Abbreviation: 'ON',
+  },
+  {
+    Name: 'NUNAVUT',
+    CountryId: '2',
+    Abbreviation: 'NU',
+  },
+  {
+    Name: 'NORTHWEST TERRITORIES',
+    CountryId: '2',
+    Abbreviation: 'NT',
+  },
+  {
+    Name: 'NOVA SCOTIA',
+    CountryId: '2',
+    Abbreviation: 'NS',
+  },
+  {
+    Name: 'NEWFOUNDLAND AND LABRADOR',
+    CountryId: '2',
+    Abbreviation: 'NL',
+  },
+  {
+    Name: 'NEW BRUNSWICK',
+    CountryId: '2',
+    Abbreviation: 'NB',
+  },
+  {
+    Name: 'MANATOBA',
+    CountryId: '2',
+    Abbreviation: 'MB',
+  },
+  {
+    Name: 'BRITISH COLUMBIA',
+    CountryId: '2',
+    Abbreviation: 'BC',
+  },
+  {
+    Name: 'ALBERTA',
+    CountryId: '2',
+    Abbreviation: 'AB',
+  },
+  {
+    Name: 'CHIAPAS',
+    CountryId: '3',
+    Abbreviation: 'Chis.',
+  },
+  {
+    Name: 'CAMPECHE',
+    CountryId: '3',
+    Abbreviation: 'Camp.',
+  },
+  {
+    Name: 'BAJA CALIFORNIA SUR',
+    CountryId: '3',
+    Abbreviation: 'B.C.S.',
+  },
+  {
+    Name: 'BAJA CALIFORNIA',
+    CountryId: '3',
+    Abbreviation: 'B.C.',
+  },
+  {
+    Name: 'AGUASCALIENTES',
+    CountryId: '3',
+    Abbreviation: 'Ags.',
+  },
+  {
+    Name: 'CHIHUAHUA',
+    CountryId: '3',
+    Abbreviation: 'Chih.',
+  },
+  {
+    Name: 'COAHUILA',
+    CountryId: '3',
+    Abbreviation: 'Coah.',
+  },
+  {
+    Name: 'MEXICO CITY',
+    CountryId: '3',
+    Abbreviation: 'CDMX',
+  },
+  {
+    Name: 'VERACRUZ',
+    CountryId: '3',
+    Abbreviation: 'Ver.',
+  },
+  {
+    Name: 'TLAXCALA',
+    CountryId: '3',
+    Abbreviation: 'Tlax.',
+  },
+  {
+    Name: 'TAMAULIPAS',
+    CountryId: '3',
+    Abbreviation: 'Tamps.',
+  },
+  {
+    Name: 'TABASCO',
+    CountryId: '3',
+    Abbreviation: 'Tab.',
+  },
+  {
+    Name: 'SONORA',
+    CountryId: '3',
+    Abbreviation: 'Son.',
+  },
+  {
+    Name: 'SINALOA',
+    CountryId: '3',
+    Abbreviation: 'Sin.',
+  },
+  {
+    Name: 'SAN LUIS POTOSÍ',
+    CountryId: '3',
+    Abbreviation: 'S.L.P.',
+  },
+  {
+    Name: 'QUINTANA ROO',
+    CountryId: '3',
+    Abbreviation: 'Q.R.',
+  },
+  {
+    Name: 'QUERÉTARO',
+    CountryId: '3',
+    Abbreviation: 'Qro.',
+  },
+  {
+    Name: 'PUEBLA',
+    CountryId: '3',
+    Abbreviation: 'Pue.',
+  },
+  {
+    Name: 'OAXACA',
+    CountryId: '3',
+    Abbreviation: 'Oax.',
+  },
+  {
+    Name: 'NUEVO LEÓN',
+    CountryId: '3',
+    Abbreviation: 'N.L.',
+  },
+  {
+    Name: 'NAYARIT',
+    CountryId: '3',
+    Abbreviation: 'Nay.',
+  },
+  {
+    Name: 'MORELOS',
+    CountryId: '3',
+    Abbreviation: 'Mor.',
+  },
+  {
+    Name: 'MICHOACÁN',
+    CountryId: '3',
+    Abbreviation: 'Mich.',
+  },
+  {
+    Name: 'MÉXICO',
+    CountryId: '3',
+    Abbreviation: 'Edomex',
+  },
+  {
+    Name: 'JALISCO',
+    CountryId: '3',
+    Abbreviation: 'Jal.',
+  },
+  {
+    Name: 'HIDALGO',
+    CountryId: '3',
+    Abbreviation: 'Hgo.',
+  },
+  {
+    Name: 'GUERRERO',
+    CountryId: '3',
+    Abbreviation: 'Gro.',
+  },
+  {
+    Name: 'GUANAJUATO',
+    CountryId: '3',
+    Abbreviation: 'Gto.',
+  },
+  {
+    Name: 'DURANGO',
+    CountryId: '3',
+    Abbreviation: 'Dgo.',
+  },
+  {
+    Name: 'COLIMA',
+    CountryId: '3',
+    Abbreviation: 'Col.',
+  },
+  {
+    Name: 'YUCATÁN',
+    CountryId: '3',
+    Abbreviation: 'Yuc.',
+  },
+  {
+    Name: 'ZACATECAS',
+    CountryId: '3',
+    Abbreviation: 'Zac.',
+  },
+];

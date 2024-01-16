@@ -35,9 +35,7 @@ export class AuthService {
 
       return {
         access_token: accessToken,
-        id: user.id,
-        email: user.email,
-        displayName: user.displayName,
+        ...user,
       };
     } catch (err) {
       if (err instanceof TypeORMError) {
@@ -75,9 +73,7 @@ export class AuthService {
 
     return {
       access_token: accessToken,
-      id: user.id,
-      email: user.email,
-      displayName: user.displayName,
+      ...user,
     };
   }
   async getUser(userid): Promise<{ id: number; email: string; displayName: string }> {
@@ -89,11 +85,7 @@ export class AuthService {
 
     if (!user) throw new ForbiddenException('User id incorrect! ' + userid);
 
-    return {
-      id: user.id,
-      email: user.email,
-      displayName: user.displayName,
-    };
+    return user;
   }
 
   async resetPasswordStart(host: string, email) {

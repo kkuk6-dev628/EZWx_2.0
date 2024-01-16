@@ -19,6 +19,7 @@ const authApi = apiSlice.injectEndpoints({
               email: result.data.email,
               id: result.data.id,
               displayName: result.data.displayName,
+              avatar: result.data.avatar,
             }),
           );
         } catch (err) {
@@ -41,27 +42,7 @@ const authApi = apiSlice.injectEndpoints({
               email: result.data.email,
               id: result.data.id,
               displayName: result.data.displayName,
-            }),
-          );
-        } catch (err) {
-          // do nothing
-          console.log('Error: ', err);
-        }
-      },
-    }),
-    getUser: builder.query<authUser, null>({
-      query: () => ({
-        url: '/auth/getUser',
-      }),
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          const result = await queryFulfilled;
-
-          dispatch(
-            userLoggedIn({
-              email: result.data.email,
-              id: result.data.id,
-              displayName: result.data.displayName,
+              avatar: result.data.avatar,
             }),
           );
         } catch (err) {
@@ -86,6 +67,37 @@ const authApi = apiSlice.injectEndpoints({
         }
       },
     }),
+    getUser: builder.query<authUser, null>({
+      query: () => ({
+        url: '/auth/getUser',
+      }),
+      providesTags: [{ type: 'user', id: 'LIST' }],
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+
+          dispatch(
+            userLoggedIn({
+              email: result.data.email,
+              id: result.data.id,
+              displayName: result.data.displayName,
+              avatar: result.data.avatar,
+            }),
+          );
+        } catch (err) {
+          // do nothing
+          console.log('Error: ', err);
+        }
+      },
+    }),
+    updateUserInfo: builder.mutation({
+      query: (data) => ({
+        url: '/user/update/' + data.id,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['user'],
+    }),
     existUser: builder.query<boolean, string>({
       query: (email) => ({ url: '/auth/reset-password-start?email=' + email }),
     }),
@@ -99,6 +111,14 @@ const authApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    updateAvatar: builder.mutation({
+      query: (data) => ({
+        url: '/user/avatar',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['user'],
+    }),
   }),
 });
 
@@ -110,4 +130,6 @@ export const {
   useExistUserQuery,
   useValidateTokenQuery,
   useResetMutation,
+  useUpdateAvatarMutation,
+  useUpdateUserInfoMutation,
 } = authApi;

@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectAuth, userLoggedOut } from '../../store/auth/authSlice';
 import { api } from '../../utils';
 import { useSigninMutation, useSignoutMutation } from '../../store/auth/authApi';
-import { Drawer } from '@mui/material';
+import { Avatar, Drawer } from '@mui/material';
 import { RxCross2 } from 'react-icons/rx';
 import { useCookies } from 'react-cookie';
 
@@ -28,7 +28,7 @@ function ProfileModal({ handleProfileModal, isShowProfileModal, setIsUserLoginUs
 
   const changeRoute = () => {
     handleProfileModal();
-    router.push('/home');
+    router.push('/profile');
   };
 
   const handleSignout = () => {
@@ -43,7 +43,11 @@ function ProfileModal({ handleProfileModal, isShowProfileModal, setIsUserLoginUs
       <div className="prom__header" id="draggable-dialog-title">
         <div className="prom__lft">
           <div className="prom__lft__img">
-            <Image height={50} width={50} src="/images/sunny.png" alt="profile" loading="eager" />
+            {user.avatar ? (
+              <Avatar src={`/user/${user.avatar}`} alt="profile" sx={{ width: 56, height: 56 }} />
+            ) : (
+              <Image height={50} width={50} src="/images/sunny.png" alt="profile" loading="eager" />
+            )}
           </div>
         </div>
         <div className="prom__rgt">

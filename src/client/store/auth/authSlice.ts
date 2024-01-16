@@ -6,6 +6,7 @@ const initialState: authUser = {
   email: '',
   id: '',
   displayName: '',
+  avatar: '',
 };
 
 export const authSlice = createSlice({
@@ -16,11 +17,13 @@ export const authSlice = createSlice({
       state.email = action.payload.email;
       state.id = action.payload.id;
       state.displayName = action.payload.displayName;
+      state.avatar = action.payload.avatar;
     },
     userLoggedOut: (state) => {
       state.email = '';
       state.id = '';
       state.displayName = '';
+      state.avatar = '';
       localStorage.removeItem('auth');
     },
   },

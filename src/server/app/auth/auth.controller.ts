@@ -26,10 +26,10 @@ export class AuthController {
 
   @Post('signin')
   async signin(@Body(new ValidationPipe()) dto: AuthSinginDto, @Res() res: Response) {
-    const { access_token, id, email, displayName } = await this.authService.signin(dto);
+    const user = await this.authService.signin(dto);
     return (
       res
-        .cookie('access_token', access_token, {
+        .cookie('access_token', user.access_token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
         })
@@ -37,9 +37,7 @@ export class AuthController {
         // .status(HttpStatus.OK)
         .json({
           message: 'Logged in successfully',
-          id,
-          email,
-          displayName,
+          ...user,
         })
     );
   }

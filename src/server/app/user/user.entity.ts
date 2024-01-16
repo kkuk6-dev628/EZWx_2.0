@@ -41,6 +41,12 @@ export class User {
   alternateEmail: string;
 
   @Column({ nullable: true })
+  avatar: string;
+
+  @Column({ nullable: true })
+  country: string;
+
+  @Column({ nullable: true })
   address1: string;
 
   @Column({ nullable: true })
