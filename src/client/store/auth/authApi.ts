@@ -3,6 +3,7 @@ import { apiSlice } from './../api/apiSlice';
 import { userLoggedIn, userLoggedOut } from './authSlice';
 
 const authApi = apiSlice.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     signup: builder.mutation<authUser, any>({
       query: (data: any) => ({
@@ -86,7 +87,6 @@ const authApi = apiSlice.injectEndpoints({
           );
         } catch (err) {
           // do nothing
-          console.log('Error: ', err);
         }
       },
     }),

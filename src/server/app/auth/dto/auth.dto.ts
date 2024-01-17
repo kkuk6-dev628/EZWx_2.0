@@ -28,6 +28,8 @@ export class AuthSinginDto {
   @IsNotEmpty()
   password: string;
 
+  newPassword?: string;
+
   @IsNotEmpty()
   @IsEmail()
   email: string;

@@ -41,9 +41,7 @@ const userSettingsApi = apiSlice.injectEndpoints({
             dispatch(setUserSettings(settings));
             dispatch(setActiveRoute(settings.active_route));
           }
-        } catch (err) {
-          console.error('Error: ', err);
-        }
+        } catch (err) {}
       },
     }),
     updateUserSettings: builder.mutation({

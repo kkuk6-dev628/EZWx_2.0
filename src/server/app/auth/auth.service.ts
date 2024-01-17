@@ -103,8 +103,24 @@ export class AuthService {
   }
 
   async updatePassword(dto: AuthSinginDto) {
-    const hash = await bcrypt.hash(dto.password, 2);
-    const user = await this.userService.updatePassword(dto.email, hash);
-    return user.affected;
+    if (dto.newPassword) {
+      const user = await this.userService.findOne({
+        where: {
+          email: dto.email,
+        },
+      });
+      if (!user) throw new ForbiddenException('Email incorrect!');
+
+      const pwMatches = await bcrypt.compare(dto.password, user.hash);
+
+      if (!pwMatches) throw new ForbiddenException('Password incorrect!');
+      const hash = await bcrypt.hash(dto.newPassword, 2);
+      const res = await this.userService.updatePassword(dto.email, hash);
+      return res.affected;
+    } else {
+      const hash = await bcrypt.hash(dto.password, 2);
+      const user = await this.userService.updatePassword(dto.email, hash);
+      return user.affected;
+    }
   }
 }

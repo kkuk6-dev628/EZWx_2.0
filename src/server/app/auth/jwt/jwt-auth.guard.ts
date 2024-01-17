@@ -14,11 +14,12 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const request = context.switchToHttp().getRequest();
 
     if (err || !user) {
-      // console.log('unauthorized...');
-      // throw err || new UnauthorizedException();
+      console.log('Unauthorized request', request.url);
       response.status(403);
       response.redirect('/signin');
+      throw err || new UnauthorizedException();
+    } else {
+      return user;
     }
-    return user;
   }
 }

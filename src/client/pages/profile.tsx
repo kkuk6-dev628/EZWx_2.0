@@ -13,6 +13,8 @@ import AvatarEdit from '../components/shared/AvatarEdit';
 import { Avatar } from '@mui/material';
 import { countryStates } from '../utils/constants';
 import { useGetUserQuery, useUpdateUserInfoMutation } from '../store/auth/authApi';
+import toast from 'react-hot-toast';
+import { validateEmail } from '../utils/utils';
 
 interface certifications {
   name: string;
@@ -36,20 +38,10 @@ interface IFormInput {
   certifications: certifications[];
 }
 
-interface Props {
-  setIsShowModal: (isShowModal: boolean) => void;
-}
-function profile({ setIsShowModal }: Props) {
+function profile() {
   const [showChangePasswordMOdal, setShowChangePasswordModal] = useState(false);
   const [certificationsOptions, setCertificationsOptions] = useState([]);
   const [showAvatarEdit, setShowAvatarEdit] = useState(false);
-  const [switchData, setSwitchData] = useState([
-    {
-      name: 'Send me EZNewsletters, EZTips & other general announcements & offers.',
-      id: 'a',
-      checked: true,
-    },
-  ]);
   const { data: userData } = useGetUserQuery(null, { refetchOnMountOrArgChange: true });
   const [updateUserInfo] = useUpdateUserInfoMutation();
 
@@ -102,33 +94,15 @@ function profile({ setIsShowModal }: Props) {
     },
   });
 
-  const onSubmit: SubmitHandler<IFormInput> = (data) => {
-    updateUserInfo({ ...data, id: user.id });
-  };
+  function onSubmit(data: any) {
+    updateUserInfo({ ...data, id: user.id }).then((data) => toast.success('Profile saved!'));
+  }
 
   const animatedComponents = makeAnimated();
-
-  const validateEmail = (value: string) => {
-    const emailRegex =
-      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return emailRegex.test(value) ? true : 'Invaoptiond email';
-  };
-  // const [checked, setChecked] = useState(true);
 
   function updatedAvatar() {
     setShowAvatarEdit(false);
   }
-
-  const handleChange = (item) => {
-    setSwitchData(
-      switchData.map((data) => {
-        if (data.id === item) {
-          data.checked = !data.checked;
-        }
-        return data;
-      }),
-    );
-  };
 
   const handleInfoChange = (e, key: string) => {
     setUserInfo((prev) => ({
@@ -167,12 +141,7 @@ function profile({ setIsShowModal }: Props) {
                 <SecondaryButton text="Change Avatar" isLoading={false} onClick={() => setShowAvatarEdit(true)} />
               </div>
               <div className="profile__left__btn__area">
-                <button
-                  onClick={() => {
-                    setShowChangePasswordModal(true);
-                  }}
-                  className="profile__left__btn"
-                >
+                <button onClick={() => setShowChangePasswordModal(true)} className="profile__left__btn">
                   Change Password
                 </button>
               </div>
@@ -372,7 +341,9 @@ function profile({ setIsShowModal }: Props) {
                       {countryStates
                         .filter((c) => c.CountryId === userInfo.country)
                         .map((state) => (
-                          <option value={state.Abbreviation}>{state.Name}</option>
+                          <option value={state.Abbreviation} key={state.Abbreviation}>
+                            {state.Name}
+                          </option>
                         ))}
                     </select>
                   </div>
@@ -456,31 +427,34 @@ function profile({ setIsShowModal }: Props) {
                 </div>
               </div>
               <div className="form__swt__area">
-                {switchData.map((item, index) => (
-                  <div key={item.id} className="table__data profile__swtc">
-                    <Switch
-                      checked={item.checked}
-                      onChange={() => handleChange(item.id)}
-                      onColor="#791DC6"
-                      onHandleColor="#3F0C69"
-                      offColor="#fff"
-                      handleDiameter={16}
-                      uncheckedIcon={false}
-                      checkedIcon={false}
-                      width={32}
-                      height={18}
-                      className="react-switch"
-                      id="material-switch"
-                    />
-                    <label onClick={() => handleChange(item.id)} className="modal__label text" htmlFor={item.id}>
-                      {item.name}
-                    </label>
-                  </div>
-                ))}
+                <div className="table__data profile__swtc">
+                  <Switch
+                    checked={false}
+                    onChange={(e) => handleInfoChange(e, 'switch')}
+                    onColor="#791DC6"
+                    onHandleColor="#3F0C69"
+                    offColor="#eed8ff"
+                    handleDiameter={16}
+                    uncheckedIcon={false}
+                    checkedIcon={false}
+                    width={32}
+                    height={18}
+                    className="profile-switch"
+                    id="material-switch"
+                  />
+                  <label
+                    onClick={(e) => handleInfoChange(e, 'switch')}
+                    className="modal__label text"
+                    htmlFor="material-switch"
+                  >
+                    Send me EZNewsletters, EZTips & other general announcements & offers.
+                  </label>
+                </div>
               </div>
               <div className="profile__submit__area">
                 <SecondaryButton
                   text={'Abandon'}
+                  type="reset"
                   isLoading={false}
                   onClick={() => setUserInfo(userData)}
                 ></SecondaryButton>

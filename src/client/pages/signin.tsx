@@ -23,7 +23,6 @@ function signin() {
   const [signin, { data, isLoading, error: responseError }] = useSigninMutation();
   const onSubmit: SubmitHandler<IFormInput> = (data, e) => {
     e.preventDefault();
-    console.log(data);
     signin(data);
   };
   const { data: settings } = useGetUserSettingsQuery({
