@@ -67,6 +67,12 @@ export class User {
   @Column({ nullable: true })
   phone: string;
 
+  @Column({ default: true })
+  receive_news: boolean;
+
+  @Column({ default: false })
+  is_admin: boolean;
+
   @Column()
   @CreateDateColumn()
   created_at: Date;

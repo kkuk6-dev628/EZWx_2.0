@@ -74,7 +74,6 @@ export class UserService {
       for (const key in updateUser) {
         findUser[key] = updateUser[key];
       }
-
       return await this.userRepository.save(findUser);
     } else {
       return "user doesn't exists";

@@ -23,6 +23,7 @@ function ChangePasswordModal({ setIsShowModal }: IProps) {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [resetPassword, resetResult] = useResetMutation();
+  const [invalidCurrentPassword, setInvalidCurrentPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -38,10 +39,11 @@ function ChangePasswordModal({ setIsShowModal }: IProps) {
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
     resetPassword({ email: user.email, password: password, newPassword: newPassword }).then((result: any) => {
       if (result.error) {
-        toast.error(result.error.data.message);
+        setInvalidCurrentPassword(true);
       } else if (result.data) {
         if (result.data !== 1) {
           toast.error('Something went wrong. Please try again later!');
+          setIsShowModal(false);
         } else {
           toast.success('Password has been changed!');
           setIsShowModal(false);
@@ -81,11 +83,17 @@ function ChangePasswordModal({ setIsShowModal }: IProps) {
                     })}
                     id="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setInvalidCurrentPassword(false);
+                    }}
                     className={`csuinp__input ${errors.currentPassword ? 'csuinp__input--error' : ''}`}
                     placeholder="Password (minimum 6 characters)"
                   />
                   {errors.currentPassword && <p className="csuinp__error__msg">{errors.currentPassword.message}</p>}
+                  {invalidCurrentPassword && (
+                    <p className="csuinp__error__msg">Password entered does not match the password for this account</p>
+                  )}
                 </div>
               </div>
               <div className="csuinp">

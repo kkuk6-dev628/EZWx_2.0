@@ -54,7 +54,12 @@ function profile() {
 
   useEffect(() => {
     if (userData) {
-      setUserInfo(userData);
+      const data: any = { ...userData };
+      if (!(userData as any).stateProvice) {
+        data.stateProvince = -1;
+      }
+      setUserInfo(data);
+      reset((formValues) => ({ ...formValues, ...data }));
     }
   }, [userData]);
 
@@ -74,6 +79,7 @@ function profile() {
     control,
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<IFormInput>({
     defaultValues: {
@@ -95,7 +101,14 @@ function profile() {
   });
 
   function onSubmit(data: any) {
-    updateUserInfo({ ...data, id: user.id }).then((data) => toast.success('Profile saved!'));
+    updateUserInfo({ ...userInfo, id: user.id }).then((res: any) => {
+      if (res.data) {
+        toast.success('Profile saved!');
+      } else {
+        console.log(res);
+        toast.error('Something went wrong!');
+      }
+    });
   }
 
   const animatedComponents = makeAnimated();
@@ -148,7 +161,8 @@ function profile() {
             </div>
             <div className="profile__left__btm profile__left__card">
               <h3 className="profile__left__btm__txt">Trial membership (Expired)</h3>
-              <h3 className="profile__left__btm__txt">Expired on Nov 12, 2022</h3>
+              <h3 className="profile__left__btm__txt">Expired on</h3>
+              <h3 className="profile__left__btm__txt">Nov 12, 2022</h3>
               <div className="profile__left__btn__area">
                 <button className="profile__left__btn">Join</button>
               </div>
@@ -164,7 +178,7 @@ function profile() {
                   </label>
                   <div className="csuinp__wrp__two">
                     <input
-                      type="email"
+                      type="text"
                       {...register('email', {
                         required: 'Please enter a valid email address.',
                         validate: validateEmail,
@@ -172,7 +186,7 @@ function profile() {
                       id="email"
                       className={`csuinp__input ${errors.email ? 'csuinp__input--error' : ''}`}
                       placeholder="Email for Verification"
-                      value={userInfo.email ?? ''}
+                      defaultValue={userInfo.email ?? ''}
                       onChange={(e) => handleInfoChange(e, 'email')}
                     />
                     {errors.email && <p className="csuinp__error__msg">{errors.email.message}</p>}
@@ -187,11 +201,11 @@ function profile() {
                   <div className="csuinp__wrp__two">
                     <input
                       type="text"
-                      {...register('firstname')}
+                      {...register('firstname', { required: 'Please enter a first name' })}
                       id="firstname"
                       className={`csuinp__input ${errors.firstname ? 'csuinp__input--error' : ''}`}
                       placeholder="First Name"
-                      value={userInfo.firstname ?? ''}
+                      defaultValue={userInfo.firstname ?? ''}
                       onChange={(e) => handleInfoChange(e, 'firstname')}
                     />
                     {errors.firstname && <p className="csuinp__error__msg">{errors.firstname.message}</p>}
@@ -206,11 +220,11 @@ function profile() {
                   <div className="csuinp__wrp__two">
                     <input
                       type="text"
-                      {...register('lastname')}
+                      {...register('lastname', { required: 'Please enter a last name' })}
                       id="lastname"
                       className={`csuinp__input ${errors.lastname ? 'csuinp__input--error' : ''}`}
                       placeholder="Last Name"
-                      value={userInfo.lastname ?? ''}
+                      defaultValue={userInfo.lastname ?? ''}
                       onChange={(e) => handleInfoChange(e, 'lastname')}
                     />
                     {errors.lastname && <p className="csuinp__error__msg">{errors.lastname.message}</p>}
@@ -228,7 +242,7 @@ function profile() {
                       {...register('displayName')}
                       id="displayname"
                       className={`csuinp__input ${errors.displayName ? 'csuinp__input--error' : ''}`}
-                      value={userInfo.displayName ?? ''}
+                      defaultValue={userInfo.displayName ?? ''}
                       onChange={(e) => handleInfoChange(e, 'displayName')}
                     />
                   </div>
@@ -245,7 +259,7 @@ function profile() {
                       {...register('alternateEmail')}
                       id="alternateEmail"
                       className={`csuinp__input ${errors.alternateEmail ? 'csuinp__input--error' : ''}`}
-                      value={userInfo.alternateEmail ?? ''}
+                      defaultValue={userInfo.alternateEmail ?? ''}
                       onChange={(e) => handleInfoChange(e, 'alternateEmail')}
                     />
                   </div>
@@ -261,10 +275,12 @@ function profile() {
                       {...register('country', { required: 'Please select a valid country!' })}
                       id="country"
                       className={`csuinp__input csuinp__input--select ${errors.country ? 'csuinp__input--error' : ''}`}
-                      value={userInfo.country ?? 1}
-                      onChange={(e) => handleInfoChange(e, 'country')}
+                      defaultValue={userInfo.country ?? 1}
+                      onChange={(e) => {
+                        handleInfoChange(e, 'country');
+                        setTimeout(() => reset({ stateProvince: '-1' }), 30);
+                      }}
                     >
-                      <option value="">Select a Country</option>
                       <option value={2}>CANADA</option>
                       <option value={3}>MEXICO</option>
                       <option value={1}>UNITED STATES</option>
@@ -283,7 +299,7 @@ function profile() {
                       {...register('address1')}
                       id="address1"
                       className={`csuinp__input ${errors.address1 ? 'csuinp__input--error' : ''}`}
-                      value={userInfo.address1 ?? ''}
+                      defaultValue={userInfo.address1 ?? ''}
                       onChange={(e) => handleInfoChange(e, 'address1')}
                     />
                   </div>
@@ -300,7 +316,7 @@ function profile() {
                       {...register('address2')}
                       id="address2"
                       className={`csuinp__input ${errors.lastname ? 'csuinp__input--error' : ''}`}
-                      value={userInfo.address2 ?? ''}
+                      defaultValue={userInfo.address2 ?? ''}
                       onChange={(e) => handleInfoChange(e, 'address2')}
                     />
                   </div>
@@ -317,7 +333,7 @@ function profile() {
                       {...register('city')}
                       id="city"
                       className={`csuinp__input ${errors.lastname ? 'csuinp__input--error' : ''}`}
-                      value={userInfo.city ?? ''}
+                      defaultValue={userInfo.city ?? ''}
                       onChange={(e) => handleInfoChange(e, 'city')}
                     />
                   </div>
@@ -330,18 +346,23 @@ function profile() {
                   </label>
                   <div className="">
                     <select
+                      key={userInfo.country + '-state'}
                       {...register('stateProvince')}
                       id="state"
                       className={`csuinp__input csuinp__input--select ${
                         errors.stateProvince ? 'csuinp__input--error' : ''
                       }`}
-                      value={userInfo.stateProvince ?? ''}
                       onChange={(e) => handleInfoChange(e, 'stateProvince')}
+                      placeholder="Select a State/Province"
                     >
+                      <option selected value={-1} key="state-placeholder">
+                        Select a State/Province
+                      </option>
                       {countryStates
                         .filter((c) => c.CountryId === userInfo.country)
+                        .sort((a, b) => a.Name.localeCompare(b.Name))
                         .map((state) => (
-                          <option value={state.Abbreviation} key={state.Abbreviation}>
+                          <option value={state.Abbreviation} key={`${state.Name}-${state.Abbreviation}`}>
                             {state.Name}
                           </option>
                         ))}
@@ -360,7 +381,7 @@ function profile() {
                       {...register('zip')}
                       id="zip"
                       className={`csuinp__input ${errors.lastname ? 'csuinp__input--error' : ''}`}
-                      value={userInfo.zip ?? ''}
+                      defaultValue={userInfo.zip ?? ''}
                       onChange={(e) => handleInfoChange(e, 'zip')}
                     />
                   </div>
@@ -377,7 +398,7 @@ function profile() {
                       {...register('phone')}
                       id="phone"
                       className={`csuinp__input ${errors.phone ? 'csuinp__input--error' : ''}`}
-                      value={userInfo.phone ?? ''}
+                      defaultValue={userInfo.phone ?? ''}
                       onChange={(e) => handleInfoChange(e, 'phone')}
                     />
                   </div>
@@ -386,26 +407,26 @@ function profile() {
               <div className="csuinp">
                 <div className="csuinp__ipt__wrp">
                   <label htmlFor="password" className="csuinp__lbl">
-                    Pilot certificationss (select all that apply) *
+                    Pilot certifications (select all that apply)
                   </label>
                   <div className="">
                     <Controller
-                      name="certificationss"
+                      name="certifications"
                       control={control}
-                      {...register('certifications')}
                       render={({ field }) => (
                         <Select
                           id="long-value-select"
                           instanceId="long-value-select"
-                          value={userInfo.certifications ?? []}
-                          onChange={(e) =>
+                          {...field}
+                          onChange={(e) => {
                             setUserInfo((prev) => {
                               const info = { ...prev };
                               info.certifications = e;
                               return info;
-                            })
-                          }
-                          placeholder="Select your certificationss"
+                            });
+                            field.onChange(e);
+                          }}
+                          placeholder="Select your certification(s)"
                           isMulti
                           styles={{
                             control: (baseStyles, state) => ({
@@ -429,8 +450,8 @@ function profile() {
               <div className="form__swt__area">
                 <div className="table__data profile__swtc">
                   <Switch
-                    checked={false}
-                    onChange={(e) => handleInfoChange(e, 'switch')}
+                    checked={userInfo.receive_news ?? true}
+                    onChange={(e) => handleInfoChange({ target: { value: e } }, 'receive_news')}
                     onColor="#791DC6"
                     onHandleColor="#3F0C69"
                     offColor="#eed8ff"
@@ -442,11 +463,7 @@ function profile() {
                     className="profile-switch"
                     id="material-switch"
                   />
-                  <label
-                    onClick={(e) => handleInfoChange(e, 'switch')}
-                    className="modal__label text"
-                    htmlFor="material-switch"
-                  >
+                  <label className="modal__label text" htmlFor="material-switch" style={{ cursor: 'pointer' }}>
                     Send me EZNewsletters, EZTips & other general announcements & offers.
                   </label>
                 </div>
@@ -456,7 +473,10 @@ function profile() {
                   text={'Abandon'}
                   type="reset"
                   isLoading={false}
-                  onClick={() => setUserInfo(userData)}
+                  onClick={() => {
+                    setUserInfo(userData);
+                    setTimeout(() => reset(userData), 10);
+                  }}
                 ></SecondaryButton>
                 <PrimaryButton text="Save" isLoading={false}></PrimaryButton>
               </div>

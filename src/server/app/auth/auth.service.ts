@@ -81,6 +81,9 @@ export class AuthService {
       where: {
         id: userid,
       },
+      relations: {
+        certifications: true,
+      },
     });
 
     if (!user) throw new ForbiddenException('User id incorrect! ' + userid);
