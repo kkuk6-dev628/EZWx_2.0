@@ -2578,10 +2578,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/leaflet-responsive-popup@^0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@types/leaflet-responsive-popup/-/leaflet-responsive-popup-0.6.1.tgz#5b657cac510bef77ba6cebbda5453613bcd5258e"
-  integrity sha512-Noa9jpkixbJfMa6lD0T0SUSQYPJm5tKILMWELf+lyi7RYUReZSRT0/yXLvxYpVsycJOZIC6MZ3o+5lNrPSlxnQ==
+"@types/leaflet-responsive-popup@^0.6.4":
+  version "0.6.4"
+  resolved "https://registry.yarnpkg.com/@types/leaflet-responsive-popup/-/leaflet-responsive-popup-0.6.4.tgz#ac12d686870a9023eb6a5f2206273ce340755037"
+  integrity sha512-bKpQ2fBZnx+zfJx5RZQBzsR5HN1hn3fFRJ0nt5sE009xCVsvZmPwSf0RPR4pVE/u9LELgWMs2HXPlfDWK9CEiQ==
   dependencies:
     "@types/leaflet" "*"
 
