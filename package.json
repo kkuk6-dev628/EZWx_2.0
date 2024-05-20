@@ -145,7 +145,7 @@
     "@types/jest": "^29.2.5",
     "@types/leaflet": "^1.9.3",
     "@types/leaflet-responsive-popup": "^0.6.4",
-    "@types/lodash.groupby": "^4.6.7",
+    "@types/lodash.groupby": "^4.6.9",
     "@types/lowdb": "^1.0.15",
     "@types/node": "^20.12.12",
     "@types/passport-google-oauth20": "^2.0.11",
