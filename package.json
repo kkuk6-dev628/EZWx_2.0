@@ -148,7 +148,7 @@
     "@types/lodash.groupby": "^4.6.9",
     "@types/lowdb": "^1.0.15",
     "@types/node": "^20.12.12",
-    "@types/passport-google-oauth20": "^2.0.11",
+    "@types/passport-google-oauth20": "^2.0.16",
     "@types/passport-jwt": "^3.0.8",
     "@types/passport-local": "^1.0.34",
     "@types/passport-oauth2": "^1.4.12",
