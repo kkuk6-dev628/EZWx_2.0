@@ -39,7 +39,7 @@
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "^5.13.1",
     "@nestjs-modules/mailer": "^1.10.3",
-    "@nestjs/axios": "^2.0.0",
+    "@nestjs/axios": "^3.0.2",
     "@nestjs/common": "^9.4.3",
     "@nestjs/config": "^2.3.2",
     "@nestjs/core": "^9.3.9",
