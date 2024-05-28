@@ -112,7 +112,7 @@
     "react-icons": "^4.8.0",
     "react-leaflet": "^4.2.0",
     "react-leaflet-choropleth": "^2.0.1",
-    "react-multi-date-picker": "^3.3.4",
+    "react-multi-date-picker": "^4.5.1",
     "react-prismazoom": "^3.3.5",
     "react-redux": "^8.0.5",
     "react-select": "^5.7.3",
