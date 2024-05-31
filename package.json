@@ -52,7 +52,7 @@
     "@tippyjs/react": "^4.2.6",
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "@turf/distance": "^6.5.0",
-    "@types/express-serve-static-core": "4.17.21",
+    "@types/express-serve-static-core": "4.19.3",
     "@types/multer": "^1.4.11",
     "axios": "^1.7.2",
     "bcrypt": "^5.1.0",
