@@ -46,7 +46,7 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.3.8",
-    "@nestjs/serve-static": "^3.0.1",
+    "@nestjs/serve-static": "^4.0.2",
     "@nestjs/typeorm": "^10.0.2",
     "@reduxjs/toolkit": "^1.9.3",
     "@tippyjs/react": "^4.2.6",
