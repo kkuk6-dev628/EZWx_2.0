@@ -31,7 +31,7 @@
     "@emotion/core": "^11.0.0",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
-    "@iconify/react": "^4.1.1",
+    "@iconify/react": "^5.0.1",
     "@mapbox/timespace": "^2.0.4",
     "@material-ui/core": "latest",
     "@material-ui/icons": "latest",
