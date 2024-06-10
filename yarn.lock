@@ -2190,15 +2190,15 @@
     iterare "1.2.1"
     tslib "2.5.3"
 
-"@nestjs/config@^2.3.2":
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/@nestjs/config/-/config-2.3.2.tgz#6c5b1d2c87f39d3ceab2ab3fb3a8ef518bccc0fa"
-  integrity sha512-VtGV8PBpxzMzz68kdxTWqPm9v7SYCSZXQ0tC72AMNnjdmU+CVjUSLpEpdnm0XcWHxE1nV6wSI3HZxsATIV4ZxA==
+"@nestjs/config@^3.2.2":
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/config/-/config-3.2.2.tgz#7e895edb2878564e0a7fc411614902b0330ca940"
+  integrity sha512-vGICPOui5vE6kPz1iwQ7oCnp3qWgqxldPmBQ9onkVoKlBtyc83KJCr7CjuVtf4OdovMAVcux1d8Q6jglU2ZphA==
   dependencies:
-    dotenv "16.0.3"
+    dotenv "16.4.5"
     dotenv-expand "10.0.0"
     lodash "4.17.21"
-    uuid "9.0.0"
+    uuid "9.0.1"
 
 "@nestjs/core@^10.3.9":
   version "10.3.9"
@@ -5216,12 +5216,7 @@ dotenv-flow@^4.1.0:
   dependencies:
     dotenv "^16.0.0"
 
-dotenv@16.0.3:
-  version "16.0.3"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.0.3.tgz#115aec42bac5053db3c456db30cc243a5a836a07"
-  integrity sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==
-
-dotenv@^16.0.0, dotenv@^16.0.3:
+dotenv@16.4.5, dotenv@^16.0.0, dotenv@^16.0.3:
   version "16.4.5"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.4.5.tgz#cdd3b3b604cb327e286b4762e13502f717cb099f"
   integrity sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==
@@ -12386,11 +12381,6 @@ uuid@8.3.2, uuid@^8.3.2:
   version "8.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
-
-uuid@9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.0.tgz#592f550650024a38ceb0c562f2f6aa435761efb5"
-  integrity sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==
 
 uuid@9.0.1, uuid@^9.0.0, uuid@^9.0.1:
   version "9.0.1"
