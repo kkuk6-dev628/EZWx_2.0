@@ -2710,13 +2710,15 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.3.tgz#472eaab5f15c1ffdd7f8628bd4c4f753995ec79e"
   integrity sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==
 
-"@turf/boolean-point-in-polygon@^6.5.0":
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/@turf/boolean-point-in-polygon/-/boolean-point-in-polygon-6.5.0.tgz#6d2e9c89de4cd2e4365004c1e51490b7795a63cf"
-  integrity sha512-DtSuVFB26SI+hj0SjrvXowGTUCHlgevPAIsukssW6BG5MlNSBQAo70wpICBNJL6RjukXg8d2eXaAWuD/CqL00A==
+"@turf/boolean-point-in-polygon@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@turf/boolean-point-in-polygon/-/boolean-point-in-polygon-7.0.0.tgz#378c0edffd016621ba330d466c56346796307f33"
+  integrity sha512-Z9swETfICqUJ8iVLZimvIOh8r4Wrlu9/X/c/5vIEeVvG4Lu78Ztmgu1KaobZJFC93/ntOAjMBavc9aNgw7TXgQ==
   dependencies:
-    "@turf/helpers" "^6.5.0"
-    "@turf/invariant" "^6.5.0"
+    "@turf/helpers" "^7.0.0"
+    "@turf/invariant" "^7.0.0"
+    point-in-polygon-hao "^1.1.0"
+    tslib "^2.6.2"
 
 "@turf/distance@^7.0.0":
   version "7.0.0"
@@ -2727,11 +2729,6 @@
     "@turf/invariant" "^7.0.0"
     tslib "^2.6.2"
 
-"@turf/helpers@^6.5.0":
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/@turf/helpers/-/helpers-6.5.0.tgz#f79af094bd6b8ce7ed2bd3e089a8493ee6cae82e"
-  integrity sha512-VbI1dV5bLFzohYYdgqwikdMVpe7pJ9X3E+dlr425wa2/sMJqYDhTO++ec38/pcPvPE6oD9WEEeU3Xu3gza+VPw==
-
 "@turf/helpers@^7.0.0":
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/@turf/helpers/-/helpers-7.0.0.tgz#22dc2335e8b82db2a21b8c873ea10b3fb3dc5158"
@@ -2739,13 +2736,6 @@
   dependencies:
     deep-equal "^2.2.3"
     tslib "^2.6.2"
-
-"@turf/invariant@^6.5.0":
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/@turf/invariant/-/invariant-6.5.0.tgz#970afc988023e39c7ccab2341bd06979ddc7463f"
-  integrity sha512-Wv8PRNCtPD31UVbdJE/KVAWKe7l6US+lJItRR/HOEW3eh+U/JwRCSUl/KZ7bmjM/C+zLNoreM2TU6OoLACs4eg==
-  dependencies:
-    "@turf/helpers" "^6.5.0"
 
 "@turf/invariant@^7.0.0":
   version "7.0.0"
@@ -10024,6 +10014,11 @@ pluralize@8.0.0:
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-8.0.0.tgz#1a6fa16a38d12a1901e0320fa017051c539ce3b1"
   integrity sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==
+
+point-in-polygon-hao@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/point-in-polygon-hao/-/point-in-polygon-hao-1.1.0.tgz#37f5f4fbe14e89fa8a3bb7f67c9158079d2ede7c"
+  integrity sha512-3hTIM2j/v9Lio+wOyur3kckD4NxruZhpowUbEgmyikW+a2Kppjtu1eN+AhnMQtoHW46zld88JiYWv6fxpsDrTQ==
 
 popmotion@11.0.3:
   version "11.0.3"
