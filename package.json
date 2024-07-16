@@ -37,7 +37,7 @@
     "@material-ui/icons": "latest",
     "@minoru/react-dnd-treeview": "^3.4.4",
     "@mui/icons-material": "^5.16.1",
-    "@mui/material": "^5.16.1",
+    "@mui/material": "^5.16.4",
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/axios": "^3.0.2",
     "@nestjs/common": "^10.3.10",
