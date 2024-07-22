@@ -10431,10 +10431,10 @@ rbush@^4.0.0:
   dependencies:
     quickselect "^2.0.0"
 
-rc-slider@^11.0.5:
-  version "11.0.5"
-  resolved "https://registry.yarnpkg.com/rc-slider/-/rc-slider-11.0.5.tgz#d34f60af50ba17ba085b055b6838f9aa68903d75"
-  integrity sha512-yhyecKySFqlBRqEY1JdlNfb0KEGyDz2S8jOXV54a4RD4cmJgJbfbfdb5fGT6UfxAolffbrm87uZU+ZNzIyoPfQ==
+rc-slider@^11.1.0:
+  version "11.1.0"
+  resolved "https://registry.yarnpkg.com/rc-slider/-/rc-slider-11.1.0.tgz#9d5622f574eaea4a8674433cd19db020c976abb9"
+  integrity sha512-tha9VMVZy1IGSiwl9w0pxrFjGLbOLTUu0XrPInYz9kpyU+kTSKSYA4NzKchu+G/PCr/e2SwGqAj8rCYPnwm0Dg==
   dependencies:
     "@babel/runtime" "^7.10.1"
     classnames "^2.2.5"
