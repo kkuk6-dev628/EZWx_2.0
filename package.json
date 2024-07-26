@@ -127,7 +127,7 @@
     "sharp": "^0.33.4",
     "styled-components": "^6.1.12",
     "suncalc": "^1.9.0",
-    "swiper": "^11.1.7",
+    "swiper": "^11.1.8",
     "ts-morph": "^23.0.0",
     "tsimportlib": "^0.0.5",
     "typeorm": "0.3.20"
