@@ -10308,10 +10308,10 @@ rbush@^4.0.1:
   dependencies:
     quickselect "^3.0.0"
 
-rc-slider@^11.1.5:
-  version "11.1.5"
-  resolved "https://registry.yarnpkg.com/rc-slider/-/rc-slider-11.1.5.tgz#9a596464a36d78feb90589fee4eb0bf7cec40584"
-  integrity sha512-b77H5PbjMKsvkYXAYIkn50QuFX6ICQmCTibDinI9q+BHx65/TV4TeU25+oadhSRzykxs0/vBWeKBwRyySOeWlg==
+rc-slider@^11.1.6:
+  version "11.1.6"
+  resolved "https://registry.yarnpkg.com/rc-slider/-/rc-slider-11.1.6.tgz#7ce762ff76e5ea8f4a54431ebe582df5c498629b"
+  integrity sha512-LACAaXM0hi+4x4ErDGZLy7weIQwmBIVbIgPE+eDHiHkyzMvKjWHraCG8/B22Y/tCQUPAsP02wBhKhth7mH2PIw==
   dependencies:
     "@babel/runtime" "^7.10.1"
     classnames "^2.2.5"
