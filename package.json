@@ -143,7 +143,7 @@
     "@types/express": "^5.0.0",
     "@types/gtag.js": "^0.0.20",
     "@types/jest": "^29.5.13",
-    "@types/leaflet": "^1.9.12",
+    "@types/leaflet": "^1.9.13",
     "@types/leaflet-responsive-popup": "^0.6.4",
     "@types/lodash.groupby": "^4.6.9",
     "@types/lowdb": "^1.0.15",
