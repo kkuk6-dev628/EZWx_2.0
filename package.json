@@ -142,7 +142,7 @@
     "@types/d3-scale": "^4.0.8",
     "@types/express": "^5.0.0",
     "@types/gtag.js": "^0.0.20",
-    "@types/jest": "^29.5.13",
+    "@types/jest": "^29.5.14",
     "@types/leaflet": "^1.9.13",
     "@types/leaflet-responsive-popup": "^0.6.4",
     "@types/lodash.groupby": "^4.6.9",
