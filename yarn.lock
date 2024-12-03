@@ -2425,10 +2425,10 @@
   dependencies:
     path-to-regexp "0.2.5"
 
-"@nestjs/testing@^10.4.12":
-  version "10.4.12"
-  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-10.4.12.tgz#33e0bf6bd885c6e2f88a40c3eb086283a044558a"
-  integrity sha512-Q1ZpzmIqzem6Q9pBwT1qQRYE050HhvSh8U7AbdIavOHCI063GbXOy/erXEpUnE0o46mqT+y88Nn9NjTXAQt4nQ==
+"@nestjs/testing@^10.4.13":
+  version "10.4.13"
+  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-10.4.13.tgz#18870965ae8e6d2988066fdffba8373b0f06ab97"
+  integrity sha512-07PIDxZbr5sHq+1bHFtMqAyZuxvCqu041OU6pyCR3O76sspFizZg1oxIE2TYzPCKeCbNZavjQ2Zn1K9j+rnjvQ==
   dependencies:
     tslib "2.8.1"
 
@@ -12178,11 +12178,6 @@ tslib@2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.2.tgz#703ac29425e7b37cd6fd456e92404d46d1f3e4ae"
   integrity sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==
-
-tslib@2.7.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.7.0.tgz#d9b40c5c40ab59e8738f297df3087bf1a2690c01"
-  integrity sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==
 
 tslib@2.8.1, tslib@^2.1.0, tslib@^2.3.1, tslib@^2.4.0, tslib@^2.5.0, tslib@^2.6.2:
   version "2.8.1"
