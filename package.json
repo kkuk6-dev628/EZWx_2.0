@@ -115,7 +115,7 @@
     "react-multi-date-picker": "^4.5.2",
     "react-prismazoom": "^3.3.5",
     "react-redux": "^9.2.0",
-    "react-select": "^5.8.3",
+    "react-select": "^5.9.0",
     "react-switch": "^7.0.0",
     "react-transition-group": "^4.4.5",
     "react-use": "^17.6.0",
