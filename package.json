@@ -47,7 +47,7 @@
     "@nestjs/passport": "^11.0.1",
     "@nestjs/platform-express": "^10.4.15",
     "@nestjs/serve-static": "^4.0.2",
-    "@nestjs/typeorm": "^10.0.2",
+    "@nestjs/typeorm": "^11.0.0",
     "@reduxjs/toolkit": "^2.5.0",
     "@tippyjs/react": "^4.2.6",
     "@turf/boolean-point-in-polygon": "^7.2.0",
