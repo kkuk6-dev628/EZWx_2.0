@@ -2357,10 +2357,10 @@
     "@types/jsonwebtoken" "9.0.5"
     jsonwebtoken "9.0.2"
 
-"@nestjs/passport@^11.0.2":
-  version "11.0.2"
-  resolved "https://registry.yarnpkg.com/@nestjs/passport/-/passport-11.0.2.tgz#814590fd15e5719ffcb59cc4de554964cc3d5b0e"
-  integrity sha512-l/hcBhk+yBHMTbKS8rOKN5zV7iT/5CdBX79NxMFHW6jNw2U5WB8yyH6wXDIvyEvZBkNNHaieks2FHeWluCOpuA==
+"@nestjs/passport@^11.0.4":
+  version "11.0.4"
+  resolved "https://registry.yarnpkg.com/@nestjs/passport/-/passport-11.0.4.tgz#90970a9b3f4ba5dfe69ea968d8ed4d1d8605193f"
+  integrity sha512-XpqLKPlo6yt0tFSAKgh1Q2j442UWhaL8qPh6GoMVTi5MsvK/uYD2aaMr3wrwyFIpH0/hjOqKC7TI5+Dw9e7/ng==
 
 "@nestjs/platform-express@^10.4.15":
   version "10.4.15"
