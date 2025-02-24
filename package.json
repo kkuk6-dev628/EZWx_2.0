@@ -122,7 +122,7 @@
     "react-vis": "^1.12.1",
     "reflect-metadata": "^0.2.2",
     "rimraf": "^6.0.1",
-    "rxjs": "^7.8.1",
+    "rxjs": "^7.8.2",
     "sass": "^1.85.0",
     "sharp": "^0.33.5",
     "styled-components": "^6.1.15",
