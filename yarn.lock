@@ -2423,10 +2423,10 @@
     prop-types "^15.7.2"
     react-is "^16.8.0 || ^17.0.0"
 
-"@minoru/react-dnd-treeview@^3.5.0":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@minoru/react-dnd-treeview/-/react-dnd-treeview-3.5.0.tgz#ee413d7102797ca3f0d02ee77e3064c1fd352bc6"
-  integrity sha512-kDHGQ0UK18w6ie5EH68NynATSP9BAzNLmWBXuVSoaGkraWWFdEdAWqQxAZiMorAixFu40MzYkn2N9/Gam6q17w==
+"@minoru/react-dnd-treeview@^3.5.2":
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/@minoru/react-dnd-treeview/-/react-dnd-treeview-3.5.2.tgz#f0beef2523963efa1b7cbfdbb4a82101ad26efbb"
+  integrity sha512-m5x0m+WJdbSCIilB5nUEjascNhcMPCNyn41kY3kwtezjx5W0QoLglWBtY2i4HaNVf7Knkp1dhvoRvIj2KWXpbw==
   dependencies:
     "@juggle/resize-observer" "^3.4.0"
     dnd-multi-backend "^8.1.2"
