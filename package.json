@@ -140,7 +140,7 @@
     "@next/eslint-plugin-next": "^15.3.2",
     "@types/cookie-parser": "^1.4.8",
     "@types/d3-scale": "^4.0.9",
-    "@types/express": "^5.0.1",
+    "@types/express": "^5.0.2",
     "@types/gtag.js": "^0.0.20",
     "@types/jest": "^29.5.14",
     "@types/leaflet": "^1.9.18",
