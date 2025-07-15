@@ -35,7 +35,7 @@
     "@mapbox/timespace": "^2.0.4",
     "@material-ui/core": "latest",
     "@material-ui/icons": "latest",
-    "@minoru/react-dnd-treeview": "^3.5.2",
+    "@minoru/react-dnd-treeview": "^3.5.3",
     "@mui/icons-material": "^5.18.0",
     "@mui/material": "^5.18.0",
     "@nestjs-modules/mailer": "^2.0.2",
