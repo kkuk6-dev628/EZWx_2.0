@@ -110,7 +110,7 @@
     "react-hook-form": "^7.60.0",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
-    "react-leaflet": "^4.2.0",
+    "react-leaflet": "^5.0.0",
     "react-leaflet-choropleth": "^2.0.1",
     "react-multi-date-picker": "^4.5.2",
     "react-prismazoom": "^3.3.5",
