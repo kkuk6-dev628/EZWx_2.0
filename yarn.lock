@@ -2668,10 +2668,10 @@
     prop-types "^15.7.2"
     react-is "^16.8.0 || ^17.0.0"
 
-"@minoru/react-dnd-treeview@^3.5.2":
-  version "3.5.2"
-  resolved "https://registry.yarnpkg.com/@minoru/react-dnd-treeview/-/react-dnd-treeview-3.5.2.tgz#f0beef2523963efa1b7cbfdbb4a82101ad26efbb"
-  integrity sha512-m5x0m+WJdbSCIilB5nUEjascNhcMPCNyn41kY3kwtezjx5W0QoLglWBtY2i4HaNVf7Knkp1dhvoRvIj2KWXpbw==
+"@minoru/react-dnd-treeview@^3.5.3":
+  version "3.5.3"
+  resolved "https://registry.yarnpkg.com/@minoru/react-dnd-treeview/-/react-dnd-treeview-3.5.3.tgz#0e34a6aa3df1f28b7bd30d95c2ad025563edaa63"
+  integrity sha512-k9Hz99pLWR/0AMWYR4Hyda4jQjhfBz0dqqqLpk9apfbB7RthamjIJsKKobxgvA8d7ykbVRLCOlrWlRckP1uSkw==
   dependencies:
     "@juggle/resize-observer" "^3.4.0"
     dnd-multi-backend "^8.1.2"
