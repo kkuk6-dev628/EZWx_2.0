@@ -3389,14 +3389,14 @@
   dependencies:
     "@types/node" "*"
 
-"@types/leaflet-responsive-popup@^0.6.4":
-  version "0.6.4"
-  resolved "https://registry.yarnpkg.com/@types/leaflet-responsive-popup/-/leaflet-responsive-popup-0.6.4.tgz#ac12d686870a9023eb6a5f2206273ce340755037"
-  integrity sha512-bKpQ2fBZnx+zfJx5RZQBzsR5HN1hn3fFRJ0nt5sE009xCVsvZmPwSf0RPR4pVE/u9LELgWMs2HXPlfDWK9CEiQ==
+"@types/leaflet-responsive-popup@^0.6.5":
+  version "0.6.5"
+  resolved "https://registry.yarnpkg.com/@types/leaflet-responsive-popup/-/leaflet-responsive-popup-0.6.5.tgz#3c71d0905cc620a86610dfbb3c838da56a4a6054"
+  integrity sha512-/MG76TIQDUPTlXOvMni59oeKusiBsMzeStwk4+7lqOV9MAOgxWiAYGOfxd8rfn4RmjgMT9BG7CUdf2n8Q41mPQ==
   dependencies:
-    "@types/leaflet" "*"
+    "@types/leaflet" "^1.9"
 
-"@types/leaflet@*", "@types/leaflet@^1.9.20":
+"@types/leaflet@^1.9", "@types/leaflet@^1.9.20":
   version "1.9.20"
   resolved "https://registry.yarnpkg.com/@types/leaflet/-/leaflet-1.9.20.tgz#a7feef4b0a4b36335dfc98456e76c0a86ab8462c"
   integrity sha512-rooalPMlk61LCaLOvBF2VIf9M47HgMQqi5xQ9QRi7c8PkdIe0WrIi5IxXUXQjAdL0c+vcQ01mYWbthzmp9GHWw==
