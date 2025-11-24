@@ -48,7 +48,7 @@
     "@nestjs/platform-express": "^11.1.9",
     "@nestjs/serve-static": "^5.0.4",
     "@nestjs/typeorm": "^11.0.0",
-    "@reduxjs/toolkit": "^2.10.1",
+    "@reduxjs/toolkit": "^2.11.0",
     "@tippyjs/react": "^4.2.6",
     "@turf/boolean-point-in-polygon": "^7.3.0",
     "@turf/distance": "^7.3.0",
