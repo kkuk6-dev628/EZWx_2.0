@@ -50,7 +50,7 @@
     "@nestjs/typeorm": "^11.0.0",
     "@reduxjs/toolkit": "^2.11.0",
     "@tippyjs/react": "^4.2.6",
-    "@turf/boolean-point-in-polygon": "^7.3.0",
+    "@turf/boolean-point-in-polygon": "^7.3.1",
     "@turf/distance": "^7.3.0",
     "@types/express-serve-static-core": "5.1.0",
     "@types/multer": "^2.0.0",
