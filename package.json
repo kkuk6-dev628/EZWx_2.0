@@ -136,7 +136,7 @@
     "@faker-js/faker": "^10.1.0",
     "@nestjs/cli": "^11.0.14",
     "@nestjs/schematics": "^11.0.9",
-    "@nestjs/testing": "^11.1.9",
+    "@nestjs/testing": "^11.1.10",
     "@next/eslint-plugin-next": "^16.1.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/d3-scale": "^4.0.9",
