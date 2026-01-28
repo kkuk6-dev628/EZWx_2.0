@@ -3315,13 +3315,13 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.3.tgz#472eaab5f15c1ffdd7f8628bd4c4f753995ec79e"
   integrity sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==
 
-"@turf/boolean-point-in-polygon@^7.3.2":
-  version "7.3.2"
-  resolved "https://registry.yarnpkg.com/@turf/boolean-point-in-polygon/-/boolean-point-in-polygon-7.3.2.tgz#ca09ade9fea9f70c85d759ad751e6f2d0fcd46e3"
-  integrity sha512-PAfPDQ0TW1+VLgZ7tReTSyZ/X41AW7/nMRQxVpY+h/aG7JomZJ779lojnODT4dWCn3IMTA3xD2dDDfVYBAQMYg==
+"@turf/boolean-point-in-polygon@^7.3.3":
+  version "7.3.3"
+  resolved "https://registry.yarnpkg.com/@turf/boolean-point-in-polygon/-/boolean-point-in-polygon-7.3.3.tgz#7e0672c3e71b72b1102ef78a76733525045045b5"
+  integrity sha512-hmXV4PofLAVbVZcnKk/yp//0s65huap+L3wKGKzbLWk57fWla/eRmFKx/iQ15xGu05zylHz5cA5AfriVGZHj2g==
   dependencies:
-    "@turf/helpers" "7.3.2"
-    "@turf/invariant" "7.3.2"
+    "@turf/helpers" "7.3.3"
+    "@turf/invariant" "7.3.3"
     "@types/geojson" "^7946.0.10"
     point-in-polygon-hao "^1.1.0"
     tslib "^2.8.1"
@@ -3336,28 +3336,11 @@
     "@types/geojson" "^7946.0.10"
     tslib "^2.8.1"
 
-"@turf/helpers@7.3.2":
-  version "7.3.2"
-  resolved "https://registry.yarnpkg.com/@turf/helpers/-/helpers-7.3.2.tgz#deb2a1a5bb84d8db78571bc89ca8b75586e31ed7"
-  integrity sha512-5HFN42rgWjSobdTMxbuq+ZdXPcqp1IbMgFYULTLCplEQM3dXhsyRFe7DCss4Eiw12iW3q6Z5UeTNVfITsE5lgA==
-  dependencies:
-    "@types/geojson" "^7946.0.10"
-    tslib "^2.8.1"
-
 "@turf/helpers@7.3.3":
   version "7.3.3"
   resolved "https://registry.yarnpkg.com/@turf/helpers/-/helpers-7.3.3.tgz#7fc3c4241464be3a854d8289fe2096221d9b7165"
   integrity sha512-9Ias0L1GuZPIzO6sk8jraTEuLJye6n9LYNEdw69ZGOQ6C1IigjxkPW49zmn21aTv1z27vxdVLSS3r+78DB2QnQ==
   dependencies:
-    "@types/geojson" "^7946.0.10"
-    tslib "^2.8.1"
-
-"@turf/invariant@7.3.2":
-  version "7.3.2"
-  resolved "https://registry.yarnpkg.com/@turf/invariant/-/invariant-7.3.2.tgz#490ea975572a7dfebed5ce0dd20a7dd8d0517602"
-  integrity sha512-brGmL1EFhZH/YNXhq6S+8sPWBEnmvEyxMWJO8bUNOFZyWHYiRTwxQHZM+An1blkbQ77PiEzsdNAspZqE1j7YKA==
-  dependencies:
-    "@turf/helpers" "7.3.2"
     "@types/geojson" "^7946.0.10"
     tslib "^2.8.1"
 
