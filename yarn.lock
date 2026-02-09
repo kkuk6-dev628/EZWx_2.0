@@ -7074,10 +7074,10 @@ geojson-to-svg@^1.1.4:
   optionalDependencies:
     nightmare "^3.0.2"
 
-geotiff@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/geotiff/-/geotiff-3.0.0.tgz#04468b02ed738dd333b34a1bcacd5814d83fb148"
-  integrity sha512-skoz9vd8ovTH1BUEt4Mzg2N0rcv3lQG+f57nokoPhIISg5bbmcX5okUe30avjfEuu0Yk24KZCr45nJvkUHBH1Q==
+geotiff@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/geotiff/-/geotiff-3.0.1.tgz#4da11f0f37c88eeb99a13c0e91f4efc966caf90a"
+  integrity sha512-QceP3jHk2g7kbFxSRMJvD0/knG+a/t46whujORtWw0l+HlaJPZXOzJlUEQC9sjHEba7G3TuNVT0or6pSoyqAHA==
   dependencies:
     "@petamoriken/float16" "^3.4.7"
     lerc "^3.0.0"
