@@ -40,7 +40,7 @@
     "@mui/material": "^7.3.8",
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/axios": "^4.0.1",
-    "@nestjs/common": "^11.1.15",
+    "@nestjs/common": "^11.1.16",
     "@nestjs/config": "^4.0.3",
     "@nestjs/core": "^11.1.15",
     "@nestjs/jwt": "^11.0.2",
