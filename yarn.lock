@@ -2775,10 +2775,10 @@
     "@emnapi/runtime" "^1.4.3"
     "@tybys/wasm-util" "^0.9.0"
 
-"@nestjs-modules/mailer@^2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@nestjs-modules/mailer/-/mailer-2.3.0.tgz#07fda7bf155dab332b1da4c8a15dafadb49c67fc"
-  integrity sha512-C9FQOz+GKSIgJKWfUVJHuOCfbhhcQxitHcH1+Gl/nSVR/w+PhvrC/dk4h+pwB//5KYe4aPeE7Ia1slgIVjeAJQ==
+"@nestjs-modules/mailer@^2.3.4":
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/@nestjs-modules/mailer/-/mailer-2.3.4.tgz#db85c386df99be79228dc9972ad26c9c3d8e2f78"
+  integrity sha512-0vPNAuXGFHERFphokC5RVDgRoqwUXvI3OTPNXonw74e4QQyntp25OKzS59EaXmQOCBiIuRglmWQaFPvEpP5tuw==
   dependencies:
     "@css-inline/css-inline" "0.20.0"
     glob "13.0.6"
@@ -2789,7 +2789,7 @@
     "@types/pug" "^2.0.10"
     ejs "^5.0.1"
     handlebars "^4.7.8"
-    liquidjs "^10.25.0"
+    liquidjs "^10.25.1"
     mjml "^5.0.0-alpha.4"
     nunjucks "^3.2.4"
     preview-email "^3.1.1"
@@ -9119,10 +9119,10 @@ linkify-it@5.0.0:
   dependencies:
     uc.micro "^2.0.0"
 
-liquidjs@^10.25.0:
-  version "10.25.1"
-  resolved "https://registry.yarnpkg.com/liquidjs/-/liquidjs-10.25.1.tgz#75472e266a1ec32986c5a6d98d40358c49372670"
-  integrity sha512-D+jsJvkGigFn8qNUgh8U6XNHhGFBp+p8Dk26ea/Hl+XrjFVSg9OXlN31hGAfS3MYQ3Kr8Xi9sEVBVQa/VTVSmg==
+liquidjs@^10.25.1:
+  version "10.25.2"
+  resolved "https://registry.yarnpkg.com/liquidjs/-/liquidjs-10.25.2.tgz#73258b4089d3bc466d224268e70335fe77646207"
+  integrity sha512-ZbgcjEjGNlAIjqhuMzymO3lCpHgmVMftKfrq4/YLLxmKaFFeQMXRGrJTqKX7OXX1hKVPUDpTIrvL7lxt3X/hmw==
   dependencies:
     commander "^10.0.0"
 
