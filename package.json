@@ -103,7 +103,7 @@
     "react-avatar-edit": "^1.2.0",
     "react-beautiful-dnd": "13.1.1",
     "react-contexify": "^6.0.0",
-    "react-cookie": "^8.0.1",
+    "react-cookie": "^8.1.0",
     "react-dnd": "^16.0.1",
     "react-dom": "^19.2.4",
     "react-draggable": "^4.5.0",
