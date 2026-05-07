@@ -105,7 +105,7 @@
     "react-contexify": "^6.0.0",
     "react-cookie": "^8.1.2",
     "react-dnd": "^16.0.1",
-    "react-dom": "^19.2.5",
+    "react-dom": "^19.2.6",
     "react-draggable": "^4.5.0",
     "react-hook-form": "^7.75.0",
     "react-hot-toast": "^2.6.0",
