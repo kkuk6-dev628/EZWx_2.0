@@ -130,7 +130,7 @@
     "swiper": "^12.1.4",
     "ts-morph": "^28.0.0",
     "tsimportlib": "^0.0.5",
-    "typeorm": "0.3.29"
+    "typeorm": "0.3.30"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.4.0",
