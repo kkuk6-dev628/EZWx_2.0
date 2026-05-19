@@ -2648,17 +2648,17 @@
     prop-types "^15.7.2"
     react-is "^16.8.0 || ^17.0.0"
 
-"@minoru/react-dnd-treeview@^3.5.3":
-  version "3.5.3"
-  resolved "https://registry.yarnpkg.com/@minoru/react-dnd-treeview/-/react-dnd-treeview-3.5.3.tgz#0e34a6aa3df1f28b7bd30d95c2ad025563edaa63"
-  integrity sha512-k9Hz99pLWR/0AMWYR4Hyda4jQjhfBz0dqqqLpk9apfbB7RthamjIJsKKobxgvA8d7ykbVRLCOlrWlRckP1uSkw==
+"@minoru/react-dnd-treeview@^3.5.4":
+  version "3.5.4"
+  resolved "https://registry.yarnpkg.com/@minoru/react-dnd-treeview/-/react-dnd-treeview-3.5.4.tgz#4d77984195aee28cb9f49e89fc6d88868dd54964"
+  integrity sha512-mUWYLLUzQ3WhYnN9DU0XlBWsS5mGVEFNUal34NN3O++/SwR4cF1hsmRqjq6B3IpJUdTYWqu8xjjnbTKa7CVUHQ==
   dependencies:
     "@juggle/resize-observer" "^3.4.0"
-    dnd-multi-backend "^8.1.2"
-    framer-motion "^11.17.0"
+    dnd-multi-backend "^9.0.0"
+    framer-motion "^12.38.0"
     react-dnd-html5-backend "^16.0.1"
     react-dnd-touch-backend "^16.0.1"
-    react-use-measure "^2.1.1"
+    react-use-measure "^2.1.7"
 
 "@mui/core-downloads-tracker@^7.3.9":
   version "7.3.9"
@@ -5758,11 +5758,6 @@ dayjs@^1.11.20:
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.20.tgz#88d919fd639dc991415da5f4cb6f1b6650811938"
   integrity sha512-YbwwqR/uYpeoP4pu043q+LTDLFBLApUP6VxRihdfNTqu4ubqMlGDLd6ErXhEgsyvY0K6nCs7nggYumAN+9uEuQ==
 
-debounce@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/debounce/-/debounce-1.2.1.tgz#38881d8f4166a5c5848020c11827b834bcb3e0a5"
-  integrity sha512-XRRe6Glud4rd/ZGQfiV1ruXSfbvfJedlV9Y6zOlP+2K04vBYiJEte6stfFkCP03aMnY5tsipamumUjL14fofug==
-
 debug@2.6.9, debug@^2.1.3, debug@^2.2.0, debug@^2.6.9:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
@@ -5958,10 +5953,10 @@ dnd-core@^16.0.1:
     "@react-dnd/invariant" "^4.0.1"
     redux "^4.2.0"
 
-dnd-multi-backend@^8.1.2:
-  version "8.1.2"
-  resolved "https://registry.yarnpkg.com/dnd-multi-backend/-/dnd-multi-backend-8.1.2.tgz#bf6a6ea9f6a9f5d58cabe12fd927753a753aeb92"
-  integrity sha512-KPDVEsiM+6gNEegqZYTWJQgJxYV4vB91tUrvoKJjaS0wwWqT/jNU0P7xJAwCue/cbasJNvk2dFZH7tC+bjX1Rg==
+dnd-multi-backend@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/dnd-multi-backend/-/dnd-multi-backend-9.0.0.tgz#e5b5e96051c179566f8b1fa3433b69f6a87e6434"
+  integrity sha512-BCUFes4x0LA2bZyEZFHeQzZ1CBZo6PB40zMOG/gNgICxjAZfN2jHgISowqkR1isdx/msUNzscxEb17SP7yc4KQ==
 
 doctypes@^1.1.0:
   version "1.1.0"
@@ -7000,13 +6995,13 @@ forwarded@0.2.0:
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.2.0.tgz#2269936428aad4c15c7ebe9779a84bf0b2a81811"
   integrity sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==
 
-framer-motion@^11.17.0:
-  version "11.17.0"
-  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-11.17.0.tgz#2c8fe7e008b3c5301efc6288a990cd5e73805353"
-  integrity sha512-uTNLH9JPMD3ad14WBt3KYRTR+If4tGPLgKTKTIIPaEBMkvazs6EkWNcmCh65qA/tyinOqIbQiuCorXX0qQsNoQ==
+framer-motion@^12.38.0:
+  version "12.39.0"
+  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-12.39.0.tgz#905f120cae5c769d7a8a83c9e25e079ba2617e35"
+  integrity sha512-+vnLfzrv0MzjLzNl+nvNvR7jdg3q4cxxjz/YvzfifHl0TREtL00cs1RoMTxs+1PzLiEqZGV6gYsBY0oEAYZ24w==
   dependencies:
-    motion-dom "^11.16.4"
-    motion-utils "^11.16.0"
+    motion-dom "^12.39.0"
+    motion-utils "^12.39.0"
     tslib "^2.4.0"
 
 fresh@^2.0.0:
@@ -9815,17 +9810,17 @@ moment@^2.12.0, moment@^2.29.4, moment@^2.30.1:
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.30.1.tgz#f8c91c07b7a786e30c59926df530b4eac96974ae"
   integrity sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==
 
-motion-dom@^11.16.4:
-  version "11.16.4"
-  resolved "https://registry.yarnpkg.com/motion-dom/-/motion-dom-11.16.4.tgz#7c18dbe8f8b0d4210a89992cda30f5926f003777"
-  integrity sha512-2wuCie206pCiP2K23uvwJeci4pMFfyQKpWI0Vy6HrCTDzDCer4TsYtT7IVnuGbDeoIV37UuZiUr6SZMHEc1Vww==
+motion-dom@^12.39.0:
+  version "12.39.0"
+  resolved "https://registry.yarnpkg.com/motion-dom/-/motion-dom-12.39.0.tgz#2a663bc8f572890d529e393114f4cf11824b0d0b"
+  integrity sha512-Xn7aAcGDhco/JZTXOub64UmaYn73C6J1Po7Fk+8EvkJsNGTqfhon6UJY53vJKXW5v5Zl8HrYsVxv6oPXeGoGLQ==
   dependencies:
-    motion-utils "^11.16.0"
+    motion-utils "^12.39.0"
 
-motion-utils@^11.16.0:
-  version "11.16.0"
-  resolved "https://registry.yarnpkg.com/motion-utils/-/motion-utils-11.16.0.tgz#e75865442278be49e411ca9105c9139edc572811"
-  integrity sha512-ngdWPjg31rD4WGXFi0eZ00DQQqKKu04QExyv/ymlC+3k+WIgYVFbt6gS5JsFPbJODTF/r8XiE/X+SsoT9c0ocw==
+motion-utils@^12.39.0:
+  version "12.39.0"
+  resolved "https://registry.yarnpkg.com/motion-utils/-/motion-utils-12.39.0.tgz#e1c66f0e912999804bc5e69b4630c3bc794ef29f"
+  integrity sha512-8nadJAJjTtqRkmRF36FoJTrywK9nnFmnPwnSMyxaOCU7GDjN9RTMJIxx9De8ErM+vpPhMccr/6fo5WciyQLnMQ==
 
 ms@2.0.0:
   version "2.0.0"
@@ -11583,12 +11578,10 @@ react-universal-interface@^0.6.2:
   resolved "https://registry.yarnpkg.com/react-universal-interface/-/react-universal-interface-0.6.2.tgz#5e8d438a01729a4dbbcbeeceb0b86be146fe2b3b"
   integrity sha512-dg8yXdcQmvgR13RIlZbTRQOoUrDciFVoSBZILwjE2LFISxZZ8loVJKAkuzswl5js8BHda79bIb2b84ehU8IjXw==
 
-react-use-measure@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/react-use-measure/-/react-use-measure-2.1.1.tgz#5824537f4ee01c9469c45d5f7a8446177c6cc4ba"
-  integrity sha512-nocZhN26cproIiIduswYpV5y5lQpSQS1y/4KuvUCjSKmw7ZWIS/+g3aFnX3WdBkyuGUtTLif3UTqnLLhbDoQig==
-  dependencies:
-    debounce "^1.2.1"
+react-use-measure@^2.1.7:
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/react-use-measure/-/react-use-measure-2.1.7.tgz#36b8a2e7fd2fa58109ab851b3addcb0aad66ad1d"
+  integrity sha512-KrvcAo13I/60HpwGO5jpW7E9DfusKyLPLvuHlUyP5zqnmAPhNc6qTRjUQrdTADl0lpPpDVU2/Gg51UlOGHXbdg==
 
 react-use@^17.6.0:
   version "17.6.0"
