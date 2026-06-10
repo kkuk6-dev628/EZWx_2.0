@@ -88,7 +88,7 @@
     "next": "^16.2.7",
     "next-pwa": "^5.6.0",
     "next-redux-wrapper": "^8.1.0",
-    "nodemailer": "^8.0.10",
+    "nodemailer": "^8.0.11",
     "nouislider-react": "^3.4.2",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
