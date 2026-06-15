@@ -71,7 +71,7 @@
     "geojson-to-svg": "^1.1.4",
     "geotiff": "^3.0.5",
     "google-auth-library": "^10.7.0",
-    "graphql": "^16.14.2",
+    "graphql": "^17.0.0",
     "handlebars": "^4.7.9",
     "jsonp": "^0.2.1",
     "leaflet": "^1.9.4",
