@@ -2944,10 +2944,10 @@
     "@emnapi/runtime" "^1.4.3"
     "@tybys/wasm-util" "^0.9.0"
 
-"@nestjs-modules/mailer@^2.3.6":
-  version "2.3.6"
-  resolved "https://registry.yarnpkg.com/@nestjs-modules/mailer/-/mailer-2.3.6.tgz#668a529a202ef897e0e230dd58276e4724819ae3"
-  integrity sha512-mk7+fNNzq74lVa+5hRMyrkcUvK/kptmPk7XstDURWjXGTgIRHVinQwK9Os9lX3L/FD3Ye93E8sF6uD48xJ8SPw==
+"@nestjs-modules/mailer@^2.3.7":
+  version "2.3.7"
+  resolved "https://registry.yarnpkg.com/@nestjs-modules/mailer/-/mailer-2.3.7.tgz#c1793db91131147f9fe00701936fae3345d715c2"
+  integrity sha512-7prUdL8rt7Lz9m/RP/PFvZHwYgAewDexQHLwy4kyYueksoTGGxOzu7q4N/4Q+SU2+hKLakasbHdw8GrvQJi85w==
   dependencies:
     "@css-inline/css-inline" "0.20.0"
     glob "13.0.6"
