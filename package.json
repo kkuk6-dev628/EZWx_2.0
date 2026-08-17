@@ -64,7 +64,7 @@
     "cros": "^1.1.0",
     "d3-scale": "^4.0.2",
     "detect-it": "^4.0.1",
-    "dexie": "^4.4.4",
+    "dexie": "^4.4.5",
     "dexie-react-hooks": "^4.4.0",
     "express": "^5.2.1",
     "fs": "^0.0.1-security",
