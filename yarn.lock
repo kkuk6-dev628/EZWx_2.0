@@ -5941,10 +5941,10 @@ dexie-react-hooks@^4.4.0:
   resolved "https://registry.yarnpkg.com/dexie-react-hooks/-/dexie-react-hooks-4.4.0.tgz#7229ef22b94d2c4e22007cee56c3a37ff2efa379"
   integrity sha512-ObLXBS5+4BJU8vtSvBx6b9fY6zZYgniAtwxzjCHsUQadgbqYN6935X2/1TWw4Rf2N1aZV1io5/ziox4vKuxABA==
 
-dexie@^4.4.4:
-  version "4.4.4"
-  resolved "https://registry.yarnpkg.com/dexie/-/dexie-4.4.4.tgz#ed75e818e6cb4a131a6956095f96f6669cfab464"
-  integrity sha512-jIwsYI8Os2hgnqc6O49YwFDKGc5v5QjGx0wPVp543ip1F53VFAKMLthV2pQosQcVTv3eAskTWYspOx195PM0FQ==
+dexie@^4.4.5:
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/dexie/-/dexie-4.4.5.tgz#0af5132d36ee4212d099dad0c1fa327fbadb1685"
+  integrity sha512-wWCHdihT3dmlUSuNhn5mMZDWSpG0suxjAni7YjjiZdzabZcKmy3uNZGZ7AeYYXBoLbpSXX35fikPLkPC44Osiw==
 
 dezalgo@^1.0.4:
   version "1.0.4"
