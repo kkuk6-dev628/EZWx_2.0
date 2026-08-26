@@ -7070,7 +7070,7 @@ fs@^0.0.1-security:
   resolved "https://registry.yarnpkg.com/fs/-/fs-0.0.1-security.tgz#8a7bd37186b6dddf3813f23858b57ecaaf5e41d4"
   integrity sha512-3XY9e1pP0CVEUCdj5BmfIZxRBTSDycnbqhIOGec9QYtmVH2fbLpj86CFWkrNOkt/Fvty4KZG5lTglL9j/gJ87w==
 
-fsevents@*, fsevents@^2.3.3:
+fsevents@^2.3.3:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.3.tgz#cac6407785d03675a2a5e1a5305c697b347d90d6"
   integrity sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==
@@ -11478,12 +11478,10 @@ react-multi-date-picker@^4.5.2:
     react-date-object "^2.1.8"
     react-element-popper "^2.1.6"
 
-react-prismazoom@^3.3.5:
-  version "3.3.5"
-  resolved "https://registry.yarnpkg.com/react-prismazoom/-/react-prismazoom-3.3.5.tgz#7bfcf0e13b48a3b5c004f31d75dfc1a6a03bd1b7"
-  integrity sha512-bpXY6Te325Ot11PzWAPrwrxi06CcJeKx9WOQvjdt+msmPOdgJgmvC70Khu+UG9Hur161TeNKNfepwvg0BT/USQ==
-  optionalDependencies:
-    fsevents "*"
+react-prismazoom@^3.3.6:
+  version "3.3.6"
+  resolved "https://registry.yarnpkg.com/react-prismazoom/-/react-prismazoom-3.3.6.tgz#3e99c27aba663e64a86dc96b243d896d5b1696a4"
+  integrity sha512-R8+NL4g0zB2jt0MwddxjV/xRHPlRbDaG0wYlXADjXfW0McFIazPCFr6+Hi0PyvFSgXS8xxNP1dq4xLHlOMpbVg==
 
 react-redux@^7.2.0:
   version "7.2.9"
