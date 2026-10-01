@@ -9916,10 +9916,10 @@ nodemailer@8.0.3:
   resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-8.0.3.tgz#6c5c10d3e70b8ca1b311646c4d03e1b206ef168c"
   integrity sha512-JQNBqvK+bj3NMhUFR3wmCl3SYcOeMotDiwDBvIoCuQdF0PvlIY0BH+FJ2CG7u4cXKPChplE78oowlH/Otsc4ZQ==
 
-nodemailer@^10.0.11:
-  version "10.0.11"
-  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-10.0.11.tgz#b605e8de1dbb2866a58e9717eb20daf47f438c52"
-  integrity sha512-/c4P7U7aGpiNu2Rl08q525q2zECkUpSaf2zQPgIStCcAjHAkkQQKwD4sTyi3l91mGcLQrKzL1syXPHymo+Ogtw==
+nodemailer@^10.0.12:
+  version "10.0.12"
+  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-10.0.12.tgz#f94e46bb0f450f515cca29ba1af139fb0d83a149"
+  integrity sha512-PQ46oNbNMuH/Sno7B5IWIU9etytwrO0xdTFvWXpIQFRXhBAXtzD48243AS+BCbQQTPD8y3fqUrgLn0tSo77gvg==
 
 nodemailer@^7.0.12:
   version "7.0.13"
