@@ -12420,10 +12420,10 @@ sumchecker@^1.2.0:
     debug "^2.2.0"
     es6-promise "^4.0.5"
 
-suncalc@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/suncalc/-/suncalc-2.0.2.tgz#d55959cc4414a177f77ea65f56563f23e7edb5a1"
-  integrity sha512-cedP91TuhxggoERke/jLkUVr/VMUifEMz1OkxfBZezvOFQdk8LSe9CFv7/Ov0Frn2tc2YUs+44oSrXeNEyTyGQ==
+suncalc@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/suncalc/-/suncalc-2.1.0.tgz#a5866acf1071edf6d6105f7b05120c471ab8c496"
+  integrity sha512-a+c8UJqY/yjVt0L15Npi2CAJL3lRKEvb5JZdGsRWDonWuPGse90G6LYduRkqH5LO9KXkyZoRFXDEchsMsob/IA==
 
 superagent@^10.3.0:
   version "10.3.0"
