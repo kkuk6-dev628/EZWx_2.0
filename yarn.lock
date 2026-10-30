@@ -8601,10 +8601,10 @@ mime@2.6.0:
   resolved "https://registry.yarnpkg.com/mime/-/mime-2.6.0.tgz#a2a682a95cd4d0cb1d6257e28f83da7e35800367"
   integrity sha512-USPkMeET31rOMiarsBNIHZKLGgvKc/LrjofAnBlOttf5ajRvqiRA8QsenbcooctK6d6Ts6aqZXBA+XbkKthiQg==
 
-mime@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/mime/-/mime-4.1.1.tgz#74423f8333766bf8ab91d9543c73bd864f3d5c38"
-  integrity sha512-YAApRsTpM2+gnUFHhRNGfkX8NK0V5xj1nyQLufGlwEI+eX4xRsTcel2IXDuMEGSGjBvzykNW4VuoEACgwYe7BQ==
+mime@^4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/mime/-/mime-4.1.2.tgz#b5ffeeebd449031c39d830a26c2e90d619a84888"
+  integrity sha512-ikRzZ2RwbUVDyL9SsU0f2Phcmav4yq5r8faH5ZZKHtOZrMBLnrQOrj0uvqZ5R1uQnj+RO7Wcklw/lAf81mP9LQ==
 
 mimic-fn@^2.1.0:
   version "2.1.0"
