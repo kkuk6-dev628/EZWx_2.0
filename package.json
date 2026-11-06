@@ -62,7 +62,7 @@
     "compression": "^1.8.2",
     "cookie-parser": "^1.4.7",
     "cros": "^1.1.0",
-    "d3-scale": "^4.0.2",
+    "d3-scale": "^4.0.3",
     "detect-it": "^4.0.1",
     "dexie": "^4.4.7",
     "dexie-react-hooks": "^4.4.0",
