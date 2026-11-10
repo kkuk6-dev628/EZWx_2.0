@@ -2909,12 +2909,12 @@
   dependencies:
     path-to-regexp "8.4.2"
 
-"@nestjs/testing@^12.3.2":
-  version "12.3.2"
-  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-12.3.2.tgz#cc6c2026032900d2e95df2ecbaf2b81ca1aedb28"
-  integrity sha512-l1m+uHTp4hJ1K+Gw8ENrLSj2TxZlKVre7aoluUdxMHCodK2kZnpjvD8H8Oh460hj/Z6PDJ/m9r6t8NIK6OyDxA==
+"@nestjs/testing@^12.4.0":
+  version "12.4.0"
+  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-12.4.0.tgz#9d2329efc9907f84cbf0b880fb5f176fded9e478"
+  integrity sha512-jRnK2OwXABrhkqrGL+hCxHO5IO1gpz0Zhew/ga3ND4dNqgTUAwLmntbnQo17uKo1V2oj2H5VsYamMqkixTma3g==
   dependencies:
-    tslib "2.8.1"
+    tslib "2.9.1"
 
 "@nestjs/typeorm@^12.0.3":
   version "12.0.3"
