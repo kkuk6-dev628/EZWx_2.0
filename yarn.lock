@@ -10889,10 +10889,10 @@ sumchecker@^1.2.0:
     debug "^2.2.0"
     es6-promise "^4.0.5"
 
-suncalc@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/suncalc/-/suncalc-2.1.2.tgz#52bf80a15cc82959fcd64734295ba1205484fcb3"
-  integrity sha512-ynVGhi3CUcgrfbhQNqe1k53uKLe1FUfZq0czOVA84ASwdB5HUrlZX6gQ9akcItor92CJB69Yg8F6VoUWqrTkiw==
+suncalc@^2.1.3:
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/suncalc/-/suncalc-2.1.3.tgz#861c24b1cf1bac7858dc2222bce069bf3742e5ef"
+  integrity sha512-7DWCsxPKRPMtylyGqSrgNBr+pseyczJGqb4NCpW2EziwNHaSuHc9w1lL4i91IyDw5CnPUWqBNBWyd/vFjr4rTw==
 
 superagent@^10.4.1:
   version "10.4.2"
