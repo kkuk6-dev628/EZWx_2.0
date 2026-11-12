@@ -70,7 +70,7 @@
     "fs": "^0.0.1-security",
     "geojson-to-svg": "^1.1.4",
     "geotiff": "^3.0.5",
-    "google-auth-library": "^11.3.3",
+    "google-auth-library": "^11.3.4",
     "graphql": "^17.1.0",
     "handlebars": "^4.7.10",
     "jsonp": "^0.2.1",
