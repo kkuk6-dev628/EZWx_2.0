@@ -8912,10 +8912,10 @@ node-releases@^2.0.8:
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-2.0.10.tgz#c311ebae3b6a148c89b1813fd7c4d3c024ef537f"
   integrity sha512-5GFldHPXVG/YZmFzJvKK2zDSzPKhEp0+ZR5SVaoSag9fsL5YgHbUHDfnG5494ISANDcK4KwPXAx2xqVEydmd7w==
 
-nodemailer@^10.4.0:
-  version "10.4.0"
-  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-10.4.0.tgz#7739a14f1de1af2c3d2761d8b00cc638df3611fb"
-  integrity sha512-fyy6r4Q5euRJ9Qr3Cts9K7SZrfe9zmz9oLOYiAR02MEJRDRci+99y0OoYBYBgpLffOqkkjXrB/d26VfiMje/kA==
+nodemailer@^10.5.0:
+  version "10.5.0"
+  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-10.5.0.tgz#5e18ac741f90ec321ad355a413faa442e32fbd7b"
+  integrity sha512-L/w/HH5MqpzMDuZD7fQdt/+KqymuvrpaApaIjAH2XA3ILePwlcvXCVVvP75xVrXCEt2ggK2marrrHHFB5Qu0kA==
 
 normalize-path@^3.0.0:
   version "3.0.0"
