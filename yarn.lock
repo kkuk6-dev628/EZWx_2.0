@@ -8154,10 +8154,10 @@ leaflet-responsive-popup@^1.0.0:
   resolved "https://registry.yarnpkg.com/leaflet-responsive-popup/-/leaflet-responsive-popup-1.0.0.tgz#5d6011debb46c339b0fe8c8e84da4ebf7229a699"
   integrity sha512-BEPnq057TyTtBH5I98SMWqH4p/Usi6yirWPUSIYI2EGjXN3/HbyTPjTmEe6Z2RXBTBzEN3nMC8ZkaRWQ0pWfeQ==
 
-leaflet-timedimension@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/leaflet-timedimension/-/leaflet-timedimension-1.1.1.tgz#35d3ecd980114d9a6f1463415a71a999e25530b1"
-  integrity sha512-ejXldN94veRsWka1vpC+4rbH+2+3d3ztn2xYx4jcXtjYDrKC/sNnoqCmyH2UEYIy51PI2851aI2k8uGdOEbhlw==
+leaflet-timedimension@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/leaflet-timedimension/-/leaflet-timedimension-1.2.0.tgz#cf4349373d82aeaaf569b52c322d23de87168d80"
+  integrity sha512-KRUTSic3KWuSiqpTQwis43kXA56JviRq/1lVAHFAnaqBZJsw0fM7wI5+9a9OCgiKmIfa+OxH3yHIkwfrWnFN9g==
   dependencies:
     iso8601-js-period "^0.2.1"
     leaflet "~0.7.4 || ~1"
